@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+
+<project name="ano-doc" default="all" basedir=".">
+	
+	<property name="output.dir" value="${basedir}/build"/>
+	<property name="classes.dir" value="${output.dir}/classes"/>
+
+	<property name="src" value="${basedir}/java"/>
+
+	<property name="lib.project" value="${basedir}/lib"/>
+
+	<property name="etc" value="${basedir}/etc"/>
+	<property name="html" value="${basedir}/web"/>
+
+	<property name="generation.output" value="${basedir}/generated"/>	
+
+	<property name="dist.dir" value="${basedir}/dist"/>
+	<property name="lib.dest" value="${dist.dir}/lib"/>
+	
+	<property name="javadoc.dest" value="${basedir}/../javadoc"/>
+	
+	<property name="project.name" value="ano-doc"/>
+	<property name="target.jar.name" value="ano-doc.jar"/>
+	
+	<target name="clean">
+		<delete dir="${output.dir}"/>
+	</target>
+
+	<target name="prepare">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${classes.dir}"/>
+	</target>
+	
+	<target name="compile" depends="prepare">
+		<javac destdir="${classes.dir}" srcdir="${src}" debug="on" deprecation="off" optimize="on">
+			<classpath>
+				<fileset dir="${lib.project}">
+					<include name="**/*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<jar jarfile="${dist.dir}/${target.jar.name}">
+         	<fileset dir="${classes.dir}">
+         		<include name="**/*"/>
+         	</fileset>
+		</jar>
+	</target>
+	
+	<target name="dist.clean" depends="clean">
+		<delete dir="${dist.dir}"/>
+	</target>
+
+	<target name="dist" depends="jar">
+	    <copy todir="${lib.dest}">
+	      <fileset dir="${lib.project}"/>
+	    </copy>
+	</target>
+	
+	<target name="all" depends="dist"/>
+	
+	<target name="javadoc" depends="compile">
+		<mkdir dir="${javadoc.dest}/${project.name}"/>
+	    <javadoc source="1.5" packagenames="de.payback.pt.*" 
+	    	private="true" author="true"
+	    	sourcepath="${src}" destdir="${javadoc.dest}/${project.name}" 
+	    	bottom="Copyright &#169; 2007 Loyalty Partners. All Rights Reserved.&lt;br/&gt;"
+		>
+		<classpath>
+	        <fileset dir="${lib.project}">
+	          <include name="**/*.jar"/>
+	        </fileset>
+	      </classpath>
+	      <tag name="created" scope="all" description="Created: " />
+	      <link href="http://java.sun.com/j2se/1.5.0/docs/api"/>
+	      <link href="http://struts.apache.org/1.x/struts-core/apidocs/"/>
+	      <link href="http://java.sun.com/products/servlet/2.2/javadoc/"/>
+	      <link href="http://www.jdom.org/docs/apidocs/"/>
+	      <link href="http://moskito.anotheria.net/javadoc/core/"/>
+	      <link href="http://moskito.anotheria.net/javadoc/web/"/>
+	    </javadoc>
+	</target>
+</project>
