@@ -454,6 +454,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         increaseIdent();
         ret += writeStatement("setProperty(i+1, ps, properties.get(i))");
         ret +=closeBlock();
+        ret += writeStatement("System.out.println(\"SQL: \"+SQL)");
         
         
         ret += writeStatement("ResultSet result = ps.executeQuery()");

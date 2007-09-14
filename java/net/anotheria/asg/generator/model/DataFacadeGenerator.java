@@ -143,7 +143,6 @@ public class DataFacadeGenerator
 			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
 				ret += writeImport("java.util.List");
 				ret += writeImport("java.util.ArrayList");
-				ret += writeImport("net.anotheria.anodoc.data.StringProperty");
 				listImported = true;
 				break;
 			}
@@ -153,7 +152,6 @@ public class DataFacadeGenerator
 				if (!listImported){
 					ret += writeImport("java.util.List");
 					ret += writeImport("java.util.ArrayList");
-					ret += writeImport("net.anotheria.anodoc.data.StringProperty");
 				}
 				break;
 			}
@@ -180,7 +178,7 @@ public class DataFacadeGenerator
 		ret += writeString("public interface "+doc.getName()+interfaceDecl+"{");
 		increaseIdent();
 //		ret += emptyline();
-//		ret += generatePropertyConstants(doc);
+		ret += generatePropertyConstants(doc);
 //		ret += emptyline();
 //		ret += generateDefaultConstructor(doc);
 //		ret += emptyline();

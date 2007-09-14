@@ -66,6 +66,8 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	    ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryResultEntry");
+	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
+	    
 	    ret += emptyline();
 	    ret += writeImport("org.jdom.Element");
 	    ret += emptyline();
@@ -195,8 +197,13 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	        
 	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value){");
 	        increaseIdent();
-	        ret += writeCommentLine("TODO not implemented");
-	        ret += writeStatement("throw new RuntimeException(\"+not yet implemented\")");
+			ret += writeStatement("QueryProperty p = new QueryProperty(propertyName, value)");
+			ret += writeString("try{");
+			ret += writeIncreasedStatement("return pService.get"+doc.getMultiple()+"ByProperty(p)");
+			ret += writeString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
+			ret += writeIncreasedStatement("throw new RuntimeException(\"Persistence failed: \"+e.getMessage())");
+			ret += writeString("}");
+			
 /*
 	        ret += writeStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()");
 	        ret += writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");

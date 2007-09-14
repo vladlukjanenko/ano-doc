@@ -195,8 +195,6 @@ public class DocumentGenerator extends AbstractGenerator
 		ret += writeString("public class "+getDocumentName(doc)+" extends Document "+interfaceDecl+"{");
 		increaseIdent();
 		ret += emptyline();
-		ret += generatePropertyConstants(doc);
-		ret += emptyline();
 		ret += generateDefaultConstructor(doc);
 		ret += emptyline();
 		ret += generateCloneConstructor(doc);

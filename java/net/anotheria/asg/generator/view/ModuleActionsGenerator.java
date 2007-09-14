@@ -175,6 +175,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    //write imports...
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
+	    ret += writeImport("net.anotheria.asg.util.decorators.IAttributeDecorator");
 	    ret += getStandardActionImports();
 	    ret += writeImport(context.getPackageName()+".data."+doc.getName());
 	    ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
@@ -213,12 +214,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 		}
 		
-		if (neededDecorators.size()>0){
-			for (int i=0; i<neededDecorators.size(); i++)
-				ret += writeImport(neededDecorators.get(i).getClassName());
-			ret += emptyline();
-		}
-		
 		if (section.getFilters().size()>0){
 			for (MetaFilter f : section.getFilters()){
 				ret += writeImport(f.getClassName());
@@ -245,7 +240,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			for (int i=0; i<elements.size();i++){
 				MetaViewElement element = (MetaViewElement)elements.get(i);
 				if (element.getDecorator()!=null){
-					ret += writeStatement("private "+element.getDecorator().getClassNameOnly()+" "+getDecoratorVariableName(element));
+					ret += writeStatement("private IAttributeDecorator "+getDecoratorVariableName(element));
 				}
 			}
 			ret += emptyline();
@@ -265,12 +260,18 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		if (containsComparable)
 			ret += writeStatement("sorter = new QuickSorter()");
 		if (containsDecorators){
+			ret += writeString("try{ ");
+			increaseIdent();
 			for (int i=0; i<elements.size();i++){
 				MetaViewElement element = elements.get(i);
 				if (element.getDecorator()!=null){
-					ret += writeStatement(getDecoratorVariableName(element)+" = new "+element.getDecorator().getClassNameOnly()+"()");
+					ret += writeStatement(getDecoratorVariableName(element)+" = (IAttributeDecorator)Class.forName("+quote(element.getDecorator().getClassName())+").newInstance()");
 				}
 			}
+			decreaseIdent();
+			ret += writeString("} catch(Exception e){");
+			ret += writeIncreasedStatement("log.fatal(\"Couldn't instantiate decorator:\", e)");
+			ret += writeString("}");
 		}
 	    //add filters
 	    for (MetaFilter f : section.getFilters()){

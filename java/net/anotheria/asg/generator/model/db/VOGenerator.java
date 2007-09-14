@@ -405,6 +405,13 @@ public class VOGenerator extends AbstractGenerator
 		String ret = "";
 		ret += writeString("public Object getPropertyValue(String propertyName){");
 		increaseIdent();
+		List <MetaProperty>properties = doc.getProperties();
+		for (MetaProperty p : properties){
+			ret += writeString("if ("+p.toNameConstant()+".equals(propertyName))");
+			ret += writeIncreasedStatement("return get"+p.getAccesserName()+"()");
+					
+		}
+
 		ret += writeStatement("throw new RuntimeException("+quote("Not yet implemented.")+")");
 		ret += closeBlock();
 		
