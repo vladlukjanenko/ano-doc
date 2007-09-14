@@ -1,0 +1,396 @@
+package net.anotheria.anodoc.data;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.jdom.Attribute;
+import org.jdom.Element;
+
+import net.anotheria.anodoc.service.IModuleFactory;
+import net.anotheria.anodoc.util.KeyUtility;
+
+/**
+ * This class describes a Module, which is a unity that can be stored
+ * and identified by the framework. Each module is identified by the 
+ * tuple (moduleId, ownerId, copyId). The moduleId (or just id) is used to determine 
+ * the proper factory and storage, the ownerId represents the owner of the module, which
+ * could be a user of the system or a content piece by content supporting functions (comments, netlogs, etc)
+ * and the copyId is used for multiple copies systems or for context separation.<br>
+ * A Module shouldn't be used directly, instead it should be extended and 
+ * enhanced with the methods that are needed for the business logic.  
+ */
+public class Module implements ICompositeDataObject, Serializable{
+	/**
+	 * The id of the module (moduleId).
+	 */
+	private String id;
+	
+	/**
+	 * Contained holders.
+	 */
+	private Hashtable<String,DataHolder> holders;
+	
+	/**
+	 * The id of the owner of this instance.
+	 */
+	private String ownerId;
+	
+	/**
+	 * The copy id.
+	 */
+	private String copyId;
+	
+	/**
+	 * log is transient, so it will not be transmitted via network in a 
+	 * distributed environment.
+	 */
+	private transient Logger log;
+
+	private static final long serialVersionUID = 4896753471545492611L;
+
+	/**
+	 * Returns the current logger. Creates one if needed.  
+	 */
+	protected Logger getLog(){
+		if (log==null)
+			log = Logger.getLogger(this.getClass());
+		return log;
+	}
+	
+	/**
+	 * The factory is mainly needed for document reassembling.
+	 */
+	private IModuleFactory moduleFactory;
+	
+	private char DELIMITER = '$';
+	
+	/**
+	 * Creates a new Module with given moduleId.
+	 * @param anId the id of the module.
+	 */
+	public Module(String anId){
+		this.id = anId;
+		holders = new Hashtable<String,DataHolder>();
+		getLog();//ensuring that logger is initialized.
+	}
+	
+	/**
+	 * Returns the document with given name (if there is any).
+	 */
+	public Document getDocument(String name) throws NoSuchDocumentException{
+		DataHolder doc = getDataHolder(name);
+		if (doc==null || (!(doc instanceof Document)))
+			throw new NoSuchDocumentException(name);
+		return (Document)doc;
+	}
+	
+	/**
+	 * Returns the documentlist with given name (if there is any).
+	 */
+	public DocumentList getList(String name) throws NoSuchDocumentListException{
+		DataHolder list = getDataHolder(name);
+		if (list==null || (!(list instanceof DocumentList)))
+			throw new NoSuchDocumentListException(name);
+		return (DocumentList)list;
+	}
+	
+	/**
+	 * Puts the given list into this module. 
+	 */
+	public void putList(DocumentList aList){
+		putDataHolder(aList);
+	}
+	
+	/**
+	 * Puts the given document into this module. 
+	 */
+	public void putDocument(Document aDoc){
+		putDataHolder(aDoc);
+	}
+	
+	/**
+	 * Puts the given data holder into this module. 
+	 */
+	private void putDataHolder(DataHolder holder){
+		holders.put(holder.getId(), holder);
+	}
+	
+	/**
+	 * Returns the data holder with given name (key). 
+	 */
+	private DataHolder getDataHolder(String key){
+		return holders.get(key);
+	}
+	
+		
+	
+	/**
+	 * Returns the ownerId.
+	 * @return String
+	 */
+	public String getOwnerId() {
+		return ownerId;
+	}
+
+	/**
+	 * Sets the ownerId.
+	 * @param ownerId The ownerId to set
+	 */
+	public void setOwnerId(String ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	/**
+	 * Returns the id.
+	 * @return String
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * Returns the copyId.
+	 * @return String
+	 */
+	public String getCopyId() {
+		return copyId;
+	}
+
+	/**
+	 * Sets the copyId.
+	 * @param copyId The copyId to set
+	 */
+	public void setCopyId(String copyId) {
+		this.copyId = copyId;
+	}
+	
+	/**
+	 * Returns the String representation of this Module entity.
+	 */
+	public String toString(){
+		return "Module:"+getId()+DELIMITER+ownerId+DELIMITER+copyId;//+" holders:"+holders;
+	}
+	
+	///////////////////
+	///// storage /////	
+	///////////////////
+	
+
+	/**
+	 * @see net.anotheria.anodoc.data.IStoreable#getKeys()
+	 */
+	public Enumeration getKeys() {
+		Enumeration allObjects = holders.elements();
+		Vector<String> keys = new Vector<String>();
+		while(allObjects.hasMoreElements()){
+			IBasicStoreableObject o = (IBasicStoreableObject)allObjects.nextElement();			
+			keys.add(o.getStorageId());
+		}
+		return keys.elements();
+	}
+
+	/**
+	 * @see net.anotheria.anodoc.data.IStoreable#getObject(Object)
+	 */
+	public Object getObject(String key) {
+		String myKey = key.substring(key.indexOf(IHelperConstants.DELIMITER)+1);
+		return holders.get(myKey);
+	}
+
+	/**
+	 * @see net.anotheria.anodoc.data.IBasicStoreableObject#getStorageId()
+	 */
+	public String getStorageId() {
+		return ""+id+DELIMITER+ownerId+DELIMITER+copyId;		
+	}
+	
+	/// restoring from container
+	/**
+	 * Retores this module from a container. When a Module is saved, 
+	 * it's not saved as is, but only it's contents (which recursively matches for contained documents too).
+	 * If a Module instance is loaded, it have to be reassembled which happens in this function.
+	 */
+	public void fillFromContainer(Hashtable container){
+		log.debug("Filling from container, this:"+this+" container:"+container);
+		Enumeration e = container.keys();
+		while(e.hasMoreElements()){
+			String key = (String)e.nextElement();
+			Object subContainer = container.get(key);
+			//System.err.println("Key:"+key);
+			DataHolder assembledData = null;
+			
+			if (KeyUtility.isDocument(key)){
+ 				assembledData = assembleDocument(key, subContainer, null);
+			}
+			if (KeyUtility.isList(key)){
+				assembledData = assembleList(key, subContainer);
+			}
+			
+			if (assembledData==null)
+				log.warn("Unsupported assemblee with key: "+key);
+			else
+				putDataHolder(assembledData);
+				
+		}
+		log.info("Assembled module:"+this);
+	}
+	
+	/**
+	 * Assembles a document, used by  fillFromContainer.
+	 * @param key	the key of the object.
+	 * @param o		the object which represented the assemblee (Hashtable for Document)
+	 * @param context	the context in which the resulting Document previously existed and will exists now.
+	 * @return the newly assembled Document
+	 */
+	private Document assembleDocument(String key, Object o, DataHolder context){
+		Hashtable myContainer = (Hashtable)o;
+		String myName = KeyUtility.getDocumentName(key);
+		
+		log.info("Assembling document with name:"+myName);
+		Document doc = context == null ?
+			 moduleFactory.createDocument(myName) :
+			 moduleFactory.createDocument(myName, context);
+		
+		//jetzt versuchen wir properties auszulesen!
+		Enumeration e = myContainer.keys();
+		while(e.hasMoreElements()){
+			String aKey = (String)e.nextElement();
+			Object anObj = myContainer.get(aKey);
+			
+			if (anObj instanceof Property){
+				doc.putProperty((Property)anObj);
+			}else{
+				//dirst decided...whether list or not...
+				Hashtable tmp = (Hashtable)anObj;
+				DataHolder containedHolder = null;
+				if (tmp.containsKey(IHelperConstants.IDENTIFIER_KEY) &&
+					((StringProperty)tmp.get(IHelperConstants.IDENTIFIER_KEY)).getString().equals(IHelperConstants.IDENTIFIER_DOCUMENT))
+					containedHolder = assembleDocument(aKey, anObj, doc);
+				else
+					containedHolder = assembleList(aKey, anObj);
+				doc.addDataHolder(containedHolder);
+				//System.err.println("YET Unsupported type!"+anObj.getClass());
+			}
+				
+		}
+		return doc;
+	}
+
+	/**
+	 * Assembles a list, used by  fillFromContainer.
+	 * @param key	the key of the object.
+	 * @param o		the object which represented the assemblee (Hashtable)
+	 * @return the newly assembled DocumentList
+	 */
+	private DocumentList assembleList(String key, Object o){
+		Hashtable myContainer = (Hashtable)o;
+		String myName = KeyUtility.getDocumentName(key);
+		
+		log.info("Assembling list with name:"+myName);
+		DocumentList list = moduleFactory.createDocumentList(myName);
+		
+		//jetzt versuchen wir properties auszulesen!
+		Enumeration e = myContainer.keys();
+		Document arr[] = new Document[myContainer.size()];
+		
+		while(e.hasMoreElements()){
+			String aKey = (String)e.nextElement();
+			Object anObj = myContainer.get(aKey);
+			
+			//wir koennen nur documents speichern...
+			
+			int pos = Integer.parseInt(KeyUtility.getListPos(aKey));
+			String docKey = KeyUtility.getKeyFromListKey(aKey);
+			Document doc = assembleDocument(docKey, anObj, list);
+			arr[pos] = doc;
+				
+				
+		}
+		
+		for (int i=0; i<arr.length; i++)
+			list.addDocument(arr[i]);
+
+		return list;
+		
+	}
+
+	/**
+	 * Returns the moduleFactory.
+	 * @return IModuleFactory
+	 */
+	public IModuleFactory getModuleFactory() {
+		return moduleFactory;
+	}
+
+	/**
+	 * Sets the moduleFactory.
+	 * @param moduleFactory The moduleFactory to set
+	 */
+	public void setModuleFactory(IModuleFactory myFactory) {
+		this.moduleFactory = myFactory;
+	}
+	
+	/**
+	 * Overwrite this to return some statistical information for netStats (activity module)
+	 * which would be save automatically on each module save.<br>
+	 * Return -1 if you don't want to provide any statistical information
+	 */	
+	public long getStatisticalInformation(){
+		return -1;
+	}
+	
+	/**
+	 * Returns the size of the module in bytes. Actually it checks the size of all contained Documents and DocumentLists 
+	 * and returns the cumulated value.
+	 * @return the size of the data in the module in bytes.
+	 */
+	public long getSizeInBytes(){
+		Enumeration dataHolders = holders.elements();
+		long sum = 0;
+		while (dataHolders.hasMoreElements()){
+			sum += ((DataHolder)dataHolders.nextElement()).getSizeInBytes();
+		}
+		return sum;
+	}
+	
+	/**
+	 * Returns the names of the holders contained in this module. 
+	 */
+	public Enumeration getHolderNames(){
+		return holders.keys();
+	}
+
+	protected IDHolder _getIdHolder(String docName){
+		try{
+			IDHolder h = (IDHolder)getDocument(docName);
+			return h;
+		}catch(NoSuchDocumentException e){}
+		return new IDHolder(docName);
+	}
+	
+	public Element toXMLElement(){
+		Element root = new Element("module");
+		
+		root.setAttribute(new Attribute("moduleId", getId()));
+		root.setAttribute(new Attribute("copyId", getCopyId()));
+		root.setAttribute(new Attribute("ownerId", getOwnerId()));
+		root.setAttribute(new Attribute("size", ""+getSizeInBytes()));
+		List<Element> containedObjects = new ArrayList<Element>();
+		
+		Collection<DataHolder> myDataHolders = holders.values();
+		for (DataHolder dh : myDataHolders){
+			containedObjects.add(dh.toXMLElement());
+		}
+		
+		root.setChildren(containedObjects);
+		
+		return root;
+	}
+
+}
