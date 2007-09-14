@@ -1,0 +1,91 @@
+/*
+ * Created on 17.03.2004
+ *
+ * To change the template for this generated file go to
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ */
+package net.anotheria.asg.generator.util;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import net.anotheria.util.StringUtils;
+
+/**
+ * @author lrosenberg
+ *
+ * To change the template for this generated type comment go to
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ */
+public class FileWriter {
+	
+	private static String BASE_DIR ;
+	
+	public static final String DEF_BASE_DIR = ".";
+	
+	static{
+		BASE_DIR = DEF_BASE_DIR;
+	}
+	
+	public static final void writeFile(String path, String fileName, String content){
+		writeFile(path, fileName, content, false);
+	}
+
+	public static final void writeFile(String path, String fileName, String content, boolean override){
+		if (content==null || content.length()==0){
+			//System.out.println("IGNORE emptyfile "+fileName );
+			return;
+		}
+		if (path==null)
+			path = "";
+		if (path.length()>0 && !path.endsWith("/"));
+			path += "/";
+			
+		File fDir = new File(BASE_DIR+"/"+path);
+		fDir.mkdirs();
+		File f = new File(BASE_DIR+"/"+path+fileName);
+		if (f.exists() && !override){
+			try{
+				FileInputStream fIn = new FileInputStream(f);
+				byte d[] = new byte[fIn.available()];
+				fIn.read(d);
+				fIn.close();
+				if (content.equals(new String(d))){
+					//System.out.println("Skipping "+f);
+					return;					
+				}
+					
+			}catch(IOException e){}
+		}
+		System.out.println("writing "+f);
+		try{
+		
+			FileOutputStream fOut = new FileOutputStream(f);
+			fOut.write(content.getBytes());
+			fOut.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public static final void writeJavaFile(String packageName, String className, String content){
+		String tokens[] = StringUtils.tokenize(packageName, '.');
+		String path = "";
+		for (int i=0; i<tokens.length; i++){
+			path += tokens[i];
+			if (i< tokens.length-1)
+				path += "/";
+		}
+		writeFile(path, className+".java", content, false);
+	}
+	
+	public static void setBaseDir(String aBaseDir){
+		BASE_DIR = aBaseDir;
+	}
+	
+	public static void main(String []a){
+		
+	}
+}
