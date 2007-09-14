@@ -63,8 +63,10 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
+	    ret += writeImport("java.util.HashMap");
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += writeImport("net.anotheria.util.Date");
+		ret += writeImport("net.anotheria.util.StringUtils");
 	    ret += writeImport(context.getPackageName()+".BasicService");
 	    
 	    List<FederatedModuleDef> federatedModules = module.getFederatedModules();
@@ -105,7 +107,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    ret += emptyline();
 	    
 	    ret += writeCommentLine("Federated services: ");
-    	ret += writeStatement("public static final String ID_DELIMITER = "+quote("-"));
+    	ret += writeStatement("public static final char ID_DELIMITER = '-'");
 	    for (FederatedModuleDef fedDef : federatedModules){
 	    	MetaModule target = targetModules.get(fedDef.getKey());
 	    	ret += writeStatement(ServiceGenerator.getInterfaceName(target)+" "+FEDERATION_VARIABLE_PREFIX+fedDef.getKey());
@@ -113,6 +115,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    	targetModules.put(fedDef.getKey(), target);
 	    }
 	    ret += emptyline();
+	    ret += writeStatement("private HashMap<String, Object> federatedServiceMap");
 	    
 	    ret += writeString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
@@ -125,10 +128,12 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    }
 	    
 	    //initialize federated servises;
+	    ret += writeStatement("federatedServiceMap = new HashMap<String, Object>("+federatedModules.size()+")");
 	    for (FederatedModuleDef fedDef : federatedModules){
 	    	MetaModule target = targetModules.get(fedDef.getKey());
 	    	ret += writeStatement(FEDERATION_VARIABLE_PREFIX+fedDef.getKey()+ " = "+ServiceGenerator.getFactoryName(target)+".create"+ServiceGenerator.getServiceName(target)+"()");
 	    	targetModules.put(fedDef.getKey(), target);
+	    	ret += writeStatement("federatedServiceMap.put("+quote(fedDef.getKey())+", "+FEDERATION_VARIABLE_PREFIX+fedDef.getKey()+")");
 	    }
 	    
 	    ret += closeBlock();
@@ -213,7 +218,14 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 
 	        ret += writeString("public "+doc.getName()+" get"+doc.getName()+"(String id){");
 	        increaseIdent();
-	        ret += writeStatement("throw new RuntimeException(\"not implemented.\")");
+	        ret += writeStatement("String tokens[] = StringUtils.tokenize(id, ID_DELIMITER)");
+	        
+	        for(FederatedDocumentMapping mapping : mappings){
+	        	ret += writeString("if (tokens[0].equals("+quote(mapping.getTargetKey())+")){");
+	        	ret += writeIncreasedStatement("return copy("+FEDERATION_VARIABLE_PREFIX+mapping.getTargetKey()+".get"+mapping.getTargetDocument()+"(tokens[1]))");
+	        	ret += writeString("}");
+	        }
+	        ret += writeStatement("throw new RuntimeException("+quote("Unknown federated key: ")+"+tokens[0]+"+quote(" in ")+"+id)");
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
