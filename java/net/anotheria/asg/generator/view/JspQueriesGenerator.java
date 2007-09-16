@@ -35,11 +35,11 @@ public class JspQueriesGenerator
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		MetaView view = (MetaView)g;
 	
-		FileEntry menu = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getMenuName(view), generateMenu(view));
+		FileEntry menu = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(MetaModule.SHARED)), getMenuName(view), generateMenu(view));
 		menu.setType(".jsp");
 		files.add(menu);
 
-		FileEntry footer = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getFooterName(view), generateFooter(view, FOOTER_SELECTION_QUERIES));
+		FileEntry footer = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(MetaModule.SHARED)), getFooterName(view), generateFooter(view, FOOTER_SELECTION_QUERIES));
 		footer.setType(".jsp");
 		files.add(footer);
 
@@ -50,7 +50,7 @@ public class JspQueriesGenerator
 			MetaModuleSection section = (MetaModuleSection)s;
 			MetaDocument doc = section.getDocument();
 			if (doc.getLinks().size()>0){
-				FileEntry showQueryFile = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getShowQueriesPageName(section.getDocument()), generateShowQueriesPage(section, view));
+				FileEntry showQueryFile = new FileEntry(FileEntry.package2path(getContext().getPackageName(doc)+".jsp"), getShowQueriesPageName(section.getDocument()), generateShowQueriesPage(section, view));
 				showQueryFile.setType(".jsp");
 				files.add(showQueryFile);
 			}
@@ -141,7 +141,7 @@ public class JspQueriesGenerator
 	
 
 	private String getMenuName(MetaView view){
-		return StringUtils.capitalize(view.getName())+"QueriesMenu";		
+		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"QueriesMenu";		
 	}
 
 	private String generateMenu(MetaView view){
@@ -179,6 +179,6 @@ public class JspQueriesGenerator
 	}
 	
 	private String getFooterName(MetaView view){
-		return StringUtils.capitalize(view.getName())+"QueryFooter";		
+		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"QueryFooter";		
 	}
 }

@@ -34,6 +34,22 @@ public class Context {
 		return packageName;
 	}
 	
+	public String getJspPackageName(MetaDocument doc){
+		return getJspPackageName(doc.getParentModule());
+	}
+	
+	public String getJspPackageName(MetaModule module){
+		return getPackageName(module)+".jsp";
+	}
+
+	public String getServicePackageName(MetaDocument doc){
+		return getServicePackageName(doc.getParentModule());
+	}
+	
+	public String getServicePackageName(MetaModule module){
+		return getPackageName(module)+".service";
+	}
+	
 	public String getPackageName(MetaModule module){
 		return packageName+"."+module.getName().toLowerCase();
 	}

@@ -29,7 +29,7 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 		
 		MetaView view = (MetaView)g;
 		String ret = generateViewAction(view, context);
-		return new FileEntry(FileEntry.package2path(context.getPackageName()+".action"), getViewActionName(view),ret);
+		return new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".action"), getViewActionName(view),ret);
 	}
 	
 	public static String getViewActionName(MetaView view){
@@ -53,7 +53,7 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 
 		
 
-		ret += writeStatement("package "+context.getPackageName()+".action");
+		ret += writeStatement("package "+context.getPackageName(MetaModule.SHARED)+".action");
 		ret += emptyline();
 		
 		ret += writeImport("java.util.List");

@@ -1148,7 +1148,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 	    ret += writeStatement("package "+getPackage(section.getModule()));
 	    ret += emptyline();
-	    ret += writeImport(context.getTopPackageName()+".action."+BaseViewActionGenerator.getViewActionName(view));
+	    ret += writeImport(context.getPackageName(MetaModule.SHARED)+".action."+BaseViewActionGenerator.getViewActionName(view));
 	    ret += emptyline();
 	    
 	    ret += writeString("public abstract class "+getBaseActionName(section)+" extends "+BaseViewActionGenerator.getViewActionName(view)+" {");
@@ -1192,6 +1192,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    return context.getPackageName(module)+".action";
 	}
 	
+	public static String getPackage(Context context, MetaDocument doc){
+	    return context.getPackageName(doc)+".action";
+	}
+
 	public static String getServiceInstanceName(MetaModule module){
 	    return module.getName().toLowerCase()+"Service";
 	}

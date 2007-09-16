@@ -29,7 +29,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		String ret = generateBaseAction(context, views);
 		
 		
-		return new FileEntry(FileEntry.package2path(context.getPackageName()+".action"), getBaseActionName(context),ret);
+		return new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".action"), getBaseActionName(context),ret);
 	}
 	
 	public static String getBaseActionName(Context context){
@@ -54,7 +54,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 			}		
 		}
 
-		ret += writeStatement("package "+context.getPackageName()+".action");
+		ret += writeStatement("package "+context.getPackageName(MetaModule.SHARED)+".action");
 		ret += emptyline();
 		
 		ret += writeImport("net.anotheria.webutils.actions.*");

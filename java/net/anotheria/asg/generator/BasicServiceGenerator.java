@@ -20,6 +20,8 @@ package net.anotheria.asg.generator;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anotheria.asg.generator.meta.MetaModule;
+
 
 /**
  * TODO Please remain lrosenberg to comment AbstractServiceGenerator.java
@@ -32,8 +34,8 @@ public class BasicServiceGenerator extends AbstractGenerator{
 	public List<FileEntry> generate(List modules, Context context){
 		List<FileEntry> ret = new ArrayList<FileEntry>(); 
 		
-		ret.add(new FileEntry(FileEntry.package2path(context.getPackageName()), "BasicService", generateBasicService(modules, context)));
-		ret.add(new FileEntry(FileEntry.package2path(context.getPackageName()), "BasicCMSService", generateBasicCMSService(modules, context)));
+		ret.add(new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".service"), "BasicService", generateBasicService(modules, context)));
+		ret.add(new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".service"), "BasicCMSService", generateBasicCMSService(modules, context)));
 		
 		return ret;
 	}
@@ -43,7 +45,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		
 		String ret = "";
 		
-		ret += writeStatement("package "+context.getPackageName());
+		ret += writeStatement("package "+context.getPackageName(MetaModule.SHARED)+".service");
 		ret += emptyline();
 
 
@@ -118,7 +120,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		
 		String ret = "";
 		
-		ret += writeStatement("package "+context.getPackageName());
+		ret += writeStatement("package "+context.getPackageName(MetaModule.SHARED)+".service");
 		ret += emptyline();
 
 		ret += writeImport("net.anotheria.anodoc.data.Module");

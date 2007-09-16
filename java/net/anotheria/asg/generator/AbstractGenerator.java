@@ -156,10 +156,6 @@ public class AbstractGenerator{
 	    return ret;
 	}
 
-	public static final String getVersion(){
-		return "1.0";
-	}
-
 	protected static List<MetaViewElement> createMultilingualList(List<MetaViewElement> source, MetaDocument doc, Context context){
 		List<MetaViewElement> ret = new ArrayList<MetaViewElement>();
 		for (MetaViewElement e : source){

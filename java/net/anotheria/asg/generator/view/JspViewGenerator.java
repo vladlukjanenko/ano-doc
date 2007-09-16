@@ -19,6 +19,7 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
 import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaListProperty;
+import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
@@ -54,15 +55,15 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		MetaView view = (MetaView)g;
 		
-		FileEntry menu = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getMenuName(view), generateMenu(view));
+		FileEntry menu = new FileEntry(FileEntry.package2path(getContext().getPackageName(MetaModule.SHARED)+".jsp"), getMenuName(view), generateMenu(view));
 		menu.setType(".jsp");
 		files.add(menu);
 		
-		FileEntry footer = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getFooterName(view), generateFooter(view, FOOTER_SELECTION_CMS));
+		FileEntry footer = new FileEntry(FileEntry.package2path(getContext().getPackageName(MetaModule.SHARED)+".jsp"), getFooterName(view), generateFooter(view, FOOTER_SELECTION_CMS));
 		footer.setType(".jsp");
 		files.add(footer);
 		
-		FileEntry searchResultPage = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getSearchResultPageName(), generateSearchPage());
+		FileEntry searchResultPage = new FileEntry(FileEntry.package2path(getContext().getPackageName(MetaModule.SHARED)+".jsp"), getSearchResultPageName(), generateSearchPage());
 		searchResultPage.setType(".jsp");
 		files.add(searchResultPage);
 
@@ -74,15 +75,15 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			if (!(s instanceof MetaModuleSection))
 				continue;
 			MetaModuleSection section = (MetaModuleSection)s;
-			FileEntry sectionFile = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getShowPageName(section.getDocument()), generateSection(section, view));
+			FileEntry sectionFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getShowPageName(section.getDocument()), generateSection(section, view));
 			sectionFile.setType(".jsp");
 			files.add(sectionFile);
 			
-			FileEntry csvExportFile = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getExportAsCSVPageName(section.getDocument()), generateCSVExport(section, view));
+			FileEntry csvExportFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getExportAsCSVPageName(section.getDocument()), generateCSVExport(section, view));
 			csvExportFile.setType(".jsp");
 			files.add(csvExportFile);
 
-			FileEntry xmlExportFile = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getExportAsXMLPageName(section.getDocument()), generateXMLExport(section, view));
+			FileEntry xmlExportFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getExportAsXMLPageName(section.getDocument()), generateXMLExport(section, view));
 			xmlExportFile.setType(".jsp");
 			files.add(xmlExportFile);
 
@@ -90,7 +91,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			for (int d=0; d<dialogs.size(); d++){
 				MetaDialog dialog = dialogs.get(d);
 				
-				FileEntry dialogFile = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getDialogName(dialog, section.getDocument()), generateDialog(dialog, section, view));
+				FileEntry dialogFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getDialogName(dialog, section.getDocument()), generateDialog(dialog, section, view));
 				dialogFile.setType(".jsp");
 				files.add(dialogFile);
 			}
@@ -99,7 +100,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			for (int p=0; p<doc.getProperties().size(); p++){
 				MetaProperty pp = doc.getProperties().get(p);
 				if (pp instanceof MetaContainerProperty){
-				    FileEntry entry = new FileEntry(FileEntry.package2path(getContext().getPackageName()+".jsp"), getContainerPageName(doc, (MetaContainerProperty)pp), generateContainerPage(doc, (MetaContainerProperty)pp)); 
+				    FileEntry entry = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getContainerPageName(doc, (MetaContainerProperty)pp), generateContainerPage(doc, (MetaContainerProperty)pp)); 
 					entry.setType(".jsp");
 				    files.add(entry);
 				}
@@ -112,11 +113,11 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	}
 	
 	private String getMenuName(MetaView view){
-		return StringUtils.capitalize(view.getName())+"Menu";		
+		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"Menu";		
 	}
 	
 	private String getFooterName(MetaView view){
-		return StringUtils.capitalize(view.getName())+"Footer";		
+		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"Footer";		
 	}
 
 

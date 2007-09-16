@@ -50,7 +50,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	    ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += writeImport("net.anotheria.util.Date");
-	    ret += writeImport(context.getTopPackageName()+".BasicService");
+	    ret += writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
 	    ret += emptyline();
 	    ret += writeImport(JDBCPersistenceServiceGenerator.getInterfaceImport(context, module));
 	    ret += writeImport(JDBCPersistenceServiceGenerator.getFactoryImport(context, module));

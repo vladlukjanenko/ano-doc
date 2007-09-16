@@ -30,7 +30,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = context.getPackageName(mod)+".service";
+		String packageName = getPackageName(mod);
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
@@ -41,7 +41,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	}
 	
 	private String getPackageName(MetaModule module){
-		return context.getPackageName(module)+".service";
+		return context.getServicePackageName(module);
 	}
 	
 	public static final String FEDERATION_VARIABLE_PREFIX = "federated";
@@ -65,7 +65,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += writeImport("net.anotheria.util.Date");
 		ret += writeImport("net.anotheria.util.StringUtils");
-	    ret += writeImport(context.getTopPackageName()+".BasicService");
+	    ret += writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
 	    
 	    List<FederatedModuleDef> federatedModules = module.getFederatedModules();
 	    Map<String,MetaModule> targetModules = new HashMap<String, MetaModule>();

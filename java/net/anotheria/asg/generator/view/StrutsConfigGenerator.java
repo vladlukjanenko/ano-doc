@@ -212,54 +212,54 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	    
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_SHOW),
-	            ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getContainerShowActionName(doc, container),
+	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerShowActionName(doc, container),
 	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
 	            );
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_DELETE),
-	            ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getContainerDeleteEntryActionName(doc, container),
+	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerDeleteEntryActionName(doc, container),
 	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
 	            );
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_MOVE_UP),
-	            ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getContainerMoveUpEntryActionName(doc, container),
+	            ModuleActionsGenerator.getPackage(context,doc )+"."+ModuleActionsGenerator.getContainerMoveUpEntryActionName(doc, container),
 	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
 	            );
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_MOVE_DOWN),
-	            ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getContainerMoveDownEntryActionName(doc, container),
+	            ModuleActionsGenerator.getPackage(context,doc)+"."+ModuleActionsGenerator.getContainerMoveDownEntryActionName(doc, container),
 	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
 	            );
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_MOVE_TOP),
-	            ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getContainerMoveTopEntryActionName(doc, container),
+	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerMoveTopEntryActionName(doc, container),
 	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
 	            );
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_MOVE_BOTTOM),
-	            ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getContainerMoveBottomEntryActionName(doc, container),
+	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerMoveBottomEntryActionName(doc, container),
 	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
 	            );
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_ADD),
-	            ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getContainerAddEntryActionName(doc, container),
+	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerAddEntryActionName(doc, container),
 	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
 	            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
 	            getContainerEntryFormName(doc, container)
 	            );
 	    
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_QUICK_ADD),
-	            ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getContainerQuickAddActionName(doc, container),
+	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerQuickAddActionName(doc, container),
 	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
 	            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
 	            getContainerQuickAddFormName(doc, container)
 	            );
@@ -275,54 +275,54 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_SHOW), 
-			ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getShowActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getShowActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 			);
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_SEARCH), 
-			ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getSearchActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getSearchActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getSearchResultPageName()+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getSearchResultPageName()+".jsp"
 			);
 		
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_EXPORT+SUFFIX_CSV), 
-			ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getShowActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getShowActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getExportAsCSVPageName(doc)+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getExportAsCSVPageName(doc)+".jsp"
 			);
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_EXPORT+SUFFIX_XML), 
-			ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getShowActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getShowActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getExportAsXMLPageName(doc)+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getExportAsXMLPageName(doc)+".jsp"
 			);
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_DELETE), 
-			ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getDeleteActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getDeleteActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 			);
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_DUPLICATE), 
-			ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getDuplicateActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getDuplicateActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 			);
 		
 		if (doc.getLinks().size()>0){
 			ret += generateActionMapping(
 					"/"+getPath(doc, ACTION_SHOW_QUERIES), 
-					ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getShowQueryActionName(section),
+					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getShowQueryActionName(section),
 					"success",
-					FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowQueriesPageName(doc)+".jsp"
+					FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowQueriesPageName(doc)+".jsp"
 					);
 			ret += generateActionMapping(
 					"/"+getPath(doc, ACTION_EXECUTE_QUERY), 
-					ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getExecuteQueryActionName(section),
+					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getExecuteQueryActionName(section),
 					"success",
-					FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
+					FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 					);
 		}
 		
@@ -341,47 +341,47 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		if (generateWithForms){
 			ret += generateActionMapping(
 				"/"+getPath(doc, ACTION_CREATE), 
-				ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getCreateActionName(section),
+				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getCreateActionName(section),
 				"success",
-				FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp",
+				FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp",
 				JspViewGenerator.getEditPageName(doc)+".jsp",
 				getDialogFormName(dialog, doc)				
 				);
 			ret += generateActionMapping(
 				"/"+getPath(doc, ACTION_UPDATE), 
-				ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getUpdateActionName(section),
+				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getUpdateActionName(section),
 				"success",
-				FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp",
+				FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp",
 				JspViewGenerator.getEditPageName(doc)+".jsp",
 				getDialogFormName(dialog, doc)				
 				);
 		}else{
 			ret += generateActionMapping(
 				"/"+getPath(doc, ACTION_CREATE), 
-				ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getCreateActionName(section),
+				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getCreateActionName(section),
 				"success",
-				FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
+				FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 				);
 			ret += generateActionMapping(
 				"/"+getPath(doc, ACTION_UPDATE), 
-				ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getUpdateActionName(section),
+				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getUpdateActionName(section),
 				"success",
-				FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
+				FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 				);
 			
 		}
 		
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_NEW), 
-			ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getNewActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getNewActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
 			);
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_EDIT), 
-			ModuleActionsGenerator.getPackage(context)+"."+ModuleActionsGenerator.getEditActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getEditActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
 			);
 		
 		

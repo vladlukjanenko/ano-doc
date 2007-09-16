@@ -36,7 +36,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 	private FileEntry generateConfigurator(List<MetaModule> modules, Context context){
 		String ret = "";
 		
-		ret += writeStatement("package "+context.getTopPackageName());
+		ret += writeStatement("package "+context.getServicePackageName(MetaModule.SHARED));
 
 
 		ret += writeImport("net.anotheria.anodoc.service.IModuleFactory");
@@ -97,14 +97,14 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 		ret += closeBlock();
 		ret += closeBlock();
 			
-		return new FileEntry(FileEntry.package2path(context.getPackageName()), getConfiguratorClassName(),ret);
+		return new FileEntry(FileEntry.package2path(context.getServicePackageName(MetaModule.SHARED)), getConfiguratorClassName(),ret);
 		
 	}
 	
 	private FileEntry generateExporter(List<MetaModule> modules, Context context){
 		String ret = "";
 		
-		ret += writeStatement("package "+context.getTopPackageName());
+		ret += writeStatement("package "+context.getServicePackageName(MetaModule.SHARED));
 		
 		/*ret += writeImport("net.anotheria.anodoc.service.IModuleFactory");
 		ret += writeImport("net.anotheria.anodoc.service.IModuleService");
@@ -246,7 +246,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 		ret += closeBlock();
 		
 
-		return new FileEntry(FileEntry.package2path(context.getPackageName()), getExporterClassName(context),ret);
+		return new FileEntry(FileEntry.package2path(context.getServicePackageName(MetaModule.SHARED)), getExporterClassName(context),ret);
 		
 	}
 

@@ -50,7 +50,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = context.getPackageName(mod)+".service";
+		String packageName = context.getServicePackageName(mod);
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
