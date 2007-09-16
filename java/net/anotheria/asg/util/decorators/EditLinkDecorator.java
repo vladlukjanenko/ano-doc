@@ -1,5 +1,6 @@
 package net.anotheria.asg.util.decorators;
 
+import net.anotheria.anodoc.data.NoSuchPropertyException;
 import net.anotheria.asg.data.DataObject;
 import net.anotheria.asg.util.decorators.IAttributeDecorator;
 
@@ -15,7 +16,10 @@ public class EditLinkDecorator implements IAttributeDecorator{
 		String docName = obj.getDefinedName().toLowerCase();//Character.toLowerCase(obj.getDefinedName().charAt(0))+obj.getDefinedName().substring(1);
 		String linkTarget = docName+"Edit?ts="+System.currentTimeMillis()+"&pId="+obj.getId();
 		
-		String caption = ""+obj.getPropertyValue(attributeName);
+		String caption = "NoProp";
+		try{
+			caption = ""+obj.getPropertyValue(attributeName);
+		}catch(NoSuchPropertyException e){}
 		
 		if (linkTarget==null)
 			return caption;
