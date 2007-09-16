@@ -35,14 +35,14 @@ public class FederationVOGenerator extends AbstractGenerator
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDocumentImplName(doc), generateDocument(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentImplName(doc), generateDocument(doc)));
 		//_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getSortTypeName(doc), generateSortType(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
 		return _ret;
 	}
 	
-	private String getPackageName(){
-		return context.getPackageName()+".data";
+	private String getPackageName(MetaDocument doc){
+		return context.getPackageName(doc)+".data";
 	}
 	
 	public static String getDocumentImplName(MetaDocument doc){
@@ -79,7 +79,7 @@ public class FederationVOGenerator extends AbstractGenerator
 		String ret = "";
 		
 	
-		ret += writeStatement("package "+getPackageName());
+		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 
 		boolean listImported = false;
@@ -616,7 +616,7 @@ public class FederationVOGenerator extends AbstractGenerator
 		String ret = "";
 		
 	
-		ret += writeStatement("package "+getPackageName());
+		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 
 		

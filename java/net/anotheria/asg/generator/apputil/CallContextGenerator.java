@@ -88,7 +88,7 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 	}
 	
 	private static String getPackageName(Context context){
-		return context.getPackageName()+".util";
+		return context.getTopPackageName()+".util";
 	}
 
 	public static final String getFullFactoryName(Context c){

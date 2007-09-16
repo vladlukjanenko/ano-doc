@@ -50,7 +50,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = context.getPackageName()+".service";
+		String packageName = context.getPackageName(mod)+".service";
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
@@ -78,8 +78,8 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		return ret;
 	}
 	
-	private String getPackageName(){
-		return context.getPackageName()+".service";
+	private String getPackageName(MetaModule module){
+		return context.getPackageName(module)+".service";
 	}
 	
 	private String generateInterface(MetaModule module){
@@ -87,7 +87,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    
 	    ret += CommentGenerator.generateJavaTypeComment(getInterfaceName(module));
  
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("net.anotheria.util.sorter.SortType");
@@ -96,7 +96,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    List docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        ret += writeImport(context.getPackageName()+".data."+doc.getName());
+	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    }
 	    ret += emptyline();
 	    
@@ -158,7 +158,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 
 		ret += CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+".");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
@@ -372,7 +372,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 
 		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    
 	    ret += writeString("public class "+getFactoryName(module)+"{");
@@ -394,19 +394,39 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    return "I"+getServiceName(m);
 	}
 	
+	public static String getInterfaceImport(Context ctx, MetaModule m){
+		return getPackageName(ctx,m)+"."+getInterfaceName(m);
+	}
+	
 	public static String getServiceName(MetaModule m){
 	    return m.getName()+"Service";
 	}
+	
+	
 
 	public static String getFactoryName(MetaModule m){
 	    return getServiceName(m)+"Factory";
 	}
 	
+	public static String getFactoryImport(Context ctx, MetaModule m){
+	    return getPackageName(ctx, m)+"."+getFactoryName(m);
+	}
+
 	public static String getImplementationName(MetaModule m){
 	    return getServiceName(m)+"Impl";
 	}
 	
+	
+	
+	/**
+	 * @deprecated
+	 * @param context
+	 * @return
+	 */
 	public static String getPackageName(Context context){
 	    return context.getPackageName()+".service";
+	}
+	public static String getPackageName(Context context, MetaModule module){
+	    return context.getPackageName(module)+".service";
 	}
 }

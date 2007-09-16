@@ -3,6 +3,9 @@ package net.anotheria.asg.generator;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaModule;
+
 /**
  * TODO please remined another to comment this class
  * @author another
@@ -20,10 +23,23 @@ public class Context {
 	private String defaultLanguage;
 	
 	/**
+	 * @deprecated use getPackageName(MetaModule m);
 	 * @return
 	 */
 	public String getPackageName() {
 		return packageName;
+	}
+	
+	public String getTopPackageName(){
+		return packageName;
+	}
+	
+	public String getPackageName(MetaModule module){
+		return packageName+"."+module.getName().toLowerCase();
+	}
+	
+	public String getPackageName(MetaDocument doc){
+		return getPackageName(doc.getParentModule());
 	}
 
 	/**

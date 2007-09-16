@@ -15,6 +15,7 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
@@ -22,7 +23,7 @@ import net.anotheria.util.StringUtils;
  * TODO please remined another to comment this class
  * @author another
  */
-public class DocumentGenerator extends AbstractGenerator
+public class DocumentGenerator extends AbstractDataObjectGenerator
 	implements IGenerator{
 
 	public static final String PROPERTY_DECLARATION = "public static final String ";	
@@ -37,14 +38,9 @@ public class DocumentGenerator extends AbstractGenerator
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDocumentName(doc), generateDocument(doc)));
-		//_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getSortTypeName(doc), generateSortType(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentName(doc), generateDocument(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
 		return _ret;
-	}
-	
-	private String getPackageName(){
-		return context.getPackageName()+".data";
 	}
 	
 	public static String getDocumentName(MetaDocument doc){
@@ -150,7 +146,7 @@ public class DocumentGenerator extends AbstractGenerator
 		String ret = "";
 		
 	
-		ret += writeStatement("package "+getPackageName());
+		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 
 		ret += writeImport("net.anotheria.anodoc.data.Document");
@@ -423,12 +419,12 @@ public class DocumentGenerator extends AbstractGenerator
 	}
 	
 	public static final String getDocumentImport(Context context, MetaDocument doc){
-		return context.getPackageName()+".data."+getDocumentImplName(doc);
+		return context.getPackageName(doc)+".data."+getDocumentImplName(doc);
 	}
 	
 
 	public static final String getSortTypeImport(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".data."+getSortTypeName(doc);
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data."+getSortTypeName(doc);
 	}
 	
 	private String generateAdditionalMethods(MetaDocument doc){
@@ -640,7 +636,7 @@ public class DocumentGenerator extends AbstractGenerator
 		String ret = "";
 		
 	
-		ret += writeStatement("package "+getPackageName());
+		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 
 		

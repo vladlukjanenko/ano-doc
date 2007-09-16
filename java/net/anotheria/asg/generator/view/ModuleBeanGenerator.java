@@ -35,6 +35,7 @@ import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
 import net.anotheria.asg.generator.meta.MetaListProperty;
+import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
@@ -75,21 +76,21 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		
 		//System.out.println("Generate section: "+section);
 		
-		files.add(new FileEntry(FileEntry.package2path(getPackage()), getListItemBeanName(section.getDocument()), generateListItemBean(section)));
+		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getListItemBeanName(section.getDocument()), generateListItemBean(section)));
 		String sortTypeContent = generateListItemSortType(section);
 		if (sortTypeContent!=null)
-			files.add(new FileEntry(FileEntry.package2path(getPackage()), getListItemBeanSortTypeName(section.getDocument()), sortTypeContent));
+			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getListItemBeanSortTypeName(section.getDocument()), sortTypeContent));
 		List<MetaDialog> dialogs = section.getDialogs();
 		for (int i=0; i<dialogs.size(); i++){
 			MetaDialog dlg = dialogs.get(i);
-			files.add(new FileEntry(FileEntry.package2path(getPackage()), getDialogBeanName(dlg, section.getDocument()), generateDialogForm(dlg, section.getDocument())));
+			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDialogBeanName(dlg, section.getDocument()), generateDialogForm(dlg, section.getDocument())));
 			
 			MetaDocument doc = section.getDocument();
 			for (int p=0; p<doc.getProperties().size(); p++){
 				MetaProperty pp = doc.getProperties().get(p);
 				if (pp instanceof MetaContainerProperty){
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerEntryFormName((MetaContainerProperty)pp), generateContainerEntryForm((MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerQuickAddFormName((MetaContainerProperty)pp), generateContainerQuickAddForm((MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerEntryFormName((MetaContainerProperty)pp), generateContainerEntryForm(doc, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerQuickAddFormName((MetaContainerProperty)pp), generateContainerQuickAddForm(doc, (MetaContainerProperty)pp)));
 				}
 			}
 
@@ -121,32 +122,32 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		return StringUtils.capitalize(p.getName())+"QuickAddForm";
 	}
 
-	public static String getContainerEntryFormImport(MetaContainerProperty p){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".bean."+getContainerEntryFormName(p);
+	public static String getContainerEntryFormImport(MetaDocument doc, MetaContainerProperty p){
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerEntryFormName(p);
 	}
 	
-	public static String getContainerQuickAddFormImport(MetaContainerProperty p){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".bean."+getContainerQuickAddFormName(p);
+	public static String getContainerQuickAddFormImport(MetaDocument doc, MetaContainerProperty p){
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerQuickAddFormName(p);
 	}
 
-	private String generateContainerEntryForm(MetaContainerProperty p){
+	private String generateContainerEntryForm(MetaDocument doc, MetaContainerProperty p){
 		if (p instanceof MetaTableProperty)
-			return generateTableRowForm((MetaTableProperty)p);
+			return generateTableRowForm(doc, (MetaTableProperty)p);
 		if (p instanceof MetaListProperty)
-			return generateListElementForm((MetaListProperty)p);
+			return generateListElementForm(doc, (MetaListProperty)p);
 		throw new RuntimeException("Unsupported container type: "+p);
 	}
 	
-	private String generateContainerQuickAddForm(MetaContainerProperty p){
+	private String generateContainerQuickAddForm(MetaDocument doc, MetaContainerProperty p){
 		if (p instanceof MetaListProperty)
-			return generateListQuickAddForm((MetaListProperty)p);
+			return generateListQuickAddForm(doc, (MetaListProperty)p);
 		System.out.println("WARN Unsupported container type: "+p);
 		return "";
 	}
 
-	private String generateListElementForm(MetaListProperty list){
+	private String generateListElementForm(MetaDocument doc, MetaListProperty list){
 		String ret = "";
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(doc));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
 		ret += writeImport("javax.servlet.http.HttpServletRequest");
@@ -215,9 +216,9 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		return ret;
 	}
 
-	private String generateListQuickAddForm(MetaListProperty list){
+	private String generateListQuickAddForm(MetaDocument doc, MetaListProperty list){
 		String ret = "";
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(doc));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
 		ret += writeImport("javax.servlet.http.HttpServletRequest");
@@ -268,9 +269,9 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	}
 
 	@SuppressWarnings("unchecked")
-	private String generateTableRowForm(MetaTableProperty p){
+	private String generateTableRowForm(MetaDocument doc, MetaTableProperty p){
 		String ret = "";
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(doc));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
 		ret += writeImport("javax.servlet.http.HttpServletRequest");
@@ -317,7 +318,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	String generateDialogForm(MetaDialog dialog, MetaDocument doc){
 		String ret = "";
 		
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(doc));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
 		ret += writeImport("javax.servlet.http.HttpServletRequest");
@@ -414,7 +415,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			return null;
 			
 		String ret = "";
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getDocument()));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += emptyline();
@@ -547,7 +548,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		elements.add(plainId);
 
 		String ret = "";
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getDocument()));
 		ret += emptyline();
 
 		boolean containsComparable = false;
@@ -741,19 +742,31 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	}
 	
 	public static String getPackage(){
-	    return getPackage(GeneratorDataRegistry.getInstance().getContext());
+	    return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".bean";
 	}
 	
-	public static String getPackage(Context context){
-	    return context.getPackageName()+".bean";
+	public static String getPackage(MetaModule module){
+	    return getPackage(GeneratorDataRegistry.getInstance().getContext(), module);
 	}
 	
+	public static String getPackage(MetaDocument doc){
+	    return getPackage(GeneratorDataRegistry.getInstance().getContext(), doc);
+	}
+
+	public static String getPackage(Context context, MetaModule module){
+	    return context.getPackageName(module)+".bean";
+	}
+	
+	public static String getPackage(Context context, MetaDocument doc){
+	    return context.getPackageName(doc)+".bean";
+	}
+
 	public static String getListItemBeanSortTypeImport(Context context, MetaDocument doc){
-		return getPackage(context)+"."+getListItemBeanSortTypeName(doc);
+		return getPackage(context, doc)+"."+getListItemBeanSortTypeName(doc);
 	}
 	
 	public static String getListItemBeanImport(Context context, MetaDocument doc){
-		return getPackage(context)+"."+getListItemBeanName(doc);
+		return getPackage(context, doc)+"."+getListItemBeanName(doc);
 	}
 	
 	public static String getDialogBeanName(MetaDialog dialog, MetaDocument document){
@@ -761,7 +774,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	}
 	
 	public static String getDialogBeanImport(Context context, MetaDialog dialog, MetaDocument doc){
-		return getPackage(context)+"."+getDialogBeanName(dialog, doc);
+		return getPackage(context, doc)+"."+getDialogBeanName(dialog, doc);
 	}
 	
 	public static String getFormBeanImport(MetaForm form){
@@ -775,7 +788,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	public String generateFormBean(MetaForm form){
 	    String ret = "";
 	    
-		ret += writeStatement("package "+getPackage(GeneratorDataRegistry.getInstance().getContext()));
+		ret += writeStatement("package "+getPackage());
 		ret += emptyline();
 		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
 		ret += writeImport("javax.servlet.http.HttpServletRequest");
@@ -874,91 +887,3 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	
 
 }
-
-/* ------------------------------------------------------------------------- *
- * $Log: ModuleBeanGenerator.java,v $
- * Revision 1.13  2007/06/19 14:14:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.12  2007/06/07 23:40:19  lrosenberg
- * added db functionality
- *
- * Revision 1.11  2007/03/26 22:05:06  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.10  2007/03/26 16:27:10  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.9  2007/03/16 15:56:51  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.8  2007/02/25 22:49:48  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.7  2007/02/25 16:49:42  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.6  2007/02/24 23:13:00  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.5  2007/01/29 23:26:32  lrosenberg
- * added list import for enumeration properties
- *
- * Revision 1.4  2007/01/28 20:42:17  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.3  2006/12/28 22:22:04  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.2  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.1  2005/10/20 21:20:12  lro
- * *** empty log message ***
- *
- * Revision 1.15  2005/07/30 22:35:12  lro
- * *** empty log message ***
- *
- * Revision 1.14  2005/06/30 00:03:12  lro
- * *** empty log message ***
- *
- * Revision 1.13  2005/06/29 00:02:48  lro
- * *** empty log message ***
- *
- * Revision 1.12  2005/03/28 01:12:39  lro
- * *** empty log message ***
- *
- * Revision 1.11  2005/03/15 02:14:47  lro
- * *** empty log message ***
- *
- * Revision 1.10  2005/03/14 19:31:26  lro
- * *** empty log message ***
- *
- * Revision 1.9  2005/03/14 01:47:34  lro
- * *** empty log message ***
- *
- * Revision 1.8  2005/03/11 01:26:13  lro
- * *** empty log message ***
- *
- * Revision 1.7  2005/03/07 13:37:54  lro
- * *** empty log message ***
- *
- * Revision 1.6  2005/03/07 02:48:20  lro
- * *** empty log message ***
- *
- * Revision 1.5  2005/03/02 02:49:13  lro
- * *** empty log message ***
- *
- * Revision 1.4  2005/02/28 20:00:31  lro
- * *** empty log message ***
- *
- * Revision 1.3  2005/02/28 02:47:16  lro
- * *** empty log message ***
- *
- * Revision 1.2  2005/02/27 03:16:05  lro
- * *** empty log message ***
- *
- * Revision 1.1  2005/02/25 19:36:52  lro
- * *** empty log message ***
- *
- */

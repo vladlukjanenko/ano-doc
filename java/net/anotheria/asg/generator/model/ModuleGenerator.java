@@ -59,7 +59,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 	private FileEntry generateModule(MetaModule module, Context context){
 		String ret = "";
 		
-		String packageName = context.getPackageName()+".data";
+		String packageName = context.getPackageName(module)+".data";
 	
 		ret += writeStatement("package "+packageName);
 		ret += emptyline();

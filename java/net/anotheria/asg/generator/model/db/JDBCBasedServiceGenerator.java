@@ -22,7 +22,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = context.getPackageName()+".service";
+		String packageName = context.getPackageName(mod)+".service";
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
@@ -32,8 +32,8 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 		return ret;
 	}
 	
-	private String getPackageName(){
-		return context.getPackageName()+".service";
+	private String getPackageName(MetaModule mod){
+		return context.getPackageName(mod)+".service";
 	}
 	
 	
@@ -42,7 +42,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 
 		ret += CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+".");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
@@ -50,7 +50,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	    ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += writeImport("net.anotheria.util.Date");
-	    ret += writeImport(context.getPackageName()+".BasicService");
+	    ret += writeImport(context.getTopPackageName()+".BasicService");
 	    ret += emptyline();
 	    ret += writeImport(JDBCPersistenceServiceGenerator.getInterfaceImport(context, module));
 	    ret += writeImport(JDBCPersistenceServiceGenerator.getFactoryImport(context, module));
@@ -282,7 +282,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 
 		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    
 	    ret += writeString("public class "+getFactoryName(module)+"{");
@@ -316,7 +316,4 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	    return getServiceName(m)+"Impl";
 	}
 	
-	public static String getPackageName(Context context){
-	    return context.getPackageName()+".service";
-	}
 }

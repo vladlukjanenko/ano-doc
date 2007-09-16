@@ -26,16 +26,16 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
-		ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getExceptionName(mod), generateException(mod)));
-		ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getInterfaceName(mod), generateInterface(mod)));
-		ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getFactoryName(mod), generateFactory(mod)));
-		ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getImplementationName(mod), generateImplementation(mod)));
+		ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getExceptionName(mod), generateException(mod)));
+		ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getInterfaceName(mod), generateInterface(mod)));
+		ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getFactoryName(mod), generateFactory(mod)));
+		ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getImplementationName(mod), generateImplementation(mod)));
 		
 		return ret;
 	}
 	
-	private String getPackageName(){
-		return getPackageName(context);
+	private String getPackageName(MetaModule m){
+		return getPackageName(context, m);
 	}
 	
 	private String generateException(MetaModule module){
@@ -43,7 +43,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		
 	    ret += CommentGenerator.generateJavaTypeComment(getInterfaceName(module));
 	    
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.sql.SQLException");
 	    ret += writeImport("net.anotheria.db.dao.DAOException");
@@ -73,7 +73,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    
 	    ret += CommentGenerator.generateJavaTypeComment(getInterfaceName(module));
  
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += emptyline();
@@ -83,7 +83,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    List docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        ret += writeImport(context.getPackageName()+".data."+doc.getName());
+	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    }
 	    ret += emptyline();
 
@@ -132,7 +132,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 
 		ret += CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+".");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
@@ -328,7 +328,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 
 		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    
 	    ret += writeString("public class "+getFactoryName(module)+"{");
@@ -364,19 +364,19 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    return getServiceName(m)+"Impl";
 	}
 	
-	public static String getPackageName(Context context){
-		return context.getPackageName()+".service.persistence";
+	public static String getPackageName(Context context, MetaModule module){
+		return context.getPackageName(module)+".service.persistence";
 	}
 	
 	public static final String getExceptionImport(Context c, MetaModule m){
-		return getPackageName(c)+"."+getExceptionName(m);
+		return getPackageName(c,m)+"."+getExceptionName(m);
 	}
 
 	public static final String getFactoryImport(Context c, MetaModule m){
-		return getPackageName(c)+"."+getFactoryName(m);
+		return getPackageName(c,m)+"."+getFactoryName(m);
 	}
 
 	public static final String getInterfaceImport(Context c, MetaModule m){
-		return getPackageName(c)+"."+getInterfaceName(m);
+		return getPackageName(c, m)+"."+getInterfaceName(m);
 	}
 }

@@ -15,11 +15,15 @@ public class MetaDocument implements IGenerateable{
 	private List<MetaProperty> properties;
 	private List<MetaProperty> links;
 	
+	private MetaModule parentModule;
+	
 	public MetaDocument(String aName){
 		name = aName;
 		properties = new ArrayList<MetaProperty>();
 		links = new ArrayList<MetaProperty>();
 	}
+	
+	
 	
 	public void addProperty(MetaProperty p){
 		properties.add(p);
@@ -131,6 +135,18 @@ public class MetaDocument implements IGenerateable{
 		}
 
 		return false;
+	}
+
+
+
+	public MetaModule getParentModule() {
+		return parentModule;
+	}
+
+
+
+	public void setParentModule(MetaModule parentModule) {
+		this.parentModule = parentModule;
 	}
 	
 	

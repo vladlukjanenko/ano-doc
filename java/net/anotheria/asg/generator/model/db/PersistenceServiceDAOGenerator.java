@@ -30,10 +30,10 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		
 		List<MetaDocument> documents = mod.getDocuments();
 		for (MetaDocument d: documents){
-			ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getExceptionName(d), generateException(d)));
-			ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getNoItemExceptionName(d), generateNoItemException(d)));
-			ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDAOName(d), generateDAO(d)));
-			ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getRowMapperName(d), generateRowMapper(d)));
+			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getExceptionName(d), generateException(d)));
+			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getNoItemExceptionName(d), generateNoItemException(d)));
+			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getDAOName(d), generateDAO(d)));
+			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getRowMapperName(d), generateRowMapper(d)));
 		}
 //		ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
 	//	ret.add(new FileEntry(FileEntry.package2path(packageName), getImplementationName(mod), generateImplementation(mod)));
@@ -41,8 +41,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		return ret;
 	}
 	
-	private String getPackageName(){
-		return context.getPackageName()+".service.persistence";
+	private String getPackageName(MetaModule module){
+		return context.getPackageName(module)+".service.persistence";
 	}
 	
 	private String generateException(MetaDocument doc){
@@ -50,7 +50,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		
 	    ret += CommentGenerator.generateJavaTypeComment(getExceptionName(doc));
 	    
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
 	    ret += emptyline();
 	    ret += writeImport("net.anotheria.db.dao.DAOException");
 	    ret += emptyline();
@@ -76,7 +76,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		
 	    ret += CommentGenerator.generateJavaTypeComment(getNoItemExceptionName(doc));
 	    
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
 	    ret += emptyline();
 
 	    ret += writeString("public class "+ getNoItemExceptionName(doc)+ " extends "+getExceptionName(doc)+"{");
@@ -107,7 +107,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    
 	    ret += CommentGenerator.generateJavaTypeComment(getRowMapperName(doc));
 	    
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
 	    ret += emptyline();
 	    
 	    ret += writeImport("java.sql.ResultSet");
@@ -221,7 +221,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
 	    
 	    
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");

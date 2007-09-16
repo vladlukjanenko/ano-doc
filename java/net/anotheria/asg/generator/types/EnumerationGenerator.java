@@ -9,6 +9,7 @@ import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 
 /**
@@ -50,7 +51,7 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 	}
 	
 	public static String getPackageName(Context context){
-		return context.getPackageName()+".data";
+		return context.getPackageName(MetaModule.SHARED)+".data";
 	}
 	
 	private String generateDefinition(EnumerationType type){

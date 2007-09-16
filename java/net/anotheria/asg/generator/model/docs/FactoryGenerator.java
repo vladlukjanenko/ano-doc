@@ -37,7 +37,7 @@ public class FactoryGenerator extends AbstractGenerator implements IGenerator{
 	private FileEntry generateFactory(MetaModule module, Context context){
 		String ret = "";
 		
-		String packageName = context.getPackageName()+".data";
+		String packageName = context.getPackageName(module)+".data";
 	
 		ret += CommentGenerator.generateJavaTypeComment(getModuleFactoryName(module), "The Factory for the "+module.getName()+" objects.");
 

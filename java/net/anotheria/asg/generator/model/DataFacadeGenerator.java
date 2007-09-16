@@ -17,7 +17,7 @@ import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.util.StringUtils;
 
 public class DataFacadeGenerator 
-	extends AbstractGenerator
+	extends AbstractDataObjectGenerator
 	implements IGenerator{
 
 	public static final String PROPERTY_DECLARATION = "public static final String ";	
@@ -32,13 +32,9 @@ public class DataFacadeGenerator
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDocumentName(doc), generateDocument(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getSortTypeName(doc), generateSortType(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentName(doc), generateDocument(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getSortTypeName(doc), generateSortType(doc)));
 		return _ret;
-	}
-	
-	private String getPackageName(){
-		return context.getPackageName()+".data";
 	}
 	
 	public String getDocumentName(MetaDocument doc){
@@ -76,7 +72,7 @@ public class DataFacadeGenerator
 		if (properties.size()==0)
 			return null;
 			
-		ret += writeStatement("package "+getPackageName());
+		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += emptyline();
@@ -134,7 +130,7 @@ public class DataFacadeGenerator
 		String ret = "";
 		
 	
-		ret += writeStatement("package "+getPackageName());
+		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.asg.data.DataObject");
 		
@@ -396,11 +392,11 @@ public class DataFacadeGenerator
 	}
 	
 	public static final String getDocumentImport(Context context, MetaDocument doc){
-		return context.getPackageName()+".data."+doc.getName();
+		return context.getPackageName(doc)+".data."+doc.getName();
 	}
 	
 	public static final String getSortTypeImport(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".data."+getSortTypeName(doc);
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data."+getSortTypeName(doc);
 	}
 	
 	private String generateAdditionalMethods(MetaDocument doc){
@@ -509,15 +505,6 @@ public class DataFacadeGenerator
 		return ret;
 	}
 	
-	private String generateDefNameMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public static String getDefinedName(){");
-		increaseIdent();
-		ret += writeStatement("return "+quote(doc.getName()));
-		ret += closeBlock();
-		return ret;
-	}
-
 	public static String getContainerSizeGetterName(MetaContainerProperty p){
 		return "get"+StringUtils.capitalize(p.getName())+"Size"; 
 	}
@@ -546,7 +533,7 @@ public class DataFacadeGenerator
 	}
 
 	public static final String getDocumentFactoryImport(Context context, MetaDocument doc){
-		return context.getPackageName()+".data."+getDocumentFactoryName(doc);
+		return context.getPackageName(doc)+".data."+getDocumentFactoryName(doc);
 	}
 
 

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sound.sampled.TargetDataLine;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
@@ -32,7 +30,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = context.getPackageName()+".service";
+		String packageName = context.getPackageName(mod)+".service";
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
@@ -42,8 +40,8 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 		return ret;
 	}
 	
-	private String getPackageName(){
-		return context.getPackageName()+".service";
+	private String getPackageName(MetaModule module){
+		return context.getPackageName(module)+".service";
 	}
 	
 	public static final String FEDERATION_VARIABLE_PREFIX = "federated";
@@ -59,7 +57,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    }
 		ret += CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+"as a federated service layer: "+federationcomment);
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
@@ -67,12 +65,14 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += writeImport("net.anotheria.util.Date");
 		ret += writeImport("net.anotheria.util.StringUtils");
-	    ret += writeImport(context.getPackageName()+".BasicService");
+	    ret += writeImport(context.getTopPackageName()+".BasicService");
 	    
 	    List<FederatedModuleDef> federatedModules = module.getFederatedModules();
 	    Map<String,MetaModule> targetModules = new HashMap<String, MetaModule>();
 	    for (FederatedModuleDef fedDef : federatedModules){
 	    	MetaModule target = GeneratorDataRegistry.getInstance().getModule(fedDef.getName());
+	    	ret += writeImport(ServiceGenerator.getInterfaceImport(context, target));
+	    	ret += writeImport(ServiceGenerator.getFactoryImport(context, target));
 	    	targetModules.put(fedDef.getKey(), target);
 	    }
 	    
@@ -328,7 +328,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 
 		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    
 	    ret += writeString("public class "+getFactoryName(module)+"{");

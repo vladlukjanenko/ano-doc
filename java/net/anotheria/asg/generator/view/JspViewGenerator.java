@@ -194,7 +194,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
 		ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
 		ret += writeString("</tr>");
-		ret += writeString("<logic:iterate name="+quote("elements")+" id="+quote("element")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(list))+" indexId="+quote("ind")+">");
+		ret += writeString("<logic:iterate name="+quote("elements")+" id="+quote("element")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, list))+" indexId="+quote("ind")+">");
 		increaseIdent();
 		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
 		increaseIdent();
@@ -389,7 +389,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		}
 	    ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
 		ret += writeString("</tr>");
-		ret += writeString("<logic:iterate name="+quote("rows")+" id="+quote("row")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(table))+" indexId="+quote("ind")+">");
+		ret += writeString("<logic:iterate name="+quote("rows")+" id="+quote("row")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, table))+" indexId="+quote("ind")+">");
 		increaseIdent();
 		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
 		increaseIdent();

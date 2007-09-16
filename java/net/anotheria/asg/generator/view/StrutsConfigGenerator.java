@@ -132,13 +132,13 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	    String ret = "";
 	    ret += writeString("<form-bean name="+quote(getContainerEntryFormName(doc, container)));
 	    increaseIdent();
-	    ret += writeString("type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(container))+"/>");
+	    ret += writeString("type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, container))+"/>");
 	    decreaseIdent();
 	    
 	    if (container instanceof MetaListProperty){
 		    ret += writeString("<form-bean name="+quote(getContainerQuickAddFormName(doc, container)));
 		    increaseIdent();
-		    ret += writeString("type="+quote(ModuleBeanGenerator.getContainerQuickAddFormImport(container))+"/>");
+		    ret += writeString("type="+quote(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, container))+"/>");
 		    decreaseIdent();
 	    }
 	    

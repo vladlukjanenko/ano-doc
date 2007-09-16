@@ -22,7 +22,7 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = context.getPackageName()+".service";
+		String packageName = context.getPackageName(mod)+".service";
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
@@ -32,8 +32,8 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 		return ret;
 	}
 	
-	private String getPackageName(){
-		return context.getPackageName()+".service";
+	private String getPackageName(MetaModule module){
+		return context.getPackageName(module)+".service";
 	}
 	
 	private String generateImplementation(MetaModule module){
@@ -41,7 +41,7 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 
 		ret += CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+".");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
@@ -49,8 +49,8 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	    ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += writeImport("net.anotheria.util.Date");
-	    ret += writeImport(context.getPackageName()+".data."+ module.getModuleClassName());
-	    ret += writeImport(context.getPackageName()+".BasicCMSService");
+	    ret += writeImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
+	    ret += writeImport(context.getTopPackageName()+".BasicCMSService");
 	    List docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
@@ -255,7 +255,7 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 
 		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
 
-	    ret += writeStatement("package "+getPackageName());
+	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    
 	    ret += writeString("public class "+getFactoryName(module)+"{");

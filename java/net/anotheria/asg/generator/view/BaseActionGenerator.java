@@ -69,8 +69,8 @@ public class BaseActionGenerator extends AbstractGenerator {
 
 		for (int i=0; i<modules.size(); i++){
 			MetaModule m = modules.get(i);
-			ret += writeImport(ServiceGenerator.getPackageName(GeneratorDataRegistry.getInstance().getContext())+"."+ServiceGenerator.getInterfaceName(m));
-			ret += writeImport(ServiceGenerator.getPackageName(GeneratorDataRegistry.getInstance().getContext())+"."+ServiceGenerator.getFactoryName(m));
+			ret += writeImport(ServiceGenerator.getInterfaceImport(context, m));
+			ret += writeImport(ServiceGenerator.getFactoryImport(context, m));
 		}
 
 		ret += emptyline();

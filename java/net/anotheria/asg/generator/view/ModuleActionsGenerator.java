@@ -27,6 +27,7 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.types.EnumerationGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
@@ -64,32 +65,32 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		MetaModuleSection section = (MetaModuleSection)g;
 		//System.out.println("Generate section: "+section);
 		
-		files.add(new FileEntry(FileEntry.package2path(getPackage()), getBaseActionName(section), generateBaseAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage()), getShowActionName(section), generateShowAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage()), getSearchActionName(section), generateSearchAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage()), getDeleteActionName(section), generateDeleteAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage()), getDuplicateActionName(section), generateDuplicateAction(section)));
+		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getBaseActionName(section), generateBaseAction(section)));
+		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getShowActionName(section), generateShowAction(section)));
+		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getSearchActionName(section), generateSearchAction(section)));
+		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDeleteActionName(section), generateDeleteAction(section)));
+		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDuplicateActionName(section), generateDuplicateAction(section)));
 		try{
 			if (section.getDialogs().size()>0){
 			
 			//works only if the section has a dialog.
-			files.add(new FileEntry(FileEntry.package2path(getPackage()), getUpdateActionName(section), generateUpdateAction(section)));
-			files.add(new FileEntry(FileEntry.package2path(getPackage()), getEditActionName(section), generateEditAction(section)));
-			files.add(new FileEntry(FileEntry.package2path(getPackage()), getNewActionName(section), generateNewAction(section)));
+			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getUpdateActionName(section), generateUpdateAction(section)));
+			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getEditActionName(section), generateEditAction(section)));
+			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getNewActionName(section), generateNewAction(section)));
 			MetaDocument doc = section.getDocument();
 			for (int p=0; p<doc.getProperties().size(); p++){
 				MetaProperty pp = (MetaProperty)doc.getProperties().get(p);
 				//System.out.println("checking "+pp+" "+(pp instanceof MetaContainerProperty));
 				if (pp instanceof MetaContainerProperty){
 				//	System.out.println("generating "+pp);
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerShowActionName(doc, (MetaContainerProperty)pp), generateContainerShowAction(section, (MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerAddEntryActionName(doc, (MetaContainerProperty)pp), generateContainerAddRowAction(section, (MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerQuickAddActionName(doc, (MetaContainerProperty)pp), generateContainerQuickAddAction(section, (MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerDeleteEntryActionName(doc, (MetaContainerProperty)pp), generateContainerDeleteEntryAction(section, (MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerMoveUpEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveUpEntryAction(section, (MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerMoveDownEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveDownEntryAction(section, (MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerMoveTopEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveTopEntryAction(section, (MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage()), getContainerMoveBottomEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveBottomEntryAction(section, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerShowActionName(doc, (MetaContainerProperty)pp), generateContainerShowAction(section, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerAddEntryActionName(doc, (MetaContainerProperty)pp), generateContainerAddRowAction(section, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerQuickAddActionName(doc, (MetaContainerProperty)pp), generateContainerQuickAddAction(section, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerDeleteEntryActionName(doc, (MetaContainerProperty)pp), generateContainerDeleteEntryAction(section, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveUpEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveUpEntryAction(section, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveDownEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveDownEntryAction(section, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveTopEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveTopEntryAction(section, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveBottomEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveBottomEntryAction(section, (MetaContainerProperty)pp)));
 				}
 			}
 		}
@@ -101,8 +102,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		MetaDocument targetDocument = section.getDocument();
 		List links = targetDocument.getLinks();
 		if (links.size()>0){
-			files.add(new FileEntry(FileEntry.package2path(getPackage()), getShowQueryActionName(section), generateShowQueryAction(section)));
-			files.add(new FileEntry(FileEntry.package2path(getPackage()), getExecuteQueryActionName(section), generateExecuteQueryAction(section)));
+			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getShowQueryActionName(section), generateShowQueryAction(section)));
+			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getExecuteQueryActionName(section), generateExecuteQueryAction(section)));
 		}
 		
 			
@@ -169,7 +170,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		List<MetaViewElement> elements = section.getElements();
 	    
 	    boolean containsComparable = section.containsComparable();
-	    ret += writeStatement("package "+getPackage());
+	    ret += writeStatement("package "+getPackage(section.getModule()));
 	    ret += emptyline();
 	    
 	    //write imports...
@@ -177,7 +178,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    ret += writeImport("java.util.ArrayList");
 	    ret += writeImport("net.anotheria.asg.util.decorators.IAttributeDecorator");
 	    ret += getStandardActionImports();
-	    ret += writeImport(context.getPackageName()+".data."+doc.getName());
+	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
 		ret += emptyline();
 		if (containsComparable){
@@ -450,14 +451,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    MetaDocument doc = section.getDocument();
 		List<MetaViewElement> elements = section.getElements();
 	    
-	    ret += writeStatement("package "+getPackage());
+	    ret += writeStatement("package "+getPackage(section.getModule()));
 	    ret += emptyline();
 	    
 	    //write imports...
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
 	    ret += getStandardActionImports();
-	    ret += writeImport(context.getPackageName()+".data."+doc.getName());
+	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
@@ -562,7 +563,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		String ret = "";
 		MetaDocument doc = section.getDocument();
 	    
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 		ret += getStandardActionImports();
 		ret += emptyline();
@@ -652,13 +653,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		MetaDocument doc = section.getDocument();
 		//List<MetaViewElement> elements = section.getElements();
 	    
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 		ret += getStandardActionImports();
 		ret += writeImport("java.util.List");
 		ret += writeImport("java.util.ArrayList");
 		ret += emptyline();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
+	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		ret += emptyline();
 
 		ret += writeString("public class "+getExecuteQueryActionName(section)+" extends "+getShowActionName(section)+" {");
@@ -713,7 +714,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		String ret = "";
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 
 		//write imports...
@@ -824,7 +825,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		EnumerationPropertyGenerator enumProGenerator = new EnumerationPropertyGenerator(doc);
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 
 		//write imports...
@@ -970,7 +971,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	private String generateDeleteAction(MetaModuleSection section){
 	    String ret = "";
 	    MetaDocument doc = section.getDocument();
-	    ret += writeStatement("package "+getPackage());
+	    ret += writeStatement("package "+getPackage(section.getModule()));
 	    ret += emptyline();
 
 	    //write imports...
@@ -996,7 +997,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	private String generateDuplicateAction(MetaModuleSection section){
 		String ret = "";
 		MetaDocument doc = section.getDocument();
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 
 		//write imports...
@@ -1032,7 +1033,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		EnumerationPropertyGenerator enumPropGen = new EnumerationPropertyGenerator(doc);
 		
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 
 		//write imports...
@@ -1145,9 +1146,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    //MetaDocument doc = section.getDocument();
 //	    MetaModule mod = section.getModule();
 	    
-	    ret += writeStatement("package "+getPackage());
+	    ret += writeStatement("package "+getPackage(section.getModule()));
 	    ret += emptyline();
-	    
+	    ret += writeImport(context.getTopPackageName()+".action."+BaseViewActionGenerator.getViewActionName(view));
+	    ret += emptyline();
 	    
 	    ret += writeString("public abstract class "+getBaseActionName(section)+" extends "+BaseViewActionGenerator.getViewActionName(view)+" {");
 	    increaseIdent();
@@ -1165,14 +1167,30 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    return ret;
 	}
 	
+	/**
+	 * @deprecated
+	 * @return
+	 */
 	public static String getPackage(){
 	    return getPackage(GeneratorDataRegistry.getInstance().getContext());
 	}
 	
+	public static String getPackage(MetaModule module){
+	    return getPackage(GeneratorDataRegistry.getInstance().getContext(), module);
+	}
+
+	/**
+	 * @deprecated
+	 * @param context
+	 * @return
+	 */
 	public static String getPackage(Context context){
 	    return context.getPackageName()+".action";
 	}
 
+	public static String getPackage(Context context, MetaModule module){
+	    return context.getPackageName(module)+".action";
+	}
 	
 	public static String getServiceInstanceName(MetaModule module){
 	    return module.getName().toLowerCase()+"Service";
@@ -1215,6 +1233,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeImport("org.apache.struts.action.ActionForward");
 		ret += writeImport("org.apache.struts.action.ActionMapping");
 		ret += emptyline();
+		//TODO change this, its probably no need to store shared actions under action
+		//ret += writeImport(GeneratorDataRegistry.getInstance().getContext().getTopPackageName()+".action.*");
+		//ret += emptyline();
 		return ret;
 	}
 	
@@ -1279,13 +1300,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
-		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(list));
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerAddEntryActionName(doc, list)+" extends "+getContainerShowActionName(doc, list)+"{");	
@@ -1318,13 +1339,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
-		ret += writeImport(ModuleBeanGenerator.getContainerQuickAddFormImport(list));
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.util.StringUtils");
 		
@@ -1370,13 +1391,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
-		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(table));
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerAddEntryActionName(doc, table)+" extends "+getContainerShowActionName(doc, table)+"{");	
@@ -1412,12 +1433,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerDeleteEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
@@ -1450,12 +1471,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerMoveUpEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
@@ -1498,12 +1519,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerMoveTopEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
@@ -1539,12 +1560,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerMoveBottomEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
@@ -1577,12 +1598,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerMoveDownEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
@@ -1623,17 +1644,17 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += writeImport("java.util.List");
 		ret += writeImport("java.util.ArrayList");
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
-		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(list));
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
 		if (list.getContainedProperty().isLinked()){
-			ret += writeImport(ModuleBeanGenerator.getContainerQuickAddFormImport(list));
+			ret += writeImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
 			MetaLink link = (MetaLink)list.getContainedProperty();
 			String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
 			MetaModule targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
@@ -1744,15 +1765,15 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage());
+		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 	    
 		//write imports...
 		ret += writeImport("java.util.List");
 		ret += writeImport("java.util.ArrayList");
 		ret += getStandardActionImports();
-		ret += writeImport(context.getPackageName()+".data."+doc.getName());
-		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(table));
+		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
 		ret += emptyline();
 
 		ret += writeString("public class "+getContainerShowActionName(doc, table)+" extends "+getBaseActionName(section)+" {");

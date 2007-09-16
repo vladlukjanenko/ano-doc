@@ -31,6 +31,7 @@ public class MetaModule implements IGenerateable{
 	
 	public void addDocument(MetaDocument aDocument){
 		documents.add(aDocument);
+		aDocument.setParentModule(this);
 	}
 	
 	public String toString(){
@@ -121,5 +122,7 @@ public class MetaModule implements IGenerateable{
 	public void setStorageKey(String storageKey) {
 		this.storageKey = storageKey;
 	}
+	
+	public static final MetaModule SHARED = new MetaModule("Shared");
 	
 }

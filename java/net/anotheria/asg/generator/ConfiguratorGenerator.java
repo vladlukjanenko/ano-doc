@@ -36,7 +36,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 	private FileEntry generateConfigurator(List<MetaModule> modules, Context context){
 		String ret = "";
 		
-		ret += writeStatement("package "+context.getPackageName());
+		ret += writeStatement("package "+context.getTopPackageName());
 
 
 		ret += writeImport("net.anotheria.anodoc.service.IModuleFactory");
@@ -44,7 +44,9 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 		ret += writeImport("net.anotheria.anodoc.service.ModuleServiceFactory");
 		ret += writeImport("net.anotheria.anodoc.util.CommonHashtableModuleStorage");
 		ret += emptyline();
-		ret += writeImport(context.getPackageName()+".data.*");
+		for (MetaModule m : modules){
+			ret += writeImport(context.getPackageName(m)+".data.*");
+		}
 		
 		ret += emptyline();
 		ret += writeString("public class "+getConfiguratorClassName()+"{");
@@ -102,7 +104,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 	private FileEntry generateExporter(List<MetaModule> modules, Context context){
 		String ret = "";
 		
-		ret += writeStatement("package "+context.getPackageName());
+		ret += writeStatement("package "+context.getTopPackageName());
 		
 		/*ret += writeImport("net.anotheria.anodoc.service.IModuleFactory");
 		ret += writeImport("net.anotheria.anodoc.service.IModuleService");
@@ -128,7 +130,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 		ret += writeImport("org.apache.log4j.BasicConfigurator");
 		ret += emptyline();
 		for (MetaModule m : modules){
-			ret += writeImport(context.getPackageName()+".service"+"."+ServiceGenerator.getFactoryName(m));
+			ret += writeImport(ServiceGenerator.getFactoryImport(context, m));
 		}
 		
 		ret += emptyline();

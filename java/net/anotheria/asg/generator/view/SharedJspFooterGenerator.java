@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
@@ -14,7 +15,7 @@ public class SharedJspFooterGenerator extends AbstractJSPGenerator {
 	public FileEntry generate(List<MetaView> views , Context context) {
 		
 		String ret = generateSharedFooter(views, context);
-		FileEntry footer = new FileEntry(FileEntry.package2path(context.getPackageName()+".jsp"), getSharedJspFooterName(), ret);
+		FileEntry footer = new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".jsp"), getSharedJspFooterName(), ret);
 		footer.setType(".jsp");
 		return footer;
 		

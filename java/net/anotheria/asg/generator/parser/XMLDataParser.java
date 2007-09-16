@@ -82,7 +82,7 @@ public class XMLDataParser implements IDataParser {
 		}
 		List childs = m.getChildren("document");
 		for (int i=0; i<childs.size(); i++)
-			mod.addDocument(parseDocument((Element)childs.get(i), federation));
+			mod.addDocument(parseDocument((Element)childs.get(i)));
 		
 		List listeners = m.getChildren("listener");
 		for (int i=0; i<listeners.size(); i++){
@@ -113,7 +113,7 @@ public class XMLDataParser implements IDataParser {
 		
 	}
 	
-	private MetaDocument parseDocument(Element d, boolean federation){
+	private MetaDocument parseDocument(Element d){
 		MetaDocument doc = new MetaDocument(d.getAttributeValue("name"));
 		List properties = d.getChildren("property");
 		List links = d.getChildren("link");

@@ -14,6 +14,7 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
@@ -21,7 +22,7 @@ import net.anotheria.util.StringUtils;
  * TODO please remined another to comment this class
  * @author another
  */
-public class VOGenerator extends AbstractGenerator
+public class VOGenerator extends AbstractDataObjectGenerator
 	implements IGenerator{
 
 	public static final String DAO_CREATED = "daoCreated";
@@ -41,15 +42,12 @@ public class VOGenerator extends AbstractGenerator
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDocumentImplName(doc), generateDocument(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentImplName(doc), generateDocument(doc)));
 		//_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getSortTypeName(doc), generateSortType(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
 		return _ret;
 	}
 	
-	private String getPackageName(){
-		return context.getPackageName()+".data";
-	}
 	
 	public static String getDocumentImplName(MetaDocument doc){
 		return doc.getName()+"VO";
@@ -85,7 +83,7 @@ public class VOGenerator extends AbstractGenerator
 		String ret = "";
 		
 	
-		ret += writeStatement("package "+getPackageName());
+		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 
 		boolean listImported = false;
@@ -421,12 +419,12 @@ public class VOGenerator extends AbstractGenerator
 
 
 	public static final String getDocumentImport(Context context, MetaDocument doc){
-		return context.getPackageName()+".data."+getDocumentImplName(doc);
+		return context.getPackageName(doc)+".data."+getDocumentImplName(doc);
 	}
 	
 
 	public static final String getSortTypeImport(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".data."+getSortTypeName(doc);
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data."+getSortTypeName(doc);
 	}
 	
 	private String generateAdditionalMethods(MetaDocument doc){
@@ -638,7 +636,7 @@ public class VOGenerator extends AbstractGenerator
 		String ret = "";
 		
 	
-		ret += writeStatement("package "+getPackageName());
+		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 
 		
