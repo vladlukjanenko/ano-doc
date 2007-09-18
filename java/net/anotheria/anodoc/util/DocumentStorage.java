@@ -17,9 +17,6 @@ import net.anotheria.anodoc.data.TextProperty;
 import net.anotheria.anodoc.service.IModuleFactory;
 
 /**
- * Database class for {@link biz.beaglesoft.bgldoc.data.BGLDocument}.<br>
- * Only {@link biz.beaglesoft.bgldoc.util.CommonJDOModuleStorage} uses this class
- * to be insusceptable against class changes.
  */
 class DocumentStorage {
 
@@ -51,46 +48,34 @@ class DocumentStorage {
 	 */
 	private String moduleId;
 	
-	/**
-	 * the list of {@link biz.beaglesoft.bgldoc.data.BGLListProperty}s this document contains
-	 */
 	private PropertyListStorage[] listProps;
 	
-	/**
-	 * the list of {@link biz.beaglesoft.bgldoc.data.BGLProperty}s this document contains
-	 */
 	private PropertyStorage[] props;
 	
-	/**
-	 * the list of {@link biz.beaglesoft.bgldoc.data.BGLDocument}s this document contains
-	 */
 	private DocumentStorage[] docs;
 	
-	/**
-	 * the list of {@link biz.beaglesoft.bgldoc.data.BGLDocumentList}s this document contains
-	 */
 	private DocumentListStorage[] lists;
 	
 	private DocumentStorage(){}
 	
-	DocumentStorage(Document bglDocument, String moduleId) {
-		initializeFromDocument(bglDocument, moduleId);
+	DocumentStorage(Document document, String moduleId) {
+		initializeFromDocument(document, moduleId);
 	}
 
 	/**
 	 * This method initializes the instance of this class out of a {@link biz.beaglesoft.bgldoc.data.BGLDocument}
 	 */
-	private void initializeFromDocument(Document bglDocument, String moduleId) {
-		name = bglDocument.getId();
-		typeId = bglDocument.getTypeIdentifier();
+	private void initializeFromDocument(Document document, String moduleId) {
+		name = document.getId();
+		typeId = document.getTypeIdentifier();
 		this.moduleId = moduleId; 
-		Enumeration keys = bglDocument.getKeys();
+		Enumeration keys = document.getKeys();
 		List _docs = new ArrayList();
 		List _lists = new ArrayList();
 		List _props = new ArrayList();
 		List _listProps = new ArrayList();
 		while(keys.hasMoreElements()){
-			Object o = bglDocument.getObject((String)keys.nextElement());
+			Object o = document.getObject((String)keys.nextElement());
 			if (log.isDebugEnabled()) {
 				NDC.push(_myAddress_);
 				log.debug("handling object of "+o.getClass());
