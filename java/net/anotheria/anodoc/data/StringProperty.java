@@ -77,7 +77,7 @@ public class StringProperty extends Property{
 	 */
 	public long getSizeInBytes() { 
 		String s = getString();
-		return s==null ? 0 : s.length();
+		return s==null ? 0 : s.length()*2;
 	}
 	
 	/* (non-Javadoc)
