@@ -31,10 +31,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		ret += "<%@ page"+CRLF;
 		ret += "\tcontentType=\"text/html;charset="+GeneratorDataRegistry.getInstance().getContext().getEncoding()+"\" session=\"true\""+CRLF;
 		
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-bean.tld\" prefix=\"bean\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-html.tld\" prefix=\"html\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-logic.tld\" prefix=\"logic\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/anoweb.tld\" prefix=\"ano\""+CRLF;
+		ret += "%><%@ taglib uri=\"/tags/struts-bean\" prefix=\"bean\""+CRLF;
+		ret += "%><%@ taglib uri=\"/tags/struts-html\" prefix=\"html\""+CRLF;
+		ret += "%><%@ taglib uri=\"/tags/struts-logic\" prefix=\"logic\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/anoweb.tld\" prefix=\"ano\""+CRLF;
 		ret += "%>"+CRLF;
 		return ret;
 	}
@@ -44,10 +44,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		ret += "<%@ page"+CRLF;
 		ret += "\tcontentType=\"text/xml;charset="+GeneratorDataRegistry.getInstance().getContext().getEncoding()+"\" session=\"true\""+CRLF;
 		
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-bean.tld\" prefix=\"bean\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-html.tld\" prefix=\"html\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-logic.tld\" prefix=\"logic\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/anoweb.tld\" prefix=\"ano\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/struts-bean.tld\" prefix=\"bean\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/struts-html.tld\" prefix=\"html\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/struts-logic.tld\" prefix=\"logic\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/anoweb.tld\" prefix=\"ano\""+CRLF;
 		ret += "%>";
 		return ret;
 	}
@@ -57,10 +57,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		ret += "<%@ page"+CRLF;
 		ret += "\tcontentType=\"application/msexcel;charset="+GeneratorDataRegistry.getInstance().getContext().getEncoding()+"\" session=\"true\""+CRLF;
 		
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-bean.tld\" prefix=\"bean\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-html.tld\" prefix=\"html\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/struts-logic.tld\" prefix=\"logic\""+CRLF;
-		ret += "%><%@ taglib uri=\"/WEB-INF/tlds/anoweb.tld\" prefix=\"ano\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/struts-bean.tld\" prefix=\"bean\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/struts-html.tld\" prefix=\"html\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/struts-logic.tld\" prefix=\"logic\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/anoweb.tld\" prefix=\"ano\""+CRLF;
 		ret += "%>";
 		return ret;
 	}
