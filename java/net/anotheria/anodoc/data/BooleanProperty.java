@@ -3,7 +3,7 @@ package net.anotheria.anodoc.data;
 /**
  * This class represents a boolean property.
  * @since 1.0
- * @author lro
+ * @author lrosenberg
  */
 public class BooleanProperty extends Property{
 	
