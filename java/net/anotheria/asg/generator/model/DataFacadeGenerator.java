@@ -3,7 +3,6 @@ package net.anotheria.asg.generator.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -16,9 +15,13 @@ import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.util.StringUtils;
 
-public class DataFacadeGenerator 
-	extends AbstractDataObjectGenerator
-	implements IGenerator{
+/**
+ * This generator generates the data facade - the interface which defines the behaviour of the document and its attributes. It also generates the 
+ * sort type. 
+ * @author another
+ *
+ */
+public class DataFacadeGenerator extends AbstractDataObjectGenerator implements IGenerator{
 
 	public static final String PROPERTY_DECLARATION = "public static final String ";	
 	
@@ -27,8 +30,6 @@ public class DataFacadeGenerator
 	public List<FileEntry> generate(IGenerateable gdoc, Context context){
 		MetaDocument doc = (MetaDocument)gdoc;
 		this.context = context;
-		
-		
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
@@ -201,24 +202,6 @@ public class DataFacadeGenerator
 		return ret;
 	}
 	
-	private String generateDefaultConstructor(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public "+doc.getName()+"(String id){");
-		increaseIdent();
-		ret += writeStatement("super(id)");
-		ret += closeBlock();
-		return ret;
-	}
-	
-	private String generateCloneConstructor(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public "+doc.getName()+"("+doc.getName()+" toClone){");
-		increaseIdent();
-		ret += writeStatement("super(toClone)");
-		ret += closeBlock();
-		return ret;
-	}
-
 	private String generatePropertyConstants(MetaDocument doc){
 		String ret = "";
 		ret += _generatePropertyConstants(doc.getProperties());
@@ -263,11 +246,7 @@ public class DataFacadeGenerator
 	private String generatePropertyAccessMethods(MetaDocument doc){
 		String ret = "";
 		
-		List<MetaProperty> properties = (List)((ArrayList)doc.getProperties()).clone();
-		//MetaProperty id = new MetaProperty("id", "string");
-		//id.setReadonly(true);
-		//properties.add(id);
-		ret += _generatePropertyAccessMethods(properties);
+		ret += _generatePropertyAccessMethods(doc.getProperties());
 		ret += _generatePropertyAccessMethods(doc.getLinks());
 		return ret;
 	}
@@ -363,40 +342,14 @@ public class DataFacadeGenerator
 		return ret;
 	}
 
-	private String generateToStringMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public String toString(){");
-		increaseIdent();
-		ret += writeStatement("String ret = "+quote(doc.getName()+" "));
-		ret += writeStatement("ret += \"[\"+getId()+\"] \"");
-		List<MetaProperty> props = doc.getProperties();
-		for (int i=0; i<props.size(); i++){
-			MetaProperty p = props.get(i);
-			if (p instanceof MetaTableProperty){
-				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
-				for (int t=0; t<columns.size(); t++){
-					MetaProperty pp = columns.get(t);
-					ret += writeStatement("ret += "+quote(pp.getName()+": ")+"+get"+pp.getAccesserName()+"()");
-					if (t<columns.size()-1)
-						ret += writeStatement("ret += \", \"");
-				}
-			}else{
-				ret += writeStatement("ret += "+quote(p.getName()+": ")+"+get"+p.getAccesserName()+"()");
-			}
-			if (i<props.size()-1)
-				ret += writeStatement("ret += \", \"");
-		}
-		ret += writeStatement("return ret"); 
-		ret += closeBlock();
-		return ret;
-	}
 	
 	public static final String getDocumentImport(Context context, MetaDocument doc){
-		return context.getPackageName(doc)+".data."+doc.getName();
+		return context.getDataPackageName(doc)+"."+doc.getName();
 	}
 	
 	public static final String getSortTypeImport(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data."+getSortTypeName(doc);
+		return GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc)+"."+getSortTypeName(doc);
+		
 	}
 	
 	private String generateAdditionalMethods(MetaDocument doc){
@@ -417,12 +370,9 @@ public class DataFacadeGenerator
 	
 	private String generateContainerMethods(MetaContainerProperty container){
 		String ret = "";
-
 		ret += writeString("public int "+getContainerSizeGetterName(container)+"();");
 		ret += emptyline();
-		
 		return ret;
-
 	}
 	
 	private String generateListMethods(MetaListProperty list){
@@ -474,37 +424,6 @@ public class DataFacadeGenerator
 		return ret;
 	}
 	
-	private String generateCompareMethod(MetaDocument doc){
-		String ret = "";
-		
-		ret += writeString("public int compareTo(IComparable anotherComparable, int method){");
-		increaseIdent();
-
-		ret += writeStatement(getDocumentName(doc)+" anotherDoc = ("+getDocumentName(doc)+") anotherComparable");
-		ret += writeString("switch(method){");
-		increaseIdent();
-		List<MetaProperty> properties = extractSortableProperties(doc);
-
-		for (int i=0; i<properties.size(); i++){
-			MetaProperty p = properties.get(i);
-
-			String caseDecl = getSortTypeName(doc)+".SORT_BY_"+p.getName().toUpperCase();
-			ret += writeString("case "+caseDecl+":");
-			String type2compare = null; 
-			type2compare = StringUtils.capitalize(p.toJavaType());
-			String retDecl = "return BasicComparable.compare"+type2compare;
-			retDecl += "(get"+p.getAccesserName()+"(), anotherDoc.get"+p.getAccesserName()+"())";
-			ret += writeIncreasedStatement(retDecl);
-		}
-		ret += writeString("default:");
-		ret += writeIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
-		ret += closeBlock();
-
-		ret += closeBlock();
-		
-		return ret;
-	}
-	
 	public static String getContainerSizeGetterName(MetaContainerProperty p){
 		return "get"+StringUtils.capitalize(p.getName())+"Size"; 
 	}
@@ -533,7 +452,7 @@ public class DataFacadeGenerator
 	}
 
 	public static final String getDocumentFactoryImport(Context context, MetaDocument doc){
-		return context.getPackageName(doc)+".data."+getDocumentFactoryName(doc);
+		return context.getDataPackageName(doc)+"."+getDocumentFactoryName(doc);
 	}
 
 

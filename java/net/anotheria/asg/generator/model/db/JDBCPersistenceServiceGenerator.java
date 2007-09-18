@@ -313,16 +313,12 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		ret += writeString("}");
 		return ret;
 	}
-	
-	private String getModuleGetterMethod(MetaModule module){
-	    return "_get"+module.getModuleClassName();	    
-	}
-	
-	private String getModuleGetterCall(MetaModule module){
-	    return getModuleGetterMethod(module)+"()";
-	}
-	
 
+	/**
+	 * Generates a factory for the implementation.
+	 * @param module
+	 * @return
+	 */
 	private String generateFactory(MetaModule module){
 	    String ret = "";
 
@@ -369,11 +365,11 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	}
 	
 	public static final String getExceptionImport(Context c, MetaModule m){
-		return getPackageName(c,m)+"."+getExceptionName(m);
+		return getPackageName(c, m)+"."+getExceptionName(m);
 	}
 
 	public static final String getFactoryImport(Context c, MetaModule m){
-		return getPackageName(c,m)+"."+getFactoryName(m);
+		return getPackageName(c, m)+"."+getFactoryName(m);
 	}
 
 	public static final String getInterfaceImport(Context c, MetaModule m){

@@ -3,8 +3,6 @@ package net.anotheria.asg.generator.model.docs;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -77,71 +75,6 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		return properties;
 	}
 	
-/*	private String generateSortType(MetaDocument doc){
-		String ret = "";
-
-		List<MetaProperty> properties = extractSortableProperties(doc);
-
-		// ??? boolean containsComparable = false;
-		
-		if (properties.size()==0)
-			return null;
-			
-		ret += writeStatement("package "+getPackageName());
-		ret += emptyline();
-		ret += writeImport("net.anotheria.util.sorter.SortType");
-		ret += emptyline();
-		
-		ret += writeString("public class "+getSortTypeName(doc)+" extends SortType{");
-		increaseIdent();
-		
-		
-		int lastIndex = 1;
-		for (int i=0; i<properties.size(); i++){
-			MetaProperty p = properties.get(i);
-			ret += writeStatement("public static final int SORT_BY_"+p.getName().toUpperCase()+" = "+(lastIndex++));
-		}
-		ret += writeStatement("public static final int SORT_BY_DEFAULT = SORT_BY_ID");
-
-		ret += emptyline();
-
-		ret += writeString("public "+getSortTypeName(doc)+"(){");
-		increaseIdent();
-		ret += writeString("super(SORT_BY_DEFAULT);");
-		ret += closeBlock();
-		ret += emptyline();
-
-		ret += writeString("public "+getSortTypeName(doc)+"(int method){");
-		increaseIdent();
-		ret += writeString("super(method);");
-		ret += closeBlock();
-		ret += emptyline();
-				
-		ret += writeString("public "+getSortTypeName(doc)+"(int method, boolean order){");
-		increaseIdent();
-		ret += writeString("super(method, order);");
-		ret += closeBlock();
-		ret += emptyline();
-		
-		ret += writeString("public static int name2method(String name){");
-		increaseIdent();
-		for (int i=0; i<properties.size(); i++){
-			MetaProperty p = properties.get(i);
-				ret += writeString("if ("+quote(p.getName())+".equals(name))");
-				ret += writeIncreasedStatement("return SORT_BY_"+p.getName().toUpperCase());
-		}
-		ret += writeStatement("throw new RuntimeException("+quote("Unknown sort type name: ")+"+name)");		
-		ret += closeBlock();
-
-		ret += closeBlock();
-		
-
-		return ret;
-		
-		
-	}
-	
-	*/
 	private String generateDocument(MetaDocument doc){
 		String ret = "";
 		

@@ -305,7 +305,6 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    ret += emptyline();
 	    ret += writeString("public Element exportToXML(){");
 	    increaseIdent();
-	    ret += writeStatement("//return "+getModuleGetterCall(module)+".toXMLElement()");
 	    ret += writeStatement("throw new RuntimeException(\"not implemented\")");
 	    ret += closeBlock();
 	    
@@ -314,15 +313,6 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    return ret;
 	}
 	
-	private String getModuleGetterMethod(MetaModule module){
-	    return "_get"+module.getModuleClassName();	    
-	}
-	
-	private String getModuleGetterCall(MetaModule module){
-	    return getModuleGetterMethod(module)+"()";
-	}
-	
-
 	private String generateFactory(MetaModule module){
 	    String ret = "";
 
@@ -362,7 +352,4 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    return getServiceName(m)+"Impl";
 	}
 	
-	public static String getPackageName(Context context){
-	    return context.getPackageName()+".service";
-	}
 }

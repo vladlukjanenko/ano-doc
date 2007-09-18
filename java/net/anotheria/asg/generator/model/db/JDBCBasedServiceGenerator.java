@@ -13,6 +13,11 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 
+/**
+ * Generates a DB-Backed implementation of a module interface and the according factory.
+ * @author another
+ *
+ */
 public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGenerator{
 	
 	private Context context;
@@ -33,10 +38,14 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	}
 	
 	private String getPackageName(MetaModule mod){
-		return context.getPackageName(mod)+".service";
+		return context.getServicePackageName(mod);
 	}
 	
-	
+	/**
+	 * Generates the implementation
+	 * @param module the metamodule to generate
+	 * @return
+	 */
 	private String generateImplementation(MetaModule module){
 	    String ret = "";
 
@@ -46,9 +55,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
-	    ret += writeImport("net.anotheria.anodoc.data.Property");
-	    ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
-		ret += writeImport("net.anotheria.util.sorter.SortType");
+	    ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += writeImport("net.anotheria.util.Date");
 	    ret += writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
 	    ret += emptyline();
@@ -268,15 +275,6 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	    return ret;
 	}
 	
-	private String getModuleGetterMethod(MetaModule module){
-	    return "_get"+module.getModuleClassName();	    
-	}
-	
-	private String getModuleGetterCall(MetaModule module){
-	    return getModuleGetterMethod(module)+"()";
-	}
-	
-
 	private String generateFactory(MetaModule module){
 	    String ret = "";
 

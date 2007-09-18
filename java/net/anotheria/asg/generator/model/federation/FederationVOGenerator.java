@@ -6,7 +6,6 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
@@ -36,7 +35,6 @@ public class FederationVOGenerator extends AbstractGenerator
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
 		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentImplName(doc), generateDocument(doc)));
-		//_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getSortTypeName(doc), generateSortType(doc)));
 		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
 		return _ret;
 	}
@@ -49,10 +47,6 @@ public class FederationVOGenerator extends AbstractGenerator
 		return doc.getName()+"VO";
 	}
 	
-
-	public static String getClassImplName(MetaDocument doc){
-		return doc.getName()+"Document";
-	}
 
 	public static String getSortTypeName(MetaDocument doc){
 		return doc.getName()+"SortType";
@@ -198,7 +192,7 @@ public class FederationVOGenerator extends AbstractGenerator
 	private String _generatePropertyField(MetaProperty p){
 		String ret = "";
 		if (context.areLanguagesSupported() && p.isMultilingual()){
-			System.out.println("Multilingual support for VOs not yet implemented!");
+			System.err.println("Multilingual support for VOs not yet implemented!");
 			/*
 			for (String l: context.getLanguages()){
 				String decl = PROPERTY_DECLARATION;
@@ -399,12 +393,7 @@ public class FederationVOGenerator extends AbstractGenerator
 
 
 	public static final String getDocumentImport(Context context, MetaDocument doc){
-		return context.getPackageName()+".data."+getDocumentImplName(doc);
-	}
-	
-
-	public static final String getSortTypeImport(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".data."+getSortTypeName(doc);
+		return context.getDataPackageName(doc)+"."+getDocumentImplName(doc);
 	}
 	
 	private String generateAdditionalMethods(MetaDocument doc){

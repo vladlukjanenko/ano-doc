@@ -8,7 +8,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 
 public class AbstractDataObjectGenerator extends AbstractGenerator{
 	protected String getPackageName(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data";
+		return GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc);
 	}
 	
 	public static String getPackageName(Context context, MetaDocument doc){

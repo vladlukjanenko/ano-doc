@@ -15,7 +15,11 @@ import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
-
+/**
+ * This generator generates the DAO for a Document, the daoexceptions, and the rowmapper.
+ * @author another
+ *
+ */
 public class PersistenceServiceDAOGenerator extends AbstractGenerator implements IGenerator{
 	
 	private Context context;
@@ -35,8 +39,6 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getDAOName(d), generateDAO(d)));
 			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getRowMapperName(d), generateRowMapper(d)));
 		}
-//		ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
-	//	ret.add(new FileEntry(FileEntry.package2path(packageName), getImplementationName(mod), generateImplementation(mod)));
 		
 		return ret;
 	}
@@ -137,13 +139,18 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    
 	    ret += writeStatement("long id = row.getLong(1)");
 	    ret += writeStatement(doc.getName()+" ret = new "+VOGenerator.getDocumentImplName(doc)+"(\"\"+id)");
-	    
 	    for (int i=0; i<doc.getProperties().size(); i++){
 	    	ret += generateProperty2DBMapping(doc.getProperties().get(i), i+2);
 	    }
+	    int ioffset = doc.getProperties().size();
 	    
-	    ret += generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_CREATED, "long"), doc.getProperties().size()+2);
-	    ret += generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_UPDATED, "long"), doc.getProperties().size()+3);
+	    for (int i=0; i<doc.getLinks().size(); i++){
+	    	ret += generateProperty2DBMapping(doc.getLinks().get(i), i+ioffset+2);
+	    }
+	    
+	    ioffset = doc.getProperties().size()+doc.getLinks().size();
+	    ret += generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_CREATED, "long"), ioffset+2);
+	    ret += generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_UPDATED, "long"), ioffset+3);
 	    
 	    ret += writeStatement("return ret");
 	    decreaseIdent();
@@ -237,6 +244,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         ret += writeImport("net.anotheria.db.dao.RowMapper");
 	    ret += emptyline(); 
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
+	    ret += writeImport("net.anotheria.anodoc.util.context.DBContext");
+	    ret += writeImport("net.anotheria.anodoc.util.context.ContextManager");
 	    ret += emptyline();
 
 	    ret += writeImport("java.sql.Connection");
@@ -261,7 +270,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    MetaProperty id = new MetaProperty("id", "string");
 	    MetaProperty dao_created = new MetaProperty("dao_created", "long");
 	    MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
-	    List<MetaProperty> properties = doc.getProperties();
+	    List<MetaProperty> properties = new ArrayList<MetaProperty>();
+	    properties.addAll(doc.getProperties());
+	    properties.addAll(doc.getLinks());
 	    ret += writeStatement(constDecl+getAttributeConst(id)+" = "+quote(getAttributeName(id)));
 	    for (MetaProperty p : properties){
 		    ret += writeStatement(constDecl+getAttributeConst(p)+" \t = "+quote(getAttributeName(p)));
@@ -270,12 +281,13 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    ret += emptyline();
 	    //create sql staments
 	    //SQL-CREATE
-	    String sqlCreate = quote("INSERT INTO ")+" + TABNAME +"+quote(" (");
-	    sqlCreate += "+"+getAttributeConst(id);
+	    String sqlCreate1 = quote("INSERT INTO ");
+	    String sqlCreate2 = quote(" (");
+	    sqlCreate2 += "+"+getAttributeConst(id);
 	    for (MetaProperty p : properties){
-	    	sqlCreate += "+"+quote(", ")+"+"+getAttributeConst(p);
+	    	sqlCreate2 += "+"+quote(", ")+"+"+getAttributeConst(p);
 	    }
-	    sqlCreate += "+"+quote(", ")+"+"+getAttributeConst(dao_created);
+	    sqlCreate2 += "+"+quote(", ")+"+"+getAttributeConst(dao_created);
 	    String sqlCreateEnd = ") VALUES (";
 	    //+2 because of created flag and id.
 	    for (int i=0; i<properties.size()+2; i++){
@@ -284,36 +296,45 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    		sqlCreateEnd+=",";
 	    }
 	    sqlCreateEnd += ")";
-	    sqlCreate += "+"+quote(sqlCreateEnd);
-	    ret += writeStatement(constDecl+" SQL_CREATE \t\t= "+sqlCreate);
+	    sqlCreate2 += "+"+quote(sqlCreateEnd);
+	    ret += writeStatement(constDecl+" SQL_CREATE_1 \t= "+sqlCreate1);
+	    ret += writeStatement(constDecl+" SQL_CREATE_2 \t= "+sqlCreate2);
 	    
 	    //SQL-UPDATE
-	    String sqlUpdate = quote("UPDATE ")+" + TABNAME +"+quote(" SET ");
+	    String sqlUpdate1 = quote("UPDATE ");
+	    String sqlUpdate2 = quote(" SET ");
 	    for (MetaProperty p : properties){
-	    	sqlUpdate += " + "+getAttributeConst(p)+" + "+quote(" = ?, ");
+	    	sqlUpdate2 += " + "+getAttributeConst(p)+" + "+quote(" = ?, ");
 	    }
-    	sqlUpdate += " + "+getAttributeConst(dao_updated)+" + "+quote(" = ?");
-	    sqlUpdate += " + "+quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
+    	sqlUpdate2 += " + "+getAttributeConst(dao_updated)+" + "+quote(" = ?");
+	    sqlUpdate2 += " + "+quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
 
-    	ret += writeStatement(constDecl+" SQL_UPDATE \t\t= "+sqlUpdate);
+    	ret += writeStatement(constDecl+" SQL_UPDATE_1 \t= "+sqlUpdate1);
+    	ret += writeStatement(constDecl+" SQL_UPDATE_2 \t= "+sqlUpdate2);
 	    
 	    //SQL-DELETE
-	    String sqlDelete = quote("DELETE FROM ")+" + TABNAME +";
-	    sqlDelete += quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
-	    ret += writeStatement(constDecl + " SQL_DELETE \t\t= "+sqlDelete);
+	    String sqlDelete1 = quote("DELETE FROM ");
+	    String sqlDelete2 = quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
+	    ret += writeStatement(constDecl + " SQL_DELETE_1 \t= "+sqlDelete1);
+	    ret += writeStatement(constDecl + " SQL_DELETE_2 \t= "+sqlDelete2);
 
 	    //SQL-READ-ONE
-	    String sqlReadOne = quote("SELECT * FROM ")+" + TABNAME +";
-	    sqlReadOne += quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
-	    ret += writeStatement(constDecl + " SQL_READ_ONE \t= "+sqlReadOne);
+	    String sqlReadOne1 = quote("SELECT * FROM ");
+	    String sqlReadOne2 = quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
+	    ret += writeStatement(constDecl + " SQL_READ_ONE_1 \t= "+sqlReadOne1);
+	    ret += writeStatement(constDecl + " SQL_READ_ONE_2 \t= "+sqlReadOne2);
 
 	    //SQL-READ-ALL
-	    String sqlReadAll = quote("SELECT * FROM ")+" + TABNAME ";
-	    ret += writeStatement(constDecl + " SQL_READ_ALL \t= "+sqlReadAll);
+	    String sqlReadAll1 = quote("SELECT * FROM ");
+	    String sqlReadAll2 = quote("");
+	    ret += writeStatement(constDecl + " SQL_READ_ALL_1 \t= "+sqlReadAll1);
+	    ret += writeStatement(constDecl + " SQL_READ_ALL_2 \t= "+sqlReadAll2);
 	    
 	    //SQL-READ-ALL
-	    String sqlReadAllByProperty = quote("SELECT * FROM ")+" + TABNAME +"+quote(" WHERE ");
-	    ret += writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY \t= "+sqlReadAllByProperty);
+	    String sqlReadAllByProperty1 = quote("SELECT * FROM ");
+	    String sqlReadAllByProperty2 = quote(" WHERE ");
+	    ret += writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_1 \t= "+sqlReadAllByProperty1);
+	    ret += writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_2 \t= "+sqlReadAllByProperty2);
 
 	    ret += emptyline();
 	    ret += writeStatement("private AtomicLong lastId = new AtomicLong()");
@@ -324,6 +345,17 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    ret += emptyline();
 	    //create impl
 	    
+	    
+	    //createSQL Method
+	    ret += writeString("private String createSQL(String sql1, String sql2){");
+	    increaseIdent();
+	    ret += writeStatement("DBContext context = ContextManager.getCallContext().getDbContext()");
+	    ret += writeStatement("StringBuilder sql = new StringBuilder();");
+	    ret += writeStatement("sql.append(sql1).append(context.getTableNameInContext(TABNAME)).append(sql2)");
+	    ret += writeStatement("System.out.println(\"SQL: \"+sql)");
+	    ret += writeStatement("return sql.toString()");
+	    ret += closeBlock();
+	    ret += emptyline();
 	    
 	    String throwsClause = " throws DAOException";
 	    String callLog = "";
@@ -380,8 +412,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         ret += generateFunctionStart("SQL_CREATE", callLog, true);
         ret += writeStatement("long nextId = lastId.incrementAndGet()");
         ret += writeStatement("ps.setLong(1, nextId)");
-        for (int i=0; i<doc.getProperties().size(); i++){
-        	ret += generateDB2PropertyMapping(doc.getVariableName(), doc.getProperties().get(i), i+2);
+        for (int i=0; i<properties.size(); i++){
+        	ret += generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2);
         	ii = i +2;
         }
         ret += writeCommentLine("set create timestamp");
@@ -410,8 +442,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         ret += openFun("public "+doc.getName()+" update"+doc.getName()+"(Connection con, "+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
         ret += generateFunctionStart("SQL_UPDATE", callLog, true);
 
-        for (int i=0; i<doc.getProperties().size(); i++){
-        	ret += generateDB2PropertyMapping(doc.getVariableName(), doc.getProperties().get(i), i+1);
+        for (int i=0; i<properties.size(); i++){
+        	ret += generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+1);
         	ii = i+1;
         }
         ret += writeCommentLine("set update timestamp");
@@ -438,7 +470,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		ret += openTry();
 		//TODO Caching fuer generierte SQL Statements
         ret += writeCommentLine("//enable caching of statements one day");
-        ret += writeStatement("String SQL = SQL_READ_ALL_BY_PROPERTY");
+        ret += writeStatement("String SQL = createSQL(SQL_READ_ALL_BY_PROPERTY_1, SQL_READ_ALL_BY_PROPERTY_2)");
         ret += writeStatement("String whereClause = "+quote(""));
         ret += writeString("for (QueryProperty p : properties){");
         increaseIdent();
@@ -454,7 +486,6 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         increaseIdent();
         ret += writeStatement("setProperty(i+1, ps, properties.get(i))");
         ret +=closeBlock();
-        ret += writeStatement("System.out.println(\"SQL: \"+SQL)");
         
         
         ret += writeStatement("ResultSet result = ps.executeQuery()");
@@ -563,6 +594,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		for (int i=0; i<doc.getProperties().size(); i++){
 			ret += writeString(getSQLPropertyDefinition(doc.getProperties().get(i))+",");
 		}
+		for (int i=0; i<doc.getLinks().size(); i++){
+			ret += writeString(getSQLPropertyDefinition(doc.getLinks().get(i))+",");
+		}
 		for (int i=0; i<additionalProps.length-1; i++)
 			ret += writeString(getSQLPropertyDefinition(additionalProps[i])+",");
 		ret += writeString(getSQLPropertyDefinition(additionalProps[additionalProps.length-1]));
@@ -576,6 +610,11 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		return getAttributeName(p)+" "+getSQLPropertyType(p);
 	}
 	
+	/**
+	 * This method maps MetaProperties Types to SQL DataTypes.
+	 * @param p
+	 * @return
+	 */
 	private String getSQLPropertyType(MetaProperty p){
 		if (p.getType().equals("string"))
 			return "varchar";
@@ -589,11 +628,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			return "boolean";
 		return "UNKNOWN!";
 	}
-/*	iid integer PRIMARY KEY,
-    secret char(10) NOT NULL,
-    pb_card char(16),
-    pb_pin char(4)
-	*/
+
 	private String getSQLTableName(MetaDocument doc){
 		return doc.getName().toLowerCase();
 	}
@@ -604,7 +639,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			ret += writeStatement("PreparedStatement ps = null");
 			ret += openTry();
 			ret += writeStatement("con.setAutoCommit(true)");
-			ret += writeStatement("ps = con.prepareStatement("+SQL_STATEMENT+")");
+			ret += writeStatement("ps = con.prepareStatement(createSQL("+SQL_STATEMENT+"_1, "+SQL_STATEMENT+"_2))");
 		}else{
 			ret += writeStatement("Statement st = null");
 			ret += openTry();
@@ -630,36 +665,6 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	}
 	
 	
-	private String getModuleGetterMethod(MetaModule module){
-	    return "_get"+module.getModuleClassName();	    
-	}
-	
-	private String getModuleGetterCall(MetaModule module){
-	    return getModuleGetterMethod(module)+"()";
-	}
-	
-/*
-	private String generateFactory(MetaModule module){
-	    String ret = "";
-
-		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
-
-	    ret += writeStatement("package "+getPackageName());
-	    ret += emptyline();
-	    
-	    ret += writeString("public class "+getFactoryName(module)+"{");
-	    increaseIdent();
-
-	    ret += writeString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");
-	    increaseIdent();
-	    ret += writeString("return "+getImplementationName(module)+".getInstance();");
-	    ret += closeBlock();
-	    
-	    ret += closeBlock();
-	    return ret;
-	}
-*/
-	
 	public static final String getExceptionName(MetaDocument doc){
 		return getDAOName(doc)+"Exception";
 	}
@@ -668,19 +673,11 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		return getDAOName(doc)+"NoItemForIdFoundException";
 	}
 
-	/*	public static String getInterfaceName(MetaModule m){
-	    return "I"+getServiceName(m);
-	}
-	*/
 	public static String getDAOName(MetaDocument doc){
 	    return doc.getName()+"DAO";
 	}
 
 	public static String getRowMapperName(MetaDocument doc){
 	    return doc.getName()+"RowMapper";
-	}
-
-	public static String getPackageName(Context context){
-	    return context.getPackageName()+".service";
 	}
 }

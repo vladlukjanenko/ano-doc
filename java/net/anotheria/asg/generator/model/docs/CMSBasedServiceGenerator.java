@@ -288,8 +288,4 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	public static String getImplementationName(MetaModule m){
 	    return getServiceName(m)+"Impl";
 	}
-	
-	public static String getPackageName(Context context){
-	    return context.getPackageName()+".service";
-	}
 }

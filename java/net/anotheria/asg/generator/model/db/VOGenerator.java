@@ -3,7 +3,6 @@ package net.anotheria.asg.generator.model.db;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -19,7 +18,7 @@ import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
+ * Generates value objects for db bound document implementation.
  * @author another
  */
 public class VOGenerator extends AbstractDataObjectGenerator
@@ -40,10 +39,8 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		id.setReadonly(true);
 		
 		
-		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
 		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentImplName(doc), generateDocument(doc)));
-		//_ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getSortTypeName(doc), generateSortType(doc)));
 		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
 		return _ret;
 	}

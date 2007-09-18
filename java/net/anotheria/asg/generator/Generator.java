@@ -1,5 +1,6 @@
 package net.anotheria.asg.generator;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import net.anotheria.asg.generator.parser.XMLDataParser;
 import net.anotheria.asg.generator.parser.XMLDecoratorsParser;
 import net.anotheria.asg.generator.parser.XMLFiltersParser;
 import net.anotheria.asg.generator.parser.XMLFormParser;
+import net.anotheria.asg.generator.parser.XMLPreprocessor;
 import net.anotheria.asg.generator.parser.XMLTypesParser;
 import net.anotheria.asg.generator.parser.XMLViewParser;
 import net.anotheria.asg.generator.types.TypesGenerator;
@@ -20,10 +22,9 @@ import net.anotheria.asg.generator.view.ViewGenerator;
 import net.anotheria.asg.generator.view.meta.MetaDecorator;
 import net.anotheria.asg.generator.view.meta.MetaFilter;
 import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.util.IOUtils;
 
 /**
- * TODO please remined another to comment this class
+ * This is the main class which runs all other generators in order to produce the code.
  * @author another
  */
 public class Generator {
@@ -39,11 +40,11 @@ public class Generator {
 	}
 	
 	public static void generate() throws Exception{
-		String dataContent = IOUtils.readFileAtOnceAsString(BASE_DIR+"etc/def/datadef.xml");
-		String contextContent = IOUtils.readFileAtOnceAsString(BASE_DIR+"etc/def/context.xml");
+		String dataContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/datadef.xml"));
+		String contextContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/context.xml"));
 		String viewContent = null;
 		try{
-			viewContent = IOUtils.readFileAtOnceAsString(BASE_DIR+"etc/def/editview_def.xml");
+			viewContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/editview_def.xml"));
 		}catch(IOException ignored){}
 
 		XMLContextParser contextParser = new XMLContextParser(contextContent);
@@ -58,7 +59,7 @@ public class Generator {
 		AppUtilGenerator utilGen = new AppUtilGenerator(c);
 		utilGen.generate();
 		try{
-			String typesContent = IOUtils.readFileAtOnceAsString(BASE_DIR+"etc/def/datatypes.xml");
+			String typesContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/datatypes.xml"));
 			XMLTypesParser typesParser = new XMLTypesParser(typesContent);
 			List<DataType> types = typesParser.parseTypes();
 			TypesGenerator tg = new TypesGenerator();
@@ -68,7 +69,7 @@ public class Generator {
 		}catch(Exception e){}
 
 		try{
-			String decoratorsContent = IOUtils.readFileAtOnceAsString(BASE_DIR+"etc/def/decorators-def.xml");
+			String decoratorsContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/decorators-def.xml"));
 			XMLDecoratorsParser dParser = new XMLDecoratorsParser(decoratorsContent);
 			List<MetaDecorator> decorators = dParser.parseDecorators();
 			GeneratorDataRegistry.getInstance().addDecorators(decorators);
@@ -76,7 +77,7 @@ public class Generator {
 		}catch(Exception e){}
 
 		try{
-			String filtersContent = IOUtils.readFileAtOnceAsString(BASE_DIR+"etc/def/filters-def.xml");
+			String filtersContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/filters-def.xml"));
 			XMLFiltersParser dParser = new XMLFiltersParser(filtersContent);
 			List<MetaFilter> filters = dParser.parseFilters();
 			//System.out.println("parsed filters: "+filters);
@@ -101,7 +102,7 @@ public class Generator {
 		}
 		
 		try{
-			String formContent = IOUtils.readFileAtOnceAsString(BASE_DIR+"etc/def/forms_def.xml");
+			String formContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/forms_def.xml"));
 			XMLFormParser formParser = new XMLFormParser(formContent);
 			List<MetaForm> forms = formParser.parseForms();
 			FormsGenerator fg = new FormsGenerator();
