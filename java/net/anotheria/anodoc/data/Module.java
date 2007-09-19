@@ -228,8 +228,13 @@ public class Module implements ICompositeDataObject, Serializable{
 			if (KeyUtility.isDocument(key)){
  				assembledData = assembleDocument(key, subContainer, null);
 			}
-			if (KeyUtility.isList(key)){
-				assembledData = assembleList(key, subContainer);
+			
+			try{
+				if (KeyUtility.isList(key)){
+					assembledData = assembleList(key, subContainer);
+				}
+			}catch(Exception ex){
+				log.warn("Couldn't assemble "+key+" cause: "+ex.getMessage());
 			}
 			
 			if (assembledData==null)

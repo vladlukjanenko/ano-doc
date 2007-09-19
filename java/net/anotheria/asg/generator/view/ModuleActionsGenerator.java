@@ -915,6 +915,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				if (p.isLinked()){
 					MetaLink link = (MetaLink)p;
 					MetaModule targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
+					if (targetModule == null){
+						throw new RuntimeException("Can't resolve link: "+p+" in document "+doc.getName()+" and dialog "+dialog.getName());
+					}
 					String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
 					MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
 					String listName = targetDocument.getMultiple().toLowerCase();

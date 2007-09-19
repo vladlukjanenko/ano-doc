@@ -83,7 +83,7 @@ public class MetaModule implements IGenerateable{
 	        if (d.getName().equals(name))
 	            return d;
 	    }
-	    throw new RuntimeException("No such document: "+name);
+	    throw new RuntimeException("No such document: "+name + " in module "+getName());
 	}
 
 	public boolean equals(Object o){

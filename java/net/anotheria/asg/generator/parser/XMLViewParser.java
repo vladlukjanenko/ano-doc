@@ -99,7 +99,7 @@ public class XMLViewParser {
 		String documentName = section.getChildText("document");
 		MetaModule mod = GeneratorDataRegistry.getInstance().getModule(moduleName);
 		if (mod==null)
-			throw new RuntimeException("Module "+moduleName+" not found!");
+			throw new RuntimeException("Module "+moduleName+" not found (parsing section: "+title+")");
 		s.setModule(mod); 
 		s.setDocument(mod.getDocumentByName(documentName));
 		
