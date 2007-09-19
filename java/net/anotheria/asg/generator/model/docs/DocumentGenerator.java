@@ -18,7 +18,8 @@ import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
+ * This generator generates an ano-doc framework based implementation of the data object interface previously generated
+ * by the DataFacadeGenerator. It also generates an according factory. 
  * @author another
  */
 public class DocumentGenerator extends AbstractDataObjectGenerator
@@ -164,47 +165,6 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		return ret;
 	}
 
-	private String generatePropertyConstants(MetaDocument doc){
-		String ret = "";
-		ret += _generatePropertyConstants(doc.getProperties());
-		ret += _generatePropertyConstants(doc.getLinks());
-		return ret;
-	}
-	
-	private String _generatePropertyConstants(List<MetaProperty> propertyList){
-		String ret = "";
-		for (int i=0; i<propertyList.size(); i++){
-			MetaProperty p = propertyList.get(i);
-			if (p instanceof MetaTableProperty){
-				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
-				for (int t=0; t<columns.size(); t++)
-					ret += _generatePropertyConstant(columns.get(t));
-			}else{
-				ret += _generatePropertyConstant(p);
-			}
-		}
-		return ret;
-	}
-	
-	private String _generatePropertyConstant(MetaProperty p){
-		String ret = "";
-		if (context.areLanguagesSupported() && p.isMultilingual()){
-			for (String l: context.getLanguages()){
-				String decl = PROPERTY_DECLARATION;
-				decl += p.toNameConstant(l);
-				decl += "\t= \""+p.getName()+"_"+l+"\"";
-				ret += writeStatement(decl);
-			}
-			return ret;
-		}else{
-			ret += PROPERTY_DECLARATION;
-			ret += p.toNameConstant();
-			ret += "\t= \""+p.getName()+"\"";
-			return writeStatement(ret);
-		}
-	}
-	
-	
 	private String generatePropertyAccessMethods(MetaDocument doc){
 		String ret = "";
 		

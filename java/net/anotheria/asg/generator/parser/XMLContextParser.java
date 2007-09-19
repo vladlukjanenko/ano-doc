@@ -51,6 +51,7 @@ public class XMLContextParser {
 		return ret;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Context parseLanguages(Context src, Element languages){
 		src.enableMultiLanguageSupport();
 		Element supportedLanguages = languages.getChild("supported");

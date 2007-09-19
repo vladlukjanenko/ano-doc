@@ -55,12 +55,12 @@ public class XMLDataParser implements IDataParser {
 		return ret;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private MetaModule parseModule(Element m){
 		//System.out.println("Parsing "+m.getName());
 		String name = m.getAttributeValue("name");
 		MetaModule mod = new MetaModule();
 		mod.setName(name);
-		boolean federation = false;
 		try{
 			String storageType = m.getAttributeValue("storageType");
 			if (storageType!=null){
@@ -69,7 +69,6 @@ public class XMLDataParser implements IDataParser {
 				if (storageType.equalsIgnoreCase("federation")){
 					//ugly, but ok.
 					mod = new MetaFederationModule(name);
-					federation = true;
 				}
 					
 			}
