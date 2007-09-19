@@ -13,7 +13,7 @@ import net.anotheria.asg.util.decorators.IAttributeDecorator;
 public class EditLinkDecorator implements IAttributeDecorator{
 
 	public String decorate(DataObject obj, String attributeName, String rule) {
-		String docName = obj.getDefinedName().toLowerCase();//Character.toLowerCase(obj.getDefinedName().charAt(0))+obj.getDefinedName().substring(1);
+		String docName = Character.toLowerCase(obj.getDefinedName().charAt(0))+obj.getDefinedName().substring(1);
 		String linkTarget = docName+"Edit?ts="+System.currentTimeMillis()+"&pId="+obj.getId();
 		
 		String caption = "NoProp";
