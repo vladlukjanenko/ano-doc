@@ -108,6 +108,9 @@ public class VOGenerator extends AbstractDataObjectGenerator
 				break;
 			}
 		}
+		
+		ret += writeImport("net.anotheria.asg.data.AbstractVO");
+		
 		ret += emptyline();
 		
 		String interfaceDecl = "implements "+doc.getName();
@@ -119,7 +122,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		}
 		
 		
-		ret += writeString("public class "+getDocumentImplName(doc)+" "+interfaceDecl+"{");
+		ret += writeString("public class "+getDocumentImplName(doc)+" extends AbstractVO "+interfaceDecl+"{");
 		increaseIdent();
 		ret += emptyline();
 		ret += generatePropertyFields(doc);

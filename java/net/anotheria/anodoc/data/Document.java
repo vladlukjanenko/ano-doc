@@ -30,6 +30,9 @@ public class Document extends DataHolder
 	 */
 	public static final String PROP_TYPE_IDENTIFIER = "###my_type###";
 	
+	
+	public static final String PROP_LAST_UPDATE = "###last_update###";
+
 	/**
 	 * Creates a new Document with given name. 
 	 */
@@ -640,5 +643,13 @@ public class Document extends DataHolder
 	
 	public Object getPropertyValue(String propertyName){
 		return getProperty(propertyName).getValue();
+	}
+	
+	public void setLastUpdateNow(){
+		setLong(PROP_LAST_UPDATE, System.currentTimeMillis());
+	}
+	
+	public long getLastUpdateTimestamp(){
+		return getLong(PROP_LAST_UPDATE); 
 	}
 }

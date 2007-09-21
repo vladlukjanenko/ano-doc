@@ -159,6 +159,14 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return "SearchResult";
 	}
 
+	public static String getVersionInfoPageName(){
+		return "VersionInfo";
+	}
+
+	public static String getVersionInfoPageName(MetaDocument doc){
+		return getVersionInfoPageName();
+	}
+
 	public static String getShowQueriesPageName(MetaDocument doc){
 		return "Show"+doc.getMultiple()+"Queries";
 	}
@@ -232,6 +240,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 
 	protected String getDeleteImage(){
 		return getDeleteImage("delete");
+	}
+
+	protected String getVersionImage(){
+		return "V";//getDeleteImage("delete");
 	}
 
 	protected String getEditImage(){

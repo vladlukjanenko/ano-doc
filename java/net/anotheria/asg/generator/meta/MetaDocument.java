@@ -109,6 +109,9 @@ public class MetaDocument implements IGenerateable{
 		if (name.equals("plainId"))
 			return new MetaProperty("plainId","string");
 
+		if (name.equals("documentLastUpdateTimestamp"))
+			return new MetaProperty("documentLastUpdateTimestamp","string");
+
 		for (MetaProperty p : properties)
 			if (p.getName().equals(name))
 				return p; 

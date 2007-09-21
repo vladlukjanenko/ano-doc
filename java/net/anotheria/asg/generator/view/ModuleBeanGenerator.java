@@ -547,6 +547,12 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		plainId.setDecorator(null);
 		elements.add(plainId);
 
+		MetaFieldElement versionInfo = new MetaFieldElement("documentLastUpdateTimestamp");
+		plainId.setComparable(false);
+		plainId.setReadonly(true);
+		plainId.setDecorator(null);
+		elements.add(versionInfo);
+		
 		String ret = "";
 		ret += writeStatement("package "+getPackage(section.getDocument()));
 		ret += emptyline();

@@ -51,6 +51,8 @@ public class Generator {
 		Context c = contextParser.parseContext();
 		GeneratorDataRegistry.getInstance().setContext(c);
 		
+		System.out.println("Context parameters: "+c.getContextParameters());
+		
 		/*System.out.println("Context ist multilanguage enabled: "+c.areLanguagesSupported());
 		if (c.areLanguagesSupported()){
 			System.out.println("Supported "+c.getLanguages()+", default: "+c.getDefaultLanguage());

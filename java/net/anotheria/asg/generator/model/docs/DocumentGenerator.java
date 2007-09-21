@@ -26,7 +26,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 	implements IGenerator{
 
 	public static final String PROPERTY_DECLARATION = "public static final String ";	
-	
+	public static final String GET_CURRENT_LANG = "ContextManager.getCallContext().getCurrentLanguage()";
+
 	private Context context;
 	
 	public List<FileEntry> generate(IGenerateable gdoc, Context context){
@@ -224,6 +225,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 	
 	private String generateListPropertyGetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		if (p.isMultilingual())
+			tmp.setMultilingual(true);
 		return generatePropertyGetterMethod(tmp);
 	}
 	
@@ -272,6 +275,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 
 	private String generateListPropertySetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		if (p.isMultilingual())
+			tmp.setMultilingual(true);
 		return generatePropertySetterMethod(tmp);
 	}
 
@@ -337,6 +342,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 	}
 	
 	private String generateContainerMethods(MetaContainerProperty container){
+		
+		if (container.isMultilingual())
+			return generateContainerMethodsMultilingual(container);
+		
 		String ret = "";
 
 		ret += writeString("public int "+getContainerSizeGetterName(container)+"(){");
@@ -349,11 +358,39 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		ret += emptyline();
 		
 		return ret;
-
 	}
 	
+	private String generateContainerMethodsMultilingual(MetaContainerProperty container){
+		String ret = "";
+
+		for (String l : context.getLanguages()){
+			ret += writeString("public int "+getContainerSizeGetterName(container, l)+"(){");
+			increaseIdent();
+			MetaProperty pr = container instanceof MetaTableProperty ? 
+					(MetaProperty) ((MetaTableProperty)container).getColumns().get(0) :
+						container;
+					ret += writeStatement("return getList("+pr.toNameConstant(l)+").size()"); 
+					ret += closeBlock();
+					ret += emptyline();
+		}
+		
+		ret += writeString("public int "+getContainerSizeGetterName(container)+"(){");
+		increaseIdent();
+		ret += writeStatement("return getList("+quote(container.getName()+"_")+"+"+GET_CURRENT_LANG+").size()"); 
+		ret += closeBlock();
+		ret += emptyline();
+//		ret += writeStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
+
+		
+		return ret;
+
+	}
+
 	private String generateListMethods(MetaListProperty list){
 		String ret = "";
+		
+		if (list.isMultilingual())
+			return generateListMethodsMultilingual(list);
 
 		MetaProperty c = list.getContainedProperty();
 
@@ -397,6 +434,92 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		return ret;
 	}
 	
+	private String generateListMethodsMultilingual(MetaListProperty list){
+		String ret = "";
+
+		MetaProperty c = list.getContainedProperty();
+
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+			String decl = "public void "+getContainerEntryAdderName(list, l)+"(";
+			decl += c.toJavaType()+" "+c.getName();
+			decl += "){";
+			ret += writeString(decl);
+			increaseIdent();
+			
+			ret += writeStatement(c.toJavaType()+"Property p = new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+")");
+			ret += writeStatement("List tmp = get"+list.getAccesserName(l)+"()");
+			ret += writeStatement("tmp.add(p)");
+			ret += writeStatement("set"+list.getAccesserName(l)+"(tmp)");
+			ret += closeBlock();
+			ret += emptyline();
+			
+			
+			ret += writeString("public void "+getContainerEntryDeleterName(list, l)+"(int index){");
+			increaseIdent();
+			ret += writeStatement("getListProperty("+list.toNameConstant(l)+").remove(index)"); 
+			ret += closeBlock();
+			ret += emptyline();
+			
+			ret += writeString("public void "+getContainerEntrySwapperName(list, l)+"(int index1, int index2){");
+			increaseIdent();
+			ret += writeStatement(c.toJavaType()+" tmp1, tmp2");
+			ret += writeStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).get"+c.toJavaType()+"()");
+			ret += writeStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).get"+c.toJavaType()+"()");
+			ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).set"+c.toJavaType()+"(tmp2)");
+			ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).set"+c.toJavaType()+"(tmp1)");
+			ret += closeBlock();
+			ret += emptyline();
+	
+			ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list, l)+"(int index){");
+			increaseIdent();
+			ret += writeStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index)");
+			ret += writeStatement("return p.get"+c.toJavaType()+"()");
+			ret += closeBlock();
+			ret += emptyline();
+		}
+		
+//		quote(container.getName()+"_")+"+"+GET_CURRENT_LANG+
+		String decl = "public void "+getContainerEntryAdderName(list )+"(";
+		decl += c.toJavaType()+" "+c.getName();
+		decl += "){";
+		ret += writeString(decl);
+		increaseIdent();
+		
+		ret += writeStatement(c.toJavaType()+"Property p = new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+")");
+		ret += writeStatement("List tmp = get"+list.getAccesserName()+"()");
+		ret += writeStatement("tmp.add(p)");
+		ret += writeStatement("set"+list.getAccesserName()+"(tmp)");
+		ret += closeBlock();
+		ret += emptyline();
+		
+		
+		ret += writeString("public void "+getContainerEntryDeleterName(list)+"(int index){");
+		increaseIdent();
+		ret += writeStatement("getListProperty("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").remove(index)"); 
+		ret += closeBlock();
+		ret += emptyline();
+		
+		ret += writeString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
+		increaseIdent();
+		ret += writeStatement(c.toJavaType()+" tmp1, tmp2");
+		ret += writeStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).get"+c.toJavaType()+"()");
+		ret += writeStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).get"+c.toJavaType()+"()");
+		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).set"+c.toJavaType()+"(tmp2)");
+		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).set"+c.toJavaType()+"(tmp1)");
+		ret += closeBlock();
+		ret += emptyline();
+
+		ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
+		increaseIdent();
+		ret += writeStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index)");
+		ret += writeStatement("return p.get"+c.toJavaType()+"()");
+		ret += closeBlock();
+		ret += emptyline();
+
+		
+		return ret;
+	}
+
 	private String generateTableMethods(MetaTableProperty table){
 		String ret = "";
 		List<MetaProperty> columns = table.getColumns();
@@ -506,23 +629,44 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		return "get"+StringUtils.capitalize(p.getName())+"Size"; 
 	}
 
+	public static String getContainerSizeGetterName(MetaContainerProperty p, String language){
+		return "get"+StringUtils.capitalize(p.getName(language))+"Size"; 
+	}
+
 	public static String getTableGetterName(MetaTableProperty p){
 		return "get"+StringUtils.capitalize(p.getName())+"Table"; 
 	}
 	
 	public static String getContainerEntryAdderName(MetaContainerProperty p){
-	    return "add"+StringUtils.capitalize(p.getName())+p.getContainerEntryName();	    
+	    return DataFacadeGenerator.getContainerEntryAdderName(p);	    
 	}
+
+	public static String getContainerEntryAdderName(MetaContainerProperty p, String language){
+		return DataFacadeGenerator.getContainerEntryAdderName(p, language);	    
+	}
+
 	public static String getContainerEntryDeleterName(MetaContainerProperty p){
-		return "remove"+StringUtils.capitalize(p.getName())+p.getContainerEntryName();	    
+		return DataFacadeGenerator.getContainerEntryDeleterName(p);	    
+	}
+
+	public static String getContainerEntryDeleterName(MetaContainerProperty p, String language){
+		return DataFacadeGenerator.getContainerEntryDeleterName(p, language);	    
 	}
 
 	public static String getContainerEntrySwapperName(MetaContainerProperty p){
-		return "swap"+StringUtils.capitalize(p.getName())+p.getContainerEntryName();	    
+		return DataFacadeGenerator.getContainerEntrySwapperName(p);	    
 	}
 	
+	public static String getContainerEntrySwapperName(MetaContainerProperty p, String language){
+		return DataFacadeGenerator.getContainerEntrySwapperName(p, language);	    
+	}
+
 	public static String getListElementGetterName(MetaListProperty list){
-		return "get"+StringUtils.capitalize(list.getName())+list.getContainerEntryName();
+		return DataFacadeGenerator.getListElementGetterName(list);	    
+	}
+
+	public static String getListElementGetterName(MetaListProperty list, String language){
+		return DataFacadeGenerator.getListElementGetterName(list, language);	    
 	}
 
 	private String generateDocumentFactory(MetaDocument doc){

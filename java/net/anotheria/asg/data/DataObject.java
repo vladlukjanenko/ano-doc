@@ -22,4 +22,5 @@ public interface DataObject extends Cloneable{
 	 */
 	public String getDefinedName();
 
+	public long getLastUpdateTimestamp();
 }

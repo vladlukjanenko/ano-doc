@@ -271,6 +271,8 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	
 	private String generateListPropertyGetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		if (p.isMultilingual())
+			tmp.setMultilingual(true);
 		return generatePropertyGetterMethod(tmp);
 	}
 	
@@ -311,6 +313,8 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 
 	private String generateListPropertySetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		if (p.isMultilingual())
+			tmp.setMultilingual(true);
 		return generatePropertySetterMethod(tmp);
 	}
 
@@ -350,17 +354,31 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	
 	private String generateContainerMethods(MetaContainerProperty container){
 		String ret = "";
+		if (container.isMultilingual())
+			ret += generateContainerMethodsMultilingual(container);
 		ret += writeComment("Returns the number of elements in the \""+container.getName()+"\" container");
 		ret += writeString("public int "+getContainerSizeGetterName(container)+"();");
 		ret += emptyline();
 		return ret;
 	}
 	
+	private String generateContainerMethodsMultilingual(MetaContainerProperty container){
+		String ret = "";
+		for (String l : context.getLanguages()){
+			ret += writeComment("Returns the number of elements in the \""+container.getName()+"\" container");
+			ret += writeString("public int "+getContainerSizeGetterName(container, l)+"();");
+			ret += emptyline();
+		}
+		return ret;
+	}
+
 	private String generateListMethods(MetaListProperty list){
 		String ret = "";
 
+		if (list.isMultilingual())
+			ret += generateListMethodsMultilingual(list);
+		
 		MetaProperty c = list.getContainedProperty();
-
 		ret += writeComment("Adds a new element to the list.");
 		String decl = "public void "+getContainerEntryAdderName(list)+"(";
 		decl += c.toJavaType()+" "+c.getName();
@@ -383,6 +401,35 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		return ret;
 	}
 	
+	private String generateListMethodsMultilingual(MetaListProperty list){
+		String ret = "";
+
+		for (String l : context.getLanguages()){
+		
+			MetaProperty c = list.getContainedProperty();
+			ret += writeComment("Adds a new element to the list.");
+			String decl = "public void "+getContainerEntryAdderName(list, l)+"(";
+			decl += c.toJavaType()+" "+c.getName();
+			decl += ");";
+			ret += writeString(decl);
+			ret += emptyline();
+			
+			ret += writeComment("Removes the element at position index from the list.");
+			ret += writeString("public void "+getContainerEntryDeleterName(list, l)+"(int index);");
+			ret += emptyline();
+			
+			ret += writeComment("Swaps elements at positions index1 and index2 in the list.");
+			ret += writeString("public void "+getContainerEntrySwapperName(list, l)+"(int index1, int index2);");
+			ret += emptyline();
+			
+			ret += writeComment("Returns the element at the position index in the list.");
+			ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list, l)+"(int index);");
+			ret += emptyline();
+		}
+
+		return ret;
+	}
+
 	private String generateTableMethods(MetaTableProperty table){
 		String ret = "";
 		List<MetaProperty> columns = table.getColumns();
@@ -413,6 +460,10 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		return "get"+StringUtils.capitalize(p.getName())+"Size"; 
 	}
 
+	public static String getContainerSizeGetterName(MetaContainerProperty p, String language){
+		return "get"+StringUtils.capitalize(p.getName(language))+"Size"; 
+	}
+
 	public static String getTableGetterName(MetaTableProperty p){
 		return "get"+StringUtils.capitalize(p.getName())+"Table"; 
 	}
@@ -420,16 +471,33 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	public static String getContainerEntryAdderName(MetaContainerProperty p){
 	    return "add"+StringUtils.capitalize(p.getName())+p.getContainerEntryName();	    
 	}
+
+	public static String getContainerEntryAdderName(MetaContainerProperty p, String language){
+	    return "add"+StringUtils.capitalize(p.getName(language))+p.getContainerEntryName();	    
+	}
+	
 	public static String getContainerEntryDeleterName(MetaContainerProperty p){
 		return "remove"+StringUtils.capitalize(p.getName())+p.getContainerEntryName();	    
+	}
+
+	public static String getContainerEntryDeleterName(MetaContainerProperty p, String language){
+		return "remove"+StringUtils.capitalize(p.getName(language))+p.getContainerEntryName();	    
 	}
 
 	public static String getContainerEntrySwapperName(MetaContainerProperty p){
 		return "swap"+StringUtils.capitalize(p.getName())+p.getContainerEntryName();	    
 	}
 	
+	public static String getContainerEntrySwapperName(MetaContainerProperty p, String language){
+		return "swap"+StringUtils.capitalize(p.getName(language))+p.getContainerEntryName();	    
+	}
+
 	public static String getListElementGetterName(MetaListProperty list){
 		return "get"+StringUtils.capitalize(list.getName())+list.getContainerEntryName();
+	}
+
+	public static String getListElementGetterName(MetaListProperty list, String language){
+		return "get"+StringUtils.capitalize(list.getName(language))+list.getContainerEntryName();
 	}
 
 	public static String getDocumentFactoryName(MetaDocument doc){

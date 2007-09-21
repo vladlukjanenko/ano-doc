@@ -39,6 +39,7 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	public static final String ACTION_CREATE = "create";
 	public static final String ACTION_UPDATE = "update";
 	public static final String ACTION_DELETE = "delete";
+	public static final String ACTION_VERSIONINFO = "versioninfo";
 	public static final String ACTION_DUPLICATE = "duplicate";
 	public static final String ACTION_DEEPCOPY = "deepcopy";
 	public static final String ACTION_ADD 	 = "add";
@@ -283,7 +284,7 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			"/"+getPath(doc, ACTION_SEARCH), 
 			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getSearchActionName(section),
 			"success",
-			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getSearchResultPageName()+".jsp"
+			FileEntry.package2path(JspViewGenerator.getPackage(context, MetaModule.SHARED)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getSearchResultPageName()+".jsp"
 			);
 		
 		ret += generateActionMapping(
@@ -384,6 +385,12 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
 			);
 		
+		ret += generateActionMapping(
+			"/"+getPath(doc, ACTION_VERSIONINFO), 
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getVersionInfoActionName(section),
+			"success",
+			FileEntry.package2path(JspViewGenerator.getPackage(context, MetaModule.SHARED)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getVersionInfoPageName(doc)+".jsp"
+			);
 		
 		return ret;
 	}

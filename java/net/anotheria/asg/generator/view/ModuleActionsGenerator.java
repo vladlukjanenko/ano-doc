@@ -39,6 +39,7 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.util.NumberUtils;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -70,6 +71,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getSearchActionName(section), generateSearchAction(section)));
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDeleteActionName(section), generateDeleteAction(section)));
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDuplicateActionName(section), generateDuplicateAction(section)));
+		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getVersionInfoActionName(section), generateVersionInfoAction(section)));
+		
 		try{
 			if (section.getDialogs().size()>0){
 			
@@ -147,6 +150,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    return "Update"+getActionSuffix(section);
 	}
 	
+	public static String getVersionInfoActionName(MetaModuleSection section){
+	    return "VersionInfo"+getActionSuffix(section);
+	}
+
 	public static String getNewActionName(MetaModuleSection section){
 	    return "New"+getActionSuffix(section);
 	}
@@ -177,6 +184,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
 	    ret += writeImport("net.anotheria.asg.util.decorators.IAttributeDecorator");
+	    ret += writeImport("net.anotheria.util.NumberUtils");
 	    ret += getStandardActionImports();
 	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
@@ -378,6 +386,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    ret += closeBlock();
 	    ret += emptyline();
 	    
+	    
+	    // BEAN creation function
 	    ret += writeString("protected "+ModuleBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	    increaseIdent();
 	    ret += writeStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = new "+ModuleBeanGenerator.getListItemBeanName(doc)+"()");
@@ -396,7 +406,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaProperty p = doc.getField(field.getName());
 				if (p instanceof MetaContainerProperty){
 					String value = "";
-					value = doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName((MetaContainerProperty)p)+"()";
+					value = doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName((MetaContainerProperty)p, lang)+"()";
 					if (element.getDecorator()!=null){
 						//if decorated, save original value for sorting and replace with decorated value
 						MetaProperty tmp ;
@@ -405,11 +415,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						else
 							tmp = new MetaProperty(p.getName()+"ForSorting", p.getType());
 							
-						ret += writeStatement("bean."+tmp.toBeanSetter()+"("+value+")");
+						ret += writeStatement("bean."+tmp.toBeanSetter(lang)+"("+value+")");
 						MetaDecorator d = element.getDecorator();
 						value = getDecoratorVariableName(element)+".decorate("+doc.getVariableName()+", "+quote(p.getName())+", "+quote(d.getRule())+")";
 					}
-					ret += writeStatement("bean."+p.toBeanSetter()+"("+value+")");
+					ret += writeStatement("bean."+p.toBeanSetter(lang)+"("+value+")");
 				}else{
 					String value = "";
 					if (p instanceof MetaEnumerationProperty){
@@ -434,6 +444,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				}
 			}
 		}
+		
+		ret += writeStatement("bean.setDocumentLastUpdateTimestamp(NumberUtils.makeISO8601TimestampString("+doc.getVariableName()+".getLastUpdateTimestamp()))");
 	    
 	    ret += writeStatement("return bean");
 	    ret += closeBlock();
@@ -710,6 +722,48 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return "make"+StringUtils.capitalize(beanName);
 	}
 	
+	private String generateVersionInfoAction(MetaModuleSection section){
+		String ret = "";
+		MetaDocument doc = section.getDocument();
+		MetaDialog dialog = section.getDialogs().get(0);
+		ret += writeStatement("package "+getPackage(section.getModule()));
+		ret += emptyline();
+
+		//write imports...
+		ret += getStandardActionImports();
+	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    ret += writeImport("net.anotheria.util.NumberUtils");
+	    ret += emptyline();
+
+		ret += writeString("public class "+getVersionInfoActionName(section)+" extends "+getBaseActionName(section)+" {");
+		increaseIdent();
+		ret += emptyline();
+	    
+		ret += writeString(getExecuteDeclaration());
+		increaseIdent();
+	
+		ret += writeStatement("String id = getStringParameter(req, PARAM_ID)");
+		ret += writeStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+		ret += writeStatement("long timestamp = "+doc.getVariableName()+".getLastUpdateTimestamp()");
+		ret += writeStatement("String lastUpdateDate = NumberUtils.makeDigitalDateStringLong(timestamp)");
+		ret += writeStatement("lastUpdateDate += \" \"+NumberUtils.makeTimeString(timestamp)");
+
+		try{
+			doc.getField("name");
+			ret += writeStatement("req.setAttribute("+quote("documentName")+", "+doc.getVariableName()+".getName())");
+		}catch(Exception ignored){
+			ret += writeStatement("req.setAttribute("+quote("documentName")+", \"Id:\"+"+doc.getVariableName()+".getId())");
+		}
+		ret += writeStatement("req.setAttribute("+quote("documentType")+", "+doc.getVariableName()+".getClass())");
+		ret += writeStatement("req.setAttribute("+quote("lastUpdate")+", lastUpdateDate)");
+		
+		ret += writeStatement("return mapping.findForward("+quote("success")+")");
+	    
+		ret += closeBlock();
+		ret += closeBlock();
+		return ret;
+	}
+	
 	private String generateUpdateAction(MetaModuleSection section){
 		String ret = "";
 		MetaDocument doc = section.getDocument();
@@ -892,7 +946,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaProperty p = doc.getField(field.getName());
 				if (p instanceof MetaContainerProperty){
 					ret += writeString("// "+p.getName()+" is a table, storing size only");
-					ret += writeStatement("form."+p.toBeanSetter()+"("+doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName((MetaContainerProperty)p)+"())");
+					String lang = getElementLanguage(elem);
+					ret += writeStatement("form."+p.toBeanSetter(lang)+"("+doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName((MetaContainerProperty)p, lang)+"())");
 				}else{
 					String lang = getElementLanguage(elem);
 					String propertyCopy = "";

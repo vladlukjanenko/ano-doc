@@ -185,6 +185,12 @@ public class XMLDataParser implements IDataParser {
 		Element property = (Element)content.getChildren().get(0);
 		MetaProperty containedProperty = parseAttribute(property);
 		ret.setContainedProperty(containedProperty);
+		
+		String multilingual = p.getAttributeValue("multilingual");
+		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
+			ret.setMultilingual(true);
+
+		
 		return ret;
 		
 	}
@@ -196,6 +202,10 @@ public class XMLDataParser implements IDataParser {
 		MetaLink l = new MetaLink(name);
 		l.setLinkTarget(target);
 		l.setLinkType(linkType);
+		String multilingual = p.getAttributeValue("multilingual");
+		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
+			l.setMultilingual(true);
+
 		return l;
 		
 	}

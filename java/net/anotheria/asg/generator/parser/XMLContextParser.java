@@ -41,9 +41,18 @@ public class XMLContextParser {
 				Element languages = context.getChild("languages");
 				if (languages!=null)
 					ret = parseLanguages(ret, languages);
-			}catch(Exception ignored){
+			}catch(Exception ignored){}
+			
+			try{
+				Element parameters = context.getChild("parameters");
+				if (parameters!=null){
+					List<Element> params = parameters.getChildren("parameter");
+					for (Element e : params){
+						ret.addContextParameter(e.getAttributeValue("name"), e.getAttributeValue("value"));
+					}
+				}
 				
-			}
+			}catch(Exception ignored){}
 			
 		}catch(JDOMException e){
 			e.printStackTrace();

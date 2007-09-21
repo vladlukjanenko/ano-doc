@@ -168,6 +168,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		increaseIdent();
 		ret += writeString("DocumentList "+doc.getMultiple().toLowerCase()+" = _get"+doc.getMultiple()+"();");
 		ret += writeString(doc.getMultiple().toLowerCase()+".removeDocumentById("+doc.getVariableName()+".getId());");
+		ret += writeStatement(doc.getVariableName()+".setLastUpdateNow()");
 		ret += writeString(doc.getMultiple().toLowerCase()+".addDocument("+doc.getVariableName()+");");
 		ret += writeString("_update"+doc.getMultiple()+"("+doc.getMultiple().toLowerCase()+");");
 		ret += closeBlock();
@@ -189,6 +190,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		ret += writeStatement("putDocument(idh)");
 		ret += emptyline();
 		ret += writeStatement("DocumentList entries = _get"+doc.getMultiple()+"()");
+		ret += writeStatement(doc.getVariableName()+".setLastUpdateNow()");
 		ret += writeStatement("entries.addDocument("+doc.getVariableName()+")");
 		ret += writeStatement("_update"+doc.getMultiple()+"(entries)");
 		ret += writeStatement("return "+doc.getVariableName());

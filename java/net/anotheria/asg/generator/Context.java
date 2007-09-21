@@ -1,7 +1,9 @@
 package net.anotheria.asg.generator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
@@ -21,6 +23,12 @@ public class Context {
 	
 	private List<String> languages;
 	private String defaultLanguage;
+	
+	private Map<String, ContextParameter> parameters;
+	
+	public Context(){
+		parameters = new HashMap<String, ContextParameter>();
+	}
 	
 	/**
 	 * @deprecated use getPackageName(MetaModule m);
@@ -154,6 +162,24 @@ public class Context {
 	
 	public void addLanguage(String l){
 		languages.add(l);
+	}
+	
+	public void addContextParameter(ContextParameter p){
+		parameters.put(p.getName(), p);
+	}
+	
+	public void addContextParameter(String name, String value){
+		addContextParameter(new ContextParameter(name, value));
+	}
+	
+	public List<ContextParameter> getContextParameters(){
+		ArrayList<ContextParameter> ret = new ArrayList<ContextParameter>();
+		ret.addAll(parameters.values());
+		return ret;
+	}
+	
+	public ContextParameter getContextParameter(String name){
+		return parameters.get(name);
 	}
 
 }

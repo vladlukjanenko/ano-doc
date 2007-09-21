@@ -67,6 +67,9 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		searchResultPage.setType(".jsp");
 		files.add(searchResultPage);
 
+		FileEntry versionInfoPage = new FileEntry(FileEntry.package2path(getContext().getPackageName(MetaModule.SHARED)+".jsp"), getVersionInfoPageName(), generateVersionInfoPage());
+		versionInfoPage.setType(".jsp");
+		files.add(versionInfoPage);
 		
 		
 		
@@ -599,7 +602,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		}
 		
 		if (p instanceof MetaContainerProperty)
-			return generateContainerLinkEditor((MetaContainerProperty)p);
+			return generateContainerLinkEditor(element, (MetaContainerProperty)p);
 		
 		if (p.getType().equals("image")){
 			return generateImageEditor(element, p);
@@ -637,18 +640,18 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return p.getType();
 	}
 	
-	private String generateContainerLinkEditor(MetaContainerProperty p){
+	private String generateContainerLinkEditor(MetaFieldElement element, MetaContainerProperty p){
 		String ret = "";
-		
+		String lang = getElementLanguage(element); 
 		String name = quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()));
 		ret += "<logic:equal name="+name+" property="+quote("id")+" value="+quote("")+">";
 		ret += "none";
 		ret += "</logic:equal>";
 		ret += "<logic:notEqual name="+name+" property="+quote("id")+" value="+quote("")+">";
-		ret += "<bean:write name="+name+" property="+quote(p.getName())+"/>";
+		ret += "<bean:write name="+name+" property="+quote(p.getName(lang))+"/>";
 		ret += "&nbsp;";
 		ret += "element";
-		ret += "<logic:notEqual name="+name+" property="+quote(p.getName())+" value="+quote("1")+">";
+		ret += "<logic:notEqual name="+name+" property="+quote(p.getName(lang))+" value="+quote("1")+">";
 		ret += "s";
 		ret += "</logic:notEqual>";
 		ret += "&nbsp;";
@@ -970,6 +973,80 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
  
+	private String generateVersionInfoPage(){
+		ident = 0;
+		String ret = "";
+		ret += getBaseJSPHeader();
+		
+
+		ret += writeString("<html>");
+		increaseIdent();
+		ret += writeString("<head>");
+		increaseIdent();
+		ret += writeString("<title>VersionInfo for <bean:write name=\"documentName\"/></title>");
+		//ret += writeString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
+		ret += generatePragmas();
+		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		decreaseIdent();
+		ret += writeString("</head>");
+		ret += writeString("<body>");
+		increaseIdent();
+		//ret += writeString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
+
+		int colspan = 2;
+		
+		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
+		increaseIdent();
+		ret += writeString("<tr>");
+		increaseIdent();
+		ret += writeString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
+		decreaseIdent(); 
+		ret += writeString("</tr>");
+		
+		//write header
+		ret += writeString("<tr class=\"lineCaptions\">");
+		increaseIdent();
+		ret += writeString("<td colspan=\"2\">VersionInfo for document</td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+		
+		ret += writeString("<tr class=\"lineLight\">");
+		ret += writeIncreasedString("<td width=\"20%\">Document name: </td>");
+		ret += writeIncreasedString("<td width=\"80%\"><bean:write name="+quote("documentName")+"/></td>");
+		ret += writeString("</tr>");
+
+		ret += writeString("<tr class=\"lineDark\">");
+		ret += writeIncreasedString("<td width=\"20%\">Document type: </td>");
+		ret += writeIncreasedString("<td width=\"80%\"><bean:write name="+quote("documentType")+"/></td>");
+		ret += writeString("</tr>");
+
+		ret += writeString("<tr class=\"lineLight\">");
+		ret += writeIncreasedString("<td width=\"20%\">Last update: </td>");
+		ret += writeIncreasedString("<td width=\"80%\"><bean:write name="+quote("lastUpdate")+"/></td>");
+		ret += writeString("</tr>");
+
+		ret += writeString("<tr class=\"lineDark\">");
+		increaseIdent();
+		ret += writeString("<td colspan=\"2\">&nbsp;</td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+
+		ret += writeString("<tr class=\"lineLight\">");
+		ret += writeIncreasedString("<td width=\"20%\">&nbsp;</td>");
+		ret += writeIncreasedString("<td width=\"80%\"><a href=\"javascript:history.back();\">Back</a></td>");
+		ret += writeString("</tr>");
+
+		decreaseIdent();
+		ret += writeString("</table>");
+		decreaseIdent();
+		//ret += writeString("<jsp:include page=\""+getFooterName(view)+".jsp\" flush=\"true\"/>");
+		ret += writeString("</body>");
+		decreaseIdent();
+		ret += writeString("</html>");
+		ret += getBaseJSPFooter(); 
+		return ret;
+	}
+
 	private String generateElementHeader(MetaViewElement element){
 		if (element instanceof MetaFieldElement)
 			return generateFieldHeader((MetaFieldElement)element);
@@ -1015,6 +1092,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		if (((MetaModuleSection)currentSection).getDocument().getField(element.getName()).getType().equals("image") && element.getDecorator()==null)
 			return generateImage(entryName, element);
 		String elementName = element instanceof MultilingualFieldElement ? element.getVariableName() : element.getName();
+		if (elementName.startsWith("itemsV"))
+				System.out.println(elementName);
 		return "<td><bean:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
 		//return "<td><bean:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}
@@ -1035,6 +1114,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 
 	private String generateFunction(String entryName, MetaFunctionElement element){
 		
+		if (element.getName().equals("version")){
+			return generateVersionFunction(entryName, element);
+		}
+
 		if (element.getName().equals("delete")){
 			return generateDeleteFunction(entryName, element);
 		}
@@ -1077,6 +1160,13 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
 		return "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getDuplicateImage()+"</a></td>" ;
+	}
+
+	private String generateVersionFunction(String entryName, MetaFunctionElement element){
+		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_VERSIONINFO);
+		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
+		
+		return "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+" title="+quote("LastUpdate: <bean:write name="+quote(entryName)+" property="+quote("documentLastUpdateTimestamp")+"/>")+">"+getVersionImage()+"</a></td>" ;
 	}
 
 	private String generateDeleteFunction(String entryName, MetaFunctionElement element){
