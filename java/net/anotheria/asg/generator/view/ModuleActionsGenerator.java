@@ -725,7 +725,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	private String generateVersionInfoAction(MetaModuleSection section){
 		String ret = "";
 		MetaDocument doc = section.getDocument();
-		MetaDialog dialog = section.getDialogs().get(0);
 		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
 
