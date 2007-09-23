@@ -24,6 +24,8 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 public class FederationServiceGenerator extends AbstractGenerator implements IGenerator{
 	
 	private Context context;
+	MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
+
 	
 	public List<FileEntry> generate(IGenerateable gmodule, Context context){
 		
@@ -80,6 +82,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        ret += writeImport(FederationVOGenerator.getDocumentImport(context, doc));
 	        ret += writeImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 
 	        List<FederatedDocumentMapping> mappings = module.getMappingsForDocument(doc.getName());
@@ -168,6 +171,9 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	        	for (MetaProperty p : properties){
 	        		ret += writeStatement("ret.set"+p.getAccesserName()+"(d.get"+p.getAccesserName()+"())");
 	        	}
+	        	
+	        	//add lastupdate copy:
+	        	ret += writeStatement("(("+FederationVOGenerator.getDocumentImplName(doc)+")ret).set"+lastUpdate.getAccesserName()+"(d.get"+lastUpdate.getAccesserName()+"())");
 	        	
 	        	ret += writeStatement("return ret");
 	        	ret += closeBlock();

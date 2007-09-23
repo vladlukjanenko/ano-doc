@@ -25,6 +25,7 @@ public class FederationVOGenerator extends AbstractGenerator
 
 	private Context context;
 	MetaProperty id = new MetaProperty("id","string");
+	MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
 	
 	public List<FileEntry> generate(IGenerateable gdoc, Context context){
 		MetaDocument doc = (MetaDocument)gdoc;
@@ -170,6 +171,7 @@ public class FederationVOGenerator extends AbstractGenerator
 		ret +=_generatePropertyField(id);
 		ret += _generatePropertyFields(doc.getProperties());
 		ret += _generatePropertyFields(doc.getLinks());
+		ret += _generatePropertyField(lastUpdate);
 		
 		return ret;
 	}
@@ -216,6 +218,9 @@ public class FederationVOGenerator extends AbstractGenerator
 		String ret = "";
 		
 		ret += generatePropertyGetterMethod(id);
+		List<MetaProperty> lastUpdList = new ArrayList<MetaProperty>();
+		lastUpdList.add(lastUpdate);
+		ret += _generatePropertyAccessMethods(lastUpdList);
 		ret += _generatePropertyAccessMethods(doc.getProperties());
 		ret += _generatePropertyAccessMethods(doc.getLinks());
 
