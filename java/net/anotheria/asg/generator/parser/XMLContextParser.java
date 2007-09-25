@@ -23,6 +23,7 @@ public class XMLContextParser {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	public Context parseContext(){
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);

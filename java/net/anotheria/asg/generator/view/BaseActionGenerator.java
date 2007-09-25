@@ -7,7 +7,6 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;

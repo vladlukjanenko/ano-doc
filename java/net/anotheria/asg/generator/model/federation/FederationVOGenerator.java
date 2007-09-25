@@ -17,7 +17,7 @@ import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
+ * This generator generates VO objects for a Module Federation.
  * @author another
  */
 public class FederationVOGenerator extends AbstractGenerator

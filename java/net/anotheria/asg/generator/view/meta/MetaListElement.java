@@ -8,11 +8,11 @@ import java.util.List;
  * @author another
  */
 public class MetaListElement extends MetaViewElement{
-	private List elements;
+	private List<MetaViewElement> elements;
 	
 	public MetaListElement(){
 		super("");
-		elements = new ArrayList();
+		elements = new ArrayList<MetaViewElement>();
 	}
 	
 	/**
@@ -25,7 +25,7 @@ public class MetaListElement extends MetaViewElement{
 	/**
 	 * @param list
 	 */
-	public void setElements(List list) {
+	public void setElements(List<MetaViewElement> list) {
 		elements = list;
 	}
 
