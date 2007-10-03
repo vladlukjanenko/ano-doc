@@ -1,7 +1,9 @@
 package net.anotheria.asg.generator.meta;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.anotheria.asg.generator.IGenerateable;
 
@@ -17,6 +19,8 @@ public class MetaModule implements IGenerateable{
 	
 	private StorageType storageType;
 	private String storageKey;
+	
+	private Map<String, ModuleParameter> parameters;
 	 
 	public MetaModule(){
 		this(null);
@@ -27,6 +31,7 @@ public class MetaModule implements IGenerateable{
 		documents = new ArrayList<MetaDocument>();
 		listeners = new ArrayList<String>();
 		storageType = StorageType.CMS;
+		parameters = new HashMap<String, ModuleParameter>();
 	}
 	
 	public void addDocument(MetaDocument aDocument){
@@ -124,5 +129,19 @@ public class MetaModule implements IGenerateable{
 	}
 	
 	public static final MetaModule SHARED = new MetaModule("Shared");
+	
+	public void addModuleParameter(ModuleParameter p){
+		parameters.put(p.getName(), p);
+	}
+	
+	public ModuleParameter getModuleParameter(String name){
+		return parameters.get(name);
+	}
+	
+	public boolean isParameterEqual(String name, String value){
+		ModuleParameter p = getModuleParameter(name);
+		return p == null ? false : p.getValue().equals(value);
+	}
+	
 	
 }

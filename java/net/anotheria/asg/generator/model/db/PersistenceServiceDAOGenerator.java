@@ -12,6 +12,7 @@ import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.meta.ModuleParameter;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
@@ -226,13 +227,17 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    
 	    ret += CommentGenerator.generateJavaTypeComment(getDAOName(doc));
 
-	    
+	    boolean moduleDbContextSensitive = doc.getParentModule().isParameterEqual(ModuleParameter.MODULE_DB_CONTEXT_SENSITIVE, "true");
 	    
 	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
 	    ret += writeImport("java.util.concurrent.atomic.AtomicLong");
+	    if (moduleDbContextSensitive){
+	    	ret += writeImport("java.util.Map");
+	    	ret += writeImport("java.util.HashMap");
+	    }
 	    ret += emptyline();
 	    
 	    
@@ -337,23 +342,63 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    ret += writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_2 \t= "+sqlReadAllByProperty2);
 
 	    ret += emptyline();
-	    ret += writeStatement("private AtomicLong lastId = new AtomicLong()");
-	    ret += writeStatement("private static final long START_ID = 0");
-	    ret += emptyline();
 	    ret += writeStatement("private RowMapper<"+doc.getName()+"> rowMapper = new "+doc.getName()+"RowMapper()");
 	    
 	    ret += emptyline();
 	    //create impl
+
+
+	    if (moduleDbContextSensitive){
+	    	ret += writeStatement("private Map<String,AtomicLong> lastIds = new HashMap<String,AtomicLong>()");
+	    }else{
+		    ret += writeStatement("private AtomicLong lastId = new AtomicLong()");
+	    }
+	    ret += writeStatement("private static final long START_ID = 0");
+	    ret += emptyline();
 	    
+	    //get last id method
+	    ret += writeString("private AtomicLong getLastId(Connection con) throws DAOException {");
+	    increaseIdent();
+	    if (moduleDbContextSensitive){
+		    ret += writeStatement("DBContext context = ContextManager.getCallContext().getDbContext()");
+		    ret += writeStatement("String tableName = context.getTableNameInContext(TABNAME)");
+	    	ret += writeStatement("AtomicLong lastId = lastIds.get(tableName)");
+	    	ret += writeString("if (lastId==null){");
+	    	increaseIdent();
+	    	ret += writeCommentLine("double-checked-locking");
+	    	ret += writeString("synchronized(lastIds){");
+	    	increaseIdent();
+	    	ret += writeStatement("lastId = lastIds.get(tableName)");
+	    	ret += writeString("if (lastId==null){");
+	    	increaseIdent();
+        	ret += writeStatement("long maxId = getMaxId(con, tableName)");
+        	ret += writeStatement("lastId = new AtomicLong(maxId == 0 ? START_ID : maxId)");
+        	ret += writeStatement("lastIds.put(tableName, lastId)");
+        	ret += closeBlock();
+        	ret += closeBlock();
+        	ret += closeBlock();
+        	ret += writeStatement("return lastId");
+	    	
+	    }else{
+	    	ret += writeStatement("return lastId");
+	    	
+	    }
+	    ret += closeBlock();
+	    ret += emptyline();
 	    
 	    //createSQL Method
 	    ret += writeString("private String createSQL(String sql1, String sql2){");
 	    increaseIdent();
-	    ret += writeStatement("DBContext context = ContextManager.getCallContext().getDbContext()");
-	    ret += writeStatement("StringBuilder sql = new StringBuilder();");
-	    ret += writeStatement("sql.append(sql1).append(context.getTableNameInContext(TABNAME)).append(sql2)");
-	    ret += writeStatement("System.out.println(\"SQL: \"+sql)");
-	    ret += writeStatement("return sql.toString()");
+	    if (moduleDbContextSensitive){
+		    ret += writeStatement("DBContext context = ContextManager.getCallContext().getDbContext()");
+		    ret += writeStatement("StringBuilder sql = new StringBuilder();");
+		    ret += writeStatement("sql.append(sql1).append(context.getTableNameInContext(TABNAME)).append(sql2)");
+		    ret += writeStatement("return sql.toString()");
+	    }else{
+		    ret += writeStatement("StringBuilder sql = new StringBuilder();");
+		    ret += writeStatement("sql.append(sql1).append(TABNAME).append(sql2)");
+		    ret += writeStatement("return sql.toString()");
+	    }
 	    ret += closeBlock();
 	    ret += emptyline();
 	    
@@ -410,7 +455,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         ret += writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
         ret += openFun("public "+doc.getName()+" create"+doc.getName()+"(Connection con, "+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
         ret += generateFunctionStart("SQL_CREATE", callLog, true);
-        ret += writeStatement("long nextId = lastId.incrementAndGet()");
+        ret += writeStatement("long nextId = getLastId(con).incrementAndGet()");
         ret += writeStatement("ps.setLong(1, nextId)");
         for (int i=0; i<properties.size(); i++){
         	ret += generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2);
@@ -559,26 +604,35 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         
         ret += openFun("protected void finish(Statement st)");
         ret += closeBlock();
+        ret += emptyline();
 
-        //init() method
-        ret += openFun("public void init(Connection con) "+throwsClause);
-        ret += writeStatement("log.debug(\"Called: init(\"+con+\")\")");
+        ret += openFun("private long getMaxId(Connection con, String tableName) "+throwsClause);
         ret += writeStatement("Statement st = null");
         ret += openTry();
         ret += writeStatement("con.setAutoCommit(true)");
         ret += writeStatement("st = con.createStatement()");
-        ret += writeStatement("st.execute(\"SELECT MAX(\"+"+getAttributeConst(id)+"+\") FROM \"+TABNAME)");
-        ret += writeStatement("ResultSet set = st.getResultSet()");
+    	ret += writeStatement("st.execute(\"SELECT MAX(\"+"+getAttributeConst(id)+"+\") FROM \"+tableName)");
+    	ret += writeStatement("ResultSet set = st.getResultSet()");
     	ret += writeStatement("long maxId = 0");
     	ret += writeString("if (set.next())");
     	ret += writeIncreasedStatement("maxId = set.getLong(1)");
-    	ret += writeStatement("lastId = new AtomicLong(maxId == 0 ? START_ID : maxId)");
-    	ret += writeStatement("log.info(\"lastId is \"+lastId)");
+    	ret += writeStatement("log.info(\"maxId in table \"+tableName+\" is \"+maxId)");
     	ret += writeStatement("set.close()");
     	ret += writeStatement("st.close()");
-    	ret += generateFunctionEnd(quote("init(")+"+con+"+quote(")"), false);
-    	ret += closeBlock();
+    	ret += writeStatement("return maxId");
     	
+    	ret += generateFunctionEnd(quote("getMaxId(")+"+con+"+quote(", ")+"+tableName+"+quote(")"), false);
+        ret += closeBlock();
+        ret += emptyline();
+        
+        //init() method
+        ret += openFun("public void init(Connection con) "+throwsClause);
+        ret += writeStatement("log.debug(\"Called: init(\"+con+\")\")");
+        if (!moduleDbContextSensitive){
+        	ret += writeStatement("long maxId = getMaxId(con, TABNAME)");
+        	ret += writeStatement("lastId = new AtomicLong(maxId == 0 ? START_ID : maxId)");
+        }
+    	ret += closeBlock();
 	    ret += closeBlock();
 	    return ret;
 	}

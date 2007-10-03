@@ -14,6 +14,7 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.ModuleParameter;
 import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.util.StringUtils;
 
@@ -107,6 +108,15 @@ public class XMLDataParser implements IDataParser {
 				((MetaFederationModule)mod).addMapping(mapping);
 			}
 		}
+		
+		//parse parameters
+		List<Element> parameters = m.getChildren("parameter");
+		for (Element p : parameters){
+			ModuleParameter param = new ModuleParameter(p.getAttributeValue("name"), p.getAttributeValue("value"));
+			System.out.println("Parsed module parameter "+param+" for module "+mod.getName());
+			mod.addModuleParameter(param);
+		}
+		
 		
 		return mod; 
 		
