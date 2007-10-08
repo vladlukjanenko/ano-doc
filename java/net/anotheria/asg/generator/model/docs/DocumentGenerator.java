@@ -10,6 +10,8 @@ import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaGenericListProperty;
+import net.anotheria.asg.generator.meta.MetaGenericProperty;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
@@ -199,7 +201,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		
 		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
-		ret += writeStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant()+")");
+		if(p instanceof MetaGenericProperty)
+			ret += writeStatement("return "+((MetaGenericProperty)p).toPropertyGetterCall());
+		else
+			ret += writeStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant()+")");
 		ret += closeBlock();
 		return ret;
 	}
@@ -224,7 +229,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 	
 	
 	private String generateListPropertyGetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		MetaProperty tmp = new MetaGenericListProperty(p.getName(), p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
 		return generatePropertyGetterMethod(tmp);
@@ -250,7 +255,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 
 		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
-		ret += writeStatement(""+p.toPropertySetter()+"("+p.toNameConstant()+", value)");
+		if(p instanceof MetaGenericProperty)
+			ret += writeStatement(""+((MetaGenericProperty)p).toPropertySetterCall());
+		else
+			ret += writeStatement(""+p.toPropertySetter()+"("+p.toNameConstant()+", value)");
 		ret += closeBlock();	
 		return ret;
 	}
@@ -274,7 +282,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 	}
 
 	private String generateListPropertySetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		MetaProperty tmp = new MetaGenericListProperty(p.getName(), p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
 		return generatePropertySetterMethod(tmp);
@@ -400,10 +408,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		ret += writeString(decl);
 		increaseIdent();
 		
-		ret += writeStatement(c.toJavaType()+"Property p = new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+")");
-		ret += writeStatement("List tmp = get"+list.getAccesserName()+"()");
-		ret += writeStatement("tmp.add(p)");
-		ret += writeStatement("set"+list.getAccesserName()+"(tmp)");
+		
+		ret += writeStatement("getListProperty("+list.toNameConstant()+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
 		ret += closeBlock();
 		ret += emptyline();
 		

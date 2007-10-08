@@ -22,6 +22,8 @@ import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
+import net.anotheria.asg.generator.meta.MetaGenericListProperty;
+import net.anotheria.asg.generator.meta.MetaGenericProperty;
 import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
@@ -1575,6 +1577,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			//System.out.println("WARN moveTop only supported by lists, "+container+" is not a list");
 			return null;
 		}
+		MetaListProperty sourceProperty = (MetaListProperty)container;
+		MetaGenericProperty generic = new MetaGenericListProperty(sourceProperty.getName(), sourceProperty.getContainedProperty());
 			
 		String ret = "";
 		 
@@ -1586,6 +1590,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//write imports...
 		ret += getStandardActionImports();
 		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport("java.util.List");
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerMoveTopEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
@@ -1600,8 +1605,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeStatement(doc.getName()+" "+doc.getVariableName());
 		ret += writeStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 
-		ret += writeStatement("Object toSwap = "+doc.getVariableName()+".get"+container.getAccesserName()+"().remove(position)");
-		ret += writeStatement(doc.getVariableName()+".get"+container.getAccesserName()+"().add(0, toSwap)"); 
+		ret += writeStatement(generic.toJavaType()+" targetList = "+doc.getVariableName()+".get"+container.getAccesserName()+"()");
+		ret += writeStatement(sourceProperty.getContainedProperty().toJavaType()+" toSwap = targetList.remove(position)");
+		ret += writeStatement("targetList.add(0, toSwap)");
+		ret += writeStatement(doc.getVariableName()+".set"+container.getAccesserName()+"(targetList)"); 
 		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 		ret += closeBlock();
 		ret += writeStatement("return "+getSuperCall());
@@ -1616,10 +1623,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			//System.out.println("WARN moveTop only supported by lists, "+container+" is not a list");
 			return null;
 		}
-			
+		
+		MetaListProperty sourceProperty = (MetaListProperty)container;
+		MetaGenericProperty generic = new MetaGenericListProperty(sourceProperty.getName(), sourceProperty.getContainedProperty());
+		
 		String ret = "";
 		 
 		MetaDocument doc = section.getDocument();
+		
 
 		ret += writeStatement("package "+getPackage(section.getModule()));
 		ret += emptyline();
@@ -1627,6 +1638,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//write imports...
 		ret += getStandardActionImports();
 		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport("java.util.List");
 		ret += emptyline();
 		
 		ret += writeString("public class "+getContainerMoveBottomEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
@@ -1639,8 +1651,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeStatement(doc.getName()+" "+doc.getVariableName());
 		ret += writeStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 
-		ret += writeStatement("Object toSwap = "+doc.getVariableName()+".get"+container.getAccesserName()+"().remove(position)");
-		ret += writeStatement(doc.getVariableName()+".get"+container.getAccesserName()+"().add(toSwap)"); 
+		
+		ret += writeStatement(generic.toJavaType()+" targetList = "+doc.getVariableName()+".get"+container.getAccesserName()+"()");
+		ret += writeStatement(sourceProperty.getContainedProperty().toJavaType()+" toSwap = targetList.remove(position)");
+		ret += writeStatement("targetList.add(toSwap)");
+		ret += writeStatement(doc.getVariableName()+".set"+container.getAccesserName()+"(targetList)"); 
 		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 		ret += writeStatement("return "+getSuperCall());
 		ret += closeBlock();

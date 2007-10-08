@@ -331,7 +331,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
 	    //SQL-READ-ALL
 	    String sqlReadAll1 = quote("SELECT * FROM ");
-	    String sqlReadAll2 = quote("");
+	    String sqlReadAll2 = quote(" ORDER BY id");
 	    ret += writeStatement(constDecl + " SQL_READ_ALL_1 \t= "+sqlReadAll1);
 	    ret += writeStatement(constDecl + " SQL_READ_ALL_2 \t= "+sqlReadAll2);
 	    

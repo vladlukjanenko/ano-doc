@@ -24,11 +24,11 @@ public class ListProperty extends Property{
 	
 	/**
 	 * Creates a new ListProperty with the given name 
-	 * and the given list. The list should only contain BGLProperty objects.<br>
+	 * and the given list. The list should only contain Property objects.<br>
 	 * <b>Warning: </b> the content of the list parameter will be not explicitely check 
 	 * to contain only Property object, but will cause runtime exceptions later in case it contained something else.
 	 */
-	public ListProperty(String name, List aList){
+	public ListProperty(String name, List<Property> aList){
 		super(name, aList);
 	}
 	

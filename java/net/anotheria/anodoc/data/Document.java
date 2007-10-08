@@ -461,7 +461,7 @@ public class Document extends DataHolder
 		}
 	}
 	
-	public List getList(String fieldId) throws NoSuchPropertyException{
+	public List<Property> getList(String fieldId) throws NoSuchPropertyException{
 		try{
 			return getListProperty(fieldId).getList();
 		}catch(NoSuchPropertyException e){
@@ -505,7 +505,7 @@ public class Document extends DataHolder
 		}
 	}
 	
-	public void setList(String fieldId, List value){
+	public void setList(String fieldId, List<Property> value){
 		putListProperty(new ListProperty(fieldId, value));
 	}
 
@@ -651,5 +651,19 @@ public class Document extends DataHolder
 	
 	public long getLastUpdateTimestamp(){
 		return getLong(PROP_LAST_UPDATE); 
+	}
+	
+	protected List<String> copyToStringList(List<Property> properties){
+		ArrayList<String> ret = new ArrayList<String>(properties.size());
+		for (Property p : properties)
+			ret.add(((StringProperty)p).getString());
+		return ret;
+	}
+	
+	protected List<Property> copyFromStringList(List<String> strings){
+		ArrayList<Property> ret = new ArrayList<Property>();
+		for (String s : strings)
+			ret.add(new StringProperty(s,s));
+		return ret;
 	}
 }

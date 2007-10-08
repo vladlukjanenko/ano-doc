@@ -10,6 +10,7 @@ import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaGenericProperty;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
@@ -139,7 +140,6 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
 				ret += writeImport("java.util.List");
-				ret += writeImport("java.util.ArrayList");
 				listImported = true;
 				break;
 			}
@@ -148,7 +148,6 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 			if (doc.getProperties().get(i) instanceof MetaTableProperty){
 				if (!listImported){
 					ret += writeImport("java.util.List");
-					ret += writeImport("java.util.ArrayList");
 				}
 				break;
 			}
@@ -158,7 +157,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		if (doc.isComparable()){
 			ret += writeImport("net.anotheria.util.sorter.IComparable");
 			ret += emptyline();
-			//interfaceDecl = "implements IComparable ";
+			interfaceDecl += ", IComparable ";
 		}
 		
 		
@@ -270,7 +269,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	
 	
 	private String generateListPropertyGetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
 		return generatePropertyGetterMethod(tmp);
@@ -312,7 +311,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 
 	private String generateListPropertySetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
 		return generatePropertySetterMethod(tmp);
