@@ -409,7 +409,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		increaseIdent();
 		
 		
-		ret += writeStatement("getListProperty("+list.toNameConstant()+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
+		ret += writeStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
 		ret += closeBlock();
 		ret += emptyline();
 		
