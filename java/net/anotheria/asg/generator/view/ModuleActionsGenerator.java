@@ -986,7 +986,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						ret += writeString("//link "+link.getName()+" to "+link.getLinkTarget());
 						ret += writeString("//to lazy to include List in the imports.");
 						ret += writeStatement("List<"+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
-						ret += writeStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size())");
+						ret += writeStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
+						ret += writeStatement(listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
 						ret += writeString("for ("+(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
 						increaseIdent();
 						ret += writeStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+".getId(), "+targetDocument.getVariableName()+".getName() )");
@@ -1168,7 +1169,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					}else{
 						ret += writeString("//link "+link.getName()+" to "+link.getLinkTarget());
 						ret += writeStatement("List<"+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
-						ret += writeStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size())");
+						ret += writeStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
+						ret += writeStatement(listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
 						ret += writeString("for ("+(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
 						increaseIdent();
 						
