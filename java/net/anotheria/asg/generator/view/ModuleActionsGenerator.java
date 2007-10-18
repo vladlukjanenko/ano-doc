@@ -29,7 +29,6 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
-import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.types.EnumerationGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
@@ -41,7 +40,6 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
-import net.anotheria.util.NumberUtils;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -817,7 +815,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += closeBlock();
 		ret += emptyline();
 		
-		
+		ret += writeStatement("String nextAction = req.getParameter("+quote("nextAction")+")");
+		ret += writeString("if (nextAction == null || nextAction.length() == 0)");
+		ret += writeIncreasedStatement("nextAction = \"close\"");
+		ret += emptyline();
 		
 		//set fields
 		for (int i=0; i<elements.size(); i++){
@@ -856,14 +857,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 		}
 		
+		ret += emptyline();
+		ret += writeStatement(doc.getName()+" updatedCopy = null");
+		
 		ret += writeString("if (create){");
 		//ret += writeIncreasedStatement("System.out.println(\"creating\")");
-		ret += writeIncreasedStatement(getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+")");
+		ret += writeIncreasedStatement("updatedCopy = "+getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+")");
 		ret += writeString("}else{");
-		ret += writeIncreasedStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
+		ret += writeIncreasedStatement("updatedCopy = "+getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 		//ret += writeIncreasedStatement("System.out.println(\"updating\")");
 		ret += writeString("}");
-	    ret += writeStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
+		ret += writeString("if (nextAction.equalsIgnoreCase("+quote("stay")+"))");
+	    ret += writeIncreasedStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+updatedCopy.getId())");
+		ret += writeString("else");
+	    ret += writeIncreasedStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
 	    ret += writeStatement("return null");
 		ret += closeBlock();
 		ret += emptyline();
@@ -1018,7 +1025,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		
 		ret += writeStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
-		
+		ret += writeStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Update")+")");
 	
 		ret += writeStatement("return mapping.findForward(\"success\")");
 		ret += closeBlock();
@@ -1192,6 +1199,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		ret += emptyline();
 		ret += writeStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
+		ret += writeStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Create")+")");
 
 		ret += writeStatement("return mapping.findForward(\"success\")");
 		ret += closeBlock();
@@ -2146,4 +2154,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	private String getShowActionRedirect(MetaDocument doc){
 	    return quote(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW)+"?ts=")+"+System.currentTimeMillis()";
 	}
+	private String getEditActionRedirect(MetaDocument doc){
+	    return quote(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_EDIT)+"?ts=")+"+System.currentTimeMillis()";
+	}
+	
 }

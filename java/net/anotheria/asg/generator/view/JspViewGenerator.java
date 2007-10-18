@@ -494,7 +494,11 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		increaseIdent();
 		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
 		ret += writeString("<tr>");
-		ret += writeIncreasedString("<td class=\"menuTitleSelected\"><input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+"><input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">"+dialog.getTitle()+"</td>");
+		ret += writeIncreasedString("<td class=\"menuTitleSelected\">");
+		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
+		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
+		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
+		ret += writeIncreasedString(dialog.getTitle()+"</td>");
 		ret += writeString("</tr>");
 		decreaseIdent();
 		ret += writeString("</table>");
@@ -1146,14 +1150,30 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 
 	private String generateFunctionEditor(MetaDocument doc, MetaFunctionElement element){
 		if (element.getName().equals("cancel")){
-			return "<a href="+quote(generateTimestampedLinkPath(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW)))+">&nbsp;&raquo&nbsp;Cancel&nbsp;</a>";
+			return "<a href="+quote(generateTimestampedLinkPath(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW)))+">&nbsp;&raquo&nbsp;Close&nbsp;</a>";
 		}
 		
 		if (element.getName().equals("update")){
-			return "<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;Update&nbsp;</a>";
+			return generateUpdateAndCloseFunction(doc, element);
 		}
+
+		if (element.getName().equals("updateAndStay")){
+			return generateUpdateAndStayFunction(doc, element);
+		}
+		if (element.getName().equals("updateAndClose")){
+			return generateUpdateAndCloseFunction(doc, element);
+		}
+		
 		return "";
 	}
+	
+	private String generateUpdateAndStayFunction(MetaDocument doc, MetaFunctionElement element){
+		return "<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>";
+	}
+	private String generateUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
+		return "<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a>";
+	}
+	
 	
 	private String generateDuplicateFunction(String entryName, MetaFunctionElement element){
 		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_DUPLICATE);
