@@ -531,6 +531,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			
 			ret += writeString("<td align=\"left\" width=\"65%\">&nbsp;");
 			ret += generateElementEditor(section.getDocument(), element);
+			ret += writeString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
 			ret += writeString("</td>");
 			
 			ret += writeString("</tr>");
@@ -1096,8 +1097,6 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		if (((MetaModuleSection)currentSection).getDocument().getField(element.getName()).getType().equals("image") && element.getDecorator()==null)
 			return generateImage(entryName, element);
 		String elementName = element instanceof MultilingualFieldElement ? element.getVariableName() : element.getName();
-		if (elementName.startsWith("itemsV"))
-				System.out.println(elementName);
 		return "<td><bean:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
 		//return "<td><bean:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}

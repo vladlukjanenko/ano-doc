@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 
+import net.anotheria.asg.data.DataObject;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
@@ -894,6 +895,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += getStandardActionImports();
 		ret += writeImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
 		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
 		ret += emptyline();
 		
 		//check if we have to import list.
@@ -1026,6 +1028,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		ret += writeStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		ret += writeStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Update")+")");
+		
+		//add field descriptions ...
+		ret += writeStatement("String fieldDescription = null");
+		for (MetaProperty p : doc.getProperties()){
+			ret += writeStatement("fieldDescription = CMSViewHelperUtil.getFieldExplanation("+quote(doc.getParentModule().getName()+"."+doc.getName())+ ", "+doc.getVariableName()+", "+quote(p.getName())+")");
+			ret += writeString("if (fieldDescription!=null && fieldDescription.length()>0)");
+			ret += writeIncreasedStatement("req.setAttribute("+quote("description."+p.getName())+", fieldDescription)");
+		}
 	
 		ret += writeStatement("return mapping.findForward(\"success\")");
 		ret += closeBlock();
