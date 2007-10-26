@@ -600,8 +600,8 @@ public class Document extends DataHolder
 		return false;
 	}
 	
-	public List getEmptyList(){
-		return new ArrayList();
+	public List<Property> getEmptyList(){
+		return new ArrayList<Property>();
 	}
 	
 	/**

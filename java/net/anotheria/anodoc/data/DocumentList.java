@@ -52,7 +52,7 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 	 * Returns the underlying list. Don't use it, if you don't know
 	 * for sure.
 	 */
-	public List getList(){
+	public List<Document> getList(){
 		return list;
 	}
 	
