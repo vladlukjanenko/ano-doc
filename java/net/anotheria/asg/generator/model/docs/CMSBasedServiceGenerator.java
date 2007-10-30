@@ -62,6 +62,8 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	    ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryResultEntry");
+	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
+	    
 	    ret += emptyline();
 	    ret += writeImport("org.jdom.Element");
 	    ret += emptyline();
@@ -226,6 +228,21 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 			ret += writeStatement("return result");
 			ret += closeBlock();
 			ret += emptyline();
+			
+			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches.");
+	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
+	        increaseIdent();
+	        ret += writeStatement("throw new RuntimeException(\"Not yet implemented\")");
+	        ret += closeBlock();
+	        ret += emptyline();
+	        
+			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
+			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
+	        increaseIdent();
+	        ret += writeStatement("throw new RuntimeException(\"Not yet implemented\")");
+	        ret += closeBlock();
+			ret += emptyline();
+			
 			
 	    }
 	    

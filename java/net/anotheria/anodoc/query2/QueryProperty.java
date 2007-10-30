@@ -25,4 +25,8 @@ public class QueryProperty {
 	public String toString(){
 		return getName() + "=" +getValue();
 	}
+	
+	public String getComparator(){
+		return " = ";
+	}
 }

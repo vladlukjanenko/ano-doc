@@ -37,7 +37,23 @@ public class MetaGenericProperty extends MetaProperty{
 		throw new RuntimeException("Not supported :-(");
 	}
 	
+	public String toPropertyGetterCall(String language){
+		throw new RuntimeException("Not supported :-(");
+	}	
+
+	public String toPropertyGetterCallForCurrentLanguage(String langVariable){
+		throw new RuntimeException("Not supported :-(");
+	}	
+	
+	public String toPropertySetterCallForCurrentLanguage(String langVariable){
+		throw new RuntimeException("Not supported :-(");
+	}	
+
 	public String toPropertySetterCall(){
+		throw new RuntimeException("Not supported :-(");
+	}
+
+	public String toPropertySetterCall(String language){
 		throw new RuntimeException("Not supported :-(");
 	}
 }

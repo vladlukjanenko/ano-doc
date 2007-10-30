@@ -242,9 +242,7 @@ public class Document extends DataHolder
 	protected ListProperty getListPropertyAnyCase(String name){
 		 try{
 		 	return getListProperty(name);
-		 }catch(NoSuchPropertyException e){
-		 	System.out.println(e);
-		 }
+		 }catch(NoSuchPropertyException e){}
 		 ListProperty list = new ListProperty(name);
 		 putProperty(list);
 		 return list;

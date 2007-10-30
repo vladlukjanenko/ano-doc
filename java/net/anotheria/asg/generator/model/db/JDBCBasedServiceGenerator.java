@@ -259,6 +259,24 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 			ret += writeStatement("return result");
 			ret += closeBlock();
 			ret += emptyline();
+
+			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches.");
+	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
+	        increaseIdent();
+			ret += writeString("try{");
+			ret += writeIncreasedStatement("return pService.get"+doc.getMultiple()+"ByProperty(property)");
+			ret += writeString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
+			ret += writeIncreasedStatement("throw new RuntimeException(\"Persistence failed: \"+e.getMessage())");
+			ret += writeString("}");
+	        ret += closeBlock();
+	        ret += emptyline();
+	        
+			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
+			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
+	        increaseIdent();
+	        ret += writeStatement("return sorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
+	        ret += closeBlock();
+			ret += emptyline();
 			
 	    }
 	    

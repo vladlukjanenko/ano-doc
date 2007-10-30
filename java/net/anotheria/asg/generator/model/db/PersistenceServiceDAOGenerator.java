@@ -521,7 +521,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         increaseIdent();
         ret += writeString("if (whereClause.length()>0)");
         ret += writeIncreasedStatement("whereClause += "+quote(" AND "));
-        ret += writeStatement("whereClause += p.getName()+"+quote("=?"));
+        ret += writeStatement("whereClause += p.getName()+p.getComparator()+"+quote("?"));
         ret +=closeBlock();
         ret += writeStatement("SQL += whereClause");
         //ret += writeStatement("System.out.println(SQL)");

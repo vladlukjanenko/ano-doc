@@ -91,7 +91,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
 				ret += writeImport("java.util.List");
-				ret += writeImport("java.util.ArrayList");
+				if (doc.getProperties().get(i) instanceof MetaTableProperty)
+					ret += writeImport("java.util.ArrayList");
 				ret += writeImport("net.anotheria.anodoc.data.StringProperty");
 				listImported = true;
 				break;
@@ -101,7 +102,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 			if (doc.getProperties().get(i) instanceof MetaTableProperty){
 				if (!listImported){
 					ret += writeImport("java.util.List");
-					ret += writeImport("java.util.ArrayList");
+					//ret += writeImport("java.util.ArrayList");
 					ret += writeImport("net.anotheria.anodoc.data.StringProperty");
 				}
 				break;
@@ -214,14 +215,20 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		for (String l : context.getLanguages()){
 			ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"(){");
 			increaseIdent();
-			ret += writeStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
+			if (p instanceof MetaGenericProperty)
+				ret += writeStatement("return "+((MetaGenericProperty)p).toPropertyGetterCall(l));
+			else
+				ret += writeStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
 			ret += closeBlock();
 			ret += emptyline();
 		}
 		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
 		String v = "ContextManager.getCallContext().getCurrentLanguage()";
-		ret += writeStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
+		if(p instanceof MetaGenericProperty)
+			ret += writeStatement("return "+((MetaGenericProperty)p).toPropertyGetterCallForCurrentLanguage(v));
+		else
+			ret += writeStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
 		ret += closeBlock();
 		ret += emptyline();
 		return ret;
@@ -268,14 +275,20 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		for (String l : context.getLanguages()){
 			ret += writeString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value){");
 			increaseIdent();
-			ret += writeStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
+			if(p instanceof MetaGenericProperty)
+				ret += writeStatement(""+((MetaGenericProperty)p).toPropertySetterCall(l));
+			else
+				ret += writeStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
 			ret += closeBlock();
 			ret += emptyline();
 		}
 		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
 		String v = "ContextManager.getCallContext().getCurrentLanguage()";
-		ret += writeStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
+		if(p instanceof MetaGenericProperty)
+			ret += writeStatement(""+((MetaGenericProperty)p).toPropertySetterCallForCurrentLanguage(v));
+		else
+			ret += writeStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
 		ret += closeBlock();
 		ret += emptyline();
 		return ret;
@@ -289,6 +302,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 	}
 
 	private String generateTablePropertySetterMethods(MetaTableProperty p){
+		System.out.println("Generating table property "+p+", contained: "+p.getColumns());
 		String ret = "";
 		List<MetaProperty> columns = p.getColumns();
 		for (int t=0; t<columns.size(); t++)
@@ -452,10 +466,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 			ret += writeString(decl);
 			increaseIdent();
 			
-			ret += writeStatement(c.toJavaType()+"Property p = new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+")");
-			ret += writeStatement("List tmp = get"+list.getAccesserName(l)+"()");
-			ret += writeStatement("tmp.add(p)");
-			ret += writeStatement("set"+list.getAccesserName(l)+"(tmp)");
+			ret += writeStatement("getListPropertyAnyCase("+list.toNameConstant(l)+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
 			ret += closeBlock();
 			ret += emptyline();
 			
@@ -491,10 +502,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		ret += writeString(decl);
 		increaseIdent();
 		
-		ret += writeStatement(c.toJavaType()+"Property p = new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+")");
-		ret += writeStatement("List tmp = get"+list.getAccesserName()+"()");
-		ret += writeStatement("tmp.add(p)");
-		ret += writeStatement("set"+list.getAccesserName()+"(tmp)");
+		ret += writeStatement("getListPropertyAnyCase("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
 		ret += closeBlock();
 		ret += emptyline();
 		

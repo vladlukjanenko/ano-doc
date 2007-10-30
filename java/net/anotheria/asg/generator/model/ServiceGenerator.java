@@ -103,6 +103,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    ret += emptyline();
 	    ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
+	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
 	    ret += emptyline();
 
 	    ret += writeString("public interface "+getInterfaceName(module)+"{");
@@ -141,6 +142,12 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 			ret += emptyline();
 			ret += writeComment("Executes a query");
 			ret += writeStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)");
+			ret += emptyline();
+	        ret += writeComment("Returns all "+doc.getName()+" objects, where property matches.");
+	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)");
+	        ret += emptyline();
+			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
+			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)");
 			ret += emptyline();
 	    }
 	    
