@@ -117,7 +117,7 @@ public class Generator {
 	}
 	
 	public static final String getVersionString(){
-		return "1.3";
+		return "1.3.1";
 	}
 	
 	public static final String getProductString(){
