@@ -846,6 +846,37 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("<td align=\"right\">"+generateNewFunction("", new MetaFunctionElement("add"))+"</td>");
 		decreaseIdent(); 
 		ret += writeString("</tr>");
+		
+		ret += writeString("<% String selectedPaging = \"\"+request.getAttribute("+quote("currentItemsOnPage")+"); %>");
+		ret += writeString("<logic:present name=\"paginglinks\" scope=\"request\">");
+		increaseIdent();
+		ret += writeString("<tr>");
+		increaseIdent();
+		ret += writeString("<td align=\"right\" colspan=\""+(colspan)+"\"><div style=\"white-space:nowrap; height:2em; line-height:2em\">");
+		increaseIdent();
+		ret += writeString("<logic:iterate name="+quote("paginglinks")+" scope="+quote("request")+" id="+quote("link")+" type="+quote("net.anotheria.asg.util.bean.PagingLink")+">");
+		increaseIdent();
+		ret += writeString("&nbsp;");
+		ret += writeString("<logic:equal name="+quote("link")+" property="+quote("linked")+" value="+quote("true")+">");
+		ret += writeIncreasedString("<a href=\"?pageNumber=<bean:write name="+quote("link")+" property="+quote("link")+"/>\"><bean:write name="+quote("link")+" property="+quote("caption")+"/></a>");
+		ret += writeString("</logic:equal>");
+		ret += writeString("<logic:notEqual name="+quote("link")+" property="+quote("linked")+" value="+quote("true")+">");
+		ret += writeIncreasedString("<bean:write name="+quote("link")+" property="+quote("caption")+"/>"); 
+		ret += writeString("</logic:notEqual>");
+		decreaseIdent();
+		ret += writeString("</logic:iterate>");
+		ret += writeString("<form name="+quote("ItemsOnPageForm")+" action=\"\" method=\"GET\""+">&nbsp;&nbsp;Items&nbsp;on&nbsp;page:&nbsp;");
+		ret += writeString("<select name="+quote("itemsOnPage")+" onchange="+quote("document.ItemsOnPageForm.submit();")+">");
+		ret += writeString("<logic:iterate name="+quote("PagingSelector")+" type="+quote("java.lang.String")+" id="+quote("option")+">");
+		ret += writeString("<option value="+quote("<bean:write name="+quote("option")+"/>")+" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name="+quote("option")+"/></option>"); 
+		ret += writeString("</logic:iterate>");
+		ret += writeString("</select></form>");
+		decreaseIdent();
+		ret += writeString("</div></td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+		decreaseIdent();
+		ret += writeString("</logic:present>");
 
 		//filter management line
 		for (MetaFilter f : section.getFilters()){

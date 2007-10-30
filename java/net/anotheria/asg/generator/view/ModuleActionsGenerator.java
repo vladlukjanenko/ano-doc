@@ -6,8 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-import net.anotheria.asg.data.DataObject;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
@@ -197,6 +195,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			ret += emptyline();
 		}
 		
+		ret += writeImport("net.anotheria.util.slicer.Slicer");
+		ret += writeImport("net.anotheria.util.slicer.Slice");
+		ret += writeImport("net.anotheria.util.slicer.Segment");
+		ret += writeImport("net.anotheria.asg.util.bean.PagingLink");
+		ret += emptyline();
+		
 		//check if we have to property definition files.
 		//check if we have decorators
 		HashMap<String,MetaEnumerationProperty> importedEnumerations = new HashMap<String,MetaEnumerationProperty>();
@@ -238,6 +242,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    //generate session attributes constants
 	    ret += writeStatement("public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+"+quote(doc.getName()));
 	    ret += writeStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+"+quote(doc.getName()));
+	    ret += writeStatement("private static final List<String> ITEMS_ON_PAGE_SELECTOR = java.util.Arrays.asList(new String[]{\"5\",\"10\",\"20\",\"25\",\"50\",\"100\",\"500\",\"1000\"})");
 	    
 	    boolean containsDecorators = neededDecorators.size() >0;
 	    
@@ -366,6 +371,53 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    }else{
 		    ret += writeStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
 	    }
+	    
+	    ret += writeCommentLine("paging");
+	    ret += writeStatement("int pageNumber = 1"); 
+	    ret += writeString("try{");
+	    ret += writeIncreasedStatement("pageNumber = Integer.parseInt(req.getParameter("+quote("pageNumber")+"))");
+	    ret += writeString("}catch(Exception ignored){}");
+	    ret += writeStatement("Integer lastItemsOnPage = (Integer)req.getSession().getAttribute(\"currentItemsOnPage\")");
+	    ret += writeStatement("int itemsOnPage = lastItemsOnPage == null ? 20 : lastItemsOnPage"); 
+	    ret += writeString("try{");
+	    ret += writeIncreasedStatement("itemsOnPage = Integer.parseInt(req.getParameter("+quote("itemsOnPage")+"))");
+	    ret += writeString("}catch(Exception ignored){}");
+	    ret += writeStatement("Slice<"+doc.getName()+"> slice = Slicer.slice(new Segment(pageNumber, itemsOnPage), "+listName+")");
+	    ret += writeStatement(listName+" = slice.getSliceData()");
+	    ret += emptyline();
+	    
+	    ret += writeCommentLine("prepare paging links");
+	    ret += writeStatement("ArrayList<PagingLink> pagingLinks = new ArrayList<PagingLink>()");
+		ret += writeStatement("pagingLinks.add(new PagingLink(slice.isFirstSlice() ? null : \"1\", \"|<<\"))");
+		ret += writeStatement("pagingLinks.add(new PagingLink(slice.hasPrevSlice() ? \"\"+(slice.getCurrentSlice()-1) : null, \"<<\"))");
+		
+		ret += writeString("for (int i=1; i<slice.getCurrentSlice(); i++){");
+		increaseIdent();
+		ret += writeString("if (slice.getCurrentSlice()-i<=7)");
+		ret += writeIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))");
+		ret += closeBlock();
+		
+		ret += writeStatement("pagingLinks.add(new PagingLink(null, \"Page \"+(slice.getCurrentSlice()+\" of \"+slice.getTotalNumberOfSlices())))");
+		
+		ret += writeString("for (int i=slice.getCurrentSlice()+1; i<=slice.getTotalNumberOfSlices(); i++){");
+		increaseIdent();
+		ret += writeString("if (i-slice.getCurrentSlice()<=7)");
+		ret += writeIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))");
+		ret += closeBlock();
+		
+		
+		ret += writeStatement("pagingLinks.add(new PagingLink(slice.hasNextSlice() ?  \"\"+(slice.getCurrentSlice()+1) : null, \">>\"))");
+		ret += writeStatement("pagingLinks.add(new PagingLink(slice.isLastPage() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))");
+	    ret += writeCommentLine(" paging links end");
+	    
+	    
+	    ret += writeStatement("req.setAttribute("+quote("paginglinks")+", pagingLinks)");
+	    ret += writeStatement("req.setAttribute("+quote("currentpage")+", pageNumber)");
+	    ret += writeStatement("req.setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)");
+	    ret += writeStatement("req.getSession().setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)");
+	    ret += writeStatement("req.setAttribute("+quote("PagingSelector")+", ITEMS_ON_PAGE_SELECTOR)");
+	    ret += emptyline();
+	    
 		ret += writeStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
 		ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){");
 		increaseIdent();
