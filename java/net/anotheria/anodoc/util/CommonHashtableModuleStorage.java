@@ -13,6 +13,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 
+import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.data.IBasicStoreableObject;
 import net.anotheria.anodoc.data.ICompositeDataObject;
@@ -168,7 +169,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		while(allKeys.hasMoreElements()){
 			String aKey = (String)allKeys.nextElement();
 			
-			Module module = (Module)storage.get(aKey);
+			Module module = storage.get(aKey);
 			Hashtable moduleTarget = new Hashtable();
 			saveObject("module", module, moduleTarget);
 			Hashtable moduleContainer = (Hashtable)moduleTarget.get("module");
@@ -247,7 +248,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 	/**
 	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#executeQueryOnDocuments(BasicPredicate)
 	 */
-	public List executeQueryOnDocuments(Predicate q) {
+	public List<Document> executeQueryOnDocuments(Predicate q) {
 		throw new RuntimeException("Not implemented");
 	}
 

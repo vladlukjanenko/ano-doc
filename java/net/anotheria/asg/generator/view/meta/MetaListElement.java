@@ -18,7 +18,7 @@ public class MetaListElement extends MetaViewElement{
 	/**
 	 * @return
 	 */
-	public List getElements() {
+	public List<MetaViewElement> getElements() {
 		return elements;
 	}
 

@@ -102,7 +102,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		
 		MetaDocument targetDocument = section.getDocument();
-		List links = targetDocument.getLinks();
+		List<MetaProperty> links = targetDocument.getLinks();
 		if (links.size()>0){
 			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getShowQueryActionName(section), generateShowQueryAction(section)));
 			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getExecuteQueryActionName(section), generateExecuteQueryAction(section)));
@@ -247,7 +247,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    boolean containsDecorators = neededDecorators.size() >0;
 	    
 		if (containsComparable){
-			ret += writeStatement("private Sorter sorter");
+			ret += writeStatement("private Sorter<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> sorter");
 			ret += emptyline();
 		}
 		
@@ -273,7 +273,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		increaseIdent();
 		ret += writeStatement("super()");
 		if (containsComparable)
-			ret += writeStatement("sorter = new QuickSorter()");
+			ret += writeStatement("sorter = new QuickSorter<"+ModuleBeanGenerator.getListItemBeanName(doc)+">()");
 		if (containsDecorators){
 			ret += writeString("try{ ");
 			increaseIdent();
@@ -371,7 +371,19 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    }else{
 		    ret += writeStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
 	    }
-	    
+
+		ret += writeStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
+		ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){");
+		increaseIdent();
+		ret += writeStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
+		ret += writeStatement("beans.add(bean)");
+		ret += closeBlock();
+	    ret += emptyline();
+	    if (containsComparable){
+	    	ret += writeStatement("beans = sorter.sort(beans, sortType)");
+	    }
+
+	    //paging start
 	    ret += writeCommentLine("paging");
 	    ret += writeStatement("int pageNumber = 1"); 
 	    ret += writeString("try{");
@@ -382,8 +394,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    ret += writeString("try{");
 	    ret += writeIncreasedStatement("itemsOnPage = Integer.parseInt(req.getParameter("+quote("itemsOnPage")+"))");
 	    ret += writeString("}catch(Exception ignored){}");
-	    ret += writeStatement("Slice<"+doc.getName()+"> slice = Slicer.slice(new Segment(pageNumber, itemsOnPage), "+listName+")");
-	    ret += writeStatement(listName+" = slice.getSliceData()");
+	    ret += writeStatement("Slice<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> slice = Slicer.slice(new Segment(pageNumber, itemsOnPage), beans)");
+	    ret += writeStatement("beans = slice.getSliceData()");
 	    ret += emptyline();
 	    
 	    ret += writeCommentLine("prepare paging links");
@@ -410,24 +422,16 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeStatement("pagingLinks.add(new PagingLink(slice.isLastPage() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))");
 	    ret += writeCommentLine(" paging links end");
 	    
-	    
 	    ret += writeStatement("req.setAttribute("+quote("paginglinks")+", pagingLinks)");
 	    ret += writeStatement("req.setAttribute("+quote("currentpage")+", pageNumber)");
 	    ret += writeStatement("req.setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)");
 	    ret += writeStatement("req.getSession().setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)");
 	    ret += writeStatement("req.setAttribute("+quote("PagingSelector")+", ITEMS_ON_PAGE_SELECTOR)");
 	    ret += emptyline();
+	    //paging end
 	    
-		ret += writeStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
-		ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){");
-		increaseIdent();
-		ret += writeStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
-		ret += writeStatement("beans.add(bean)");
-		ret += closeBlock();
-	    ret += emptyline();
-	    if (containsComparable){
-	    	ret += writeStatement("beans = (List<"+ModuleBeanGenerator.getListItemBeanName(doc)+">)sorter.sort(beans, sortType)");
-	    }
+	    
+	    
 	    ret += writeStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
 	    
 	    //add filters
@@ -638,7 +642,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeImport("java.util.Iterator");
 		ret += emptyline();
 	
-		List links = doc.getLinks();
+		List<MetaProperty> links = doc.getLinks();
 		
 		Set<String> linkTargets = new HashSet<String>(); 
 
@@ -1158,7 +1162,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		String ret = "";
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
-		List elements = dialog.getElements();
+		List<MetaViewElement> elements = dialog.getElements();
 		
 		EnumerationPropertyGenerator enumPropGen = new EnumerationPropertyGenerator(doc);
 		
@@ -1172,7 +1176,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		//check if we have to import list.
 		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = (MetaViewElement)elements.get(i);
+			MetaViewElement element = elements.get(i);
 			if (element instanceof MetaFieldElement){
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());
@@ -1546,9 +1550,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 		
 		String call = "";
-		List columns = table.getColumns();
+		List<MetaProperty> columns = table.getColumns();
 		for (int i =0; i<columns.size(); i++){
-		    MetaProperty p = (MetaProperty)columns.get(i);
+		    MetaProperty p = columns.get(i);
 		    String getter = "form.get"+StringUtils.capitalize(table.extractSubName(p))+"()";
 		    call += getter;
 		    if (i<columns.size()-1)
@@ -2178,11 +2182,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 	
 	class EnumerationPropertyGenerator{
-	    private List generatedProperties;
+	    private List<String> generatedProperties;
 	    MetaDocument doc;
 	    
 	    EnumerationPropertyGenerator(MetaDocument doc){
-	        generatedProperties = new ArrayList();
+	        generatedProperties = new ArrayList<String>();
 	        this.doc = doc;
 	    }
 	    

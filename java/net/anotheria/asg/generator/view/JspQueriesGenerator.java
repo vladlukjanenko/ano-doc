@@ -11,6 +11,7 @@ import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
@@ -22,8 +23,6 @@ import net.anotheria.util.StringUtils;
  */
 public class JspQueriesGenerator 
 	extends AbstractJSPGenerator implements IGenerator{
-	
-	private MetaSection currentSection;
 	
 
 	/* (non-Javadoc)
@@ -64,7 +63,6 @@ public class JspQueriesGenerator
 		String ret = "";
 		ret += getBaseJSPHeader();
 		
-		currentSection = section;
 		MetaDocument doc = section.getDocument();
 
 		ret += writeString("<html>");
@@ -100,7 +98,7 @@ public class JspQueriesGenerator
 		ret += writeString("<td>&nbsp;Available queries:</td>");
 		ret += closeTR();
 		
-		List links = doc.getLinks();
+		List<MetaProperty> links = doc.getLinks();
 		for (int i=0; i<links.size(); i++){
 			MetaLink link = (MetaLink)links.get(i);
 			

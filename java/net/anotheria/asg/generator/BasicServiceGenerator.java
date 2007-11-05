@@ -31,7 +31,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 public class BasicServiceGenerator extends AbstractGenerator{
 	
 	
-	public List<FileEntry> generate(List modules, Context context){
+	public List<FileEntry> generate(List<MetaModule>  modules, Context context){
 		List<FileEntry> ret = new ArrayList<FileEntry>(); 
 		
 		ret.add(new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".service"), "BasicService", generateBasicService(modules, context)));
@@ -40,7 +40,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		return ret;
 	}
 	
-	private String generateBasicService(List modules, Context context){
+	private String generateBasicService(List<MetaModule> modules, Context context){
 		
 		
 		String ret = "";
@@ -115,7 +115,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		
 	}
 
-	private String generateBasicCMSService(List modules, Context context){
+	private String generateBasicCMSService(List<MetaModule> modules, Context context){
 		
 		
 		String ret = "";

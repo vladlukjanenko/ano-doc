@@ -366,7 +366,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	    String ret = "";
 	    resetIdent();
 	    
-	    List columns = table.getColumns();
+	    List<MetaProperty> columns = table.getColumns();
 	    String formName = StrutsConfigGenerator.getContainerEntryFormName(doc, table);
 	    
 		ret += getBaseJSPHeader();
@@ -572,9 +572,9 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private String generateListEditor(MetaDocument doc, MetaListElement element){
 		String ret = "";
 		
-		List elements = element.getElements();
+		List<MetaViewElement> elements = element.getElements();
 		for (int i=0; i<elements.size(); i++){
-			ret += generateElementEditor(doc, (MetaViewElement)elements.get(i));
+			ret += generateElementEditor(doc, elements.get(i));
 			if (i<elements.size()-1)
 				ret += "&nbsp;";
 		}
@@ -725,7 +725,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		MetaDocument doc = section.getDocument();
 
 		String entryName = doc.getName().toLowerCase();
-		List elements = section.getElements();
+		List<MetaViewElement> elements = section.getElements();
 
 		String headerLine = "";
 		for (int i=0; i<elements.size(); i++){
@@ -776,7 +776,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		increaseIdent();
 		ret += writeString("<"+doc.getName()+">");
 		increaseIdent();
-		List elements = section.getElements();
+		List<MetaViewElement> elements = section.getElements();
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = (MetaViewElement)elements.get(i);
 			String tag = generateTag(element);
@@ -865,7 +865,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("</logic:notEqual>");
 		decreaseIdent();
 		ret += writeString("</logic:iterate>");
-		ret += writeString("<form name="+quote("ItemsOnPageForm")+" action=\"\" method=\"GET\""+">&nbsp;&nbsp;Items&nbsp;on&nbsp;page:&nbsp;");
+		ret += writeString("<form style=\"display:inline\" name="+quote("ItemsOnPageForm")+" action=\"\" method=\"GET\""+">&nbsp;&nbsp;Items&nbsp;on&nbsp;page:&nbsp;");
 		ret += writeString("<select name="+quote("itemsOnPage")+" onchange="+quote("document.ItemsOnPageForm.submit();")+">");
 		ret += writeString("<logic:iterate name="+quote("PagingSelector")+" type="+quote("java.lang.String")+" id="+quote("option")+">");
 		ret += writeString("<option value="+quote("<bean:write name="+quote("option")+"/>")+" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name="+quote("option")+"/></option>"); 
@@ -1286,7 +1286,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 		increaseIdent();
 		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getFormPath(form))+">");
-		List elements = form.getElements();
+		List<MetaFormField> elements = form.getElements();
 		for (int i=0; i<elements.size(); i++){
 ///*
 		    MetaFormField element = (MetaFormField)elements.get(i);
@@ -1328,9 +1328,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 				
 				//generate table headers
 				ret += writeString("<tr>");
-				List columns = table.getColumns();
-				for (int c=0; c<columns.size(); c++){
-					MetaFormTableColumn col = (MetaFormTableColumn)columns.get(c);
+				List<MetaFormTableColumn> columns = table.getColumns();
+				for (MetaFormTableColumn col : columns){
 					MetaFormTableHeader header = col.getHeader();
 					ret += writeIncreasedString("<td><strong><bean:message key="+quote(header.getKey())+"/></strong></td>");
 				}

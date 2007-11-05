@@ -45,8 +45,8 @@ public class Document extends DataHolder
 	public Document(Document anotherDocument){
 		super("");
 		dataStorage = new Hashtable<String,DataHolder>();
-		Hashtable srcTable = anotherDocument.dataStorage;
-		Enumeration src = srcTable.elements();
+		Hashtable<String,DataHolder> srcTable = anotherDocument.dataStorage;
+		Enumeration<DataHolder> src = srcTable.elements();
 		while(src.hasMoreElements()){
 			Property p = (Property)src.nextElement();
 			try{
@@ -608,9 +608,9 @@ public class Document extends DataHolder
 	 */
 	public long getSizeInBytes() {
 		int sum = 0;
-		Enumeration values = dataStorage.elements();
+		Enumeration<DataHolder> values = dataStorage.elements();
 		while(values.hasMoreElements()){
-			sum += ((DataHolder)values.nextElement()).getSizeInBytes();
+			sum += values.nextElement().getSizeInBytes();
 		}
 		return sum;
 	}
