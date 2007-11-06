@@ -41,10 +41,10 @@ public class BaseActionGenerator extends AbstractGenerator {
 
 		List<MetaModule> modules = new ArrayList<MetaModule>();
 		for (MetaView view:views){
-			List sections = view.getSections();
+			List<MetaSection> sections = view.getSections();
 			
 			for (int i=0; i<sections.size(); i++){
-				MetaSection section = (MetaSection)sections.get(i);
+				MetaSection section = sections.get(i);
 				if (section instanceof MetaModuleSection){
 					if (modules.indexOf(((MetaModuleSection)section).getModule())==-1){
 						modules.add(((MetaModuleSection)section).getModule());

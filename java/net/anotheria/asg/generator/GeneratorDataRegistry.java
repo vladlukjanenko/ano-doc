@@ -41,7 +41,7 @@ public class GeneratorDataRegistry {
 		modules.put(m.getName(), m);
 	}
 	
-	public void addModules(List modules){
+	public void addModules(List<MetaModule> modules){
 		for (int i=0; i<modules.size(); i++)
 			addModule((MetaModule)modules.get(i));
 	}

@@ -747,6 +747,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		
 	}
 	
+	@Deprecated
 	public static String getPackage(){
 	    return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".bean";
 	}

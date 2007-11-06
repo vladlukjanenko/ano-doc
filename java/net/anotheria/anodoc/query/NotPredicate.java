@@ -25,7 +25,7 @@ public class NotPredicate extends Predicate implements java.io.Serializable{
 	/**
 	 * @see biz.beaglesoft.bgldoc.query.Predicate#toVarDecl(java.lang.String)
 	 */
-	public String toVarDecl(String var, HashSet vars) {
+	public String toVarDecl(String var, HashSet<String> vars) {
 		return p.toVarDecl(var,vars);
 	}
 

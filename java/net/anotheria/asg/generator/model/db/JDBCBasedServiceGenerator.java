@@ -63,7 +63,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	    ret += writeImport(JDBCPersistenceServiceGenerator.getFactoryImport(context, module));
 	    ret += writeImport(JDBCPersistenceServiceGenerator.getExceptionImport(context, module));
 
-	    List docs = module.getDocuments();
+	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));

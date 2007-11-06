@@ -78,7 +78,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    	targetModules.put(fedDef.getKey(), target);
 	    }
 	    
-	    List docs = module.getDocuments();
+	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));

@@ -26,7 +26,7 @@ class OrPredicate extends Predicate implements Serializable{
 	/**
 	 * @see biz.beaglesoft.bgldoc.query.Predicate#toVarDecl(java.lang.String)
 	 */
-	public String toVarDecl(String var, HashSet vars) {
+	public String toVarDecl(String var, HashSet<String> vars) {
 		String _left = left.toVarDecl(var,vars);
 		String _right = right.toVarDecl(var,vars);
 		if(_left.trim().length() == 0){

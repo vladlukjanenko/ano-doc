@@ -19,7 +19,7 @@ public class ListProperty extends Property{
      * and an empty list as data.
 	 */
 	public ListProperty(String name){
-		super(name, new ArrayList());
+		super(name, new ArrayList<Property>());
 	}
 	
 	/**

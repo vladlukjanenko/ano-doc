@@ -45,8 +45,6 @@ class ModuleStorage {
 	private String ownerId;
 	private String moduleId;
 
-	private ModuleStorage(){}
-
 	ModuleStorage(Module module){
 		initializeFromModule(module);
 	}
@@ -58,9 +56,9 @@ class ModuleStorage {
 		copyId = module.getCopyId();
 		moduleId = module.getId();
 		ownerId = module.getOwnerId();
-		Enumeration keys = module.getKeys();
-		List _docs = new ArrayList<DocumentStorage>();
-		List _lists = new ArrayList<DocumentStorage>();
+		Enumeration<String> keys = module.getKeys();
+		List<DocumentStorage> _docs = new ArrayList<DocumentStorage>();
+		List<DocumentListStorage> _lists = new ArrayList<DocumentListStorage>();
 		while(keys.hasMoreElements()){
 			Object o = keys.nextElement();
 			handleObject(module.getObject((String)o),_docs,_lists);
@@ -80,7 +78,7 @@ class ModuleStorage {
 	 * </ul>
 	 * These two types are then converted into the respective database classes.
 	 */
-	private void handleObject(Object o, List _docs, List _lists) {
+	private void handleObject(Object o, List<DocumentStorage> _docs, List<DocumentListStorage> _lists) {
 		if (log.isDebugEnabled()) {
 			NDC.push(_myAddress_);
 			log.debug("handleObject of "+o.getClass());

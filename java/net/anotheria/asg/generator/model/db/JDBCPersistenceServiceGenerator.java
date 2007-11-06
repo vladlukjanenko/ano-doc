@@ -80,7 +80,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
 	    ret += emptyline();
 	    
-	    List docs = module.getDocuments();
+	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
@@ -141,9 +141,8 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		ret += writeImport("net.anotheria.util.Date");
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
 	    ret += emptyline();
-	    List docs = module.getDocuments();
-	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	    List<MetaDocument> docs = module.getDocuments();
+	    for (MetaDocument doc : docs){
 	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    }
 	    ret += emptyline();
@@ -217,7 +216,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    String callLog = null;
 	    
 	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        MetaDocument doc = docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
 
 	        callLog = "\"Call get"+doc.getMultiple()+"() \"";

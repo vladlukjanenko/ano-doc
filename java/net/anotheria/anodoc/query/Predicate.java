@@ -37,5 +37,5 @@ public abstract class Predicate implements Serializable{
 	/**
 	 * checks the predicate for needed variables and returns the string that defines them for an OQL query
 	 */
-	public abstract String toVarDecl(String var, HashSet knownVars);	
+	public abstract String toVarDecl(String var, HashSet<String> knownVars);	
 }

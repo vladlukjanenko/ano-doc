@@ -122,7 +122,7 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 	 * Returns the keys of the contained documents.
 	 * @see net.anotheria.anodoc.data.ICompositeDataObject#getKeys()
 	 */
-	public Enumeration getKeys() {
+	public Enumeration<String> getKeys() {
 		Vector<String> keys = new Vector<String>(list.size());
 		for (int i=0; i<list.size(); i++){
 			IBasicStoreableObject obj = list.get(i);

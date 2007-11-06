@@ -1952,9 +1952,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" bean = new "+ModuleBeanGenerator.getContainerEntryFormName(table)+"()");
 		ret += writeStatement("bean.setOwnerId("+doc.getVariableName()+".getId())");
 		ret += writeStatement("bean.setPosition(\"\"+i)");
-		List columns = table.getColumns();
+		List<MetaProperty> columns = table.getColumns();
 		for (int i=0; i<columns.size(); i++){
-			MetaProperty p = (MetaProperty)columns.get(i);
+			MetaProperty p = columns.get(i);
 			String setter = "bean.set"+StringUtils.capitalize(table.extractSubName(p));
 			setter += "((String)row.get("+i+"))";
 			ret += writeStatement(setter);
@@ -2010,7 +2010,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += emptyline();
 		ret += writeStatement("private IMessagingService service = MessagingServiceFactory.getMessagingService()"); 
 		ret += emptyline();
-		List targets = form.getTargets();
+		List<String> targets = form.getTargets();
 		ret += writeString("public static String[] MAIL_TARGETS = {");
 		for (int i=0; i<targets.size(); i++){
 			ret += writeIncreasedString(quote((String)targets.get(i))+",");
@@ -2040,7 +2040,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		ret += writeStatement("htmlMessage += "+quote("<table border=\\\"0\\\">"));
 		
-		List elements = form.getElements();
+		List<MetaFormField> elements = form.getElements();
 		for (int i=0; i<elements.size(); i++){
 			ret += writeStatement("htmlMessage += "+quote("\\n"));
 
@@ -2103,11 +2103,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				ret += writeStatement("htmlMessage += "+quote("<table width=\\\"100%\\\">"));
 				
 				//generate headers.
-				List columns = table.getColumns();
+				List<MetaFormTableColumn> columns = table.getColumns();
 				ret += writeStatement("htmlMessage += "+quote("\\n"));
 				ret += writeStatement("htmlMessage += "+quote("<tr>"));
 				for (int c=0; c<columns.size(); c++){
-					MetaFormTableColumn col = (MetaFormTableColumn)columns.get(c);
+					MetaFormTableColumn col = columns.get(c);
 					MetaFormTableHeader header = col.getHeader();
 					ret += writeStatement("htmlMessage += "+quote("\\n"));
 					ret += writeStatement("htmlMessage += "+quote("\\t<th width=\\\""+header.getWidth()+"\\\">"));

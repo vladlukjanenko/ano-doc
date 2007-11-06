@@ -40,7 +40,7 @@ public class BasicPropertyPredicate extends Predicate implements Serializable{
 	/**
 	 * @see biz.beaglesoft.bgldoc.query.Predicate#toVarDecl()
 	 */
-	public String toVarDecl(String var, HashSet knownVars) {
+	public String toVarDecl(String var, HashSet<String> knownVars) {
 		if(knownVars.contains("v"+p.id)){
 			return "";
 		}

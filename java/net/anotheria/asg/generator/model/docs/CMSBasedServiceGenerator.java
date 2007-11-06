@@ -51,7 +51,7 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 		ret += writeImport("net.anotheria.util.Date");
 	    ret += writeImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
 	    ret += writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService");
-	    List docs = module.getDocuments();
+	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));

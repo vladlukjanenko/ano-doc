@@ -27,7 +27,7 @@ import net.java.dev.moskito.core.configuration.ConfigurationServiceFactory;
 
 /**
  * This storage stores everything in a hashtable and stores this 
- * in the plained form (only IPlanDataObject and ICompositeDataObject)
+ * in the plain form (only IPlanDataObject and ICompositeDataObject)
  * in ONE file.
  * 
  */
@@ -164,10 +164,10 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 	
 	private void save(){
 		//erstmal konvertieren
-		Enumeration allKeys = storage.keys();
-		Hashtable toSave = new Hashtable(storage.size());
+		Enumeration<String> allKeys = storage.keys();
+		Hashtable<String,Hashtable> toSave = new Hashtable<String,Hashtable>(storage.size());
 		while(allKeys.hasMoreElements()){
-			String aKey = (String)allKeys.nextElement();
+			String aKey = allKeys.nextElement();
 			
 			Module module = storage.get(aKey);
 			Hashtable moduleTarget = new Hashtable();
@@ -230,9 +230,9 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 
 	private void printStorage(Hashtable holder){
 		System.err.println("======= PRINT STORAGE =======");
-		Enumeration e = holder.keys();
+		Enumeration<String> e = holder.keys();
 		while(e.hasMoreElements()){
-			String key = (String)e.nextElement();
+			String key = e.nextElement();
 			System.err.println("Key:"+key);
 			String toPrint = "Key:"+key+" is a ";
 			if (KeyUtility.isDocument(key))

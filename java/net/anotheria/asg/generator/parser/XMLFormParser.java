@@ -103,7 +103,7 @@ public class XMLFormParser {
 		MetaFormTableField ret = new MetaFormTableField(name);
 		ret.setRows(rows);
 		
-		List columns = table.getChildren("column");
+		List<Element> columns = table.getChildren("column");
 		for (int i=0; i<columns.size(); i++){
 			MetaFormTableColumn c = parseColumn((Element)columns.get(i));
 			ret.addColumn(c);

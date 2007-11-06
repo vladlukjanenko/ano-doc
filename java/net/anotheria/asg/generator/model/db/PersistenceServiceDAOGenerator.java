@@ -672,6 +672,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	private String getSQLPropertyType(MetaProperty p){
 		if (p.getType().equals("string"))
 			return "varchar";
+		if (p.getType().equals("text"))
+			return "varchar";
 		if (p.getType().equals("long"))
 			return "int8";
 		if (p.getType().equals("int"))

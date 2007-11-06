@@ -37,7 +37,7 @@ public class BasicPredicate extends Predicate implements Serializable{
 	/**
 	 * @see biz.beaglesoft.bgldoc.query.Predicate#toVarDecl()
 	 */
-	public String toVarDecl(String var, HashSet knownVars) {
+	public String toVarDecl(String var, HashSet<String> knownVars) {
 		if(p == null){
 			return "";
 		}

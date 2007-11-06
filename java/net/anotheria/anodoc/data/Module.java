@@ -185,8 +185,8 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * @see net.anotheria.anodoc.data.IStoreable#getKeys()
 	 */
-	public Enumeration getKeys() {
-		Enumeration allObjects = holders.elements();
+	public Enumeration<String> getKeys() {
+		Enumeration<DataHolder> allObjects = holders.elements();
 		Vector<String> keys = new Vector<String>();
 		while(allObjects.hasMoreElements()){
 			IBasicStoreableObject o = (IBasicStoreableObject)allObjects.nextElement();			
@@ -212,7 +212,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	
 	/// restoring from container
 	/**
-	 * Retores this module from a container. When a Module is saved, 
+	 * Restores this module from a container. When a Module is saved, 
 	 * it's not saved as is, but only it's contents (which recursively matches for contained documents too).
 	 * If a Module instance is loaded, it have to be reassembled which happens in this function.
 	 */
@@ -356,7 +356,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	 * @return the size of the data in the module in bytes.
 	 */
 	public long getSizeInBytes(){
-		Enumeration dataHolders = holders.elements();
+		Enumeration<DataHolder> dataHolders = holders.elements();
 		long sum = 0;
 		while (dataHolders.hasMoreElements()){
 			sum += ((DataHolder)dataHolders.nextElement()).getSizeInBytes();
@@ -367,7 +367,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * Returns the names of the holders contained in this module. 
 	 */
-	public Enumeration getHolderNames(){
+	public Enumeration<String> getHolderNames(){
 		return holders.keys();
 	}
 

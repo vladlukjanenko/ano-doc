@@ -14,7 +14,7 @@ public interface ICompositeDataObject extends IBasicStoreableObject{
 	 * also used by debug or administration programs to trace a composite object, such as BGLDocument.  
 	 * @return the keys (ids) of contained elements.
 	 */	
-	public Enumeration getKeys();
+	public Enumeration<String> getKeys();
 	
 	/**
 	 * This method is used by the storage to save not only the container, but the underlying data too. It's
