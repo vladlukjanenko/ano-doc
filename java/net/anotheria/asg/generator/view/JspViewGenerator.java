@@ -115,6 +115,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return files;
 	}
 	
+	private String getTopMenuPage(){
+		return "../../shared/jsp/"+JspMenuGenerator.getMenuPageName();		
+	}
+
 	private String getMenuName(MetaView view){
 		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"Menu";		
 	}
@@ -814,10 +818,13 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		//ret += writeString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
 		ret += generatePragmas(view);
 		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		ret += writeString("<link href=\""+getCurrentCSSPath("menubar.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		ret += writeString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("menubar.js")+"\"></script>");
 		decreaseIdent();
 		ret += writeString("</head>");
 		ret += writeString("<body>");
 		increaseIdent();
+		ret += writeString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
 		ret += writeString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
 
 		List<MetaViewElement> elements = createMultilingualList(section.getElements(), doc, GeneratorDataRegistry.getInstance().getContext());

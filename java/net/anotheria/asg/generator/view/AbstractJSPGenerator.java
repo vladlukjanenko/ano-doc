@@ -209,8 +209,16 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return getCSSPath(stylesheetName, context);
 	}
 	
+	protected String getCurrentJSPath(String jsName){
+		return getJSPath(jsName, context);
+	}
+
 	public static String getCSSPath(String stylesheetName, Context context){
 		return "/"+context.getApplicationName()+"/css/"+stylesheetName;
+	}
+
+	public static String getJSPath(String jsName, Context context){
+		return "/"+context.getApplicationName()+"/js/"+jsName;
 	}
 
 	protected String getPackage(){

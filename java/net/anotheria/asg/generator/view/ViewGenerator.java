@@ -26,6 +26,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		//hack, works only with one view.
 		files.add(new BaseActionGenerator().generate(views, context));
 		files.add(new SharedJspFooterGenerator().generate(views, context));
+		files.add(new JspMenuGenerator().generate(views, context));
 		files.addAll(new WebXMLGenerator().generate(views, context));
 		
 		for (int i=0; i<views.size(); i++){
