@@ -81,7 +81,23 @@ public class JspMenuGenerator extends AbstractJSPGenerator {
 						link = StrutsConfigGenerator.getPath(((MetaModuleSection)section).getDocument(), StrutsConfigGenerator.ACTION_SHOW);
 						link = "<ano:tslink>"+link+"</ano:tslink>";
 					}
-					ret += writeString("<li><a href=\""+link+"\">"+section.getTitle()+"</a></li>");
+					if (section instanceof MetaModuleSection){
+						ret += writeString("<li>");
+						increaseIdent();
+						ret += writeString("<a href=\""+link+"\">"+section.getTitle()+"</a>");
+						decreaseIdent();
+						ret += writeString("<ul>");
+						increaseIdent();
+						ret += writeString("<li><a href=\""+link+"\">Show</a></li>");
+						link = StrutsConfigGenerator.getPath(((MetaModuleSection)section).getDocument(), StrutsConfigGenerator.ACTION_NEW);
+						link = "<ano:tslink>"+link+"</ano:tslink>";
+						ret += writeString("<li><a href=\""+link+"\">New</a></li>");
+						decreaseIdent();
+						ret += writeString("</ul>");
+						ret += writeString("</li>");
+					}else{
+						ret += writeString("<li><a href=\""+link+"\">"+section.getTitle()+"</a></li>");
+					}
 				}
 				decreaseIdent();
 				ret += writeString("</ul>");

@@ -152,6 +152,15 @@ public class MetaDocument implements IGenerateable{
 		this.parentModule = parentModule;
 	}
 	
+	public List<MetaLink> getLinksToDocument(MetaDocument anotherDocument){
+		List<MetaLink> ret = new ArrayList<MetaLink>();
+		for (MetaProperty p : links){
+			MetaLink l = (MetaLink)p;
+			if (l.doesTargetMatch(anotherDocument))
+				ret.add(l);
+		}
+		return ret;
+	}
 	
 
 }

@@ -22,6 +22,7 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.util.DirectLink;
 import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaEmptyElement;
@@ -546,8 +547,59 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("</html:form>");
 		decreaseIdent();
 		ret += writeString("</table>");
+		ret += writeString("<br/>");
+		
+		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
+		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		increaseIdent();
+		ret += writeString("<tr>");
+		increaseIdent();
+		ret += writeString("<td>Direct links to  this document</td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+		ret += writeString("<logic:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
+		increaseIdent();
+		ret += writeString("<tr>");
+		increaseIdent();
+	
+		String docDescriptionStatement = "Type: <bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentType")+"/>";
+		docDescriptionStatement += ", Id: <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentId")+"/></a>";
+		docDescriptionStatement += "<logic:equal name="+quote("linkToMe")+" property="+quote("descriptionAvailable") +" value="+quote("true")+">, Name: <b> <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentDescription")+"/></a></b></logic:equal>";
+		docDescriptionStatement += ", in <b><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentProperty")+"/></b>.";
+		ret += writeString("<td>"+docDescriptionStatement+"</td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+		decreaseIdent();
+		ret += writeString("</logic:iterate>");
 		
 		
+		ret += writeString("<br/>");
+		ret += writeString("<br/>");
+		ret += writeString("</logic:present>");
+		
+		ret += writeString("<!-- ");
+		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		increaseIdent();
+		ret += writeString("<tr>");
+		increaseIdent();
+		ret += writeString("<td>This "+section.getDocument().getName()+" can be used in following documents:</td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+		
+		List<DirectLink> linkee = GeneratorDataRegistry.getInstance().findLinksToDocument(section.getDocument());
+		for (DirectLink l : linkee){
+			ret += writeString("<tr>");
+			increaseIdent();
+			ret += writeString("<td>");
+			ret += writeString(l.getModule().getName()+"."+l.getDocument().getName()+", property: "+l.getProperty().getName());
+			ret += writeString("</td>");
+			decreaseIdent();
+			ret += writeString("</tr>");
+		}
+		
+		decreaseIdent();
+		ret += writeString("</table>");
+		ret += writeString("-->");
 
 		decreaseIdent();
 		ret += writeString("</body>");

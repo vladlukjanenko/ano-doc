@@ -1,12 +1,15 @@
 package net.anotheria.asg.generator;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
 import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.types.meta.DataType;
+import net.anotheria.asg.generator.util.DirectLink;
 import net.anotheria.asg.generator.view.meta.MetaDecorator;
 import net.anotheria.asg.generator.view.meta.MetaFilter;
 
@@ -53,6 +56,19 @@ public class GeneratorDataRegistry {
 		MetaModule mod = getModule(targetModuleName);
 		MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
 		return targetDocument;
+	}
+	
+	public List<DirectLink> findLinksToDocument(MetaDocument target){
+		ArrayList<DirectLink> ret = new ArrayList<DirectLink>();
+		for (MetaModule module : modules.values()){
+			for (MetaDocument document : module.getDocuments()){
+				List<MetaLink> links = document.getLinksToDocument(target);
+				for (MetaLink l : links){
+					ret.add(new DirectLink(module, document, l));
+				}
+			}
+		}
+		return ret;
 	}
 	
 	public MetaModule getModule(String name){

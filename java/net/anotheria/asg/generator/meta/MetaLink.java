@@ -58,5 +58,13 @@ public class MetaLink extends MetaProperty{
 	public String getTargetDocumentName(){
 		return getLinkTarget().substring(getLinkTarget().indexOf('.')+1);
 	}
+	
+	public boolean doesTargetMatch(MetaDocument document){
+		return doesTargetMath(document.getParentModule(), document);
+	}
+	
+	public boolean doesTargetMath(MetaModule module, MetaDocument document){
+		return linkTarget != null && linkTarget.equals(module.getName()+"."+document.getName());
+	}
 
 }

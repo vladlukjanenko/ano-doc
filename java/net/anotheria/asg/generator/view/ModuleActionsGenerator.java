@@ -31,6 +31,7 @@ import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.types.EnumerationGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
+import net.anotheria.asg.generator.util.DirectLink;
 import net.anotheria.asg.generator.view.meta.MetaDecorator;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
@@ -508,6 +509,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    ret += closeBlock();
 	    ret += emptyline();
 	    
+	    
 	    ret += closeBlock();
 	    return ret;
 	}
@@ -954,6 +956,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
 		ret += emptyline();
 		
+		boolean listImported = false;
+		
 		//check if we have to import list.
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
@@ -964,6 +968,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					ret += writeImport("java.util.List");
 					ret += writeImport("java.util.ArrayList");
 					ret += writeImport("net.anotheria.webutils.bean.LabelValueBean");
+					listImported = true;
 					break;
 				}
 			}
@@ -987,6 +992,24 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				}
 			}
 		}
+		
+	    List<DirectLink> backlinks = GeneratorDataRegistry.getInstance().findLinksToDocument(doc);
+	    if (backlinks.size()>0){
+	    	ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
+	    	ret += writeImport("net.anotheria.asg.util.bean.LinkToMeBean");
+	    	if (!listImported){
+	    		listImported=true;
+				ret += writeImport("java.util.List");
+				ret += writeImport("java.util.ArrayList");
+	    	}
+	    	for (DirectLink l : backlinks){
+	    		String imp = DataFacadeGenerator.getDocumentImport(context, l.getDocument());
+	    		if (customImports.indexOf(imp)==-1){
+	    			ret += writeImport(imp);
+	    			customImports.add(imp);
+	    		}
+	    	}
+	    }
 		
 		ret += emptyline();
 
@@ -1093,9 +1116,47 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			ret += writeIncreasedStatement("req.setAttribute("+quote("description."+p.getName())+", fieldDescription)");
 		}
 	
+	    if (backlinks.size()>0){
+	    	ret += emptyline();
+	    	ret += writeCommentLine("Generating back link handling...");
+	    	ret += writeStatement("List<LinkToMeBean> linksToMe = findLinksToCurrentDocument("+doc.getVariableName()+".getId())");
+	    	ret += writeString("if (linksToMe.size()>0)");
+	    	ret += writeIncreasedStatement("req.setAttribute("+quote("linksToMe")+", linksToMe)");
+	    }
+
+		
 		ret += writeStatement("return mapping.findForward(\"success\")");
 		ret += closeBlock();
 		ret += emptyline();
+		
+	    //backlinks
+		if (backlinks.size()>0){
+			ret += writeString("private List<LinkToMeBean> findLinksToCurrentDocument(String documentId){");
+			increaseIdent();
+			ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
+			for (DirectLink l : backlinks){
+				ret += writeStatement("ret.addAll(findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(documentId))");
+			}			
+			ret += writeStatement("return ret");
+			ret += closeBlock();
+			
+			for (DirectLink l : backlinks){
+				ret += writeString("private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId){");
+				increaseIdent();
+				ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
+				ret += writeStatement("QueryProperty p = new QueryProperty("+l.getDocument().getName()+"."+l.getProperty().toNameConstant()+", documentId)");
+				//ret += writeStatement("List<"+l.getDocument().getName()+"> list = "+getServiceGetterCall(l.getModule())+".get"+l.getDocument().getMultiple()+"ByProperty(p)");
+				ret += writeCommentLine("temporarly - replacy with query property");
+				ret += writeStatement("List<"+l.getDocument().getName()+"> list = "+getServiceGetterCall(l.getModule())+".get"+l.getDocument().getMultiple()+"ByProperty(p.getName(), p.getValue())");
+				ret += writeString("for ("+l.getDocument().getName() +" doc : list ){");
+				increaseIdent();
+				ret += writeStatement("ret.add(new LinkToMeBean(doc, "+quote(l.getProperty().getName())+"))");
+				ret += closeBlock();
+				ret += writeStatement("return ret");
+				ret += closeBlock();
+			}
+		}
+		
 	    
 		ret += closeBlock();
 		return ret;
