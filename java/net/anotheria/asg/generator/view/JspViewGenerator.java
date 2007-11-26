@@ -79,7 +79,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			if (!(s instanceof MetaModuleSection))
 				continue;
 			MetaModuleSection section = (MetaModuleSection)s;
-			FileEntry sectionFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getShowPageName(section.getDocument()), generateSection(section, view));
+			FileEntry sectionFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getShowPageName(section.getDocument()), generateShowPage(section, view));
 			sectionFile.setType(".jsp");
 			files.add(sectionFile);
 			
@@ -854,7 +854,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 
-	private String generateSection(MetaModuleSection section, MetaView view){
+	private String generateShowPage(MetaModuleSection section, MetaView view){
 		ident = 0;
 		String ret = "";
 		ret += getBaseJSPHeader();
@@ -937,27 +937,31 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		decreaseIdent();
 		ret += writeString("</logic:present>");
 
+		// FILTER START ----------------------------------------
 		//filter management line
-		for (MetaFilter f : section.getFilters()){
+		for (int i=0; i<section.getFilters().size(); i++){
+			MetaFilter f  = section.getFilters().get(i);
 			ret += writeString("<!-- Generating Filter: "+ModuleActionsGenerator.getFilterVariableName(f)+" -->");
-			ret += writeString("<% String filterParameter = (String) request.getAttribute(\"currentFilterParameter\");");
-			ret += writeString("if (filterParameter==null)");
-			ret += writeIncreasedString("filterParameter = \"\";%>");
+			ret += writeString("<% String filterParameter"+i+" = (String) request.getAttribute(\"currentFilterParameter"+i+"\");");
+			ret += writeString("if (filterParameter"+i+"==null)");
+			ret += writeIncreasedString("filterParameter"+i+" = \"\";%>");
 			ret += writeString("<tr class=\"lineCaptions\"><td colspan="+quote(colspan)+">Filter <strong>"+StringUtils.capitalize(f.getFieldName())+":</strong>&nbsp;");
 			increaseIdent();
 			ret += writeString("<logic:iterate name="+quote(ModuleActionsGenerator.getFilterVariableName(f))+" id="+quote("triggerer")+" type="+quote("net.anotheria.asg.util.filter.FilterTrigger")+">");
 			increaseIdent();
-			ret += writeString("<logic:equal name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter%>")+">");
+			ret += writeString("<logic:equal name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
 			ret += writeIncreasedString("<strong><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></strong>");
 			ret += writeString("</logic:equal>");
-			ret += writeString("<logic:notEqual name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter%>")+">");
-			ret += writeIncreasedString("<a href="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW)+"?pFilter=<bean:write name="+quote("triggerer")+" property="+quote("parameter")+"/>")+"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a>");
+			ret += writeString("<logic:notEqual name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
+			ret += writeIncreasedString("<a href="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW)+"?pFilter"+i+"=<bean:write name="+quote("triggerer")+" property="+quote("parameter")+"/>")+"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a>");
 			ret += writeString("</logic:notEqual>");
 			decreaseIdent();
 			ret += writeString("</logic:iterate>");
 			decreaseIdent();
 			ret += writeString("</td></tr>");
 		}
+		
+		// ------------------------------------------ FILTER END 
 
 		//write header
 		ret += writeString("<tr class=\"lineCaptions\">");

@@ -680,6 +680,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			return "int";
 		if (p.getType().equals("double"))
 			return "double precision";
+		if (p.getType().equals("float"))
+			return "float4";
 		if (p.getType().equals("boolean"))
 			return "boolean";
 		return "UNKNOWN!";

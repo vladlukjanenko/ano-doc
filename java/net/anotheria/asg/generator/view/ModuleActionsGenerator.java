@@ -184,6 +184,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
 	    ret += writeImport("net.anotheria.asg.util.decorators.IAttributeDecorator");
+	    ret += writeImport("net.anotheria.asg.util.filter.DocumentFilter");
 	    ret += writeImport("net.anotheria.util.NumberUtils");
 	    ret += getStandardActionImports();
 	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
@@ -229,13 +230,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 		}
 		
-		if (section.getFilters().size()>0){
-			for (MetaFilter f : section.getFilters()){
-				ret += writeImport(f.getClassName());
-			}
-			ret += emptyline();
-		}
-		
 	    ret += writeString("public class "+getShowActionName(section)+" extends "+getBaseActionName(section)+" {");
 	    increaseIdent();
 	    ret += emptyline();
@@ -264,7 +258,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		if (section.getFilters().size()>0){
 			for (MetaFilter f : section.getFilters()){
-				ret += writeStatement("private "+f.getClassNameOnly()+" "+getFilterVariableName(f));
+				ret += writeStatement("private DocumentFilter "+getFilterVariableName(f));
 			}
 			ret += emptyline();
 		}
@@ -290,10 +284,17 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			ret += writeString("}");
 		}
 	    //add filters
-	    for (MetaFilter f : section.getFilters()){
-	    	ret += writeStatement(getFilterVariableName(f)+" = new "+f.getClassNameOnly()+"()");
-	    }
-			
+		if (section.getFilters().size()>0){
+			ret += writeString("try{ ");
+			increaseIdent();
+			for (MetaFilter f : section.getFilters()){
+				ret += writeStatement(getFilterVariableName(f)+" = (DocumentFilter) Class.forName("+quote(f.getClassName())+").newInstance()");
+			}
+			decreaseIdent();
+			ret += writeString("} catch(Exception e){");
+			ret += writeIncreasedStatement("log.fatal(\"Couldn't instantiate filter:\", e)");
+			ret += writeString("}");
+		}
 		ret += closeBlock();
 		
 
@@ -301,20 +302,24 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    increaseIdent();
 	    
 	    if (section.getFilters().size()>0){
-	    	//hacky, only one filter at time allowed. otherwise, we must submit the filter name.
-	    	ret += writeStatement("String filterParameter = "+quote(""));
-	    	ret += writeString("try{ ");
-	    	ret += writeIncreasedStatement("filterParameter = getStringParameter(req, "+quote("pFilter")+")");
-	    	ret += writeIncreasedStatement("addBeanToSession(req, SA_FILTER, filterParameter)");
-	    	ret += writeString("}catch(Exception ignored){");
-	    	increaseIdent();
-	    	ret += writeCommentLine("no filter parameter given, tring to check in the session.");
-	    	ret += writeStatement("filterParameter = (String)getBeanFromSession(req, SA_FILTER)");
-	    	ret += writeString("if (filterParameter==null)");
-	    	ret += writeIncreasedStatement("filterParameter = "+quote(""));
-	    	ret += closeBlock();
-	    	ret += writeStatement("req.setAttribute("+quote("currentFilterParameter")+", filterParameter)");
-	    	ret += emptyline();
+	    	for (int i=0 ; i<section.getFilters().size(); i++){
+	    		MetaFilter f = section.getFilters().get(i);
+	    		String filterParameterName = "filterParameter"+i;
+		    	//hacky, only one filter at time allowed. otherwise, we must submit the filter name.
+		    	ret += writeStatement("String filterParameter"+i+" = "+quote(""));
+		    	ret += writeString("try{ ");
+		    	ret += writeIncreasedStatement(filterParameterName+" = getStringParameter(req, "+quote("pFilter"+i)+")");
+		    	ret += writeIncreasedStatement("addBeanToSession(req, SA_FILTER+"+quote(i)+", "+filterParameterName+")");
+		    	ret += writeString("}catch(Exception ignored){");
+		    	increaseIdent();
+		    	ret += writeCommentLine("no filter parameter given, tring to check in the session.");
+		    	ret += writeStatement(filterParameterName+" = (String)getBeanFromSession(req, SA_FILTER+"+quote(i)+")");
+		    	ret += writeString("if ("+filterParameterName+"==null)");
+		    	ret += writeIncreasedStatement(filterParameterName+" = "+quote(""));
+		    	ret += closeBlock();
+		    	ret += writeStatement("req.setAttribute("+quote("currentFilterParameter"+i)+", "+filterParameterName+")");
+		    	ret += emptyline();
+	    	}
 	    }
 	    
 	    //check if its sortable.
@@ -362,13 +367,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    if (section.getFilters().size()>0){
 		    String unfilteredListName = "_unfiltered_"+listName;
 		    //change this if more than one filter can be triggered at once.
-		    MetaFilter activeFilter = section.getFilters().get(0);
-		    String filterVarName = getFilterVariableName(activeFilter);
 		    ret += writeStatement("List<"+doc.getName()+"> "+unfilteredListName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
 		    ret += writeStatement("List<"+doc.getName()+"> "+listName+" = new ArrayList<"+doc.getName()+">()");
-		    ret += writeString("for (int i=0; i<"+unfilteredListName+".size(); i++)");
-		    ret += writeIncreasedString("if ("+filterVarName+".mayPass("+unfilteredListName+".get(i), "+quote(activeFilter.getFieldName())+", filterParameter))");
-		    ret += writeIncreasedStatement("\t"+listName+".add("+unfilteredListName+".get(i))");
+		    ret += writeString("for (int i=0; i<"+unfilteredListName+".size(); i++){");
+		    increaseIdent();
+		    ret += writeStatement("boolean mayPass = true");
+		    for (int i=0; i<section.getFilters().size(); i++){
+			    MetaFilter activeFilter = section.getFilters().get(i);
+			    String filterVarName = getFilterVariableName(activeFilter);
+			    ret += writeStatement("mayPass = mayPass && ("+filterVarName+".mayPass("+unfilteredListName+".get(i), "+quote(activeFilter.getFieldName())+", filterParameter"+i+"))");
+		    	
+		    }
+		    ret += writeString("if (mayPass)");
+		    ret += writeIncreasedStatement(listName+".add("+unfilteredListName+".get(i))");
+		    ret += closeBlock();
 	    }else{
 		    ret += writeStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
 	    }
