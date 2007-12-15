@@ -639,14 +639,16 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 	
-	private String generateLinkEditor(MetaProperty p){
+	private String generateLinkEditor(MetaFieldElement element, MetaProperty p){
 		//for now we have only one link...
 		String ret = "";
-		ret += "<html:select size=\"1\" property="+quote(p.getName())+">";
-		ret += "<html:optionsCollection property="+quote(p.getName()+"Collection")+" filter=\"false\"/>";
+		String lang = getElementLanguage(element); 
+		
+		ret += "<html:select size=\"1\" property="+quote(p.getName(lang))+">";
+		ret += "<html:optionsCollection property="+quote(p.getName()+"Collection"+(lang==null ? "":lang))+" filter=\"false\"/>";
 		ret += "</html:select>";
 		ret += "&nbsp;";
-		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
+		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 
 		return ret;
 	}
@@ -656,10 +658,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		MetaProperty p = doc.getField(element.getName());
 		
 		if (p.isLinked())
-			return generateLinkEditor(p);
+			return generateLinkEditor(element, p);
 			
 		if (p instanceof MetaEnumerationProperty){
-			return generateLinkEditor(p);
+			return generateLinkEditor(element, p);
 		}
 		
 		if (p instanceof MetaContainerProperty)
