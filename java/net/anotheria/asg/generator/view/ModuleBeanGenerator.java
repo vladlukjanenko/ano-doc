@@ -362,9 +362,9 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				}
 				ret += writeStatement("private "+p.toJavaType()+" "+p.getName(lang));
 				if (p.isLinked()){
-					MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
+					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),"list");
 					ret += writeStatement("private "+collection.toJavaType()+" "+collection.getName());
-					ret += writeStatement("private String "+p.getName()+"CurrentValue");
+					ret += writeStatement("private String "+p.getName()+"CurrentValue"+(lang==null?"":lang));
 				}
 				
 				if (p instanceof MetaEnumerationProperty){
@@ -670,6 +670,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	private String generateFieldMethodsInDialog(MetaFieldElement element, MetaDocument doc){
 		String ret = "";
 		MetaProperty p = null;
+		String lang = getElementLanguage(element);
 		if (element.getName().equals(FLAG_FORM_SUBMITTED)){
 			MetaProperty pControlFlag = new MetaProperty(FLAG_FORM_SUBMITTED, "boolean");
 			p = pControlFlag;
@@ -678,8 +679,19 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 
 		if (p.isLinked() || p instanceof MetaEnumerationProperty){
-			ret += generateMethods(new MetaFieldElement(element.getName()+"Collection"), new MetaProperty(element.getName()+"Collection", "list"));
-			ret += generateMethods(new MetaFieldElement(element.getName()+"CurrentValue"), new MetaProperty(element.getName()+"CurrentValue", "string"));
+			ret += writeString("// !!! BLA !!! ");
+			MetaFieldElement pColl = new MetaFieldElement(element.getName()+"Collection");
+			MetaFieldElement pCurr = new MetaFieldElement(element.getName()+"CurrentValue");
+			//;
+			if (p.isMultilingual()){
+				String l = getElementLanguage(element);
+				ret += generateMethods(new MultilingualFieldElement(l, pColl), new MetaProperty(element.getName()+"Collection", "list"));
+				ret += generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", "string"));
+			}else{
+				ret += generateMethods(pColl, new MetaProperty(element.getName()+"Collection", "list"));
+				ret += generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", "string"));
+			}
+			
 		}
 		ret += generateMethods(element, p);
 		return ret;

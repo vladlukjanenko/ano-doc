@@ -743,6 +743,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += writeImport("java.util.ArrayList");
 		ret += emptyline();
 	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
 		ret += emptyline();
 
 		ret += writeString("public class "+getExecuteQueryActionName(section)+" extends "+getShowActionName(section)+" {");
@@ -759,10 +760,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//ret += writeStatement("System.out.println(property+\"=\"+criteria)");
 		
 		String listName = doc.getMultiple().toLowerCase();
-		ret += writeStatement("List "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"ByProperty(property, criteria)");
+		ret += writeStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"ByProperty(property, criteria)");
 		//ret += writeStatement("System.out.println(\"result: \"+"+listName+")");
 
-		ret += writeStatement("List beans = new ArrayList("+listName+".size())");
+		ret += writeStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
 		ret += writeString("for (int i=0; i<"+listName+".size(); i++){");
 		increaseIdent();
 		ret += writeStatement("beans.add("+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"(("+doc.getName()+")"+listName+".get(i)))");
@@ -1096,15 +1097,16 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 					}
 
-					ret += writeStatement("form."+p.toBeanSetter()+"Collection("+listName+"Values"+")");
+					String lang = getElementLanguage(element);
+					ret += writeStatement("form."+p.toBeanSetter()+"Collection"+(lang==null ? "":lang)+"("+listName+"Values"+")");
 					
 					ret += writeString("try{");
 					increaseIdent();
 					String getter = getServiceGetterCall(targetModule)+".get"+targetDocument.getName()+"("+doc.getVariableName()+"."+p.toGetter()+"()).getName()";
-					ret += writeStatement("form."+p.toBeanSetter()+"CurrentValue("+getter+")");
+					ret += writeStatement("form."+p.toBeanSetter()+"CurrentValue"+(lang==null ? "":lang)+"("+getter+")");
 					decreaseIdent();
 					ret +=  writeString("}catch(Exception e){");
-					ret += writeIncreasedStatement("form."+p.toBeanSetter()+"CurrentValue("+quote("none")+")");
+					ret += writeIncreasedStatement("form."+p.toBeanSetter()+"CurrentValue"+(lang==null ? "":lang)+"("+quote("none")+")");
 					ret += writeString("}");
 					linkTargets.add(link.getLinkTarget());
 					
@@ -1147,25 +1149,49 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			increaseIdent();
 			ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
 			for (DirectLink l : backlinks){
-				ret += writeStatement("ret.addAll(findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(documentId))");
-			}			
+				if (l.getProperty().isMultilingual()){
+					for (String lang : context.getLanguages()){
+						ret += writeStatement("ret.addAll(findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName(lang))+"(documentId))");
+					}
+				}else{
+					ret += writeStatement("ret.addAll(findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(documentId))");	
+				}
+			}
 			ret += writeStatement("return ret");
 			ret += closeBlock();
 			
 			for (DirectLink l : backlinks){
-				ret += writeString("private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId){");
-				increaseIdent();
-				ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
-				ret += writeStatement("QueryProperty p = new QueryProperty("+l.getDocument().getName()+"."+l.getProperty().toNameConstant()+", documentId)");
-				//ret += writeStatement("List<"+l.getDocument().getName()+"> list = "+getServiceGetterCall(l.getModule())+".get"+l.getDocument().getMultiple()+"ByProperty(p)");
-				ret += writeCommentLine("temporarly - replacy with query property");
-				ret += writeStatement("List<"+l.getDocument().getName()+"> list = "+getServiceGetterCall(l.getModule())+".get"+l.getDocument().getMultiple()+"ByProperty(p.getName(), p.getValue())");
-				ret += writeString("for ("+l.getDocument().getName() +" doc : list ){");
-				increaseIdent();
-				ret += writeStatement("ret.add(new LinkToMeBean(doc, "+quote(l.getProperty().getName())+"))");
-				ret += closeBlock();
-				ret += writeStatement("return ret");
-				ret += closeBlock();
+				if (l.getProperty().isMultilingual()){
+					for (String lang : context.getLanguages()){
+						ret += writeString("private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName(lang))+"(String documentId){");
+						increaseIdent();
+						ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
+						ret += writeStatement("QueryProperty p = new QueryProperty("+l.getDocument().getName()+"."+l.getProperty().toNameConstant(lang)+", documentId)");
+						//ret += writeStatement("List<"+l.getDocument().getName()+"> list = "+getServiceGetterCall(l.getModule())+".get"+l.getDocument().getMultiple()+"ByProperty(p)");
+						ret += writeCommentLine("temporarly - replacy with query property");
+						ret += writeStatement("List<"+l.getDocument().getName()+"> list = "+getServiceGetterCall(l.getModule())+".get"+l.getDocument().getMultiple()+"ByProperty(p.getName(), p.getValue())");
+						ret += writeString("for ("+l.getDocument().getName() +" doc : list ){");
+						increaseIdent();
+						ret += writeStatement("ret.add(new LinkToMeBean(doc, "+quote(l.getProperty().getName())+"))");
+						ret += closeBlock();
+						ret += writeStatement("return ret");
+						ret += closeBlock();
+					}
+				}else{
+					ret += writeString("private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId){");
+					increaseIdent();
+					ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
+					ret += writeStatement("QueryProperty p = new QueryProperty("+l.getDocument().getName()+"."+l.getProperty().toNameConstant()+", documentId)");
+					//ret += writeStatement("List<"+l.getDocument().getName()+"> list = "+getServiceGetterCall(l.getModule())+".get"+l.getDocument().getMultiple()+"ByProperty(p)");
+					ret += writeCommentLine("temporarly - replacy with query property");
+					ret += writeStatement("List<"+l.getDocument().getName()+"> list = "+getServiceGetterCall(l.getModule())+".get"+l.getDocument().getMultiple()+"ByProperty(p.getName(), p.getValue())");
+					ret += writeString("for ("+l.getDocument().getName() +" doc : list ){");
+					increaseIdent();
+					ret += writeStatement("ret.add(new LinkToMeBean(doc, "+quote(l.getProperty().getName())+"))");
+					ret += closeBlock();
+					ret += writeStatement("return ret");
+					ret += closeBlock();
+				}
 			}
 		}
 		
@@ -1235,7 +1261,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		String ret = "";
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
-		List<MetaViewElement> elements = dialog.getElements();
+		//List<MetaViewElement> elements = dialog.getElements();
+		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
 		
 		EnumerationPropertyGenerator enumPropGen = new EnumerationPropertyGenerator(doc);
 		
@@ -1325,7 +1352,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						ret += closeBlock();
 					}
 					
-					ret += writeStatement("form."+p.toBeanSetter()+"Collection("+listName+"Values"+")");
+					String lang = getElementLanguage(element);
+					ret += writeStatement("form."+p.toBeanSetter()+"Collection"+(lang==null ? "" : lang)+"("+listName+"Values"+")");
 					linkTargets.add(link.getLinkTarget());
 				}//...end if (p.isLinked())
 
