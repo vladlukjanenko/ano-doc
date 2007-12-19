@@ -169,9 +169,9 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	        ret += writeString("}");
 	        ret += writeString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        ret += writeStatement("List myListeners = getServiceListeners()");
+	        ret += writeStatement("List<IServiceListener> myListeners = getServiceListeners()");
 	        ret += writeString("for (int i=0; i<myListeners.size(); i++)");
-	        ret += writeIncreasedStatement("((IServiceListener)myListeners.get(i)).documentCreated("+doc.getVariableName()+")");
+	        ret += writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
 	        ret += closeBlock();	
 	        ret += writeStatement("return "+doc.getVariableName());
 	        ret += closeBlock();
@@ -193,9 +193,9 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	        
 	        ret += writeString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        ret += writeStatement("List myListeners = getServiceListeners()");
+	        ret += writeStatement("List<IServiceListener> myListeners = getServiceListeners()");
 	        ret += writeString("for (int i=0; i<myListeners.size(); i++)");
-	        ret += writeIncreasedStatement("((IServiceListener)myListeners.get(i)).documentUpdated(oldVersion, "+doc.getVariableName()+")");
+	        ret += writeIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
 	        ret += closeBlock();
 	        
 	        ret += writeStatement("return "+doc.getVariableName());

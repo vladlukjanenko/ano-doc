@@ -541,8 +541,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
 	    ret += getStandardActionImports();
-	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
+	    //Removed 2 unneeded imports
+	    //ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    //ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
 		ret += emptyline();
 		ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
 		ret += writeImport("net.anotheria.anodoc.query2.string.ContainsStringQuery");
@@ -685,7 +686,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		increaseIdent();
 		ret += emptyline();
 		
-		ret += writeStatement("Iterator it");
+		//ret += writeStatement("Iterator it");
 		
 		linkTargets = new HashSet<String>(); 
 
@@ -700,9 +701,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			MetaModule mod = GeneratorDataRegistry.getInstance().getModule(targetModuleName);
 			MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
 			
-			ret += writeStatement("List "+targetDocument.getMultiple().toLowerCase()+" = "+getServiceGetterCall(mod)+".get"+targetDocument.getMultiple()+"()");
+			ret += writeStatement("List<"+targetDocument.getName()+"> "+targetDocument.getMultiple().toLowerCase()+" = "+getServiceGetterCall(mod)+".get"+targetDocument.getMultiple()+"()");
 			ret += writeStatement("List<LabelValueBean> "+targetDocument.getMultiple().toLowerCase()+"Beans = new ArrayList<LabelValueBean>("+targetDocument.getMultiple().toLowerCase()+".size())");
-			ret += writeString("for(it="+targetDocument.getMultiple().toLowerCase()+".iterator(); it.hasNext(); ){");
+			ret += writeString("for(Iterator<"+targetDocument.getName()+"> it="+targetDocument.getMultiple().toLowerCase()+".iterator(); it.hasNext(); ){");
 			increaseIdent();
 			ret += writeStatement(targetDocument.getName()+" "+targetDocument.getVariableName()+" = ("+targetDocument.getName()+") it.next()");
 			String beanCreationCall = targetDocument.getMultiple().toLowerCase()+"Beans";
@@ -1952,8 +1953,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			String listName = targetDocument.getMultiple().toLowerCase();
 			String sortType = "new "+DataFacadeGenerator.getSortTypeName(targetDocument);
 			sortType += "("+DataFacadeGenerator.getSortTypeName(targetDocument)+".SORT_BY_NAME)";
-			ret += writeStatement("List "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"("+sortType+")");
-			ret += writeStatement("List "+listName+"Values = new ArrayList("+listName+".size())");
+			ret += writeStatement("List<"+targetDocument.getName()+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"("+sortType+")");
+			ret += writeStatement("List<net.anotheria.webutils.bean.LabelValueBean> "+listName+"Values = new ArrayList<net.anotheria.webutils.bean.LabelValueBean>("+listName+".size())");
 			ret += writeString("for (int i=0; i<"+listName+".size(); i++){");
 			increaseIdent();
 			ret += writeStatement(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+" "+targetDocument.getTemporaryVariableName()+" = ("+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+") "+listName+".get(i)");
@@ -1980,7 +1981,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		
 		ret += writeStatement("int size = "+doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName(list)+"()");
-		ret += writeStatement("List beans = new ArrayList(size)");
+		ret += writeStatement("List<"+ModuleBeanGenerator.getContainerEntryFormName(list)+"> beans = new ArrayList<"+ModuleBeanGenerator.getContainerEntryFormName(list)+">(size)");
 		//ret += writeStatement("List elements = "+doc.getVariableName()+".get"+list.getAccesserName()+"()");
 		
 		
@@ -2300,7 +2301,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			if (generatedProperties.indexOf(arrName)==-1){
 			    ret += writeString("//enumeration "+type.getName());
 			    ret += writeStatement("int[] "+arrName+" = " +EnumerationGenerator.getUtilsClassName(type)+"."+type.getName().toUpperCase()+"_VALUES");
-			    ret += writeStatement("List "+listName+" = new ArrayList("+arrName+".length)");
+			    ret += writeStatement("List<LabelValueBean> "+listName+" = new ArrayList<LabelValueBean>("+arrName+".length)");
 			    ret += writeString("for (int i=0; i<"+arrName+".length; i++){");
 			    increaseIdent();
 			

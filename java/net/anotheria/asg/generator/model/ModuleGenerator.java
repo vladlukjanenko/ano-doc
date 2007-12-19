@@ -133,7 +133,8 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 	private String generateDocumentRelatedCode(MetaDocument doc){
 		String ret = "";
 		
-		ret += writeString("private DocumentList _get"+doc.getMultiple()+"(){");
+		ret += writeString("@SuppressWarnings(\"unchecked\")");
+		ret += writeString("private DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> _get"+doc.getMultiple()+"(){");
 		increaseIdent();
 		ret += writeString("try{");
 		increaseIdent();
@@ -141,18 +142,18 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		decreaseIdent();
 		ret += writeString("}catch(NoSuchDocumentListException e){");
 		increaseIdent();
-		ret += writeStatement("return new DocumentList("+doc.getListName()+")");
+		ret += writeStatement("return new DocumentList<"+DocumentGenerator.getDocumentName(doc)+">("+doc.getListName()+")");
 		ret += closeBlock();
 		ret += closeBlock();
 		ret += emptyline();
 		
-		ret += writeString("private void _update"+doc.getMultiple()+"(DocumentList list){");
+		ret += writeString("private void _update"+doc.getMultiple()+"(DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> list){");
 		increaseIdent();
 		ret += writeString("putList(list);");
 		ret += closeBlock();
 		ret += emptyline();
 
-		ret += writeString("public List get"+doc.getMultiple()+"(){");
+		ret += writeString("public List<"+DocumentGenerator.getDocumentName(doc)+"> get"+doc.getMultiple()+"(){");
 		increaseIdent();
 		ret += writeString("return _get"+doc.getMultiple()+"().getList();");
 		ret += closeBlock();
@@ -160,13 +161,13 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 
 		ret += writeString("public "+DocumentGenerator.getDocumentName(doc)+" get"+doc.getName()+"(String id){");
 		increaseIdent();
-		ret += writeStatement("return ("+DocumentGenerator.getDocumentName(doc)+")_get"+doc.getMultiple()+"().getDocumentById(id)");
+		ret += writeStatement("return _get"+doc.getMultiple()+"().getDocumentById(id)");
 		ret += closeBlock();
 		ret += emptyline();
 		
 		ret += writeString("public void update"+doc.getName()+"("+DocumentGenerator.getDocumentName(doc)+" "+doc.getVariableName()+"){");
 		increaseIdent();
-		ret += writeString("DocumentList "+doc.getMultiple().toLowerCase()+" = _get"+doc.getMultiple()+"();");
+		ret += writeString("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> "+doc.getMultiple().toLowerCase()+" = _get"+doc.getMultiple()+"();");
 		ret += writeString(doc.getMultiple().toLowerCase()+".removeDocumentById("+doc.getVariableName()+".getId());");
 		ret += writeStatement(doc.getVariableName()+".setLastUpdateNow()");
 		ret += writeString(doc.getMultiple().toLowerCase()+".addDocument("+doc.getVariableName()+");");
@@ -176,7 +177,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		
 		ret += writeString("public void delete"+doc.getName()+"(String id){");
 		increaseIdent();
-		ret += writeStatement("DocumentList entries = _get"+doc.getMultiple()+"()");
+		ret += writeStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
 		ret += writeStatement("entries.removeDocumentById(id)");
 		ret += writeStatement("_update"+doc.getMultiple()+"(entries)");
 		ret += closeBlock();
@@ -189,7 +190,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		ret += writeStatement(doc.getVariableName()+".renameTo(\"\"+id)");
 		ret += writeStatement("putDocument(idh)");
 		ret += emptyline();
-		ret += writeStatement("DocumentList entries = _get"+doc.getMultiple()+"()");
+		ret += writeStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
 		ret += writeStatement(doc.getVariableName()+".setLastUpdateNow()");
 		ret += writeStatement("entries.addDocument("+doc.getVariableName()+")");
 		ret += writeStatement("_update"+doc.getMultiple()+"(entries)");

@@ -324,19 +324,29 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    ret += writeStatement(constDecl + " SQL_DELETE_2 \t= "+sqlDelete2);
 
 	    //SQL-READ-ONE
-	    String sqlReadOne1 = quote("SELECT * FROM ");
+	    
+	    String allAttrbutes = "\"";
+	    allAttrbutes += "+"+getAttributeConst(id);
+	    for (MetaProperty p : properties){
+	    	allAttrbutes += "+"+quote(", ")+"+"+getAttributeConst(p);
+	    }
+	    allAttrbutes += "+"+quote(", ")+"+"+getAttributeConst(dao_created);
+	    allAttrbutes += "+"+quote(", ")+"+"+getAttributeConst(dao_updated);
+	    allAttrbutes += "+\"";
+	    
+	    String sqlReadOne1 = quote("SELECT "+allAttrbutes+" FROM ");
 	    String sqlReadOne2 = quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
 	    ret += writeStatement(constDecl + " SQL_READ_ONE_1 \t= "+sqlReadOne1);
 	    ret += writeStatement(constDecl + " SQL_READ_ONE_2 \t= "+sqlReadOne2);
 
 	    //SQL-READ-ALL
-	    String sqlReadAll1 = quote("SELECT * FROM ");
+	    String sqlReadAll1 = quote("SELECT "+allAttrbutes+" FROM ");
 	    String sqlReadAll2 = quote(" ORDER BY id");
 	    ret += writeStatement(constDecl + " SQL_READ_ALL_1 \t= "+sqlReadAll1);
 	    ret += writeStatement(constDecl + " SQL_READ_ALL_2 \t= "+sqlReadAll2);
 	    
 	    //SQL-READ-ALL
-	    String sqlReadAllByProperty1 = quote("SELECT * FROM ");
+	    String sqlReadAllByProperty1 = quote("SELECT "+allAttrbutes+" FROM ");
 	    String sqlReadAllByProperty2 = quote(" WHERE ");
 	    ret += writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_1 \t= "+sqlReadAllByProperty1);
 	    ret += writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_2 \t= "+sqlReadAllByProperty2);

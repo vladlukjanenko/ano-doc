@@ -102,7 +102,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
         ret += closeBlock();
         ret += emptyline();
         
-        ret += writeString("protected List getServiceListeners(){");
+        ret += writeString("protected List<IServiceListener> getServiceListeners(){");
         increaseIdent();
         ret += writeStatement("return listeners");
         ret += closeBlock();

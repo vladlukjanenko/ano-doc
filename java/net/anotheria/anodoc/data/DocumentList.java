@@ -18,33 +18,33 @@ import org.jdom.Element;
  * </ol>
  * @since 1.0
  **/
-public class DocumentList extends DataHolder implements ICompositeDataObject{
+public class DocumentList<D extends Document> extends DataHolder implements ICompositeDataObject{
 	private static final long serialVersionUID = -6201606233792279067L;
 	
 	/**
 	 * Internal list used for storage of the documents.
 	 */
-	private ArrayList<Document> list;
+	private ArrayList<D> list;
 	
 	/**
 	 * Creates a new list with given name.
 	 */
 	public DocumentList(String name){
 		super(name);
-		list = new ArrayList<Document>();
+		list = new ArrayList<D>();
 	}
 	
 	/**
 	 * Returns the document at the given position in the list.
 	 */
-	public Document getDocumentAt(int pos){
+	public D getDocumentAt(int pos){
 		return list.get(pos);
 	}
 	
 	/**
 	 * Adds given document to list (at last position).
 	 */
-	public void addDocument(Document doc){
+	public void addDocument(D doc){
 		list.add(doc);
 	}
 	
@@ -52,7 +52,7 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 	 * Returns the underlying list. Don't use it, if you don't know
 	 * for sure.
 	 */
-	public List<Document> getList(){
+	public List<D> getList(){
 		return list;
 	}
 	
@@ -61,7 +61,7 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 	 * <em>warning: could make problems in distributed environment,
 	 * unless equals method of the document is distribution save</em>.
 	 */
-	public void removeDocument(Document doc){
+	public void removeDocument(D doc){
 		list.remove(doc);
 	}	
 
@@ -88,9 +88,9 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 	 * Returns document with given name, if it exists in the list.
 	 * Otherwise throws a NoSuchDocumentException.
 	 */
-	public Document getDocumentById(String id) throws NoSuchDocumentException{
+	public D getDocumentById(String id) throws NoSuchDocumentException{
 		for (int i=0; i<list.size(); i++){
-			Document doc = list.get(i);
+			D doc = list.get(i);
 			if (doc.getId().equals(id))
 				return doc;
 		}
@@ -100,7 +100,7 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 	/**
 	 * Inserts given into the list at position with parameter 'pos'.
 	 */
-	public void insertDocumentAt(Document doc, int pos){
+	public void insertDocumentAt(D doc, int pos){
 		list.add(pos, doc);
 	}
 	
@@ -110,7 +110,7 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 	 */
 	public void removeDocumentById(String id){
 		for (int i=0; i<list.size(); i++){
-			Document doc = list.get(i);
+			D doc = list.get(i);
 			if (doc.getId().equals(id)){
 				list.remove(i);
 				break;
@@ -141,7 +141,7 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 	 * but the key is.<br>
 	 * @see net.anotheria.anodoc.data.ICompositeDataObject#getObject(String)
 	 */
-	public Object getObject(String key) {
+	public D getObject(String key) {
 		String intKey = key.substring(0,key.indexOf(IHelperConstants.DELIMITER));
 		return list.get(Integer.parseInt(intKey));
 	}
@@ -188,7 +188,7 @@ public class DocumentList extends DataHolder implements ICompositeDataObject{
 		
 		root.setAttribute(new Attribute("listId", getId()));
 		List<Element> children = new ArrayList<Element>();
-		for (Document d : list){
+		for (D d : list){
 			children.add(d.toXMLElement());
 		}
 		root.setChildren(children);

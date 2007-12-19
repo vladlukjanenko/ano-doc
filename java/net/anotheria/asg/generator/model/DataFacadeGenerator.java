@@ -447,10 +447,10 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		ret += writeString("public void "+getContainerEntryDeleterName(table)+"(int index);");
 		ret += emptyline();
 		
-		ret += writeString("public List get"+StringUtils.capitalize(table.getName())+"Row(int index);");
+		ret += writeString("public List<String> get"+StringUtils.capitalize(table.getName())+"Row(int index);");
 		ret += emptyline();
 
-		ret += writeString("public List "+getTableGetterName(table)+"();");
+		ret += writeString("public List<List<String>> "+getTableGetterName(table)+"();");
 		ret += emptyline();
 		return ret;
 	}

@@ -572,9 +572,9 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		ret += closeBlock();
 		ret += emptyline();
 		
-		ret += writeString("public List get"+StringUtils.capitalize(table.getName())+"Row(int index){");
+		ret += writeString("public List<String> get"+StringUtils.capitalize(table.getName())+"Row(int index){");
 		increaseIdent();
-		ret += writeStatement("List ret = new ArrayList(1)");
+		ret += writeStatement("List<String> ret = new ArrayList<String>(1)");
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty p = columns.get(i);
 			ret += writeString("try{");
@@ -587,10 +587,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		ret += closeBlock();
 		ret += emptyline();
 
-		ret += writeString("public List "+getTableGetterName(table)+"(){");
+		ret += writeString("public List<List<String>> "+getTableGetterName(table)+"(){");
 		increaseIdent();
 		ret += writeStatement("int size = "+getContainerSizeGetterName(table)+"();");
-		ret += writeStatement("List ret = new java.util.ArrayList(size)");
+		ret += writeStatement("List<List<String>> ret = new java.util.ArrayList<List<String>>(size)");
 		ret += writeString("for (int i=0; i<size; i++)");
 		ret += writeIncreasedStatement("ret.add(get"+StringUtils.capitalize(table.getName())+"Row(i))");
 		ret += writeStatement("return ret");

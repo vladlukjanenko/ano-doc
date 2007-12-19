@@ -34,6 +34,7 @@ import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
+import net.anotheria.asg.generator.meta.MetaGenericListProperty;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
@@ -334,6 +335,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				MetaProperty p = doc.getField(field.getName());
 				if (p.isLinked() || p instanceof MetaEnumerationProperty){
 					ret += writeImport("java.util.List");
+					ret += writeImport("net.anotheria.webutils.bean.LabelValueBean");
 					ret += emptyline();
 					break;
 				}
@@ -363,13 +365,13 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				ret += writeStatement("private "+p.toJavaType()+" "+p.getName(lang));
 				if (p.isLinked()){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),"list");
-					ret += writeStatement("private "+collection.toJavaType()+" "+collection.getName());
+					ret += writeStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
 					ret += writeStatement("private String "+p.getName()+"CurrentValue"+(lang==null?"":lang));
 				}
 				
 				if (p instanceof MetaEnumerationProperty){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
-					ret += writeStatement("private "+collection.toJavaType()+" "+collection.getName());
+					ret += writeStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
 					ret += writeStatement("private String "+p.getName()+"CurrentValue");
 				}
 			}
@@ -679,7 +681,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 
 		if (p.isLinked() || p instanceof MetaEnumerationProperty){
-			ret += writeString("// !!! BLA !!! ");
 			MetaFieldElement pColl = new MetaFieldElement(element.getName()+"Collection");
 			MetaFieldElement pCurr = new MetaFieldElement(element.getName()+"CurrentValue");
 			//;
@@ -746,12 +747,17 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	private String generateMethodsMultilinguage(MultilingualFieldElement element, MetaProperty p){
 		String ret = "";
 		
+		//System.out.println("--- m "+p+", "+p.getType());
+		if (p.getType().equals("list"))
+			ret += writeString("@SuppressWarnings(\"unchecked\")");
 		ret += writeString("public void "+p.toBeanSetter(element.getLanguage())+"("+p.toJavaType()+" "+p.getName()+" ){");
 		increaseIdent();
 		ret += writeStatement("this."+p.getName(element.getLanguage())+" = "+p.getName());
 		ret += closeBlock();			
 		ret += emptyline();
 			
+		if (p.getType().equals("list"))
+			ret += writeString("@SuppressWarnings(\"unchecked\")");
 		ret += writeString("public "+p.toJavaType()+" "+p.toBeanGetter(element.getLanguage())+"(){");
 		increaseIdent();
 		ret += writeStatement("return "+p.getName(element.getLanguage()));
