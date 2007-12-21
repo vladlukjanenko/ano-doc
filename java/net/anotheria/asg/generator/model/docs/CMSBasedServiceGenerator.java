@@ -48,6 +48,7 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	    ret += writeImport("net.anotheria.anodoc.data.Property");
 	    ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 		ret += writeImport("net.anotheria.util.sorter.SortType");
+		ret += writeImport("net.anotheria.util.sorter.StaticQuickSorter");
 		ret += writeImport("net.anotheria.util.Date");
 	    ret += writeImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
 	    ret += writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService");
@@ -115,7 +116,7 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	        
 			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType){");
 			increaseIdent();
-			ret += writeStatement("return sorter.sort(get"+doc.getMultiple()+"(), sortType)");
+			ret += writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			ret += closeBlock();
 			ret += emptyline();
 
@@ -211,7 +212,7 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	        
 			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType){");
 			increaseIdent();
-			ret += writeStatement("return sorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
+			ret += writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
 			ret += closeBlock();
 			
 			ret += writeComment("Executes a query on "+doc.getMultiple());

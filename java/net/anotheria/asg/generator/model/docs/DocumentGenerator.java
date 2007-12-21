@@ -147,9 +147,59 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		ret +=emptyline();
 		ret += generateDefNameMethod(doc);
 		
+		if (DataFacadeGenerator.hasLanguageCopyMethods(doc)){
+			ret += generateLanguageCopyMethods(doc);
+			ret += emptyline();
+		}
+
+		
 		ret += closeBlock();
 		return ret;
 	}
+	
+	private String generateLanguageCopyMethods(MetaDocument doc){
+		String ret = "";
+		
+		//first the common method lang2lang
+		ret += writeString("public void "+DataFacadeGenerator.getCopyMethodName()+"(String sourceLanguage, String destLanguage){");
+		increaseIdent();
+		for (String srclang : context.getLanguages()){
+			for (String targetlang : context.getLanguages()){
+				if (!srclang.equals(targetlang)){
+					ret += writeString("if (sourceLanguage.equals("+quote(srclang)+") && destLanguage.equals("+quote(targetlang)+"))");
+					ret += writeIncreasedStatement(DataFacadeGenerator.getCopyMethodName(srclang, targetlang)+"()");
+				}
+			}
+		}
+		
+		ret += closeBlock();
+		ret += emptyline();
+		
+		
+		//now the concrete methods
+		for (String srclang : context.getLanguages()){
+			for (String targetlang : context.getLanguages()){
+				if (!srclang.equals(targetlang)){
+					ret += writeComment("Copies all multilingual properties from language "+srclang+" to language "+targetlang);
+					ret += writeString("public void "+DataFacadeGenerator.getCopyMethodName(srclang, targetlang)+"(){");
+					increaseIdent();
+					for (MetaProperty p : doc.getProperties()){
+						if (p.isMultilingual()){
+							String copyCall = p.toSetter(targetlang)+"(";
+							copyCall += p.toGetter(srclang)+"()";
+							copyCall += ")";
+							ret += writeStatement(copyCall);
+						}
+					}
+					ret += closeBlock();
+					ret += emptyline();
+				}
+			}
+		}
+		
+		return ret;
+	}
+	
 	
 	private String generateDefaultConstructor(MetaDocument doc){
 		String ret = "";
