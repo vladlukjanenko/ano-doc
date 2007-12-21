@@ -168,7 +168,42 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		ret += generatePropertyAccessMethods(doc);
 		ret += emptyline();
 		ret += generateAdditionalMethods(doc);
+		ret += emptyline();
+		if (hasLanguageCopyMethods(doc)){
+			ret += generateLanguageCopyMethods(doc);
+			ret += emptyline();
+		}
 		ret += closeBlock();
+		return ret;
+	}
+	
+	public static final boolean hasLanguageCopyMethods(MetaDocument doc){
+		return GeneratorDataRegistry.hasLanguageCopyMethods(doc);
+	}
+	
+	public static final String getCopyMethodName(){
+		return getCopyMethodName("LANG", "LANG");
+	}
+	public static final String getCopyMethodName(String sourceLange, String targetLang){
+		return "copy"+sourceLange.toUpperCase()+"2"+targetLang.toUpperCase();
+	}
+	
+	private String generateLanguageCopyMethods(MetaDocument doc){
+		String ret = "";
+		
+		ret += writeComment("Copies all multilingual properties from source language to destination language ");
+		ret += writeString("public void "+getCopyMethodName()+"(String sourceLanguge, String destLanguage);");
+		ret += emptyline();
+		for (String srclang : context.getLanguages()){
+			for (String targetlang : context.getLanguages()){
+				if (!srclang.equals(targetlang)){
+					ret += writeComment("Copies all multilingual properties from language "+srclang+" to language "+targetlang);
+					ret += writeString("public void "+getCopyMethodName(srclang, targetlang)+"();");
+					ret += emptyline();
+				}
+			}
+		}
+		
 		return ret;
 	}
 	

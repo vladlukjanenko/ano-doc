@@ -54,9 +54,10 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	    ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
-	    ret += writeImport("java.util.ArrayList");
+	    //ret += writeImport("java.util.ArrayList");
 	    ret += writeImport("net.anotheria.util.sorter.SortType");
-		ret += writeImport("net.anotheria.util.Date");
+	    ret += writeImport("net.anotheria.util.sorter.StaticQuickSorter");
+		//ret += writeImport("net.anotheria.util.Date");
 	    ret += writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
 	    ret += emptyline();
 	    ret += writeImport(JDBCPersistenceServiceGenerator.getInterfaceImport(context, module));
@@ -127,7 +128,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	        
 			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType){");
 			increaseIdent();
-			ret += writeStatement("return sorter.sort(get"+doc.getMultiple()+"(), sortType)");
+			ret += writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			ret += closeBlock();
 			ret += emptyline();
 
@@ -242,7 +243,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 	        
 			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType){");
 			increaseIdent();
-			ret += writeStatement("return sorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
+			ret += writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
 			ret += closeBlock();
 			
 			ret += writeComment("Executes a query on "+doc.getMultiple());
@@ -274,7 +275,7 @@ public class JDBCBasedServiceGenerator extends AbstractGenerator implements IGen
 			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
 	        increaseIdent();
-	        ret += writeStatement("return sorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
+	        ret += writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
 	        ret += closeBlock();
 			ret += emptyline();
 			
