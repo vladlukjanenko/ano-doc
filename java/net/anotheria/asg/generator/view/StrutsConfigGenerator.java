@@ -8,6 +8,7 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.Generator;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.forms.meta.MetaForm;
@@ -52,6 +53,7 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	public static final String ACTION_MOVE_TOP = "moveTop";
 	public static final String ACTION_MOVE_BOTTOM = "moveBottom";
 	public static final String ACTION_SEARCH = "search";
+	public static final String ACTION_COPY_LANG ="copyLang";
 	
 	public static final String SUFFIX_CSV = ".csv";
 	public static final String SUFFIX_XML = ".xml";
@@ -274,6 +276,10 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		MetaModule module = section.getModule();
 		MetaDocument doc  = section.getDocument();
 		
+		ret += emptyline();
+		ret += writeString("<!-- Generating mapping for "+module.getName()+"."+doc.getName()+" -->");
+		ret += emptyline();
+		
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_SHOW), 
 			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getShowActionName(section),
@@ -385,12 +391,26 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
 			);
 		
+		if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
+			ret += generateActionMapping(
+					"/"+getPath(doc, ACTION_COPY_LANG), 
+					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getLanguageCopyActionName(section),
+					"success",
+					FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
+					);
+		}
+		
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_VERSIONINFO), 
 			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getVersionInfoActionName(section),
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(context, MetaModule.SHARED)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getVersionInfoPageName(doc)+".jsp"
 			);
+		
+		ret += emptyline();
+		ret += writeString("<!-- Finished mapping for "+module.getName()+"."+doc.getName()+" -->");
+		ret += emptyline();
+
 		
 		return ret;
 	}

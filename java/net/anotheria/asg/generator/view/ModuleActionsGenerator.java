@@ -81,6 +81,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getEditActionName(section), generateEditAction(section)));
 			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getNewActionName(section), generateNewAction(section)));
 			MetaDocument doc = section.getDocument();
+			
+			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
+				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getLanguageCopyActionName(section), generateLanguageCopyAction(section)));
+			}
+			
 			for (int p=0; p<doc.getProperties().size(); p++){
 				MetaProperty pp = (MetaProperty)doc.getProperties().get(p);
 				//System.out.println("checking "+pp+" "+(pp instanceof MetaContainerProperty));
@@ -150,6 +155,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    return "Update"+getActionSuffix(section);
 	}
 	
+	public static String getLanguageCopyActionName(MetaModuleSection section){
+	    return "CopyLang"+getActionSuffix(section);
+	}
+
 	public static String getVersionInfoActionName(MetaModuleSection section){
 	    return "VersionInfo"+getActionSuffix(section);
 	}
@@ -949,6 +958,47 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		ret += emptyline();
 	    
 		ret += closeBlock();
+		return ret;
+	}
+
+	private String generateLanguageCopyAction(MetaModuleSection section){
+		String ret = "";
+		MetaDocument doc = section.getDocument();
+		ret += writeStatement("package "+getPackage(section.getModule()));
+		ret += emptyline();
+
+		//write imports...
+		ret += getStandardActionImports();
+	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    ret += emptyline();
+	    
+	    ret += writeComment("This class copies multilingual contents from one language to another in a given document");
+		ret += writeString("public class "+getLanguageCopyActionName(section)+" extends "+getBaseActionName(section)+" {");
+		increaseIdent();
+		ret += emptyline();
+	    
+		ret += writeString(getExecuteDeclaration());
+		increaseIdent();
+		
+		ret += writeStatement("String sourceLanguage = req.getParameter("+quote("pSrcLang")+")");
+		ret += writeString("if (sourceLanguage==null || sourceLanguage.length()==0)");
+		ret += writeIncreasedStatement("throw new RuntimeException("+quote("No source language")+")");
+		ret += emptyline();
+
+		ret += writeStatement("String destLanguage = req.getParameter("+quote("pDestLang")+")");
+		ret += writeString("if (destLanguage==null || destLanguage.length()==0)");
+		ret += writeIncreasedStatement("throw new RuntimeException("+quote("No destination language")+")");
+		ret += emptyline();
+
+		ret += writeStatement("String id = getStringParameter(req, PARAM_ID)");
+		ret += writeStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+		ret += writeStatement(doc.getVariableName()+"."+DataFacadeGenerator.getCopyMethodName()+"(sourceLanguage, destLanguage)");
+		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
+	    ret += writeStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+id)");
+		
+	    ret += writeStatement("return null");
+		ret += closeBlock(); //end doExecute
+		ret += closeBlock(); // end class
 		return ret;
 	}
 

@@ -517,6 +517,32 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		decreaseIdent(); 
 		ret += writeString("</tr>");
 		
+		if (GeneratorDataRegistry.hasLanguageCopyMethods(section.getDocument())){
+			ret += writeString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
+			ret += writeString("<tr>");
+			increaseIdent();
+			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\">");
+			String link = "";
+			for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+				for (String dl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+					if (!sl.equals(dl)){
+						String l = StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG);
+						l += "?pId=<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>";
+						l += "&pSrcLang="+sl;
+						l += "&pDestLang="+dl;
+						l += "&ts=<%=System.currentTimeMillis()%>";
+						link += "<a href=\""+l+"\">"+sl+"-->"+dl+"</a>&nbsp;";
+					}
+				}
+			}
+			ret += writeString(link);
+			ret += writeString("</td>");
+			decreaseIdent(); 
+			ret += writeString("</tr>");
+			ret += writeString("</logic:notEqual>");
+		
+		}
+		
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument(), GeneratorDataRegistry.getInstance().getContext()); 
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
