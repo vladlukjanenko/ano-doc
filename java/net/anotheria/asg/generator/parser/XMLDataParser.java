@@ -45,7 +45,7 @@ public class XMLDataParser implements IDataParser {
 		try{
 			Document doc = reader.build(new StringReader(content));
 			Element root = doc.getRootElement();
-			List modules = root.getChildren("module");
+			List<Element> modules = root.getChildren("module");
 			for (int i=0; i<modules.size(); i++){
 				Element elem = (Element)modules.get(i);
 				ret.add(parseModule(elem));
@@ -124,8 +124,8 @@ public class XMLDataParser implements IDataParser {
 	
 	private MetaDocument parseDocument(Element d){
 		MetaDocument doc = new MetaDocument(d.getAttributeValue("name"));
-		List properties = d.getChildren("property");
-		List links = d.getChildren("link");
+		List<Element> properties = d.getChildren("property");
+		List<Element> links = d.getChildren("link");
 
 		for (int i=0; i<properties.size(); i++){
 			Element p = (Element) properties.get(i);
@@ -178,11 +178,12 @@ public class XMLDataParser implements IDataParser {
 		String name = p.getAttributeValue("name");
 		MetaTableProperty ret = new MetaTableProperty(name);
 		
-		List columns = p.getChildren("column");
+		List<Element> columns = p.getChildren("column");
 		for (int i=0; i<columns.size(); i++){
-			Element e = (Element)columns.get(i);
+			Element e = columns.get(i);
 				ret.addColumn(e.getAttributeValue("name"));
 		}
+		
 		return ret;
 		
 	}
@@ -199,10 +200,7 @@ public class XMLDataParser implements IDataParser {
 		String multilingual = p.getAttributeValue("multilingual");
 		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
 			ret.setMultilingual(true);
-
-		
 		return ret;
-		
 	}
 
 	private MetaLink parseLink(Element p){
@@ -217,6 +215,5 @@ public class XMLDataParser implements IDataParser {
 			l.setMultilingual(true);
 
 		return l;
-		
 	}
 }
