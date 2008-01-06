@@ -21,7 +21,11 @@ public class LinkToMeBean {
 		targetDocumentProperty = propertyName;
 		try{
 			targetDocumentDescription = ""+doc.getPropertyValue("name");
-		}catch(NoSuchPropertyException e){}
+		}catch(NoSuchPropertyException e){
+			
+		}catch(RuntimeException e){
+			//temporarly, as long as VO objects are throwing exceptions of this type instead of something meaningful.
+		}
 	}
 	
 	public boolean isDescriptionAvailable(){
