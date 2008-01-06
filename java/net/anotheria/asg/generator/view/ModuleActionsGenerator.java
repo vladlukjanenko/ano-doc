@@ -1200,13 +1200,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			increaseIdent();
 			ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
 			for (DirectLink l : backlinks){
+				ret += writeString("try{");
+				String methodName = "";
 				if (l.getProperty().isMultilingual()){
 					for (String lang : context.getLanguages()){
-						ret += writeStatement("ret.addAll(findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName(lang))+"(documentId))");
+						methodName = "findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName(lang));
+						ret += writeIncreasedStatement("ret.addAll("+methodName+"(documentId))");
 					}
 				}else{
-					ret += writeStatement("ret.addAll(findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(documentId))");	
+					methodName = "findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName());
+					ret += writeIncreasedStatement("ret.addAll("+methodName+"(documentId))");	
 				}
+				ret += writeString("}catch(Exception ignored){");
+				ret += writeIncreasedStatement("log.warn(\""+methodName+"(\"+documentId+\")\", ignored)");
+				ret += writeString("}");
 			}
 			ret += writeStatement("return ret");
 			ret += closeBlock();

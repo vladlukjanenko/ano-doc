@@ -134,14 +134,21 @@ public class AbstractGenerator{
 		String ret = writeString("}");
 		return ret;
 	}
-	
+
+	protected String writeMark(int markNumber){
+		String ret = "/* ***** MARK ";
+		ret += markNumber;
+		ret += ", Generator: "+this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
+    	ret += " ***** */";
+		return emptyline()+writeString(ret)+emptyline();
+	}
+
 	protected String writeCommentLine(String commentline){
 		String tokens[] = StringUtils.tokenize(commentline, '\n');
 		if (tokens.length!=1)
 			return writeComment(commentline);
 		String ret = writeString("// "+commentline);
     	return ret;
- 
 	}
 	
 	protected String writeComment(String commentline){

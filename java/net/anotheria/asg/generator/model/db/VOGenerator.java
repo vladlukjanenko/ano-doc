@@ -121,14 +121,19 @@ public class VOGenerator extends AbstractDataObjectGenerator
 			interfaceDecl += ", IComparable ";
 		}
 		
+
+		ret += writeMark(1);
 		
 		ret += writeString("public class "+getDocumentImplName(doc)+" extends AbstractVO "+interfaceDecl+"{");
 		increaseIdent();
 		ret += emptyline();
+		ret += writeMark(2);
 		ret += generatePropertyFields(doc);
 		ret += emptyline();
+		ret += writeMark(3);
 		ret += generateDefaultConstructor(doc);
 		ret += emptyline();
+		ret += writeMark(4);
 		ret += generateCloneConstructor(doc);
 		ret += emptyline();
 		ret += generatePropertyAccessMethods(doc);
@@ -410,7 +415,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 					
 		}
 
-		ret += writeStatement("throw new RuntimeException("+quote("Not yet implemented.")+")");
+		ret += writeStatement("throw new RuntimeException("+quote("No property getter for ")+"+propertyName)");
 		ret += closeBlock();
 		
 		return ret;
