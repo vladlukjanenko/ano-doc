@@ -8,6 +8,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.model.ModuleGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
+import net.anotheria.asg.generator.model.db.SQLGenerator;
 import net.anotheria.asg.generator.model.docs.FactoryGenerator;
 
 /**
@@ -26,6 +27,7 @@ public class DataGenerator extends AbstractAnoDocGenerator{
 		List<FileEntry> todo = new ArrayList<FileEntry>();
 		todo.addAll(new ConfiguratorGenerator().generate(modules, context));
 		todo.addAll(new BasicServiceGenerator().generate(modules, context));
+		todo.addAll(new SQLGenerator().generate(modules, context));
 		for (int i=0; i<modules.size(); i++){
 			MetaModule m = modules.get(i);
 			if (m.getStorageType()==StorageType.CMS){

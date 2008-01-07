@@ -16,13 +16,20 @@ public class FileEntry {
 		type = ".java";
 	}
 	
+	public FileEntry(String aPath, String aName, String aContent, String aType){
+		this();
+		this.path = aPath;
+		this.name = aName;
+		this.content = aContent;
+		type = aType;
+	}
+	
 	public FileEntry(String aPath, String aName, String aContent){
 		this();
 		this.path = aPath;
 		this.name = aName;
 		this.content = aContent;
 	}
-	
 	
 	 
 	/**

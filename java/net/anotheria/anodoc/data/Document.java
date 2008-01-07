@@ -102,11 +102,11 @@ public class Document extends DataHolder
 	 * Returns the DocumentList contained in this Document under the given name. 
 	 * @see net.anotheria.anodoc.data.NoSuchDocumentListException 
 	 */
-	public DocumentList getDocumentList(String name) throws NoSuchDocumentListException{
+	public <D extends Document>DocumentList<D> getDocumentList(String name) throws NoSuchDocumentListException{
 		try{
 			DataHolder holder = getDataHolder(name);
 			if (holder instanceof DocumentList)
-				return (DocumentList)holder;
+				return (DocumentList<D>)holder;
 		}catch(NoSuchDataHolderException e){}
 		throw new NoSuchDocumentListException(name);
 	}
@@ -214,11 +214,11 @@ public class Document extends DataHolder
 	 * structure and shouldn't be called from outside a document.
 	 * @see net.anotheria.anodoc.data.NoSuchDocumentListException 
 	 */
-	protected DocumentList getDocumentListAnyCase(String name) {
+	protected <D extends Document>DocumentList<D> getDocumentListAnyCase(String name) {
 		try{
 			return getDocumentList(name);
 		}catch(NoSuchDocumentListException e){};
-		DocumentList newList = createDocumentList(name);
+		DocumentList<D> newList = createDocumentList(name);
 		putList(newList);
 		return newList;
 	}
@@ -255,8 +255,8 @@ public class Document extends DataHolder
 	 * @param name
 	 * @return
 	 */
-	protected DocumentList createDocumentList(String name){
-		return new DocumentList(name);
+	protected <D extends Document>DocumentList<D> createDocumentList(String name){
+		return new DocumentList<D>(name);
 	}
 	
 	/**
@@ -364,7 +364,7 @@ public class Document extends DataHolder
 	/**
 	 * Puts the given DocumentList in the internal storage.
 	 */
-	public void putList(DocumentList list){
+	public void putList(DocumentList<? extends Document> list){
 		addDataHolder(list);
 	}
 

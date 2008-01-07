@@ -32,6 +32,7 @@ import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.model.db.JDBCBasedServiceGenerator;
 import net.anotheria.asg.generator.model.db.JDBCPersistenceServiceGenerator;
 import net.anotheria.asg.generator.model.db.PersistenceServiceDAOGenerator;
+import net.anotheria.asg.generator.model.db.SQLGenerator;
 import net.anotheria.asg.generator.model.docs.CMSBasedServiceGenerator;
 import net.anotheria.asg.generator.model.federation.FederationServiceGenerator;
 
@@ -67,6 +68,9 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 			ret.addAll(daoGen.generate(gmodule, context));
 			JDBCBasedServiceGenerator servGen = new JDBCBasedServiceGenerator();
 			ret.addAll(servGen.generate(gmodule, context));
+			//SQLGenerator sqlGen = new SQLGenerator();
+			//ret.addAll(sqlGen.generate(gmodule, context));
+			
 		}
 		
 		if (mod.getStorageType()==StorageType.FEDERATION){
