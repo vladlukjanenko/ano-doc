@@ -7,6 +7,7 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
@@ -20,12 +21,10 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	public List<FileEntry> generate(IGenerateable gmodule, Context context){
 		
 		MetaModule mod = (MetaModule)gmodule;
-		
 		this.context = context;
 		String packageName = context.getPackageName(mod)+".service";
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
-		
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getImplementationName(mod), generateImplementation(mod)));
 		
@@ -41,7 +40,7 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 
 		ret += CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+".");
 
-	    ret += writeStatement("package "+getPackageName(module));
+		ret += writeStatement("package "+getPackageName(module));
 	    ret += emptyline();
 	    ret += writeImport("java.util.List");
 	    ret += writeImport("java.util.ArrayList");
@@ -102,7 +101,8 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	    ret += closeBlock();
 	    ret += emptyline();
 	    
-
+	    boolean containsAnyMultilingualDocs = false;
+	    
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
@@ -231,21 +231,50 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 			ret += emptyline();
 			
 			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches.");
-	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
+	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
 	        increaseIdent();
 	        ret += writeStatement("throw new RuntimeException(\"Not yet implemented\")");
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
 			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
-			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
+			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
 	        increaseIdent();
 	        ret += writeStatement("throw new RuntimeException(\"Not yet implemented\")");
 	        ret += closeBlock();
 			ret += emptyline();
 			
+			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
+				containsAnyMultilingualDocs = true;
+				ret += writeCommentLine("This method is not very fast, since it makes an update (eff. save) after each doc.");
+				ret += writeString("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage){");
+				increaseIdent();
+				ret += writeStatement("List<"+doc.getName()+"> allDocuments = get"+doc.getMultiple()+"()");
+				ret += writeString("for ("+doc.getName()+" document : allDocuments){");
+				increaseIdent();
+				ret += writeStatement("document.copyLANG2LANG(sourceLanguage, targetLanguage)");
+				ret += writeStatement("update"+doc.getName()+"(document)");
+				ret += closeBlock();
+				ret += closeBlock();
+				ret += emptyline();
+			
+			}
+			
 			
 	    }
+	    
+	    if (containsAnyMultilingualDocs){
+			ret += writeComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
+			ret += writeString("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage){");
+			increaseIdent();
+			for (MetaDocument doc : docs){
+				if (GeneratorDataRegistry.hasLanguageCopyMethods(doc))
+					ret += writeStatement("copyMultilingualAttributesInAll"+doc.getMultiple()+"(sourceLanguage, targetLanguage)");
+			}
+			ret += closeBlock();
+			ret += emptyline();
+	    }
+
 	    
 	    //generate export function
 	    ret += emptyline();

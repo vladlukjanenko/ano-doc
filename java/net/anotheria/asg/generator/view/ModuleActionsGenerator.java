@@ -59,7 +59,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
 	public List<FileEntry> generate(IGenerateable g, Context context) {
-		List<FileEntry> files = new ArrayList<FileEntry>();
+		 List<FileEntry> files = new ArrayList<FileEntry>();
 		
 		this.context = context;
 		
@@ -115,11 +115,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		
 			
-		
-				
-		
-		
-		
 		return files;
 	}
 	

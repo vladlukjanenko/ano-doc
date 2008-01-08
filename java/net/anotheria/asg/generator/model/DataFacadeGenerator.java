@@ -17,7 +17,14 @@ import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.util.StringUtils;
 
 /**
- * This generator generates the data facade - the interface which defines the behaviour of the document and its attributes. It also generates the 
+ * This generator genera
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ *  tes the data facade - the interface which defines the behaviour of the document and its attributes. It also generates the 
  * sort type. 
  * @author another
  *

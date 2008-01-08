@@ -24,6 +24,7 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
@@ -32,7 +33,6 @@ import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.model.db.JDBCBasedServiceGenerator;
 import net.anotheria.asg.generator.model.db.JDBCPersistenceServiceGenerator;
 import net.anotheria.asg.generator.model.db.PersistenceServiceDAOGenerator;
-import net.anotheria.asg.generator.model.db.SQLGenerator;
 import net.anotheria.asg.generator.model.docs.CMSBasedServiceGenerator;
 import net.anotheria.asg.generator.model.federation.FederationServiceGenerator;
 
@@ -96,9 +96,9 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    ret += writeImport("net.anotheria.util.sorter.SortType");
 	    ret += emptyline();
 	    
-	    List docs = module.getDocuments();
+	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        MetaDocument doc = docs.get(i);
 	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    }
 	    ret += emptyline();
@@ -106,12 +106,15 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    ret += writeImport("org.jdom.Element");
 	    ret += emptyline();
 	    ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
-	    ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
+	   
+	     ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
 	    ret += emptyline();
 
 	    ret += writeString("public interface "+getInterfaceName(module)+"{");
 	    increaseIdent();
+	    
+	    boolean containsAnyMultilingualDocs = false;
 
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
@@ -152,6 +155,19 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	        ret += emptyline();
 			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)");
+			ret += emptyline();
+			
+			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
+				ret += writeComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage");
+				ret += writeStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)");
+				ret += emptyline();
+				containsAnyMultilingualDocs = true;
+			}
+	    }
+	    
+	    if (containsAnyMultilingualDocs){
+			ret += writeComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
+			ret += writeStatement("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)");
 			ret += emptyline();
 	    }
 	    

@@ -93,11 +93,11 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * Returns the documentlist with given name (if there is any).
 	 */
-	public DocumentList getList(String name) throws NoSuchDocumentListException{
+	public <D extends Document>DocumentList<D> getList(String name) throws NoSuchDocumentListException{
 		DataHolder list = getDataHolder(name);
 		if (list==null || (!(list instanceof DocumentList)))
 			throw new NoSuchDocumentListException(name);
-		return (DocumentList)list;
+		return (DocumentList<D>)list;
 	}
 	
 	/**
