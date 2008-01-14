@@ -28,7 +28,8 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 			}
 		}
 
-		ret.addAll(generateAllScripts(documents));
+		if (documents.size()>0)
+			ret.addAll(generateAllScripts(documents));
 		
 		return ret;
 	}

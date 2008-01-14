@@ -16,7 +16,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
  * TODO please remined another to comment this class
  * @author another
  */
-public class FactoryGenerator extends AbstractGenerator implements IGenerator{
+public class ModuleFactoryGenerator extends AbstractGenerator implements IGenerator{
 	
 	
 	public List<FileEntry> generate(IGenerateable gmodule, Context context){

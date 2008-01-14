@@ -6,6 +6,7 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractAnoDocGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.meta.MetaModule;
 
 public class AppUtilGenerator extends AbstractAnoDocGenerator{
 	
@@ -15,9 +16,12 @@ public class AppUtilGenerator extends AbstractAnoDocGenerator{
 		context = aContext;
 	}
 	
-	public void generate(){
+	public void generate(List<MetaModule> modules){
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		files.addAll(new CallContextGenerator().generate(null, context));
+		files.addAll(new XMLExporterGenerator().generate(modules, context));
+		files.addAll(new LanguageUtilsGenerator().generate(modules, context));
+		
 		
 		writeFiles(files);
 	}

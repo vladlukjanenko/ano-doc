@@ -58,8 +58,6 @@ public class Generator {
 			System.out.println("Supported "+c.getLanguages()+", default: "+c.getDefaultLanguage());
 		}*/
 		
-		AppUtilGenerator utilGen = new AppUtilGenerator(c);
-		utilGen.generate();
 		try{
 			String typesContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/datatypes.xml"));
 			XMLTypesParser typesParser = new XMLTypesParser(typesContent);
@@ -91,6 +89,8 @@ public class Generator {
 		List<MetaModule> modules = dataParser.parseModules();
 		GeneratorDataRegistry.getInstance().addModules(modules);
 		
+		AppUtilGenerator utilGen = new AppUtilGenerator(c);
+		utilGen.generate(modules);
 		
 		DataGenerator g = new DataGenerator(c);
 		g.generate("java", modules);

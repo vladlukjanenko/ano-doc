@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class CommentGenerator extends AbstractGenerator{
 	
-	public static final String COPYRIGHT = "Copyright (C) 2005 -2007 Anotheria.net, www.anotheria.net";
+	public static final String COPYRIGHT = "Copyright (C) 2005 - 2008 Anotheria.net, www.anotheria.net";
 	public static final String RIGHTS    = "All Rights Reserved.";
 	
 	public static final String NOTICE_1 = "Don't edit this code, if you aren't sure";

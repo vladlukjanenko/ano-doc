@@ -9,7 +9,7 @@ import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.model.ModuleGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.model.db.SQLGenerator;
-import net.anotheria.asg.generator.model.docs.FactoryGenerator;
+import net.anotheria.asg.generator.model.docs.ModuleFactoryGenerator;
 
 /**
  * TODO please remined another to comment this class
@@ -31,11 +31,9 @@ public class DataGenerator extends AbstractAnoDocGenerator{
 		for (int i=0; i<modules.size(); i++){
 			MetaModule m = modules.get(i);
 			if (m.getStorageType()==StorageType.CMS){
-				IGenerator fg = new FactoryGenerator();
-				runGenerator(fg, m, context, todo);
+				runGenerator(new ModuleFactoryGenerator(), m, context, todo);
 			}
-			IGenerator g = new ModuleGenerator();
-			runGenerator(g, m, context, todo);
+			runGenerator(new ModuleGenerator(), m, context, todo);
 			runGenerator(new ServiceGenerator(), m, context, todo);
 			
 			//System.out.println(todo);	

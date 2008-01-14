@@ -249,7 +249,9 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 				ret += writeCommentLine("This method is not very fast, since it makes an update (eff. save) after each doc.");
 				ret += writeString("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage){");
 				increaseIdent();
-				ret += writeStatement("List<"+doc.getName()+"> allDocuments = get"+doc.getMultiple()+"()");
+				ret += writeStatement("List<"+doc.getName()+"> allDocumentsSrc = get"+doc.getMultiple()+"()");
+				ret += writeStatement("List<"+doc.getName()+"> allDocuments = new ArrayList<"+doc.getName()+">(allDocumentsSrc.size())");
+				ret += writeStatement("allDocuments.addAll(allDocumentsSrc)");
 				ret += writeString("for ("+doc.getName()+" document : allDocuments){");
 				increaseIdent();
 				ret += writeStatement("document.copyLANG2LANG(sourceLanguage, targetLanguage)");
