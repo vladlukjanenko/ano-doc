@@ -3,8 +3,6 @@ package net.anotheria.asg.generator.apputil;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.spi.Configurator;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.ConfiguratorGenerator;
 import net.anotheria.asg.generator.Context;
