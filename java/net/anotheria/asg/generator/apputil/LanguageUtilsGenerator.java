@@ -84,7 +84,7 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		increaseIdent();
 		ret += closeBlock();
 		
-		ret += writeString("public static void main(String[] a){");
+		ret += writeString("public static void main(String[] a) throws Exception{");
 		increaseIdent();
 		ret += writeStatement("BasicConfigurator.configure()");
 		ret += writeStatement("String sourceLang, targetLang");
@@ -110,7 +110,8 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		ret += closeBlock(); // ...checkParameter
 		ret += emptyline();
 		
-		ret += writeString("private static void copy(String sourceLanguage, String targetLanguage){");
+		//TODO replace with Ano-Doc exception
+		ret += writeString("private static void copy(String sourceLanguage, String targetLanguage) throws Exception {");
 		increaseIdent();
 		ret += writeString("//initialize and copy");
 		for (MetaModule m : modulesSet){

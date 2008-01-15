@@ -3,6 +3,7 @@ package net.anotheria.asg.generator.apputil;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anotheria.asg.exception.ASGRuntimeException;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.ConfiguratorGenerator;
 import net.anotheria.asg.generator.Context;
@@ -52,6 +53,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		ret += writeImport("org.jdom.output.XMLOutputter");
 		ret += emptyline();
 		ret += writeImport("net.anotheria.util.Date");
+		ret += writeImport(ASGRuntimeException.class.getName());
 		ret += writeImport("org.apache.log4j.BasicConfigurator");
 		ret += emptyline();
 		for (MetaModule m : modules){
@@ -71,7 +73,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		
 		
 		ret += writeComment("Create an XML Document (jdom) with data from all modules.");
-		ret += writeString("public Document createCompleteXMLExport(){");
+		ret += writeString("public Document createCompleteXMLExport() throws ASGRuntimeException{");
 		increaseIdent();
 		ret += writeStatement("ArrayList<Element> elements = new ArrayList<Element>()");
 		for (MetaModule m : modules){
@@ -82,14 +84,14 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		ret += emptyline();
 
 		ret += writeComment("Write XML data from all modules into given stream.");
-		ret += writeString("public void writeCompleteXMLExportToStream(OutputStream target) throws IOException{");
+		ret += writeString("public void writeCompleteXMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
 		ret += writeStatement("new XMLOutputter().output(createCompleteXMLExport(), target)");
 		ret += closeBlock();
 		ret += emptyline();
 		
 		ret += writeComment("Write XML data from all modules into given file.");
-		ret += writeString("public void writeCompleteXMLExportToFile(File target) throws IOException{");
+		ret += writeString("public void writeCompleteXMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
 		ret += writeStatement("writeToFile(createCompleteXMLExport(), target)");
 		ret += closeBlock();
@@ -100,7 +102,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		//create export methods for all modules.
 		for (MetaModule m : modules){
 			ret += writeComment("Create an XML Document (jdom) from "+m.getName()+" data for export.");
-			ret += writeString("public Document create"+m.getName()+"XMLExport(){");
+			ret += writeString("public Document create"+m.getName()+"XMLExport() throws ASGRuntimeException{");
 			increaseIdent();
 			ret += writeStatement("ArrayList<Element> elements = new ArrayList<Element>(1)");
 			ret += writeStatement("elements.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML())");
@@ -109,14 +111,14 @@ public class XMLExporterGenerator extends AbstractGenerator{
 			ret += emptyline();
 
 			ret += writeComment("Write "+m.getName()+" as XML into given stream.");
-			ret += writeString("public void write"+m.getName()+"XMLExportToStream(OutputStream target) throws IOException{");
+			ret += writeString("public void write"+m.getName()+"XMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
 			ret += writeStatement("new XMLOutputter().output(create"+m.getName()+"XMLExport(), target)");
 			ret += closeBlock();
 			ret += emptyline();
 			
 			ret += writeComment("Write "+m.getName()+" as XML into given file.");
-			ret += writeString("public void write"+m.getName()+"XMLExportToFile(File target) throws IOException{");
+			ret += writeString("public void write"+m.getName()+"XMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
 			ret += writeStatement("writeToFile(create"+m.getName()+"XMLExport(), target)");
 			ret += closeBlock();
@@ -161,7 +163,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		ret += closeBlock();
 		ret += emptyline();
 		
-		ret += writeString("public static void main(String[] a) throws IOException{");
+		ret += writeString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
 		increaseIdent();
 		ret += writeStatement("BasicConfigurator.configure()");
 		ret += writeStatement("new "+getExporterClassName(context)+"().writeCompleteXMLExportToFile(new File("+quote(context.getApplicationName()+"_export.xml")+"))");
