@@ -74,6 +74,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    for (FederatedModuleDef fedDef : federatedModules){
 	    	MetaModule target = GeneratorDataRegistry.getInstance().getModule(fedDef.getName());
 	    	ret += writeImport(ServiceGenerator.getInterfaceImport(context, target));
+	    	ret += writeImport(ServiceGenerator.getExceptionImport(context, target));
 	    	ret += writeImport(ServiceGenerator.getFactoryImport(context, target));
 	    	targetModules.put(fedDef.getKey(), target);
 	    }
@@ -110,6 +111,9 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    increaseIdent();
 	    ret += writeStatement("private static "+getImplementationName(module)+" instance");
 	    ret += emptyline();
+	    
+	    String throwsClause = " throws "+ServiceGenerator.getExceptionName(module)+" ";
+	    String throwClause = "throw new "+ServiceGenerator.getExceptionName(module)+"("+quote("Undelying service failed: ")+"+e.getMessage())";
 	    
 	    ret += writeCommentLine("Federated services: ");
     	ret += writeStatement("public static final char ID_DELIMITER = '-'");
@@ -192,13 +196,21 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	        }
 	        //... end copy methods
 	        
-	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"(){");
+	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement(listDecl+" "+doc.getMultiple().toLowerCase()+" = new Array"+listDecl+"();");
 	        for (FederatedDocumentMapping mapping : mappings){
 	        	MetaDocument target = targetModules.get(mapping.getTargetKey()).getDocumentByName(mapping.getTargetDocument());
+	        	ret += writeString("try{");
+	        	increaseIdent();
 	        	ret += writeStatement("List<"+target.getName()+"> source"+mapping.getTargetKey()+" = "+FEDERATION_VARIABLE_PREFIX+mapping.getTargetKey()+".get"+target.getMultiple()+"()");
 	        	ret += writeStatement(doc.getMultiple().toLowerCase()+".addAll(copy"+doc.getName()+"List"+mapping.getTargetKey()+"(source"+mapping.getTargetKey()+"))");
+	        	decreaseIdent();
+	        	ret += writeString("}catch("+ServiceGenerator.getExceptionName(targetModules.get(mapping.getTargetKey()))+" e){");
+	        	//TODO Add logging
+	        	ret += writeCommentLine("TODO Add logging?");
+	        	ret += writeIncreasedStatement(throwClause);
+	        	ret += writeString("}");
 	        }
 	        
 	        //"+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()");
@@ -206,38 +218,49 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
-			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType){");
+			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			ret += writeStatement("return sorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			ret += closeBlock();
 			ret += emptyline();
 
-	        ret += writeString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
+	        ret += writeString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
-	        ret += writeString("public void delete"+doc.getName()+"(String id){");
+	        ret += writeString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement("throw new RuntimeException(\"not implemented.\")");
 	        ret += closeBlock();
 	        ret += emptyline();
 
-	        ret += writeString("public "+doc.getName()+" get"+doc.getName()+"(String id){");
+	        ret += writeString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement("String tokens[] = StringUtils.tokenize(id, ID_DELIMITER)");
 	        
+	        
+
+	        
 	        for(FederatedDocumentMapping mapping : mappings){
 	        	ret += writeString("if (tokens[0].equals("+quote(mapping.getTargetKey())+")){");
+	        	increaseIdent();
+	        	ret += writeString("try{");
 	        	ret += writeIncreasedStatement("return copy("+FEDERATION_VARIABLE_PREFIX+mapping.getTargetKey()+".get"+mapping.getTargetDocument()+"(tokens[1]))");
+	        	ret += writeString("}catch("+ServiceGenerator.getExceptionName(targetModules.get(mapping.getTargetKey()))+" e){");
+	        	//TODO Add logging
+	        	ret += writeCommentLine("TODO Add logging?");
+	        	ret += writeIncreasedStatement(throwClause);
+	        	ret += writeString("}");
+	        	decreaseIdent();
 	        	ret += writeString("}");
 	        }
 	        ret += writeStatement("throw new RuntimeException("+quote("Unknown federated key: ")+"+tokens[0]+"+quote(" in ")+"+id)");
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
-	        ret += writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
+	        ret += writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement("if (1==1) throw new RuntimeException(\"not implemented.\")");
 	        
@@ -253,7 +276,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	        ret += closeBlock();
 	        ret += emptyline();
 
-	        ret += writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
+	        ret += writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement("if (1==1) throw new RuntimeException(\"not implemented.\")");
 	        ret += writeStatement(doc.getName()+" oldVersion = null");
@@ -273,13 +296,21 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
-	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value){");
+	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement(listDecl+" "+doc.getMultiple().toLowerCase()+" = new Array"+listDecl+"();");
 	        for (FederatedDocumentMapping mapping : mappings){
 	        	MetaDocument target = targetModules.get(mapping.getTargetKey()).getDocumentByName(mapping.getTargetDocument());
+	        	ret += writeString("try{");
+	        	increaseIdent();
 	        	ret += writeStatement("List<"+target.getName()+"> source"+mapping.getTargetKey()+" = "+FEDERATION_VARIABLE_PREFIX+mapping.getTargetKey()+".get"+target.getMultiple()+"ByProperty(propertyName, value)");
 	        	ret += writeStatement(doc.getMultiple().toLowerCase()+".addAll(copy"+doc.getName()+"List"+mapping.getTargetKey()+"(source"+mapping.getTargetKey()+"))");
+	        	decreaseIdent();
+	        	ret += writeString("}catch("+ServiceGenerator.getExceptionName(targetModules.get(mapping.getTargetKey()))+" e){");
+	        	//TODO Add logging
+	        	ret += writeCommentLine("TODO Add logging?");
+	        	ret += writeIncreasedStatement(throwClause);
+	        	ret += writeString("}");
 	        }
 	        
 	        //"+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()");
@@ -287,13 +318,13 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
-			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType){");
+			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			ret += writeStatement("return sorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
 			ret += closeBlock();
 			
 			ret += writeComment("Executes a query on "+doc.getMultiple());
-			ret += writeString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query){");
+			ret += writeString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause+"{");
 			increaseIdent();
 			ret += writeStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()");
 			ret += writeStatement("QueryResult result = new QueryResult()");
@@ -308,14 +339,14 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 			ret += emptyline();
 			
 			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches.");
-	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
+	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement("throw new RuntimeException(\"Not yet implemented\")");
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
 			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
-			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
+			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause+"{");
 	        increaseIdent();
 	        ret += writeStatement("throw new RuntimeException(\"Not yet implemented\")");
 	        ret += closeBlock();
@@ -326,7 +357,7 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    
 	    //generate export function
 	    ret += emptyline();
-	    ret += writeString("public Element exportToXML(){");
+	    ret += writeString("public Element exportToXML()"+throwsClause+"{");
 	    increaseIdent();
 	    ret += writeStatement("throw new RuntimeException(\"not implemented\")");
 	    ret += closeBlock();

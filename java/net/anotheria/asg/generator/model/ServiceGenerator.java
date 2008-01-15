@@ -20,6 +20,7 @@ package net.anotheria.asg.generator.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anotheria.asg.exception.ASGRuntimeException;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
@@ -55,6 +56,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getInterfaceName(mod), generateInterface(mod)));
+		ret.add(new FileEntry(FileEntry.package2path(packageName), getExceptionName(mod), generateException(mod)));
 		
 		if (mod.getStorageType()==StorageType.CMS){
 			CMSBasedServiceGenerator cmsGen = new CMSBasedServiceGenerator();
@@ -85,6 +87,27 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		return context.getPackageName(module)+".service";
 	}
 	
+	private String generateException(MetaModule module){
+	    String ret = "";
+	    
+	    ret += CommentGenerator.generateJavaTypeComment(getExceptionName(module));
+ 
+	    ret += writeStatement("package "+getPackageName(module));
+	    ret += emptyline();
+	    ret += writeImport(ASGRuntimeException.class.getName());
+	    
+	    ret += writeComment("Base class for all exceptions thrown by implementations of "+getInterfaceName(module));
+	    ret += writeString("public class "+getExceptionName(module)+" extends ASGRuntimeException{");
+	    increaseIdent();
+	    
+	    ret += writeString("public "+getExceptionName(module)+" (String message){" );
+	    ret += writeIncreasedStatement("super(message)");
+	    ret += writeString("}");
+	    
+	    ret += closeBlock();
+	    return ret;
+	}
+
 	private String generateInterface(MetaModule module){
 	    String ret = "";
 	    
@@ -116,50 +139,52 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    
 	    boolean containsAnyMultilingualDocs = false;
 
+	    String throwsClause = " throws "+getExceptionName(module);
+	    
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
 	        ret += writeComment("Returns all "+doc.getMultiple()+" objects stored.");
-	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"()");
+	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause);
 	        ret += emptyline();
 			ret += writeComment("Returns all "+doc.getMultiple()+" objects sorted by given sortType.");
-			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)");
+			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause);
 			ret += emptyline();
 	        ret += writeComment("Deletes a "+doc.getName()+" object by id.");
-	        ret += writeStatement("public void delete"+doc.getName()+"(String id)");
+	        ret += writeStatement("public void delete"+doc.getName()+"(String id)"+throwsClause);
 	        ret += emptyline();
 	        ret += writeComment("Deletes a "+doc.getName()+" object.");
-	        ret += writeStatement("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")");
+	        ret += writeStatement("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        ret += emptyline();
 	        ret += writeComment("Returns the "+doc.getName()+" object with the specified id.");
-	        ret += writeStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)");
+	        ret += writeStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
 	        ret += emptyline();
 	        ret += writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
-	        ret += writeStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")");
+	        ret += writeStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        ret += emptyline();
 	        ret += writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
-	        ret += writeStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")");
+	        ret += writeStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        ret += emptyline();
 	        //special functions
 	        ret += writeComment("Returns all "+doc.getName()+" objects, where property with given name equals object.");
-	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)");
+	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause);
 	        ret += emptyline();
 			ret += writeComment("Returns all "+doc.getName()+" objects, where property with given name equals object, sorted");
-			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)");
+			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause);
 			ret += emptyline();
 			ret += writeComment("Executes a query");
-			ret += writeStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)");
+			ret += writeStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause);
 			ret += emptyline();
 	        ret += writeComment("Returns all "+doc.getName()+" objects, where property matches.");
-	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)");
+	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause);
 	        ret += emptyline();
 			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
-			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)");
+			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause);
 			ret += emptyline();
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 				ret += writeComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage");
-				ret += writeStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)");
+				ret += writeStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)"+throwsClause);
 				ret += emptyline();
 				containsAnyMultilingualDocs = true;
 			}
@@ -167,18 +192,23 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    
 	    if (containsAnyMultilingualDocs){
 			ret += writeComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
-			ret += writeStatement("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)");
+			ret += writeStatement("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)"+throwsClause);
 			ret += emptyline();
 	    }
 	    
 		ret += writeComment("creates an xml element with all contained data.");
-		ret += writeStatement("public Element exportToXML()");
+		ret += writeStatement("public Element exportToXML()"+throwsClause);
 		ret += emptyline();
 	    
 	    ret += closeBlock();
 	    return ret;
 	}
 	
+	
+	public static String getExceptionName(MetaModule m){
+	    return getServiceName(m)+"Exception";
+	}
+
 	
 	public static String getInterfaceName(MetaModule m){
 	    return "I"+getServiceName(m);
@@ -188,6 +218,10 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		return getPackageName(ctx,m)+"."+getInterfaceName(m);
 	}
 	
+	public static String getExceptionImport(Context ctx, MetaModule m){
+		return getPackageName(ctx,m)+"."+getExceptionName(m);
+	}
+
 	public static String getServiceName(MetaModule m){
 	    return m.getName()+"Service";
 	}

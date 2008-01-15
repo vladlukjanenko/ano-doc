@@ -29,6 +29,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
+import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.types.EnumerationGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 import net.anotheria.asg.generator.util.DirectLink;
@@ -1216,7 +1217,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			for (DirectLink l : backlinks){
 				if (l.getProperty().isMultilingual()){
 					for (String lang : context.getLanguages()){
-						ret += writeString("private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName(lang))+"(String documentId){");
+						ret += writeString("private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName(lang))+"(String documentId) throws "+ServiceGenerator.getExceptionImport(context,l.getModule())+"{");
 						increaseIdent();
 						ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
 						ret += writeStatement("QueryProperty p = new QueryProperty("+l.getDocument().getName()+"."+l.getProperty().toNameConstant(lang)+", documentId)");
@@ -1231,7 +1232,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						ret += closeBlock();
 					}
 				}else{
-					ret += writeString("private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId){");
+					ret += writeString("private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId) throws "+ServiceGenerator.getExceptionImport(context, l.getModule())+"{");
 					increaseIdent();
 					ret += writeStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
 					ret += writeStatement("QueryProperty p = new QueryProperty("+l.getDocument().getName()+"."+l.getProperty().toNameConstant()+", documentId)");
