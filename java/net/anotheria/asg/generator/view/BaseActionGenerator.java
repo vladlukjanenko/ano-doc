@@ -167,6 +167,13 @@ public class BaseActionGenerator extends AbstractGenerator {
 		ret+= writeStatement("return userId!=null");
 		ret += closeBlock();
 		ret += emptyline();
+		
+		ret += writeString("public String getSubsystem() {");
+		increaseIdent();
+		ret += writeStatement("return "+quote("asg"));
+		ret += closeBlock();
+	
+
 	
 		ret += closeBlock();
 		return ret;
