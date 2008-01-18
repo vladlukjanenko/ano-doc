@@ -3,7 +3,6 @@ package net.anotheria.asg.generator.model.docs;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
@@ -12,9 +11,10 @@ import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 
-public class CMSBasedServiceGenerator extends AbstractGenerator implements IGenerator{
+public class CMSBasedServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
 	private Context context;
 	
@@ -29,10 +29,6 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getImplementationName(mod), generateImplementation(mod)));
 		
 		return ret;
-	}
-	
-	private String getPackageName(MetaModule module){
-		return context.getPackageName(module)+".service";
 	}
 	
 	private String generateImplementation(MetaModule module){
@@ -298,43 +294,4 @@ public class CMSBasedServiceGenerator extends AbstractGenerator implements IGene
 	    return getModuleGetterMethod(module)+"()";
 	}
 	
-
-	private String generateFactory(MetaModule module){
-	    String ret = "";
-
-		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
-
-	    ret += writeStatement("package "+getPackageName(module));
-	    ret += emptyline();
-	    
-	    ret += writeString("public class "+getFactoryName(module)+"{");
-	    increaseIdent();
-
-	    ret += writeString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");
-	    increaseIdent();
-	    ret += writeString("return "+getImplementationName(module)+".getInstance();");
-	    ret += closeBlock();
-	    
-	    ret += closeBlock();
-	    return ret;
-	}
-
-	
-
-	
-	public static String getInterfaceName(MetaModule m){
-	    return "I"+getServiceName(m);
-	}
-	
-	public static String getServiceName(MetaModule m){
-	    return m.getName()+"Service";
-	}
-
-	public static String getFactoryName(MetaModule m){
-	    return getServiceName(m)+"Factory";
-	}
-	
-	public static String getImplementationName(MetaModule m){
-	    return getServiceName(m)+"Impl";
-	}
 }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
@@ -18,10 +17,11 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaFederationModule;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 
-public class FederationServiceGenerator extends AbstractGenerator implements IGenerator{
+public class FederationServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
 	private Context context;
 	MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
@@ -42,9 +42,6 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 		return ret;
 	}
 	
-	private String getPackageName(MetaModule module){
-		return context.getServicePackageName(module);
-	}
 	
 	public static final String FEDERATION_VARIABLE_PREFIX = "federated";
 	
@@ -366,44 +363,4 @@ public class FederationServiceGenerator extends AbstractGenerator implements IGe
 	    ret += closeBlock();
 	    return ret;
 	}
-	
-	private String generateFactory(MetaModule module){
-	    String ret = "";
-
-		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
-
-	    ret += writeStatement("package "+getPackageName(module));
-	    ret += emptyline();
-	    
-	    ret += writeString("public class "+getFactoryName(module)+"{");
-	    increaseIdent();
-
-	    ret += writeString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");
-	    increaseIdent();
-	    ret += writeString("return "+getImplementationName(module)+".getInstance();");
-	    ret += closeBlock();
-	    
-	    ret += closeBlock();
-	    return ret;
-	}
-
-	
-
-	
-	public static String getInterfaceName(MetaModule m){
-	    return "I"+getServiceName(m);
-	}
-	
-	public static String getServiceName(MetaModule m){
-	    return m.getName()+"Service";
-	}
-
-	public static String getFactoryName(MetaModule m){
-	    return getServiceName(m)+"Factory";
-	}
-	
-	public static String getImplementationName(MetaModule m){
-	    return getServiceName(m)+"Impl";
-	}
-	
 }
