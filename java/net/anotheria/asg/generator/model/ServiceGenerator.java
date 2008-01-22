@@ -130,11 +130,13 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    ret += emptyline();
 	    ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
-	     ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
+	    ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
 	    ret += emptyline();
+	    ret += writeImport("net.anotheria.asg.service.ASGService");
+	    ret += emptyline();
 
-	    ret += writeString("public interface "+getInterfaceName(module)+"{");
+	    ret += writeString("public interface "+getInterfaceName(module)+" extends ASGService {");
 	    increaseIdent();
 	    
 	    boolean containsAnyMultilingualDocs = false;

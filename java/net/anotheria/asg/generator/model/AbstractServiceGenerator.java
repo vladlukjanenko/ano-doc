@@ -39,6 +39,7 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    ret += writeImport("net.java.dev.moskito.core.dynamic.MoskitoInvokationProxy");
 	    ret += writeImport("net.java.dev.moskito.core.predefined.ServiceStatsCallHandler");
 	    ret += writeImport("net.java.dev.moskito.core.predefined.ServiceStatsFactory");
+	    ret += writeImport("net.anotheria.asg.service.ASGService");
 	    ret += emptyline();
 
 	    
@@ -58,7 +59,7 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    ret += writeString("\""+getInterfaceName(module)+"-\"+instanceCounter.incrementAndGet(),");
 	    ret += writeString("\"service\",");
 	    ret += writeString("\"asg\",");
-	    ret += writeString(getInterfaceName(module)+".class");
+	    ret += writeString(getInterfaceName(module)+".class"+", ASGService.class");
 	    decreaseIdent();
 	    ret += writeString(");");
 	    ret += writeStatement("return ("+getInterfaceName(module)+") proxy.createProxy()");
