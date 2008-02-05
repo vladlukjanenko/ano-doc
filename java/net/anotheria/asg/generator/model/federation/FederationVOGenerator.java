@@ -103,6 +103,7 @@ public class FederationVOGenerator extends AbstractGenerator
 			}
 		}
 		ret += emptyline();
+		ret += writeImport("net.anotheria.util.xml.XMLNode");
 		
 		String interfaceDecl = "implements "+doc.getName();
 		if (doc.isComparable()){
@@ -413,6 +414,11 @@ public class FederationVOGenerator extends AbstractGenerator
 			if (p instanceof MetaListProperty)
 				ret += generateListMethods((MetaListProperty)p);
 		}
+		
+		ret += writeString("public XMLNode toXMLNode(){");
+		increaseIdent();
+		ret += writeStatement("return new XMLNode("+quote("not_imlpemented_fed_vo")+")");
+		ret += closeBlock();
 		
 		return ret;		
 	}

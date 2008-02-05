@@ -400,6 +400,9 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		for (MetaProperty p : doc.getProperties()){
 			ret += writeStatement("this."+p.getName().toLowerCase() + " = toCopy."+p.toGetter()+"()");
 		}
+		for (MetaProperty p : doc.getLinks()){
+			ret += writeStatement("this."+p.getName().toLowerCase() + " = toCopy."+p.toGetter()+"()");
+		}
 		ret += closeBlock();
 		return ret;
 	}

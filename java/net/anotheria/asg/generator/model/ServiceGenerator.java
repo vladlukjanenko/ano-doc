@@ -126,7 +126,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    }
 	    ret += emptyline();
 	    
-	    ret += writeImport("org.jdom.Element");
+	    ret += writeImport("net.anotheria.util.xml.XMLNode");
 	    ret += emptyline();
 	    ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
@@ -199,7 +199,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    }
 	    
 		ret += writeComment("creates an xml element with all contained data.");
-		ret += writeStatement("public Element exportToXML()"+throwsClause);
+		ret += writeStatement("public XMLNode exportToXML()"+throwsClause);
 		ret += emptyline();
 	    
 	    ret += closeBlock();

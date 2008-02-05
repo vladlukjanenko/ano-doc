@@ -7,7 +7,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jdom.Element;
+import net.anotheria.util.xml.XMLAttribute;
+import net.anotheria.util.xml.XMLNode;
 
 /**
  * This class represents a basic document, which is a container for properties and therefore a 
@@ -626,16 +627,13 @@ public class Document extends DataHolder
 		return ret;
 	}
 
-	public Element toXMLElement(){
-		Element root = new Element("document");
+	public XMLNode toXMLNode(){
+		XMLNode root = new XMLNode("document");
 		
-		root.setAttribute("documentId", getId());
-		List<Element> childs = new ArrayList<Element>();
+		root.addAttribute(new XMLAttribute("documentId", getId()));
 		for (Iterator<DataHolder> it = dataStorage.values().iterator(); it.hasNext();)
-			childs.add(it.next().toXMLElement());
+			root.addChildNode(it.next().toXMLNode());
 		
-		
-		root.setChildren(childs);
 		return root;
 	}
 	

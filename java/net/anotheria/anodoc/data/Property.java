@@ -1,7 +1,7 @@
 package net.anotheria.anodoc.data;
 
-import org.jdom.Attribute;
-import org.jdom.Element;
+import net.anotheria.util.xml.XMLAttribute;
+import net.anotheria.util.xml.XMLNode;
 
 /**
  * This class represents a single data entry which can be stored.
@@ -88,14 +88,12 @@ public abstract class Property
 	
 	protected abstract Object cloneValue() throws CloneNotSupportedException;
 	
-	public Element toXMLElement(){
-		Element e = new Element("property");
-		e.setAttribute(new Attribute("name", getName()));
-		e.setAttribute(new Attribute("type", getPropertyType().toString()));
-		
-		e.setText(""+getValue());
-		
-		return e;
+	public XMLNode toXMLNode(){
+		XMLNode ret = new XMLNode("property");
+		ret.addAttribute(new XMLAttribute("name", getName()));
+		ret.addAttribute(new XMLAttribute("type", getPropertyType().toString()));
+		ret.setContent(""+getValue());
+		return ret;
 	}
 	
 	public abstract PropertyType getPropertyType();

@@ -43,6 +43,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
 		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentName(doc), generateDocument(doc)));
 		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getSortTypeName(doc), generateSortType(doc)));
+		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getXMLHelperName(doc), generateXMLHelper(doc)));
 		return _ret;
 	}
 	
@@ -52,6 +53,10 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	
 	public static String getSortTypeName(MetaDocument doc){
 		return doc.getName()+"SortType";
+	}
+	
+	public static String getXMLHelperName(MetaDocument doc){
+		return doc.getName()+"XMLHelper";
 	}
 	
 	private List<MetaProperty> extractSortableProperties(MetaDocument doc){
@@ -134,6 +139,143 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		
 		
 	}
+	
+	private String generateXMLHelper(MetaDocument doc){
+		String ret = "";
+		
+		
+		ret += writeStatement("package "+getPackageName(doc));
+		ret += emptyline();
+		ret += writeImport("net.anotheria.util.xml.XMLNode");
+		ret += writeImport("net.anotheria.util.xml.XMLAttribute");
+		ret += writeImport("net.anotheria.asg.data.XMLHelper");
+		
+		boolean listImported = false;
+		for (int i=0; i<doc.getProperties().size(); i++){
+			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
+				ret += writeImport("java.util.List");
+				listImported = true;
+				break;
+			}
+		}
+		for (int i=0; i<doc.getProperties().size(); i++){
+			if (doc.getProperties().get(i) instanceof MetaTableProperty){
+				if (!listImported){
+					ret += writeImport("java.util.List");
+				}
+				break;
+			}
+		}
+		
+		ret += emptyline();
+		ret += writeString("public class "+getXMLHelperName(doc)+"{");
+		ret += emptyline();
+		increaseIdent();
+		if (context.areLanguagesSupported()){
+			String langArray = "";
+			for (String l : context.getLanguages()){
+				if (langArray.length()>0 )
+					langArray += ",";
+				langArray += quote(l);
+			}
+			ret += writeStatement("public static final String[] LANGUAGES = new String[]{"+langArray+"}");
+		}
+
+		ret += writeString("public static XMLNode toXML("+doc.getName()+" object){");
+		increaseIdent();
+		ret += writeStatement("XMLNode ret = new XMLNode("+quote(doc.getName())+")");
+		ret += writeStatement("ret.addAttribute(new XMLAttribute("+quote("id")+", object.getId()))");
+		ret += emptyline();
+		for (MetaProperty p : doc.getProperties()){
+			ret += generatePropertyToXMLMethod(p);
+		}
+		ret += emptyline();
+		for (MetaProperty p : doc.getLinks()){
+			ret += generatePropertyToXMLMethod(p);
+		}
+		ret += writeStatement("return ret");
+		ret += closeBlock();
+		ret += emptyline();
+		
+		ret += writeString("public static "+doc.getName()+" fromXML(XMLNode node){");
+		increaseIdent();
+		ret += writeStatement("return null");
+		ret += closeBlock();
+		ret += emptyline();
+		
+		
+		
+		//ret += generatePropertyAccessMethods(doc);
+		ret += emptyline();
+		//ret += generateAdditionalMethods(doc);
+		ret += emptyline();
+		ret += closeBlock();
+		return ret;
+	}
+	
+	private String generatePropertyToXMLMethod(MetaProperty p){
+		String ret = "";
+		
+		if (p instanceof MetaTableProperty)
+			return generateTablePropertyGetterMethods((MetaTableProperty)p);
+		if (p instanceof MetaListProperty)
+			return generateListPropertyToXMLMethods((MetaListProperty)p);
+		if (context.areLanguagesSupported() && p.isMultilingual())
+			return generatePropertyToXMLMethodMultilingual(p);
+		
+		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeForValue("+quote(p.getName())+", null, object.get"+p.getAccesserName()+"()	))");
+		return ret;
+	}
+	
+	
+	private String generatePropertyToXMLMethodMultilingual(MetaProperty p){
+		String ret = "";
+		
+		String callArr = "";
+		
+		for (String l : context.getLanguages()){
+			if (callArr.length()>0)
+				callArr += ", ";
+			callArr += "object.get"+p.getAccesserName(l)+"()";
+		}
+		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeForValue("+quote(p.getName())+", LANGUAGES , "+callArr+"	))");
+		return ret;
+	}
+	
+	private String generateListPropertyToXMLMethods(MetaListProperty p){
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		if (p.isMultilingual())
+			tmp.setMultilingual(true);
+		return generatePropertyToXMLMethod(tmp);
+	}
+	
+	
+	
+	/*
+	private String generatePropertyAccessMethods(MetaDocument doc){
+		String ret = "";
+		
+		ret += _generatePropertyAccessMethods(doc.getProperties());
+		ret += _generatePropertyAccessMethods(doc.getLinks());
+		return ret;
+	}
+	
+	private String _generatePropertyAccessMethods(List<MetaProperty> properties){
+		String ret = "";
+		
+		for (int i=0; i<properties.size(); i++){
+			MetaProperty p = properties.get(i);
+			ret += generatePropertyGetterMethod(p);
+			ret += emptyline();
+			if (!p.isReadonly()){
+				ret += generatePropertySetterMethod(p);
+				ret += emptyline();
+			}
+		}
+		return ret;
+	}
+
+	 */
 	
 	private String generateDocument(MetaDocument doc){
 		String ret = "";
@@ -371,6 +513,12 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	public static final String getDocumentImport(Context context, MetaDocument doc){
 		return context.getDataPackageName(doc)+"."+doc.getName();
 	}
+	
+	public static final String getXMLHelperImport(Context context, MetaDocument doc){
+		return context.getDataPackageName(doc)+"."+getXMLHelperName(doc);
+	}
+
+	
 	
 	public static final String getSortTypeImport(MetaDocument doc){
 		return GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc)+"."+getSortTypeName(doc);

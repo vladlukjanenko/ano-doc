@@ -2,7 +2,8 @@ package net.anotheria.anodoc.data;
 
 import java.io.Serializable;
 
-import org.jdom.Element;
+import net.anotheria.util.xml.XMLAttribute;
+import net.anotheria.util.xml.XMLNode;
 
 /**
  * This class represents the root class for all objects that can hold information
@@ -57,9 +58,9 @@ public abstract class DataHolder implements Serializable, Cloneable{
 		return super.clone();
 	}
 	
-	public Element toXMLElement(){
-		Element e = new Element("dataholder");
-		e.setAttribute("id", getId());
+	public XMLNode toXMLNode(){
+		XMLNode e = new XMLNode("dataholder");
+		e.addAttribute( new XMLAttribute("id", getId()));
 		return e;
 	}
 	

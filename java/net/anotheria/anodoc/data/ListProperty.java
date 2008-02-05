@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jdom.Element;
+import net.anotheria.util.xml.XMLNode;
+
+
 
 /**
  * This property hold the list of Properties.
@@ -119,18 +121,16 @@ public class ListProperty extends Property{
 		
 		return ret;
 	}
-	
-	public Element toXMLElement(){
-		Element elem = super.toXMLElement();
+
+	public XMLNode toXMLNode(){
+		XMLNode elem = super.toXMLNode();
 		
-		elem.setText("");
+		elem.setContent("");
 		
-		List<Element> children = new ArrayList<Element>();
 		for (Property p : getList()){
-			children.add(p.toXMLElement());
+			elem.addChildNode(p.toXMLNode());
 		}
 		
-		elem.setChildren(children);
 		return elem;
 	}
 	

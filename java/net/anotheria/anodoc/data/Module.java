@@ -1,19 +1,17 @@
 package net.anotheria.anodoc.data;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.jdom.Attribute;
-import org.jdom.Element;
 
 import net.anotheria.anodoc.service.IModuleFactory;
 import net.anotheria.anodoc.util.KeyUtility;
+import net.anotheria.util.xml.XMLAttribute;
+import net.anotheria.util.xml.XMLNode;
 
 /**
  * This class describes a Module, which is a unity that can be stored
@@ -379,21 +377,18 @@ public class Module implements ICompositeDataObject, Serializable{
 		return new IDHolder(docName);
 	}
 	
-	public Element toXMLElement(){
-		Element root = new Element("module");
+	public XMLNode toXMLNode(){
+		XMLNode root = new XMLNode("module");
 		
-		root.setAttribute(new Attribute("moduleId", getId()));
-		root.setAttribute(new Attribute("copyId", getCopyId()));
-		root.setAttribute(new Attribute("ownerId", getOwnerId()));
-		root.setAttribute(new Attribute("size", ""+getSizeInBytes()));
-		List<Element> containedObjects = new ArrayList<Element>();
+		root.addAttribute(new XMLAttribute("moduleId", getId()));
+		root.addAttribute(new XMLAttribute("copyId", getCopyId()));
+		root.addAttribute(new XMLAttribute("ownerId", getOwnerId()));
+		root.addAttribute(new XMLAttribute("size", ""+getSizeInBytes()));
 		
 		Collection<DataHolder> myDataHolders = holders.values();
 		for (DataHolder dh : myDataHolders){
-			containedObjects.add(dh.toXMLElement());
+			root.addChildNode(dh.toXMLNode());
 		}
-		
-		root.setChildren(containedObjects);
 		
 		return root;
 	}

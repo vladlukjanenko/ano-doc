@@ -389,10 +389,9 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 	}
 	
 	public static final String getDocumentImport(Context context, MetaDocument doc){
-		return context.getPackageName(doc)+".data."+getDocumentImplName(doc);
+		return context.getDataPackageName(doc)+"."+getDocumentImplName(doc);
 	}
 	
-
 	public static final String getSortTypeImport(MetaDocument doc){
 		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data."+getSortTypeName(doc);
 	}

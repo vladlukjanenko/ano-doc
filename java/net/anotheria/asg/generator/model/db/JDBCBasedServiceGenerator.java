@@ -73,7 +73,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
 	    
 	    ret += emptyline();
-	    ret += writeImport("org.jdom.Element");
+	    ret += writeImport("net.anotheria.util.xml.XMLNode");
 	    ret += emptyline();
 	    
 	    ret += writeString("public class "+getImplementationName(module)+" extends BasicService implements "+getInterfaceName(module)+" {");
@@ -279,10 +279,9 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    
 	    //generate export function
 	    ret += emptyline();
-	    ret += writeString("public Element exportToXML(){");
+	    ret += writeString("public XMLNode exportToXML(){");
 	    increaseIdent();
-        ret += writeCommentLine("TODO not implemented");
-        ret += writeStatement("throw new RuntimeException(\"+not yet implemented\")");
+        ret += writeStatement("return new XMLNode("+quote("unimplemented_jdbc_export_"+module.getName())+")");
 	    ret += closeBlock();
 	    
 	    

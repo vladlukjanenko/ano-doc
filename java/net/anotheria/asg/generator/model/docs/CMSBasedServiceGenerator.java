@@ -51,6 +51,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        ret += writeImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 	        ret += writeImport(DocumentGenerator.getDocumentImport(context, doc));
 	    }
 	    ret += emptyline();
@@ -61,7 +62,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
 	    
 	    ret += emptyline();
-	    ret += writeImport("org.jdom.Element");
+	    ret += writeImport("net.anotheria.util.xml.XMLNode");
+	    ret += writeImport("net.anotheria.util.xml.XMLAttribute");
 	    ret += emptyline();
 	    
 	    ret += writeString("public class "+getImplementationName(module)+" extends BasicCMSService implements "+getInterfaceName(module)+" {");
@@ -276,9 +278,30 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    
 	    //generate export function
 	    ret += emptyline();
-	    ret += writeString("public Element exportToXML(){");
+	    for (MetaDocument d : docs){
+	    	ret += writeStatement("public XMLNode export"+d.getMultiple()+"ToXML(){");
+	    	increaseIdent();
+	    	ret += writeStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
+	    	ret += writeStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()");
+	    	ret += writeStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
+	    	ret += writeString("for ("+d.getName()+" object : list)");
+	    	ret += writeIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
+	    	ret += writeStatement("return ret");
+	    	
+	    	ret += closeBlock();
+	    	ret += emptyline();
+	    }
+	    
+
+	    ret += writeString("public XMLNode exportToXML(){");
 	    increaseIdent();
-	    ret += writeStatement("return "+getModuleGetterCall(module)+".toXMLElement()");
+	    ret += writeStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
+	    ret += emptyline();
+	    for (MetaDocument d : docs){
+	    	ret += writeStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML())");
+	    }
+	    ret += emptyline();
+	    ret += writeStatement("return ret");
 	    ret += closeBlock();
 	    
 	    

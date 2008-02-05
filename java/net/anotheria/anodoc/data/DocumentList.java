@@ -5,8 +5,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
-import org.jdom.Attribute;
-import org.jdom.Element;
+import net.anotheria.util.xml.XMLAttribute;
+import net.anotheria.util.xml.XMLNode;
+
 
 /**
  * DocumentList represents a list holder for documents. The difference between holding the 
@@ -183,15 +184,13 @@ public class DocumentList<D extends Document> extends DataHolder implements ICom
 		return sum;
 	}
 	
-	public Element toXMLElement(){
-		Element root = new Element("documentlist");
+	public XMLNode toXMLNode(){
+		XMLNode root = new XMLNode("documentlist");
 		
-		root.setAttribute(new Attribute("listId", getId()));
-		List<Element> children = new ArrayList<Element>();
+		root.addAttribute(new XMLAttribute("listId", getId()));
 		for (D d : list){
-			children.add(d.toXMLElement());
+			root.addChildNode(d.toXMLNode());
 		}
-		root.setChildren(children);
 		return root;
 	}
 

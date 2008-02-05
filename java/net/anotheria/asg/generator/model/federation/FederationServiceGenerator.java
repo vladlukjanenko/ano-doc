@@ -101,7 +101,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
 
 	    ret += emptyline();
-	    ret += writeImport("org.jdom.Element");
+	    ret += writeImport("net.anotheria.util.xml.XMLNode");
 	    ret += emptyline();
 	    
 	    ret += writeString("public class "+getImplementationName(module)+" extends BasicService implements "+getInterfaceName(module)+" {");
@@ -354,9 +354,9 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    
 	    //generate export function
 	    ret += emptyline();
-	    ret += writeString("public Element exportToXML()"+throwsClause+"{");
+	    ret += writeString("public XMLNode exportToXML()"+throwsClause+"{");
 	    increaseIdent();
-	    ret += writeStatement("throw new RuntimeException(\"not implemented\")");
+        ret += writeStatement("return new XMLNode("+quote("unimplemented_federated_export_"+module.getName())+")");
 	    ret += closeBlock();
 	    
 	    
