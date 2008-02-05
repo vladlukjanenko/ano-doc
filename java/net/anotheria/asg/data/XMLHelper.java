@@ -6,31 +6,39 @@ import net.anotheria.util.xml.XMLAttribute;
 import net.anotheria.util.xml.XMLNode;
 
 public class XMLHelper {
-	public static XMLNode createXMLNodeForValue(String name, String[] language, List<String>... value){
+	public static XMLNode createXMLNodeForListValue(String name, String[] language, List<String>... value){
 		return createXMLNodeWithContent(name, language, "list", "not_yet_implemented");
 	}
+	
+	public static XMLNode createXMLNodeForImageValue(String name, String[] language, String... value){
+		return createXMLNodeForStringValue(name, language, value);
+	}
 
-	public static XMLNode createXMLNodeForValue(String name, String[] language, String... value){
+	public static XMLNode createXMLNodeForTextValue(String name, String[] language, String... value){
+		return createXMLNodeForStringValue(name, language, value);
+	}
+
+	public static XMLNode createXMLNodeForStringValue(String name, String[] language, String... value){
 		return createXMLNodeWithContent(name, language, "string",(Object[])value);
 	}
 	
-	public static XMLNode createXMLNodeForValue(String name, String[] languages, boolean... value){
+	public static XMLNode createXMLNodeForBooleanValue(String name, String[] languages, boolean... value){
 		return createXMLNodeWithAttribute(name, languages, "boolean", (Object[])makeArray(value));
 	}
 	
-	public static XMLNode createXMLNodeForValue(String name, String[] languages, int... value){
+	public static XMLNode createXMLNodeForIntValue(String name, String[] languages, int... value){
 		return createXMLNodeWithAttribute(name, languages, "int", (Object[])makeArray(value));
 	}
 
-	public static XMLNode createXMLNodeForValue(String name, String[] languages, long... value){
+	public static XMLNode createXMLNodeForLongValue(String name, String[] languages, long... value){
 		return createXMLNodeWithAttribute(name, languages, "long", (Object[])makeArray(value));
 	}
 	
-	public static XMLNode createXMLNodeForValue(String name, String[] languages, double... value){
+	public static XMLNode createXMLNodeForDoubleValue(String name, String[] languages, double... value){
 		return createXMLNodeWithAttribute(name, languages, "double", (Object[])makeArray(value));
 	}
 
-	public static XMLNode createXMLNodeForValue(String name, String[] languages, float... value){
+	public static XMLNode createXMLNodeForFloatValue(String name, String[] languages, float... value){
 		return createXMLNodeWithAttribute(name, languages, "float", (Object[])makeArray(value));
 	}
 	

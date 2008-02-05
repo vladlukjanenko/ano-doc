@@ -223,7 +223,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		if (context.areLanguagesSupported() && p.isMultilingual())
 			return generatePropertyToXMLMethodMultilingual(p);
 		
-		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeForValue("+quote(p.getName())+", null, object.get"+p.getAccesserName()+"()	))");
+		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", null, object.get"+p.getAccesserName()+"()	))");
 		return ret;
 	}
 	
@@ -238,7 +238,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 				callArr += ", ";
 			callArr += "object.get"+p.getAccesserName(l)+"()";
 		}
-		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeForValue("+quote(p.getName())+", LANGUAGES , "+callArr+"	))");
+		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", LANGUAGES , "+callArr+"	))");
 		return ret;
 	}
 	
