@@ -20,6 +20,7 @@ public class AppUtilGenerator extends AbstractAnoDocGenerator{
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		files.addAll(new CallContextGenerator().generate(null, context));
 		files.addAll(new XMLExporterGenerator().generate(modules, context));
+		files.addAll(new XMLImporterGenerator().generate(modules, context));
 		files.addAll(new LanguageUtilsGenerator().generate(modules, context));
 		
 		
