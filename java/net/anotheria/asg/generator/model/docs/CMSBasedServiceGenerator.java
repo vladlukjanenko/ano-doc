@@ -44,7 +44,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 		ret += writeImport("net.anotheria.util.sorter.SortType");
 		ret += writeImport("net.anotheria.util.sorter.StaticQuickSorter");
-		ret += writeImport("net.anotheria.util.Date");
+		//ret += writeImport("net.anotheria.util.Date");
 	    ret += writeImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
 	    ret += writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService");
 	    List<MetaDocument> docs = module.getDocuments();
@@ -138,6 +138,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        ret += closeBlock();
 	        ret += emptyline();
 	        
+	        //create
 	        ret += writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	        increaseIdent();
 	        ret += writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
@@ -156,6 +157,38 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        ret += closeBlock();
 	        ret += emptyline();
 
+	        
+	        
+	        //create multiple
+	        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
+	        ret += writeStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list){");
+	        increaseIdent();
+	        ret += writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
+	        ret += writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
+	        ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
+	        increaseIdent();
+	        ret += writeStatement(doc.getName()+" created = module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
+	        ret += writeStatement("ret.add(created)");
+	        ret += closeBlock();
+	        
+	        ret += writeStatement("updateModule(module)");
+	        
+	        ret += writeString("if (hasServiceListeners()){");
+	        increaseIdent();
+	        ret += writeStatement("List<IServiceListener> myListeners = getServiceListeners()");
+	        ret += writeString("for (int i=0; i<myListeners.size(); i++)");
+	        increaseIdent();
+	        ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
+	        ret += writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
+	        decreaseIdent();
+	        ret += closeBlock();	
+	        
+	        
+	        ret += writeStatement("return ret");
+	        ret += closeBlock();
+	        ret += emptyline();
+	        
+	        
 	        ret += writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	        increaseIdent();
 	        ret += writeStatement(doc.getName()+" oldVersion = null");

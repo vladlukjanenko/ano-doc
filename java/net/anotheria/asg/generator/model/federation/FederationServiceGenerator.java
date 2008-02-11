@@ -272,6 +272,16 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        ret += writeStatement("return "+doc.getVariableName());
 	        ret += closeBlock();
 	        ret += emptyline();
+	        
+	        
+	        //create multiple
+	        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
+	        ret += writeStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
+	        increaseIdent();
+	        ret += writeStatement("throw new RuntimeException("+quote("Not yet implemented")+")");
+	        ret += closeBlock();
+	        ret += emptyline();
+
 
 	        ret += writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();

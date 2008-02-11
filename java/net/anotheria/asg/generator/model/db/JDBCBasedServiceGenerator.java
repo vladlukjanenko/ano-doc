@@ -173,6 +173,31 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        ret += writeStatement("return "+doc.getVariableName());
 	        ret += closeBlock();
 	        ret += emptyline();
+	        
+	        //
+	        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
+	        ret += writeString("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list){");
+	        increaseIdent();
+	        ret += writeStatement(listDecl+" ret = null");
+	        ret += openTry();
+	        ret += writeStatement("ret = pService.create"+doc.getMultiple()+"(list)");
+	        decreaseIdent();
+	        ret += writeString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
+	        ret += writeIncreasedStatement("throw new RuntimeException(\"Persistence failed: \"+e.getMessage())");
+	        ret += writeString("}");
+	        ret += writeString("if (hasServiceListeners()){");
+	        increaseIdent();
+	        ret += writeStatement("List<IServiceListener> myListeners = getServiceListeners()");
+	        ret += writeString("for (int i=0; i<myListeners.size(); i++)");
+	        increaseIdent();
+	        ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
+	        ret += writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
+	        decreaseIdent();
+	        ret += closeBlock();	
+	        ret += writeStatement("return ret");
+	        ret += closeBlock();
+	        ret += emptyline();
+
 
 	        ret += writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	        increaseIdent();
