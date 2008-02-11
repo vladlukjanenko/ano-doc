@@ -107,6 +107,9 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        ret += writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
 	        ret += writeStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        ret += emptyline();
+	        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
+	        ret += writeStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
+	        ret += emptyline();
 	        ret += writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
 	        ret += writeStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        ret += emptyline();
@@ -254,6 +257,16 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        ret += generateMethodEnd(module, callLog);
 	        ret += closeBlock();
 	        ret += emptyline();
+	        
+	        callLog = "\"Call create"+doc.getMultiple()+"(\"+list+\") \"";
+	        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
+	        ret += openFun("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
+	        ret += generateMethodStart(callLog);
+	        ret += writeStatement("return "+getDAOVariableName(doc)+".create"+doc.getMultiple()+"(c, list)");
+	        ret += generateMethodEnd(module, callLog);
+	        ret += closeBlock();
+	        ret += emptyline();
+	        
 
 	        callLog = "\"Call update"+doc.getName()+"(\"+"+doc.getVariableName()+"+\") \"";
 	        ret += writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");

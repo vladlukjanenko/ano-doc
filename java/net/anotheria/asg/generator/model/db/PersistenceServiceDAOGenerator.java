@@ -490,7 +490,49 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         ret += closeBlock();
         ret += emptyline();
 
+
+        //createListXYZ method
+        String listDecl = "List<"+doc.getName()+">";
+        callLog = quote("create"+doc.getMultiple()+"(")+"+con+"+quote(", ")+"+list+"+quote(")");
+        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
+        ret += openFun("public "+listDecl+" create"+doc.getMultiple()+"(Connection con, "+listDecl+" list)"+throwsClause);
+        //ret += generateFunctionStart("SQL_CREATE", callLog, true);
+        ret += writeStatement("PreparedStatement ps = null");
+        ret += writeString("try{");
+        increaseIdent();
+        ret += writeStatement("con.setAutoCommit(false)");
+        ret += writeStatement("ps = con.prepareStatement(createSQL(SQL_CREATE_1, SQL_CREATE_2))");
+        ret += writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
+        ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
+        increaseIdent();
+        ret += writeStatement("long nextId = getLastId(con).incrementAndGet()");
+        ret += writeStatement("ps.setLong(1, nextId)");
+        for (int i=0; i<properties.size(); i++){
+        	ret += generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2);
+        	ii = i +2;
+        }
+        ret += writeCommentLine("set create timestamp");
+        ret += writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())");
+
+        ret += writeStatement("int rows = ps.executeUpdate()");
+        ret += writeString("if (rows!=1)");
+        ret += writeIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)");
         
+        /*String*/ copyResVarName = "new"+StringUtils.capitalize(doc.getVariableName());
+        /*String*/ createCopyCall = VOGenerator.getDocumentImplName(doc)+" "+copyResVarName + " = new "+VOGenerator.getDocumentImplName(doc);
+        createCopyCall += "(\"\"+nextId)";
+        ret += writeStatement(createCopyCall);
+        ret += writeStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")");
+        
+        ret += writeStatement("ret.add("+copyResVarName+")");
+        ret += closeBlock();
+        ret += writeStatement("con.commit()");
+        ret += writeStatement("return ret");
+        ret += generateFunctionEnd(callLog, true);
+        
+        ret += closeBlock();
+        ret += emptyline();
+
         //updateXYZ method
         callLog = quote("update"+doc.getName()+"(")+"+con+"+quote(", ")+"+"+doc.getVariableName()+"+"+quote(")");
         ret += writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
