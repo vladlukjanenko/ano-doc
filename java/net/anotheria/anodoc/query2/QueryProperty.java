@@ -29,4 +29,14 @@ public class QueryProperty {
 	public String getComparator(){
 		return " = ";
 	}
+	
+	public boolean doesMatch(Object o){
+		return o== null ? value == null :
+			o.equals(value);
+	}
+	
+	protected Object getOriginalValue(){
+		return value;
+	}
+	
 }

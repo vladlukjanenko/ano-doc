@@ -66,7 +66,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		increaseIdent();
 		ret += emptyline();
 
-		ret += writeStatement("protected Sorter sorter");
+		ret += writeStatement("private Sorter sorter");
 
 		ret += writeStatement("protected Logger log");
 		ret += emptyline();

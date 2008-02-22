@@ -32,72 +32,72 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	}
 	
 	private String generateImplementation(MetaModule module){
-	    String ret = "";
+	    StringBuilder ret = new StringBuilder(5000);
 
-		ret += CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+".");
+		ret.append(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+"."));
 
-		ret += writeStatement("package "+getPackageName(module));
-	    ret += emptyline();
-	    ret += writeImport("java.util.List");
-	    ret += writeImport("java.util.ArrayList");
-	    ret += writeImport("net.anotheria.anodoc.data.Property");
-	    ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
-		ret += writeImport("net.anotheria.util.sorter.SortType");
-		ret += writeImport("net.anotheria.util.sorter.StaticQuickSorter");
-		//ret += writeImport("net.anotheria.util.Date");
-	    ret += writeImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
-	    ret += writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService");
+		ret.append(writeStatement("package "+getPackageName(module)));
+	    ret.append(emptyline());
+	    ret.append(writeImport("java.util.List"));
+	    ret.append(writeImport("java.util.ArrayList"));
+	    ret.append(writeImport("net.anotheria.anodoc.data.Property"));
+	    ret.append(writeImport("net.anotheria.anodoc.data.NoSuchPropertyException"));
+		ret.append(writeImport("net.anotheria.util.sorter.SortType"));
+		ret.append(writeImport("net.anotheria.util.sorter.StaticQuickSorter"));
+		//ret.append(writeImport("net.anotheria.util.Date"));
+	    ret.append(writeImport(context.getPackageName(module)+".data."+ module.getModuleClassName()));
+	    ret.append(writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService"));
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	        ret += writeImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
-	        ret += writeImport(DocumentGenerator.getDocumentImport(context, doc));
+	        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
+	        ret.append(writeImport(DataFacadeGenerator.getXMLHelperImport(context, doc)));
+	        ret.append(writeImport(DocumentGenerator.getDocumentImport(context, doc)));
 	    }
-	    ret += emptyline();
-	    ret += writeImport("net.anotheria.asg.util.listener.IServiceListener");
-	    ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
-	    ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
-	    ret += writeImport("net.anotheria.anodoc.query2.QueryResultEntry");
-	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
+	    ret.append(emptyline());
+	    ret.append(writeImport("net.anotheria.asg.util.listener.IServiceListener"));
+	    ret.append(writeImport("net.anotheria.anodoc.query2.DocumentQuery"));
+	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResult"));
+	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResultEntry"));
+	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryProperty"));
 	    
-	    ret += emptyline();
-	    ret += writeImport("net.anotheria.util.xml.XMLNode");
-	    ret += writeImport("net.anotheria.util.xml.XMLAttribute");
-	    ret += emptyline();
+	    ret.append(emptyline());
+	    ret.append(writeImport("net.anotheria.util.xml.XMLNode"));
+	    ret.append(writeImport("net.anotheria.util.xml.XMLAttribute"));
+	    ret.append(emptyline());
 	    
-	    ret += writeString("public class "+getImplementationName(module)+" extends BasicCMSService implements "+getInterfaceName(module)+" {");
+	    ret.append(writeString("public class "+getImplementationName(module)+" extends BasicCMSService implements "+getInterfaceName(module)+" {"));
 	    increaseIdent();
-	    ret += writeStatement("private static "+getImplementationName(module)+" instance");
-	    ret += emptyline();
+	    ret.append(writeStatement("private static "+getImplementationName(module)+" instance"));
+	    ret.append(emptyline());
 	    
-	    ret += writeString("private "+getImplementationName(module)+"(){");
+	    ret.append(writeString("private "+getImplementationName(module)+"(){"));
 	    increaseIdent();
 	    if (module.getListeners().size()>0){
 	    	for (int i=0; i<module.getListeners().size(); i++){
 	    		String listClassName = (String)module.getListeners().get(i);
-	    		ret += writeStatement("addServiceListener(new "+listClassName+"())");
+	    		ret.append(writeStatement("addServiceListener(new "+listClassName+"())"));
 	    	}
 	    }
-	    ret += closeBlock();
-	    ret += emptyline();
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
-	    ret += writeString("static final "+getImplementationName(module)+" getInstance(){");
+	    ret.append(writeString("static final "+getImplementationName(module)+" getInstance(){"));
 	    increaseIdent();
-	    ret += writeString("if (instance==null){");
+	    ret.append(writeString("if (instance==null){"));
 	    increaseIdent();
-	    ret += writeStatement("instance = new "+getImplementationName(module)+"()");
-	    ret += closeBlock();
-	    ret += writeStatement("return instance");
-	    ret += closeBlock();
-	    ret += emptyline();
+	    ret.append(writeStatement("instance = new "+getImplementationName(module)+"()"));
+	    ret.append(closeBlock());
+	    ret.append(writeStatement("return instance"));
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
 	    //generate module handling.
-	    ret += writeString("private "+module.getModuleClassName()+" "+getModuleGetterCall(module)+"{");
+	    ret.append(writeString("private "+module.getModuleClassName()+" "+getModuleGetterCall(module)+"{"));
 	    increaseIdent();
-	    ret += writeStatement("return ("+module.getModuleClassName()+") getModule("+module.getModuleClassName()+".MODULE_ID)");
-	    ret += closeBlock();
-	    ret += emptyline();
+	    ret.append(writeStatement("return ("+module.getModuleClassName()+") getModule("+module.getModuleClassName()+".MODULE_ID)"));
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
 	    boolean containsAnyMultilingualDocs = false;
 	    
@@ -105,191 +105,225 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
 	        
-	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"(){");
+	        ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"(){"));
 	        increaseIdent();
-	        ret += writeStatement("List "+doc.getMultiple().toLowerCase()+" = "+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()");
-	        ret += writeStatement("return "+doc.getMultiple().toLowerCase());
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeStatement("List "+doc.getMultiple().toLowerCase()+" = "+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()"));
+	        ret.append(writeStatement("return "+doc.getMultiple().toLowerCase()));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
-			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType){");
+			ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType){"));
 			increaseIdent();
-			ret += writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
-			ret += closeBlock();
-			ret += emptyline();
+			ret.append(writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)"));
+			ret.append(closeBlock());
+			ret.append(emptyline());
 
-	        ret += writeString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
+	        ret.append(writeString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){"));
 	        increaseIdent();
-	        ret += writeStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
-	        ret += writeString("public void delete"+doc.getName()+"(String id){");
+	        ret.append(writeString("public void delete"+doc.getName()+"(String id){"));
 	        increaseIdent();
-	        ret += writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
-	        ret += writeStatement("module.delete"+doc.getName()+"(id)");
-	        ret += writeStatement("updateModule(module)");
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module)));
+	        ret.append(writeStatement("module.delete"+doc.getName()+"(id)"));
+	        ret.append(writeStatement("updateModule(module)"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 
-	        ret += writeString("public "+doc.getName()+" get"+doc.getName()+"(String id){");
+	        ret.append(writeString("public "+doc.getName()+" get"+doc.getName()+"(String id){"));
 	        increaseIdent();
-	        ret += writeStatement("return "+getModuleGetterCall(module)+".get"+doc.getName()+"(id)");
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeStatement("return "+getModuleGetterCall(module)+".get"+doc.getName()+"(id)"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
 	        //create
-	        ret += writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
+	        ret.append(writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){"));
 	        increaseIdent();
-	        ret += writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
-	        ret += writeStatement("module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
-	        ret += writeStatement("updateModule(module)");
+	        ret.append(writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module)));
+	        ret.append(writeStatement("module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")"));
+	        ret.append(writeStatement("updateModule(module)"));
 	        
-	        ret += writeString("if (hasServiceListeners()){");
+	        ret.append(writeString("if (hasServiceListeners()){"));
 	        increaseIdent();
-	        ret += writeStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        ret += writeString("for (int i=0; i<myListeners.size(); i++)");
-	        ret += writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        ret += closeBlock();	
+	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
+	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
+	        ret.append(writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")"));
+	        ret.append(closeBlock());	
 	        
 	        
-	        ret += writeStatement("return "+doc.getVariableName());
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeStatement("return "+doc.getVariableName()));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 
 	        
 	        
 	        //create multiple
-	        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
-	        ret += writeStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list){");
+	        ret.append(writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions."));
+	        ret.append(writeStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list){"));
 	        increaseIdent();
-	        ret += writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
-	        ret += writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
-	        ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
+	        ret.append(writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module)));
+	        ret.append(writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()"));
+	        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){"));
 	        increaseIdent();
-	        ret += writeStatement(doc.getName()+" created = module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
-	        ret += writeStatement("ret.add(created)");
-	        ret += closeBlock();
+	        ret.append(writeStatement(doc.getName()+" created = module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")"));
+	        ret.append(writeStatement("ret.add(created)"));
+	        ret.append(closeBlock());
 	        
-	        ret += writeStatement("updateModule(module)");
+	        ret.append(writeStatement("updateModule(module)"));
 	        
-	        ret += writeString("if (hasServiceListeners()){");
+	        ret.append(writeString("if (hasServiceListeners()){"));
 	        increaseIdent();
-	        ret += writeStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        ret += writeString("for (int i=0; i<myListeners.size(); i++)");
+	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
+	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
 	        increaseIdent();
-	        ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
-	        ret += writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
+	        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)"));
+	        ret.append(writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")"));
 	        decreaseIdent();
-	        ret += closeBlock();	
+	        ret.append(closeBlock());	
 	        
 	        
-	        ret += writeStatement("return ret");
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeStatement("return ret"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
 	        
-	        ret += writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
+	        ret.append(writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){"));
 	        increaseIdent();
-	        ret += writeStatement(doc.getName()+" oldVersion = null");
-	        ret += writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
+	        ret.append(writeStatement(doc.getName()+" oldVersion = null"));
+	        ret.append(writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module)));
 	        
-	        ret += writeString("if (hasServiceListeners())");
-	        ret += writeIncreasedStatement("oldVersion = module.get"+doc.getName()+"("+doc.getVariableName()+".getId())");
+	        ret.append(writeString("if (hasServiceListeners())"));
+	        ret.append(writeIncreasedStatement("oldVersion = module.get"+doc.getName()+"("+doc.getVariableName()+".getId())"));
 	        
-	        ret += writeStatement("module.update"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
-	        ret += writeStatement("updateModule(module)");
+	        ret.append(writeStatement("module.update"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")"));
+	        ret.append(writeStatement("updateModule(module)"));
 	        
-	        ret += writeString("if (hasServiceListeners()){");
+	        ret.append(writeString("if (hasServiceListeners()){"));
 	        increaseIdent();
-	        ret += writeStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        ret += writeString("for (int i=0; i<myListeners.size(); i++)");
-	        ret += writeIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
-	        ret += closeBlock();
+	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
+	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
+	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")"));
+	        ret.append(closeBlock());
 	        
-	        ret += writeStatement("return "+doc.getVariableName());
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeStatement("return "+doc.getVariableName()));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
-	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value){");
+
+	        //updatemultiple
+	        ret.append(writeString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list){"));
 	        increaseIdent();
-	        ret += writeStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()");
-	        ret += writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
-	        ret += writeString("for (int i=0; i<all"+doc.getMultiple()+".size(); i++){");
+	        ret.append(writeStatement(listDecl+" oldList = null;"));
+	        ret.append(writeString("if (hasServiceListeners())"));
+	        ret.append(writeIncreasedStatement("oldList = new ArrayList<"+doc.getName()+">(list.size())"));
+	        
+	        ret.append(writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module)));
+
+	        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){"));
 	        increaseIdent();
-	        ret += writeStatement(doc.getName()+" "+doc.getVariableName()+" = all"+doc.getMultiple()+".get(i)");
-	        ret += writeString("try{");
+	        ret.append(writeString("if (hasServiceListeners())"));
+	        ret.append(writeIncreasedStatement("oldList.add(module.get"+doc.getName()+"("+doc.getVariableName()+".getId()))"));
+	        ret.append(writeStatement("module.update"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")"));
+	        ret.append(closeBlock());
+	        ret.append(writeStatement("updateModule(module)"));
+	        
+	        ret.append(writeString("if (hasServiceListeners()){"));
 	        increaseIdent();
-	        ret += writeStatement("Property property = (("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+").getProperty(propertyName)");
-	        ret += writeStatement("if (property.getValue()==null && value==null){");
-	        ret += writeIncreasedStatement("ret.add("+doc.getVariableName()+")");
-	        ret += writeString("}else{");
+	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
+	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
 	        increaseIdent();
-	        ret += writeString("if (value!=null && property.getValue().equals(value))");
-	        ret += writeIncreasedStatement("ret.add("+doc.getVariableName()+")");
-	        ret += closeBlock();
+	        ret.append(writeString("for (int t=0; t<list.size(); t++)"));
+	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(oldList.get(i), list.get(i))"));
 	        decreaseIdent();
-			ret += writeString("}catch(NoSuchPropertyException nspe){");
+	        ret.append(closeBlock());
+	        
+	        ret.append(writeStatement("return list"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+	        
+	        
+	        
+	        ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value){"));
+	        increaseIdent();
+	        ret.append(writeStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()"));
+	        ret.append(writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()"));
+	        ret.append(writeString("for (int i=0; i<all"+doc.getMultiple()+".size(); i++){"));
+	        increaseIdent();
+	        ret.append(writeStatement(doc.getName()+" "+doc.getVariableName()+" = all"+doc.getMultiple()+".get(i)"));
+	        ret.append(writeString("try{"));
+	        increaseIdent();
+	        ret.append(writeStatement("Property property = (("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+").getProperty(propertyName)"));
+	        ret.append(writeStatement("if (property.getValue()==null && value==null){"));
+	        ret.append(writeIncreasedStatement("ret.add("+doc.getVariableName()+")"));
+	        ret.append(writeString("}else{"));
+	        increaseIdent();
+	        ret.append(writeString("if (value!=null && property.getValue().equals(value))"));
+	        ret.append(writeIncreasedStatement("ret.add("+doc.getVariableName()+")"));
+	        ret.append(closeBlock());
+	        decreaseIdent();
+			ret.append(writeString("}catch(NoSuchPropertyException nspe){"));
 			increaseIdent();
-			ret += writeString("if (value==null)");
-			ret += writeIncreasedStatement("ret.add("+doc.getVariableName()+")");
+			ret.append(writeString("if (value==null)"));
+			ret.append(writeIncreasedStatement("ret.add("+doc.getVariableName()+")"));
 			decreaseIdent();
-	        ret += writeString("}catch(Exception ignored){}");
+	        ret.append(writeString("}catch(Exception ignored){}"));
 	        
-	        ret += closeBlock();
-	        ret += writeString("return ret;");
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(closeBlock());
+	        ret.append(writeString("return ret;"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
-			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType){");
+			ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType){"));
 			increaseIdent();
-			ret += writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
-			ret += closeBlock();
+			ret.append(writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)"));
+			ret.append(closeBlock());
 			
-			ret += writeComment("Executes a query on "+doc.getMultiple());
-			ret += writeString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query){");
+			ret.append(writeComment("Executes a query on "+doc.getMultiple()));
+			ret.append(writeString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query){"));
 			increaseIdent();
-			ret += writeStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()");
-			ret += writeStatement("QueryResult result = new QueryResult()");
-			ret += writeString("for (int i=0; i<all"+doc.getMultiple()+".size(); i++){");
+			ret.append(writeStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()"));
+			ret.append(writeStatement("QueryResult result = new QueryResult()"));
+			ret.append(writeString("for (int i=0; i<all"+doc.getMultiple()+".size(); i++){"));
 			increaseIdent();
-			ret += writeStatement("List<QueryResultEntry> partialResult = query.match(all"+doc.getMultiple()+".get(i))");
-			ret += writeStatement("result.add(partialResult)");
-			ret += closeBlock();
+			ret.append(writeStatement("List<QueryResultEntry> partialResult = query.match(all"+doc.getMultiple()+".get(i))"));
+			ret.append(writeStatement("result.add(partialResult)"));
+			ret.append(closeBlock());
 			
-			ret += writeStatement("return result");
-			ret += closeBlock();
-			ret += emptyline();
+			ret.append(writeStatement("return result"));
+			ret.append(closeBlock());
+			ret.append(emptyline());
 			
-			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches.");
-	        ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
+			ret.append(writeComment("Returns all "+doc.getName()+" objects, where property matches."));
+	        ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){"));
 	        increaseIdent();
-	        ret += writeStatement("throw new RuntimeException(\"Not yet implemented\")");
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
-			ret += writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
-			ret += writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
+			ret.append(writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted"));
+			ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){"));
 	        increaseIdent();
-	        ret += writeStatement("throw new RuntimeException(\"Not yet implemented\")");
-	        ret += closeBlock();
-			ret += emptyline();
+	        ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
+	        ret.append(closeBlock());
+			ret.append(emptyline());
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 				containsAnyMultilingualDocs = true;
-				ret += writeCommentLine("This method is not very fast, since it makes an update (eff. save) after each doc.");
-				ret += writeString("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage){");
+				ret.append(writeCommentLine("This method is not very fast, since it makes an update (eff. save) after each doc."));
+				ret.append(writeString("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage){"));
 				increaseIdent();
-				ret += writeStatement("List<"+doc.getName()+"> allDocumentsSrc = get"+doc.getMultiple()+"()");
-				ret += writeStatement("List<"+doc.getName()+"> allDocuments = new ArrayList<"+doc.getName()+">(allDocumentsSrc.size())");
-				ret += writeStatement("allDocuments.addAll(allDocumentsSrc)");
-				ret += writeString("for ("+doc.getName()+" document : allDocuments){");
+				ret.append(writeStatement("List<"+doc.getName()+"> allDocumentsSrc = get"+doc.getMultiple()+"()"));
+				ret.append(writeStatement("List<"+doc.getName()+"> allDocuments = new ArrayList<"+doc.getName()+">(allDocumentsSrc.size())"));
+				ret.append(writeStatement("allDocuments.addAll(allDocumentsSrc)"));
+				ret.append(writeString("for ("+doc.getName()+" document : allDocuments){"));
 				increaseIdent();
-				ret += writeStatement("document.copyLANG2LANG(sourceLanguage, targetLanguage)");
-				ret += writeStatement("update"+doc.getName()+"(document)");
-				ret += closeBlock();
-				ret += closeBlock();
-				ret += emptyline();
+				ret.append(writeStatement("document.copyLANG2LANG(sourceLanguage, targetLanguage)"));
+				ret.append(writeStatement("update"+doc.getName()+"(document)"));
+				ret.append(closeBlock());
+				ret.append(closeBlock());
+				ret.append(emptyline());
 			
 			}
 			
@@ -297,49 +331,49 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    }
 	    
 	    if (containsAnyMultilingualDocs){
-			ret += writeComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
-			ret += writeString("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage){");
+			ret.append(writeComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service"));
+			ret.append(writeString("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage){"));
 			increaseIdent();
 			for (MetaDocument doc : docs){
 				if (GeneratorDataRegistry.hasLanguageCopyMethods(doc))
-					ret += writeStatement("copyMultilingualAttributesInAll"+doc.getMultiple()+"(sourceLanguage, targetLanguage)");
+					ret.append(writeStatement("copyMultilingualAttributesInAll"+doc.getMultiple()+"(sourceLanguage, targetLanguage)"));
 			}
-			ret += closeBlock();
-			ret += emptyline();
+			ret.append(closeBlock());
+			ret.append(emptyline());
 	    }
 
 	    
 	    //generate export function
-	    ret += emptyline();
+	    ret.append(emptyline());
 	    for (MetaDocument d : docs){
-	    	ret += writeStatement("public XMLNode export"+d.getMultiple()+"ToXML(){");
+	    	ret.append(writeStatement("public XMLNode export"+d.getMultiple()+"ToXML(){"));
 	    	increaseIdent();
-	    	ret += writeStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
-	    	ret += writeStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()");
-	    	ret += writeStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
-	    	ret += writeString("for ("+d.getName()+" object : list)");
-	    	ret += writeIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
-	    	ret += writeStatement("return ret");
+	    	ret.append(writeStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")"));
+	    	ret.append(writeStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()"));
+	    	ret.append(writeStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))"));
+	    	ret.append(writeString("for ("+d.getName()+" object : list)"));
+	    	ret.append(writeIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))"));
+	    	ret.append(writeStatement("return ret"));
 	    	
-	    	ret += closeBlock();
-	    	ret += emptyline();
+	    	ret.append(closeBlock());
+	    	ret.append(emptyline());
 	    }
 	    
 
-	    ret += writeString("public XMLNode exportToXML(){");
+	    ret.append(writeString("public XMLNode exportToXML(){"));
 	    increaseIdent();
-	    ret += writeStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
-	    ret += emptyline();
+	    ret.append(writeStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")"));
+	    ret.append(emptyline());
 	    for (MetaDocument d : docs){
-	    	ret += writeStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML())");
+	    	ret.append(writeStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML())"));
 	    }
-	    ret += emptyline();
-	    ret += writeStatement("return ret");
-	    ret += closeBlock();
+	    ret.append(emptyline());
+	    ret.append(writeStatement("return ret"));
+	    ret.append(closeBlock());
 	    
 	    
-	    ret += closeBlock();
-	    return ret;
+	    ret.append(closeBlock());
+	    return ret.toString();
 	}
 	
 	private String getModuleGetterMethod(MetaModule module){

@@ -11,6 +11,7 @@ import net.anotheria.asg.generator.view.meta.MetaCustomSection;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.util.ExecutionTimer;
 
 /**
  * TODO please remined another to comment this class
@@ -21,6 +22,9 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 	
 	
 	public void generate(String path, List<MetaView> views){
+		
+		ExecutionTimer timer = new ExecutionTimer("ViewGenerator");
+		timer.startExecution("common");
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		//hack, works only with one view.
@@ -28,19 +32,40 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		files.add(new SharedJspFooterGenerator().generate(views, context));
 		files.add(new JspMenuGenerator().generate(views, context));
 		files.addAll(new WebXMLGenerator().generate(views, context));
+		timer.stopExecution("common");
 		
+		timer.startExecution("views");
 		for (int i=0; i<views.size(); i++){
 			MetaView view = views.get(i);
+			timer.startExecution("view-"+view.getName());
+
+			timer.startExecution("v-"+view.getName()+"-BaseViewAction");
 			files.add(new BaseViewActionGenerator().generate(view, context));
-			files.addAll(generateView(path, view));
-			files.addAll(new JspViewGenerator().generate(view, context));
-			files.addAll(new JspQueriesGenerator().generate(view, context));
-			//TODO das muss eins nach oben...
-			files.addAll(new StrutsConfigGenerator().generate(view, context));
+			timer.stopExecution("v-"+view.getName()+"-BaseViewAction");
 			
+			timer.startExecution("v-"+view.getName()+"-View");
+			files.addAll(generateView(path, view));
+			timer.stopExecution("v-"+view.getName()+"-View");
+
+			timer.startExecution("v-"+view.getName()+"-Jsp");
+			files.addAll(new JspViewGenerator().generate(view, context));
+			timer.stopExecution("v-"+view.getName()+"-Jsp");
+			
+			timer.startExecution("v-"+view.getName()+"-JspQueries");
+			files.addAll(new JspQueriesGenerator().generate(view, context));
+			timer.stopExecution("v-"+view.getName()+"-JspQueries");
+			
+			timer.startExecution("v-"+view.getName()+"-StrutsConfig");
+			files.addAll(new StrutsConfigGenerator().generate(view, context));
+			timer.stopExecution("v-"+view.getName()+"-StrutsConfig");
+			
+			timer.stopExecution("view-"+view.getName());
 		}
+		timer.stopExecution("views");
 		
 		writeFiles(files);
+		
+		//timer.printExecutionTimesOrderedByCreation();
 	}
 	
 	public List<FileEntry> generateView(String path, MetaView view){

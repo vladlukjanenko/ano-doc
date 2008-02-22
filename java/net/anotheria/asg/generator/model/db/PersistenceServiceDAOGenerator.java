@@ -14,6 +14,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.ModuleParameter;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
+import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -33,14 +34,32 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
+		ExecutionTimer timer = new ExecutionTimer(mod.getName()+"-DaoGen");
+		
 		List<MetaDocument> documents = mod.getDocuments();
 		for (MetaDocument d: documents){
+			
+			timer.startExecution(d.getName());
+			timer.startExecution(d.getName()+"Exc");
 			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getExceptionName(d), generateException(d)));
+			timer.stopExecution(d.getName()+"Exc");
+
+			timer.startExecution(d.getName()+"NoItemE");
 			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getNoItemExceptionName(d), generateNoItemException(d)));
+			timer.stopExecution(d.getName()+"NoItemE");
+			
+			timer.startExecution(d.getName()+"DAO");
 			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getDAOName(d), generateDAO(d)));
+			timer.stopExecution(d.getName()+"DAO");
+			
+			timer.startExecution(d.getName()+"RowMapper");
 			ret.add(new FileEntry(FileEntry.package2path(getPackageName(mod)), getRowMapperName(d), generateRowMapper(d)));
+			timer.stopExecution(d.getName()+"RowMapper");
+
+			timer.stopExecution(d.getName());
 		}
 		
+		//timer.printExecutionTimesOrderedByCreation();
 		return ret;
 	}
 	
@@ -49,52 +68,52 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	}
 	
 	private String generateException(MetaDocument doc){
-		String ret = "";
+		StringBuilder ret = new StringBuilder(5000);
 		
-	    ret += CommentGenerator.generateJavaTypeComment(getExceptionName(doc));
+	    ret.append(CommentGenerator.generateJavaTypeComment(getExceptionName(doc)));
 	    
-	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
-	    ret += emptyline();
-	    ret += writeImport("net.anotheria.db.dao.DAOException");
-	    ret += emptyline();
+	    ret.append(writeStatement("package "+getPackageName(doc.getParentModule())));
+	    ret.append(emptyline());
+	    ret.append(writeImport("net.anotheria.db.dao.DAOException"));
+	    ret.append(emptyline());
 
-	    ret += writeString("public class "+getExceptionName(doc)+ " extends DAOException{");
+	    ret.append(writeString("public class "+getExceptionName(doc)+ " extends DAOException{"));
 		increaseIdent();
-		ret += emptyline();
-		ret += writeString("public "+getExceptionName(doc)+"(String message){");
-		ret += writeIncreasedStatement("super(message)");
-		ret += writeString("}");
+		ret.append(emptyline());
+		ret.append(writeString("public "+getExceptionName(doc)+"(String message){"));
+		ret.append(writeIncreasedStatement("super(message)"));
+		ret.append(writeString("}"));
 		
-		ret += emptyline();
-		ret += writeString("public "+getExceptionName(doc)+"(){");
-		ret += writeIncreasedStatement("super()");
-		ret += writeString("}");
+		ret.append(emptyline());
+		ret.append(writeString("public "+getExceptionName(doc)+"(){"));
+		ret.append(writeIncreasedStatement("super()"));
+		ret.append(writeString("}"));
 
-		ret += closeBlock();
-		return ret; 
+		ret.append(closeBlock());
+		return ret.toString(); 
 	}
 	
 	private String generateNoItemException(MetaDocument doc){
-		String ret = "";
+		StringBuilder ret = new StringBuilder(5000);
 		
-	    ret += CommentGenerator.generateJavaTypeComment(getNoItemExceptionName(doc));
+	    ret.append(CommentGenerator.generateJavaTypeComment(getNoItemExceptionName(doc)));
 	    
-	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
-	    ret += emptyline();
+	    ret.append(writeStatement("package "+getPackageName(doc.getParentModule())));
+	    ret.append(emptyline());
 
-	    ret += writeString("public class "+ getNoItemExceptionName(doc)+ " extends "+getExceptionName(doc)+"{");
+	    ret.append(writeString("public class "+ getNoItemExceptionName(doc)+ " extends "+getExceptionName(doc)+"{"));
 		increaseIdent();
-		ret += emptyline();
-		ret += writeString("public "+getNoItemExceptionName(doc)+"(String id){");
-		ret += writeIncreasedStatement("super("+quote("No item found for id: ")+"+id)");
-		ret += writeString("}");
+		ret.append(emptyline());
+		ret.append(writeString("public "+getNoItemExceptionName(doc)+"(String id){"));
+		ret.append(writeIncreasedStatement("super("+quote("No item found for id: ")+"+id)"));
+		ret.append(writeString("}"));
 		
-		ret += writeString("public "+getNoItemExceptionName(doc)+"(long id){");
-		ret += writeIncreasedStatement("this("+quote("")+"+id)");
-		ret += writeString("}");
+		ret.append(writeString("public "+getNoItemExceptionName(doc)+"(long id){"));
+		ret.append(writeIncreasedStatement("this("+quote("")+"+id)"));
+		ret.append(writeString("}"));
 
-		ret += closeBlock();
-		return ret; 
+		ret.append(closeBlock());
+		return ret.toString(); 
 	}
 	
 	private String getAttributeConst(MetaProperty p){
@@ -106,65 +125,65 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	}
 
 	private String generateRowMapper(MetaDocument doc){
-	    String ret = "";
+	    StringBuilder ret = new StringBuilder(5000);
 	    
-	    ret += CommentGenerator.generateJavaTypeComment(getRowMapperName(doc));
+	    ret.append(CommentGenerator.generateJavaTypeComment(getRowMapperName(doc)));
 	    
-	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
-	    ret += emptyline();
+	    ret.append(writeStatement("package "+getPackageName(doc.getParentModule())));
+	    ret.append(emptyline());
 	    
-	    ret += writeImport("java.sql.ResultSet");
-	    ret += writeImport("java.sql.SQLException");
-	    ret += emptyline();
+	    ret.append(writeImport("java.sql.ResultSet"));
+	    ret.append(writeImport("java.sql.SQLException"));
+	    ret.append(emptyline());
 
-	    ret += writeImport("net.anotheria.db.dao.RowMapper");
-	    ret += writeImport("net.anotheria.db.dao.RowMapperException");
-	    ret += emptyline();
-	    ret += writeImport("org.apache.log4j.Logger");
-	    ret += emptyline();
+	    ret.append(writeImport("net.anotheria.db.dao.RowMapper"));
+	    ret.append(writeImport("net.anotheria.db.dao.RowMapperException"));
+	    ret.append(emptyline());
+	    ret.append(writeImport("org.apache.log4j.Logger"));
+	    ret.append(emptyline());
 	    
-        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-        ret += writeImport(VOGenerator.getDocumentImport(context, doc));
-	    ret += emptyline();
+        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
+        ret.append(writeImport(VOGenerator.getDocumentImport(context, doc)));
+	    ret.append(emptyline());
 
-	    ret += writeString("public class "+getRowMapperName(doc)+" extends RowMapper<"+doc.getName()+">{");
+	    ret.append(writeString("public class "+getRowMapperName(doc)+" extends RowMapper<"+doc.getName()+">{"));
 	    increaseIdent();
-	    ret += emptyline();
-		ret += writeStatement("private static Logger log = Logger.getLogger("+getDAOName(doc)+".class)");
-	    ret += emptyline();
+	    ret.append(emptyline());
+		ret.append(writeStatement("private static Logger log = Logger.getLogger("+getDAOName(doc)+".class)"));
+	    ret.append(emptyline());
 
 	    
-	    ret += openFun("public "+doc.getName()+" map(ResultSet row) throws RowMapperException");
+	    ret.append(openFun("public "+doc.getName()+" map(ResultSet row) throws RowMapperException"));
 
-	    ret += openTry();
+	    ret.append(openTry());
 	    
-	    ret += writeStatement("long id = row.getLong(1)");
-	    ret += writeStatement(doc.getName()+" ret = new "+VOGenerator.getDocumentImplName(doc)+"(\"\"+id)");
+	    ret.append(writeStatement("long id = row.getLong(1)"));
+	    ret.append(writeStatement(doc.getName()+" ret = new "+VOGenerator.getDocumentImplName(doc)+"(\"\"+id)"));
 	    for (int i=0; i<doc.getProperties().size(); i++){
-	    	ret += generateProperty2DBMapping(doc.getProperties().get(i), i+2);
+	    	ret.append(generateProperty2DBMapping(doc.getProperties().get(i), i+2));
 	    }
 	    int ioffset = doc.getProperties().size();
 	    
 	    for (int i=0; i<doc.getLinks().size(); i++){
-	    	ret += generateProperty2DBMapping(doc.getLinks().get(i), i+ioffset+2);
+	    	ret.append(generateProperty2DBMapping(doc.getLinks().get(i), i+ioffset+2));
 	    }
 	    
 	    ioffset = doc.getProperties().size()+doc.getLinks().size();
-	    ret += generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_CREATED, "long"), ioffset+2);
-	    ret += generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_UPDATED, "long"), ioffset+3);
+	    ret.append(generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_CREATED, "long"), ioffset+2));
+	    ret.append(generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_UPDATED, "long"), ioffset+3));
 	    
-	    ret += writeStatement("return ret");
+	    ret.append(writeStatement("return ret"));
 	    decreaseIdent();
-	    ret += writeString("}catch(SQLException e){");
-	    ret += writeIncreasedStatement("log.error(\"map\", e)");
-	    ret += writeIncreasedStatement("throw new RowMapperException(e)");
-	    ret += writeString("}");
+	    ret.append(writeString("}catch(SQLException e){"));
+	    ret.append(writeIncreasedStatement("log.error(\"map\", e)"));
+	    ret.append(writeIncreasedStatement("throw new RowMapperException(e)"));
+	    ret.append(writeString("}"));
 	    
-	    ret += closeBlock();
+	    ret.append(closeBlock());
 
-		ret += closeBlock();
+		ret.append(closeBlock());
 	    
-	    return ret;
+	    return ret.toString();
 	}
 	
 	private String generateProperty2DBMapping(MetaProperty p, int position){
@@ -223,470 +242,503 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	}
 
 	private String generateDAO(MetaDocument doc){
-	    String ret = "";
+		StringBuilder ret = new StringBuilder(5000);
 	    
-	    ret += CommentGenerator.generateJavaTypeComment(getDAOName(doc));
+	    ret.append(CommentGenerator.generateJavaTypeComment(getDAOName(doc)));
 
 	    boolean moduleDbContextSensitive = doc.getParentModule().isParameterEqual(ModuleParameter.MODULE_DB_CONTEXT_SENSITIVE, "true");
 	    
-	    ret += writeStatement("package "+getPackageName(doc.getParentModule()));
-	    ret += emptyline();
-	    ret += writeImport("java.util.List");
-	    ret += writeImport("java.util.ArrayList");
-	    ret += writeImport("java.util.concurrent.atomic.AtomicLong");
+	    ret.append(writeStatement("package "+getPackageName(doc.getParentModule())));
+	    ret.append(emptyline());
+	    ret.append(writeImport("java.util.List"));
+	    ret.append(writeImport("java.util.ArrayList"));
+	    ret.append(writeImport("java.util.concurrent.atomic.AtomicLong"));
 	    if (moduleDbContextSensitive){
-	    	ret += writeImport("java.util.Map");
-	    	ret += writeImport("java.util.HashMap");
+	    	ret.append(writeImport("java.util.Map"));
+	    	ret.append(writeImport("java.util.HashMap"));
 	    }
-	    ret += emptyline();
+	    ret.append(emptyline());
 	    
 	    
-        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-        ret += writeImport(VOGenerator.getDocumentImport(context, doc));
-        ret += writeImport("net.anotheria.db.dao.DAO");
-        ret += writeImport("net.anotheria.db.dao.DAOException");
-        ret += writeImport("net.anotheria.db.dao.DAOSQLException");
-        ret += writeImport("net.anotheria.db.dao.RowMapper");
-	    ret += emptyline(); 
-	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
-	    ret += writeImport("net.anotheria.anodoc.util.context.DBContext");
-	    ret += writeImport("net.anotheria.anodoc.util.context.ContextManager");
-	    ret += emptyline();
+        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
+        ret.append(writeImport(VOGenerator.getDocumentImport(context, doc)));
+        ret.append(writeImport("net.anotheria.db.dao.DAO"));
+        ret.append(writeImport("net.anotheria.db.dao.DAOException"));
+        ret.append(writeImport("net.anotheria.db.dao.DAOSQLException"));
+        ret.append(writeImport("net.anotheria.db.dao.RowMapper"));
+	    ret.append(emptyline()); 
+	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryProperty"));
+	    ret.append(writeImport("net.anotheria.anodoc.util.context.DBContext"));
+	    ret.append(writeImport("net.anotheria.anodoc.util.context.ContextManager"));
+	    ret.append(emptyline());
 
-	    ret += writeImport("java.sql.Connection");
-	    ret += writeImport("java.sql.PreparedStatement");
-	    ret += writeImport("java.sql.ResultSet");
-	    ret += writeImport("java.sql.SQLException");
-	    ret += writeImport("java.sql.Statement");
-	    ret += emptyline();
+	    ret.append(writeImport("java.sql.Connection"));
+	    ret.append(writeImport("java.sql.PreparedStatement"));
+	    ret.append(writeImport("java.sql.ResultSet"));
+	    ret.append(writeImport("java.sql.SQLException"));
+	    ret.append(writeImport("java.sql.Statement"));
+	    ret.append(emptyline());
 	    
-	    ret += writeImport("org.apache.log4j.Logger");
-	    ret += emptyline();
+	    ret.append(writeImport("org.apache.log4j.Logger"));
+	    ret.append(emptyline());
 
-	    ret += writeString("public class "+getDAOName(doc)+" implements DAO{");
+	    ret.append(writeString("public class "+getDAOName(doc)+" implements DAO{"));
 	    increaseIdent();
-	    ret += emptyline();
-		ret += writeStatement("private static Logger log = Logger.getLogger("+getDAOName(doc)+".class)");
+	    ret.append(emptyline());
+		ret.append(writeStatement("private static Logger log = Logger.getLogger("+getDAOName(doc)+".class)"));
 	    
 	    //first define constants.
 	    String constDecl = "public static final String ";
-	    ret += writeStatement(constDecl+"TABNAME = "+quote(getSQLTableName(doc)));
-	    ret += emptyline();
+	    ret.append(writeStatement(constDecl+"TABNAME = "+quote(getSQLTableName(doc))));
+	    ret.append(emptyline());
 	    MetaProperty id = new MetaProperty("id", "string");
 	    MetaProperty dao_created = new MetaProperty("dao_created", "long");
 	    MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
 	    List<MetaProperty> properties = new ArrayList<MetaProperty>();
 	    properties.addAll(doc.getProperties());
 	    properties.addAll(doc.getLinks());
-	    ret += writeStatement(constDecl+getAttributeConst(id)+" = "+quote(getAttributeName(id)));
+	    ret.append(writeStatement(constDecl+getAttributeConst(id)+" = "+quote(getAttributeName(id))));
 	    for (MetaProperty p : properties){
-		    ret += writeStatement(constDecl+getAttributeConst(p)+" \t = "+quote(getAttributeName(p)));
+		    ret.append(writeStatement(constDecl+getAttributeConst(p)+" \t = "+quote(getAttributeName(p))));
 	    }
 	    
-	    ret += emptyline();
+	    ret.append(emptyline());
 	    //create sql staments
 	    //SQL-CREATE
 	    String sqlCreate1 = quote("INSERT INTO ");
-	    String sqlCreate2 = quote(" (");
-	    sqlCreate2 += "+"+getAttributeConst(id);
+	    StringBuilder sqlCreate2 = new StringBuilder(quote(" ("));
+	    sqlCreate2.append("+"+getAttributeConst(id));
 	    for (MetaProperty p : properties){
-	    	sqlCreate2 += "+"+quote(", ")+"+"+getAttributeConst(p);
+	    	sqlCreate2.append("+"+quote(", ")+"+"+getAttributeConst(p));
 	    }
-	    sqlCreate2 += "+"+quote(", ")+"+"+getAttributeConst(dao_created);
-	    String sqlCreateEnd = ") VALUES (";
+	    sqlCreate2.append("+"+quote(", ")+"+"+getAttributeConst(dao_created));
+	    StringBuilder sqlCreateEnd = new StringBuilder(") VALUES (");
 	    //+2 because of created flag and id.
 	    for (int i=0; i<properties.size()+2; i++){
-	    	sqlCreateEnd+="?";
+	    	sqlCreateEnd.append("?");
 	    	if (i<properties.size()+1)
-	    		sqlCreateEnd+=",";
+	    		sqlCreateEnd.append(",");
 	    }
-	    sqlCreateEnd += ")";
-	    sqlCreate2 += "+"+quote(sqlCreateEnd);
-	    ret += writeStatement(constDecl+" SQL_CREATE_1 \t= "+sqlCreate1);
-	    ret += writeStatement(constDecl+" SQL_CREATE_2 \t= "+sqlCreate2);
+	    sqlCreateEnd.append(")");
+	    sqlCreate2.append("+").append(quote(sqlCreateEnd));
+	    ret.append(writeStatement(constDecl+" SQL_CREATE_1 \t= "+sqlCreate1));
+	    ret.append(writeStatement(constDecl+" SQL_CREATE_2 \t= "+sqlCreate2));
 	    
 	    //SQL-UPDATE
 	    String sqlUpdate1 = quote("UPDATE ");
-	    String sqlUpdate2 = quote(" SET ");
+	    StringBuilder sqlUpdate2 = new StringBuilder(quote(" SET "));
 	    for (MetaProperty p : properties){
-	    	sqlUpdate2 += " + "+getAttributeConst(p)+" + "+quote(" = ?, ");
+	    	sqlUpdate2.append(" + ").append(getAttributeConst(p)).append(" + ").append(quote(" = ?, "));
 	    }
-    	sqlUpdate2 += " + "+getAttributeConst(dao_updated)+" + "+quote(" = ?");
-	    sqlUpdate2 += " + "+quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
+    	sqlUpdate2.append(" + ").append(getAttributeConst(dao_updated)).append(" + ").append(quote(" = ?"));
+	    sqlUpdate2.append(" + ").append(quote(" WHERE ")).append(" + ").append(getAttributeConst(id)).append(" + ").append(quote(" = ?"));
 
-    	ret += writeStatement(constDecl+" SQL_UPDATE_1 \t= "+sqlUpdate1);
-    	ret += writeStatement(constDecl+" SQL_UPDATE_2 \t= "+sqlUpdate2);
+    	ret.append(writeStatement(constDecl+" SQL_UPDATE_1 \t= "+sqlUpdate1));
+    	ret.append(writeStatement(constDecl+" SQL_UPDATE_2 \t= "+sqlUpdate2.toString()));
 	    
 	    //SQL-DELETE
 	    String sqlDelete1 = quote("DELETE FROM ");
 	    String sqlDelete2 = quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
-	    ret += writeStatement(constDecl + " SQL_DELETE_1 \t= "+sqlDelete1);
-	    ret += writeStatement(constDecl + " SQL_DELETE_2 \t= "+sqlDelete2);
+	    ret.append(writeStatement(constDecl + " SQL_DELETE_1 \t= "+sqlDelete1));
+	    ret.append(writeStatement(constDecl + " SQL_DELETE_2 \t= "+sqlDelete2));
 
 	    //SQL-READ-ONE
 	    
-	    String allAttrbutes = "\"";
-	    allAttrbutes += "+"+getAttributeConst(id);
+	    StringBuilder allAttrbutes = new StringBuilder("\"");
+	    allAttrbutes.append("+").append(getAttributeConst(id));
 	    for (MetaProperty p : properties){
-	    	allAttrbutes += "+"+quote(", ")+"+"+getAttributeConst(p);
+	    	allAttrbutes.append("+").append(quote(", ")).append("+").append(getAttributeConst(p));
 	    }
-	    allAttrbutes += "+"+quote(", ")+"+"+getAttributeConst(dao_created);
-	    allAttrbutes += "+"+quote(", ")+"+"+getAttributeConst(dao_updated);
-	    allAttrbutes += "+\"";
+	    allAttrbutes.append("+"+quote(", ")+"+"+getAttributeConst(dao_created));
+	    allAttrbutes.append("+"+quote(", ")+"+"+getAttributeConst(dao_updated));
+	    allAttrbutes.append("+\"");
 	    
 	    String sqlReadOne1 = quote("SELECT "+allAttrbutes+" FROM ");
 	    String sqlReadOne2 = quote(" WHERE ")+" + TABNAME +"+quote(".")+" + "+getAttributeConst(id)+" + "+quote(" = ?");
-	    ret += writeStatement(constDecl + " SQL_READ_ONE_1 \t= "+sqlReadOne1);
-	    ret += writeStatement(constDecl + " SQL_READ_ONE_2 \t= "+sqlReadOne2);
+	    ret.append(writeStatement(constDecl + " SQL_READ_ONE_1 \t= "+sqlReadOne1));
+	    ret.append(writeStatement(constDecl + " SQL_READ_ONE_2 \t= "+sqlReadOne2));
 
 	    //SQL-READ-ALL
 	    String sqlReadAll1 = quote("SELECT "+allAttrbutes+" FROM ");
 	    String sqlReadAll2 = quote(" ORDER BY id");
-	    ret += writeStatement(constDecl + " SQL_READ_ALL_1 \t= "+sqlReadAll1);
-	    ret += writeStatement(constDecl + " SQL_READ_ALL_2 \t= "+sqlReadAll2);
+	    ret.append(writeStatement(constDecl + " SQL_READ_ALL_1 \t= "+sqlReadAll1));
+	    ret.append(writeStatement(constDecl + " SQL_READ_ALL_2 \t= "+sqlReadAll2));
 	    
 	    //SQL-READ-ALL
 	    String sqlReadAllByProperty1 = quote("SELECT "+allAttrbutes+" FROM ");
 	    String sqlReadAllByProperty2 = quote(" WHERE ");
-	    ret += writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_1 \t= "+sqlReadAllByProperty1);
-	    ret += writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_2 \t= "+sqlReadAllByProperty2);
+	    ret.append(writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_1 \t= "+sqlReadAllByProperty1));
+	    ret.append(writeStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_2 \t= "+sqlReadAllByProperty2));
 
-	    ret += emptyline();
-	    ret += writeStatement("private RowMapper<"+doc.getName()+"> rowMapper = new "+doc.getName()+"RowMapper()");
+	    ret.append(emptyline());
+	    ret.append(writeStatement("private RowMapper<"+doc.getName()+"> rowMapper = new "+doc.getName()+"RowMapper()"));
 	    
-	    ret += emptyline();
+	    ret.append(emptyline());
 	    //create impl
 
 
 	    if (moduleDbContextSensitive){
-	    	ret += writeStatement("private Map<String,AtomicLong> lastIds = new HashMap<String,AtomicLong>()");
+	    	ret.append(writeStatement("private Map<String,AtomicLong> lastIds = new HashMap<String,AtomicLong>()"));
 	    }else{
-		    ret += writeStatement("private AtomicLong lastId = new AtomicLong()");
+		    ret.append(writeStatement("private AtomicLong lastId = new AtomicLong()"));
 	    }
-	    ret += writeStatement("private static final long START_ID = 0");
-	    ret += emptyline();
+	    ret.append(writeStatement("private static final long START_ID = 0"));
+	    ret.append(emptyline());
 	    
 	    //get last id method
-	    ret += writeString("private AtomicLong getLastId(Connection con) throws DAOException {");
+	    ret.append(writeString("private AtomicLong getLastId(Connection con) throws DAOException {"));
 	    increaseIdent();
 	    if (moduleDbContextSensitive){
-		    ret += writeStatement("DBContext context = ContextManager.getCallContext().getDbContext()");
-		    ret += writeStatement("String tableName = context.getTableNameInContext(TABNAME)");
-	    	ret += writeStatement("AtomicLong lastId = lastIds.get(tableName)");
-	    	ret += writeString("if (lastId==null){");
+		    ret.append(writeStatement("DBContext context = ContextManager.getCallContext().getDbContext()"));
+		    ret.append(writeStatement("String tableName = context.getTableNameInContext(TABNAME)"));
+	    	ret.append(writeStatement("AtomicLong lastId = lastIds.get(tableName)"));
+	    	ret.append(writeString("if (lastId==null){"));
 	    	increaseIdent();
-	    	ret += writeCommentLine("double-checked-locking");
-	    	ret += writeString("synchronized(lastIds){");
+	    	ret.append(writeCommentLine("double-checked-locking"));
+	    	ret.append(writeString("synchronized(lastIds){"));
 	    	increaseIdent();
-	    	ret += writeStatement("lastId = lastIds.get(tableName)");
-	    	ret += writeString("if (lastId==null){");
+	    	ret.append(writeStatement("lastId = lastIds.get(tableName)"));
+	    	ret.append(writeString("if (lastId==null){"));
 	    	increaseIdent();
-        	ret += writeStatement("long maxId = getMaxId(con, tableName)");
-        	ret += writeStatement("lastId = new AtomicLong(maxId == 0 ? START_ID : maxId)");
-        	ret += writeStatement("lastIds.put(tableName, lastId)");
-        	ret += closeBlock();
-        	ret += closeBlock();
-        	ret += closeBlock();
-        	ret += writeStatement("return lastId");
+        	ret.append(writeStatement("long maxId = getMaxId(con, tableName)"));
+        	ret.append(writeStatement("lastId = new AtomicLong(maxId == 0 ? START_ID : maxId)"));
+        	ret.append(writeStatement("lastIds.put(tableName, lastId)"));
+        	ret.append(closeBlock());
+        	ret.append(closeBlock());
+        	ret.append(closeBlock());
+        	ret.append(writeStatement("return lastId"));
 	    	
 	    }else{
-	    	ret += writeStatement("return lastId");
+	    	ret.append(writeStatement("return lastId"));
 	    	
 	    }
-	    ret += closeBlock();
-	    ret += emptyline();
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
 	    //createSQL Method
-	    ret += writeString("private String createSQL(String sql1, String sql2){");
+	    ret.append(writeString("private String createSQL(String sql1, String sql2){"));
 	    increaseIdent();
 	    if (moduleDbContextSensitive){
-		    ret += writeStatement("DBContext context = ContextManager.getCallContext().getDbContext()");
-		    ret += writeStatement("StringBuilder sql = new StringBuilder();");
-		    ret += writeStatement("sql.append(sql1).append(context.getTableNameInContext(TABNAME)).append(sql2)");
-		    ret += writeStatement("return sql.toString()");
+		    ret.append(writeStatement("DBContext context = ContextManager.getCallContext().getDbContext()"));
+		    ret.append(writeStatement("StringBuilder sql = new StringBuilder()"));
+		    ret.append(writeStatement("sql.append(sql1).append(context.getTableNameInContext(TABNAME)).append(sql2)"));
+		    ret.append(writeStatement("return sql.toString()"));
 	    }else{
-		    ret += writeStatement("StringBuilder sql = new StringBuilder();");
-		    ret += writeStatement("sql.append(sql1).append(TABNAME).append(sql2)");
-		    ret += writeStatement("return sql.toString()");
+		    ret.append(writeStatement("StringBuilder sql = new StringBuilder()"));
+		    ret.append(writeStatement("sql.append(sql1).append(TABNAME).append(sql2)"));
+		    ret.append(writeStatement("return sql.toString()"));
 	    }
-	    ret += closeBlock();
-	    ret += emptyline();
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
 	    String throwsClause = " throws DAOException";
 	    String callLog = "";
 	    
         //get all XYZ method
         callLog = quote("get"+doc.getMultiple()+"(")+"+con+"+quote(")");
-        ret += writeComment("Returns all "+doc.getMultiple()+" objects stored.");
-        ret += openFun("public List<"+doc.getName()+">"+" get"+doc.getMultiple()+"(Connection con)"+throwsClause);
-        ret += generateFunctionStart("SQL_READ_ALL", callLog, true);
-        ret += writeStatement("ResultSet result = ps.executeQuery()");
-        ret += writeStatement("ArrayList<"+doc.getName()+"> ret = new ArrayList<"+doc.getName()+">()");
-        ret += writeString("while(result.next())");
-		ret += writeIncreasedStatement("ret.add(rowMapper.map(result))");
-		ret += writeStatement("return  ret");
-        ret += generateFunctionEnd(callLog, true);
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(writeComment("Returns all "+doc.getMultiple()+" objects stored."));
+        ret.append(openFun("public List<"+doc.getName()+">"+" get"+doc.getMultiple()+"(Connection con)"+throwsClause));
+        ret.append(generateFunctionStart("SQL_READ_ALL", callLog, true));
+        ret.append(writeStatement("ResultSet result = ps.executeQuery()"));
+        ret.append(writeStatement("ArrayList<"+doc.getName()+"> ret = new ArrayList<"+doc.getName()+">()"));
+        ret.append(writeString("while(result.next())"));
+		ret.append(writeIncreasedStatement("ret.add(rowMapper.map(result))"));
+		ret.append(writeStatement("return  ret"));
+        ret.append(generateFunctionEnd(callLog, true));
+        ret.append(closeBlock());
+        ret.append(emptyline());
         
-        ret += writeComment("Deletes a "+doc.getName()+" object by id.");
+        ret.append(writeComment("Deletes a "+doc.getName()+" object by id."));
         callLog = quote("delete"+doc.getName()+"(")+"+con+"+quote(", ")+"+id+"+quote(")");
         
-        ret += openFun("public void delete"+doc.getName()+"(Connection con, String id)"+throwsClause);
-        ret += generateFunctionStart("SQL_DELETE", callLog, true);
-        ret += writeStatement("ps.setLong(1, Long.parseLong(id))");
-        ret += writeStatement("int rows = ps.executeUpdate()");
-        ret += writeString("if (rows!=1 && rows!=0){");
+        ret.append(openFun("public void delete"+doc.getName()+"(Connection con, String id)"+throwsClause));
+        ret.append(generateFunctionStart("SQL_DELETE", callLog, true));
+        ret.append(writeStatement("ps.setLong(1, Long.parseLong(id))"));
+        ret.append(writeStatement("int rows = ps.executeUpdate()"));
+        ret.append(writeString("if (rows!=1 && rows!=0){"));
         increaseIdent();
-        ret += writeStatement("log.warn(\"Deleted more than one row of "+doc.getName()+": \"+id)");
-		ret += closeBlock();
-		ret += generateFunctionEnd(callLog, true);
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(writeStatement("log.warn(\"Deleted more than one row of "+doc.getName()+": \"+id)"));
+		ret.append(closeBlock());
+		ret.append(generateFunctionEnd(callLog, true));
+        ret.append(closeBlock());
+        ret.append(emptyline());
         
         //getXYZ method
         callLog = quote("get"+doc.getName()+"(")+"+con+"+quote(", ")+"+id+"+quote(")");
-        ret += writeComment("Returns the "+doc.getName()+" object with the specified id.");
-        ret += openFun("public "+doc.getName()+" get"+doc.getName()+"(Connection con, String id)"+throwsClause);
-        ret += generateFunctionStart("SQL_READ_ONE", callLog, true);
-        ret += writeStatement("ps.setLong(1, Long.parseLong(id))");
-        ret += writeStatement("ResultSet result = ps.executeQuery()");
-        ret += writeString("if (!result.next())");
-        ret += writeIncreasedStatement("throw new "+getNoItemExceptionName(doc)+"(id)");
-		ret += writeStatement("return rowMapper.map(result)");
-        ret += generateFunctionEnd(callLog, true);
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(writeComment("Returns the "+doc.getName()+" object with the specified id."));
+        ret.append(openFun("public "+doc.getName()+" get"+doc.getName()+"(Connection con, String id)"+throwsClause));
+        ret.append(generateFunctionStart("SQL_READ_ONE", callLog, true));
+        ret.append(writeStatement("ps.setLong(1, Long.parseLong(id))"));
+        ret.append(writeStatement("ResultSet result = ps.executeQuery()"));
+        ret.append(writeString("if (!result.next())"));
+        ret.append(writeIncreasedStatement("throw new "+getNoItemExceptionName(doc)+"(id)"));
+		ret.append(writeStatement("return rowMapper.map(result)"));
+        ret.append(generateFunctionEnd(callLog, true));
+        ret.append(closeBlock());
+        ret.append(emptyline());
         
         int ii = 0;
         
         //createXYZ method
         callLog = quote("create"+doc.getName()+"(")+"+con+"+quote(", ")+"+"+doc.getVariableName()+"+"+quote(")");
-        ret += writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
-        ret += openFun("public "+doc.getName()+" create"+doc.getName()+"(Connection con, "+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-        ret += generateFunctionStart("SQL_CREATE", callLog, true);
-        ret += writeStatement("long nextId = getLastId(con).incrementAndGet()");
-        ret += writeStatement("ps.setLong(1, nextId)");
+        ret.append(writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version."));
+        ret.append(openFun("public "+doc.getName()+" create"+doc.getName()+"(Connection con, "+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+        ret.append(generateFunctionStart("SQL_CREATE", callLog, true));
+        ret.append(writeStatement("long nextId = getLastId(con).incrementAndGet()"));
+        ret.append(writeStatement("ps.setLong(1, nextId)"));
         for (int i=0; i<properties.size(); i++){
-        	ret += generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2);
+        	ret.append(generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2));
         	ii = i +2;
         }
-        ret += writeCommentLine("set create timestamp");
-        ret += writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())");
+        ret.append(writeCommentLine("set create timestamp"));
+        ret.append(writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())"));
 
-        ret += writeStatement("int rows = ps.executeUpdate()");
-        ret += writeString("if (rows!=1)");
-        ret += writeIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)");
+        ret.append(writeStatement("int rows = ps.executeUpdate()"));
+        ret.append(writeString("if (rows!=1)"));
+        ret.append(writeIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)"));
         
         String copyResVarName = "new"+StringUtils.capitalize(doc.getVariableName());
         String createCopyCall = VOGenerator.getDocumentImplName(doc)+" "+copyResVarName + " = new "+VOGenerator.getDocumentImplName(doc);
         createCopyCall += "(\"\"+nextId)";
-        ret += writeStatement(createCopyCall);
-        ret += writeStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")");
+        ret.append(writeStatement(createCopyCall));
+        ret.append(writeStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")"));
         
-        ret += writeStatement("return "+copyResVarName);
-        ret += generateFunctionEnd(callLog, true);
+        ret.append(writeStatement("return "+copyResVarName));
+        ret.append(generateFunctionEnd(callLog, true));
         
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(closeBlock());
+        ret.append(emptyline());
 
 
         //createListXYZ method
         String listDecl = "List<"+doc.getName()+">";
         callLog = quote("create"+doc.getMultiple()+"(")+"+con+"+quote(", ")+"+list+"+quote(")");
-        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
-        ret += openFun("public "+listDecl+" create"+doc.getMultiple()+"(Connection con, "+listDecl+" list)"+throwsClause);
-        //ret += generateFunctionStart("SQL_CREATE", callLog, true);
-        ret += writeStatement("PreparedStatement ps = null");
-        ret += writeString("try{");
+        ret.append(writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions."));
+        ret.append(openFun("public "+listDecl+" create"+doc.getMultiple()+"(Connection con, "+listDecl+" list)"+throwsClause));
+        //ret.append(generateFunctionStart("SQL_CREATE", callLog, true));
+        ret.append(writeStatement("PreparedStatement ps = null"));
+        ret.append(writeString("try{"));
         increaseIdent();
-        ret += writeStatement("con.setAutoCommit(false)");
-        ret += writeStatement("ps = con.prepareStatement(createSQL(SQL_CREATE_1, SQL_CREATE_2))");
-        ret += writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
-        ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
+        ret.append(writeStatement("con.setAutoCommit(false)"));
+        ret.append(writeStatement("ps = con.prepareStatement(createSQL(SQL_CREATE_1, SQL_CREATE_2))"));
+        ret.append(writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()"));
+        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){"));
         increaseIdent();
-        ret += writeStatement("long nextId = getLastId(con).incrementAndGet()");
-        ret += writeStatement("ps.setLong(1, nextId)");
+        ret.append(writeStatement("long nextId = getLastId(con).incrementAndGet()"));
+        ret.append(writeStatement("ps.setLong(1, nextId)"));
         for (int i=0; i<properties.size(); i++){
-        	ret += generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2);
+        	ret.append(generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2));
         	ii = i +2;
         }
-        ret += writeCommentLine("set create timestamp");
-        ret += writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())");
+        ret.append(writeCommentLine("set create timestamp"));
+        ret.append(writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())"));
 
-        ret += writeStatement("int rows = ps.executeUpdate()");
-        ret += writeString("if (rows!=1)");
-        ret += writeIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)");
+        ret.append(writeStatement("int rows = ps.executeUpdate()"));
+        ret.append(writeString("if (rows!=1)"));
+        ret.append(writeIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)"));
         
         /*String*/ copyResVarName = "new"+StringUtils.capitalize(doc.getVariableName());
         /*String*/ createCopyCall = VOGenerator.getDocumentImplName(doc)+" "+copyResVarName + " = new "+VOGenerator.getDocumentImplName(doc);
         createCopyCall += "(\"\"+nextId)";
-        ret += writeStatement(createCopyCall);
-        ret += writeStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")");
+        ret.append(writeStatement(createCopyCall));
+        ret.append(writeStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")"));
         
-        ret += writeStatement("ret.add("+copyResVarName+")");
-        ret += closeBlock();
-        ret += writeStatement("con.commit()");
-        ret += writeStatement("return ret");
-        ret += generateFunctionEnd(callLog, true);
+        ret.append(writeStatement("ret.add("+copyResVarName+")"));
+        ret.append(closeBlock());
+        ret.append(writeStatement("con.commit()"));
+        ret.append(writeStatement("return ret"));
+        ret.append(generateFunctionEnd(callLog, true));
         
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(closeBlock());
+        ret.append(emptyline());
 
         //updateXYZ method
         callLog = quote("update"+doc.getName()+"(")+"+con+"+quote(", ")+"+"+doc.getVariableName()+"+"+quote(")");
-        ret += writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
-        ret += openFun("public "+doc.getName()+" update"+doc.getName()+"(Connection con, "+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-        ret += generateFunctionStart("SQL_UPDATE", callLog, true);
+        ret.append(writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version."));
+        ret.append(openFun("public "+doc.getName()+" update"+doc.getName()+"(Connection con, "+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+        ret.append(generateFunctionStart("SQL_UPDATE", callLog, true));
 
         for (int i=0; i<properties.size(); i++){
-        	ret += generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+1);
+        	ret.append(generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+1));
         	ii = i+1;
         }
-        ret += writeCommentLine("set update timestamp");
-        ret += writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())");
-        ret += writeCommentLine("set id for the where clause");
-        ret += writeStatement("ps.setLong("+(ii+2)+", Long.parseLong("+doc.getVariableName()+".getId()))");
+        ret.append(writeCommentLine("set update timestamp"));
+        ret.append(writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())"));
+        ret.append(writeCommentLine("set id for the where clause"));
+        ret.append(writeStatement("ps.setLong("+(ii+2)+", Long.parseLong("+doc.getVariableName()+".getId()))"));
 
-        ret += writeStatement("int rows = ps.executeUpdate()");
-        ret += writeString("if (rows!=1)");
-        ret += writeIncreasedStatement("throw new DAOException(\"Update failed, updated rows: \"+rows)");
+        ret.append(writeStatement("int rows = ps.executeUpdate()"));
+        ret.append(writeString("if (rows!=1)"));
+        ret.append(writeIncreasedStatement("throw new DAOException(\"Update failed, updated rows: \"+rows)"));
 
-        ret += writeStatement("return "+doc.getVariableName());
-        ret += generateFunctionEnd(callLog, true);
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(writeStatement("return "+doc.getVariableName()));
+        ret.append(generateFunctionEnd(callLog, true));
+        ret.append(closeBlock());
+        ret.append(emptyline());
         
+        
+        //updateListXYZ method
+        callLog = quote("update"+doc.getMultiple()+"(")+"+con+"+quote(", ")+"+list+"+quote(")");
+        ret.append(writeComment("Updates multiple new "+doc.getName()+" objects.\nReturns the updated versions."));
+        ret.append(openFun("public "+listDecl+" update"+doc.getMultiple()+"(Connection con, "+listDecl+" list)"+throwsClause));
+        ret.append(writeStatement("PreparedStatement ps = null"));
+        ret.append(writeString("try{"));
+        increaseIdent();
+        ret.append(writeStatement("con.setAutoCommit(false)"));
+        ret.append(writeStatement("ps = con.prepareStatement(createSQL(SQL_UPDATE_1, SQL_UPDATE_2))"));
+        ret.append(writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()"));
+        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){"));
+        increaseIdent();
+        for (int i=0; i<properties.size(); i++){
+        	ret.append(generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+1));
+        	ii = i + 1;
+        }
+        ret.append(writeCommentLine("set update timestamp"));
+        ret.append(writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())"));
+        ret.append(writeCommentLine("set id for the where clause"));
+        ret.append(writeStatement("ps.setLong("+(ii+2)+", Long.parseLong("+doc.getVariableName()+".getId()))"));
+
+        ret.append(writeStatement("int rows = ps.executeUpdate()"));
+        ret.append(writeString("if (rows!=1)"));
+        ret.append(writeIncreasedStatement("throw new DAOException(\"Update failed, updated rows: \"+rows)"));
+        
+        ret.append(closeBlock());
+        ret.append(writeStatement("con.commit()"));
+        ret.append(writeStatement("return list"));
+        ret.append(generateFunctionEnd(callLog, true));
+        
+        ret.append(closeBlock());
+        ret.append(emptyline());
+        //end updateListXYZ
         
         //get all XYZ byProperty method
         callLog = quote("get"+doc.getMultiple()+"ByProperty(")+"+con+"+quote(",")+"+ properties+"+quote(")");
-        ret += writeComment("Returns all "+doc.getMultiple()+" objects stored which matches given properties.");
-        ret += openFun("public List<"+doc.getName()+">"+" get"+doc.getMultiple()+"ByProperty(Connection con, List<QueryProperty> properties)"+throwsClause);
-        //ret += generateFunctionStart("SQL_READ_ALL_BY_PROPERTY", callLog, true);
-		ret += writeStatement("PreparedStatement ps = null");
-		ret += openTry();
+        ret.append(writeComment("Returns all "+doc.getMultiple()+" objects stored which matches given properties."));
+        ret.append(openFun("public List<"+doc.getName()+">"+" get"+doc.getMultiple()+"ByProperty(Connection con, List<QueryProperty> properties)"+throwsClause));
+        //ret.append(generateFunctionStart("SQL_READ_ALL_BY_PROPERTY", callLog, true));
+		ret.append(writeStatement("PreparedStatement ps = null"));
+		ret.append(openTry());
 		//TODO Caching fuer generierte SQL Statements
-        ret += writeCommentLine("//enable caching of statements one day");
-        ret += writeStatement("String SQL = createSQL(SQL_READ_ALL_BY_PROPERTY_1, SQL_READ_ALL_BY_PROPERTY_2)");
-        ret += writeStatement("String whereClause = "+quote(""));
-        ret += writeString("for (QueryProperty p : properties){");
+        ret.append(writeCommentLine("//enable caching of statements one day"));
+        ret.append(writeStatement("String SQL = createSQL(SQL_READ_ALL_BY_PROPERTY_1, SQL_READ_ALL_BY_PROPERTY_2)"));
+        ret.append(writeStatement("String whereClause = "+quote("")));
+        ret.append(writeString("for (QueryProperty p : properties){"));
         increaseIdent();
-        ret += writeString("if (whereClause.length()>0)");
-        ret += writeIncreasedStatement("whereClause += "+quote(" AND "));
-        ret += writeStatement("whereClause += p.getName()+p.getComparator()+"+quote("?"));
-        ret +=closeBlock();
-        ret += writeStatement("SQL += whereClause");
-        //ret += writeStatement("System.out.println(SQL)");
-        ret += writeStatement("ps = con.prepareStatement(SQL)");
+        ret.append(writeString("if (whereClause.length()>0)"));
+        ret.append(writeIncreasedStatement("whereClause += "+quote(" AND ")));
+        ret.append(writeStatement("whereClause += p.getName()+p.getComparator()+"+quote("?")));
+        ret.append(closeBlock());
+        ret.append(writeStatement("SQL += whereClause"));
+        //ret.append(writeStatement("System.out.println(SQL)"));
+        ret.append(writeStatement("ps = con.prepareStatement(SQL)"));
         //set properties
-        ret += writeString("for (int i=0; i<properties.size(); i++){");
+        ret.append(writeString("for (int i=0; i<properties.size(); i++){"));
         increaseIdent();
-        ret += writeStatement("setProperty(i+1, ps, properties.get(i))");
-        ret +=closeBlock();
+        ret.append(writeStatement("setProperty(i+1, ps, properties.get(i))"));
+        ret.append(closeBlock());        
         
-        
-        ret += writeStatement("ResultSet result = ps.executeQuery()");
-        ret += writeStatement("ArrayList<"+doc.getName()+"> ret = new ArrayList<"+doc.getName()+">()");
-        ret += writeString("while(result.next())");
-		ret += writeIncreasedStatement("ret.add(rowMapper.map(result))");
-		ret += writeStatement("return  ret");
-        ret += generateFunctionEnd(callLog, true);
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(writeStatement("ResultSet result = ps.executeQuery()"));
+        ret.append(writeStatement("ArrayList<"+doc.getName()+"> ret = new ArrayList<"+doc.getName()+">()"));
+        ret.append(writeString("while(result.next())"));
+		ret.append(writeIncreasedStatement("ret.add(rowMapper.map(result))"));
+		ret.append(writeStatement("return  ret"));
+        ret.append(generateFunctionEnd(callLog, true));
+        ret.append(closeBlock());
+        ret.append(emptyline());
         
         //setProperty
-        ret += openFun("private void setProperty(int position, PreparedStatement ps, QueryProperty property) throws SQLException");
+        ret.append(openFun("private void setProperty(int position, PreparedStatement ps, QueryProperty property) throws SQLException"));
         for (MetaProperty p : properties){
-        	ret += writeString("if ("+getAttributeConst(p)+".equals(property.getName())){");
+        	ret.append(writeString("if ("+getAttributeConst(p)+".equals(property.getName())){"));
         	increaseIdent();
-        	ret += writeStatement(generateDB2PropertyCallMapping("property.getValue()", p, "position"));
-        	ret += writeStatement("return");
-        	ret += closeBlock();
+        	ret.append(writeStatement(generateDB2PropertyCallMapping("property.getValue()", p, "position")));
+        	ret.append(writeStatement("return"));
+        	ret.append(closeBlock());
         }
-    	ret += writeString("if ("+getAttributeConst(id)+".equals(property.getName())){");
+    	ret.append(writeString("if ("+getAttributeConst(id)+".equals(property.getName())){"));
     	increaseIdent();
-    	ret += writeStatement(generateDB2PropertyCallMapping("property.getValue()", id, "position"));
-    	ret += writeStatement("return");
-    	ret += closeBlock();
-    	ret += writeString("if ("+quote(dao_created.getName())+".equals(property.getName())){");
+    	ret.append(writeStatement(generateDB2PropertyCallMapping("property.getValue()", id, "position")));
+    	ret.append(writeStatement("return"));
+    	ret.append(closeBlock());
+    	ret.append(writeString("if ("+quote(dao_created.getName())+".equals(property.getName())){"));
     	increaseIdent();
-    	ret += writeStatement(generateDB2PropertyCallMapping("property.getValue()", dao_created, "position"));
-    	ret += writeStatement("return");
-    	ret += closeBlock();
-    	ret += writeString("if ("+quote(dao_updated.getName())+".equals(property.getName())){");
+    	ret.append(writeStatement(generateDB2PropertyCallMapping("property.getValue()", dao_created, "position")));
+    	ret.append(writeStatement("return"));
+    	ret.append(closeBlock());
+    	ret.append(writeString("if ("+quote(dao_updated.getName())+".equals(property.getName())){"));
     	increaseIdent();
-    	ret += writeStatement(generateDB2PropertyCallMapping("property.getValue()", dao_updated, "position"));
-    	ret += writeStatement("return");
-    	ret += closeBlock();
+    	ret.append(writeStatement(generateDB2PropertyCallMapping("property.getValue()", dao_updated, "position")));
+    	ret.append(writeStatement("return"));
+    	ret.append(closeBlock());
 
-        ret += closeBlock(); //end setProperty
+        ret.append(closeBlock()); //end setProperty
         
        //special functions
-//	        ret += writeComment("Returns all "+doc.getName()+" objects, where property with given name equals object.");
-//	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)");
-//	        ret += emptyline();
-//			ret += writeComment("Returns all "+doc.getName()+" objects, where property with given name equals object, sorted");
-//			ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)");
-//			ret += emptyline();
-//			ret += writeComment("Executes a query");
-//			ret += writeStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)");
-//			ret += emptyline();
+//	        ret.append(writeComment("Returns all "+doc.getName()+" objects, where property with given name equals object."));
+//	        ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"));
+//	        ret.append(emptyline());
+//			ret.append(writeComment("Returns all "+doc.getName()+" objects, where property with given name equals object, sorted"));
+//			ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"));
+//			ret.append(emptyline());
+//			ret.append(writeComment("Executes a query"));
+//			ret.append(writeStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"));
+//			ret.append(emptyline());
 	    
 	    
-//		ret += writeComment("creates an xml element with all contained data.");
-//		ret += writeStatement("public Element exportToXML()");
-//		ret += emptyline();
+//		ret.append(writeComment("creates an xml element with all contained data."));
+//		ret.append(writeStatement("public Element exportToXML()"));
+//		ret.append(emptyline());
         
-        ret += writeString("/* ---------- SQL --------- ");
-        ret += generateSQLCreate(doc, dao_created, dao_updated);
-        ret += writeString("   ---------- SQL --------- */");
+        ret.append(writeString("/* ---------- SQL --------- "));
+        ret.append(generateSQLCreate(doc, dao_created, dao_updated));
+        ret.append(writeString("   ---------- SQL --------- */"));
         
-        ret += openFun("public void createStructure(Connection connection) "+throwsClause);
-        ret += writeCommentLine("not implemented");
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(openFun("public void createStructure(Connection connection) "+throwsClause));
+        ret.append(writeCommentLine("not implemented"));
+        ret.append(closeBlock());
+        ret.append(emptyline());
         		
-        ret += writeString("/* ---------- SQL --------- ");
-        ret += generateSQLDelete(doc);
-        ret += writeString("   ---------- SQL --------- */");
-        ret += openFun("public void deleteStructure(Connection connection) "+throwsClause);
-        ret += writeCommentLine("not implemented");
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(writeString("/* ---------- SQL --------- "));
+        ret.append(generateSQLDelete(doc));
+        ret.append(writeString("   ---------- SQL --------- */"));
+        ret.append(openFun("public void deleteStructure(Connection connection) "+throwsClause));
+        ret.append(writeCommentLine("not implemented"));
+        ret.append(closeBlock());
+        ret.append(emptyline());
         
-        ret += openFun("protected void finish(Statement st)");
-        ret += closeBlock();
-        ret += emptyline();
+        ret.append(openFun("protected void finish(Statement st)"));
+        ret.append(closeBlock());
+        ret.append(emptyline());
 
-        ret += openFun("private long getMaxId(Connection con, String tableName) "+throwsClause);
-        ret += writeStatement("Statement st = null");
-        ret += openTry();
-        ret += writeStatement("con.setAutoCommit(true)");
-        ret += writeStatement("st = con.createStatement()");
-    	ret += writeStatement("st.execute(\"SELECT MAX(\"+"+getAttributeConst(id)+"+\") FROM \"+tableName)");
-    	ret += writeStatement("ResultSet set = st.getResultSet()");
-    	ret += writeStatement("long maxId = 0");
-    	ret += writeString("if (set.next())");
-    	ret += writeIncreasedStatement("maxId = set.getLong(1)");
-    	ret += writeStatement("log.info(\"maxId in table \"+tableName+\" is \"+maxId)");
-    	ret += writeStatement("set.close()");
-    	ret += writeStatement("st.close()");
-    	ret += writeStatement("return maxId");
+        ret.append(openFun("private long getMaxId(Connection con, String tableName) "+throwsClause));
+        ret.append(writeStatement("Statement st = null"));
+        ret.append(openTry());
+        ret.append(writeStatement("con.setAutoCommit(true)"));
+        ret.append(writeStatement("st = con.createStatement()"));
+    	ret.append(writeStatement("st.execute(\"SELECT MAX(\"+"+getAttributeConst(id)+"+\") FROM \"+tableName)"));
+    	ret.append(writeStatement("ResultSet set = st.getResultSet()"));
+    	ret.append(writeStatement("long maxId = 0"));
+    	ret.append(writeString("if (set.next())"));
+    	ret.append(writeIncreasedStatement("maxId = set.getLong(1)"));
+    	ret.append(writeStatement("log.info(\"maxId in table \"+tableName+\" is \"+maxId)"));
+    	ret.append(writeStatement("set.close()"));
+    	ret.append(writeStatement("st.close()"));
+    	ret.append(writeStatement("return maxId"));
     	
-    	ret += generateFunctionEnd(quote("getMaxId(")+"+con+"+quote(", ")+"+tableName+"+quote(")"), false);
-        ret += closeBlock();
-        ret += emptyline();
+    	ret.append(generateFunctionEnd(quote("getMaxId(")+"+con+"+quote(", ")+"+tableName+"+quote(")"), false));
+        ret.append(closeBlock());
+        ret.append(emptyline());
         
         //init() method
-        ret += openFun("public void init(Connection con) "+throwsClause);
-        ret += writeStatement("log.debug(\"Called: init(\"+con+\")\")");
+        ret.append(openFun("public void init(Connection con) "+throwsClause));
+        ret.append(writeStatement("log.debug(\"Called: init(\"+con+\")\")"));
         if (!moduleDbContextSensitive){
-        	ret += writeStatement("long maxId = getMaxId(con, TABNAME)");
-        	ret += writeStatement("lastId = new AtomicLong(maxId == 0 ? START_ID : maxId)");
+        	ret.append(writeStatement("long maxId = getMaxId(con, TABNAME)"));
+        	ret.append(writeStatement("lastId = new AtomicLong(maxId == 0 ? START_ID : maxId)"));
         }
-    	ret += closeBlock();
-	    ret += closeBlock();
-	    return ret;
+    	ret.append(closeBlock());
+	    ret.append(closeBlock());
+	    return ret.toString();
 	}
 	
 	private String generateSQLDelete(MetaDocument doc){

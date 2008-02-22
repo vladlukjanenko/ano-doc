@@ -13,5 +13,10 @@ public class QueryLikeProperty extends QueryProperty{
 	public Object getValue() {
 		return "%"+super.getValue()+"%";
 	}
-	
+
+	public boolean doesMatch(Object o){
+		return o== null ?getOriginalValue() == null :
+			o.toString().indexOf(getOriginalValue().toString()) != -1;
+	}
+
 }

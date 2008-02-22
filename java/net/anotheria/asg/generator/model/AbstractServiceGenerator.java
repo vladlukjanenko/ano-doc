@@ -19,7 +19,7 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    return getServiceName(m)+"Factory";
 	}
 	
-	public static final String getImplementationName(MetaModule m){
+	public String getImplementationName(MetaModule m){
 	    return getServiceName(m)+"Impl";
 	}
 
@@ -27,6 +27,10 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 		return GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module);
 	}
 
+	protected String writeAdditionalFactoryImports(MetaModule module){
+		return "";
+	}
+	
 	protected String generateFactory(MetaModule module){
 	    String ret = "";
 
@@ -40,8 +44,10 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    ret += writeImport("net.java.dev.moskito.core.predefined.ServiceStatsCallHandler");
 	    ret += writeImport("net.java.dev.moskito.core.predefined.ServiceStatsFactory");
 	    ret += writeImport("net.anotheria.asg.service.ASGService");
+	    ret += writeAdditionalFactoryImports(module);
 	    ret += emptyline();
-
+	    
+	    
 	    
 	    ret += writeString("public class "+getFactoryName(module)+"{");
 	    increaseIdent();
@@ -59,7 +65,7 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    ret += writeString("\""+getInterfaceName(module)+"-\"+instanceCounter.incrementAndGet(),");
 	    ret += writeString("\"service\",");
 	    ret += writeString("\"asg\",");
-	    ret += writeString(getInterfaceName(module)+".class"+", ASGService.class");
+	    ret += writeString(getSupportedInterfacesList(module));
 	    decreaseIdent();
 	    ret += writeString(");");
 	    ret += writeStatement("return ("+getInterfaceName(module)+") proxy.createProxy()");
@@ -75,22 +81,13 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    ret += closeBlock();
 	    return ret;
 	}
+	
+	//returns a comma-separated list of all interfaces supported by this impl, which the proxy must map.
+	protected String getSupportedInterfacesList(MetaModule module){
+		return getInterfaceName(module)+".class"+", ASGService.class";
+	}
+	
+	protected String getExceptionName(MetaModule module){
+		return ServiceGenerator.getExceptionName(module);
+	}
 }
-
-/*
-
-
-public IBe2IntegrationService createService(){
-	MoskitoInvokationProxy proxy = new MoskitoInvokationProxy(
-		createStub(),
-		new ServiceStatsCallHandler(),
-		new ServiceStatsFactory(),
-		"Be2IntegrationServiceStub-"+instanceCounter.incrementAndGet(),
-		"stub",
-		"default",
-		IBe2IntegrationService.class
-		);
-	return (IBe2IntegrationService) proxy.createProxy();
-}
-}
-*/

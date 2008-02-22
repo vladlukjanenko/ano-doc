@@ -39,55 +39,55 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	}
 	
 	private String generateException(MetaModule module){
-		String ret = "";
+		StringBuilder ret = new StringBuilder(5000);
 		
-	    ret += CommentGenerator.generateJavaTypeComment(getInterfaceName(module));
+	    ret.append(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
 	    
-	    ret += writeStatement("package "+getPackageName(module));
-	    ret += emptyline();
-	    ret += writeImport("java.sql.SQLException");
-	    ret += writeImport("net.anotheria.db.dao.DAOException");
-	    ret += emptyline();
+	    ret.append(writeStatement("package "+getPackageName(module)));
+	    ret.append(emptyline());
+	    ret.append(writeImport("java.sql.SQLException"));
+	    ret.append(writeImport("net.anotheria.db.dao.DAOException"));
+	    ret.append(emptyline());
 
-	    ret += writeString("public class "+getExceptionName(module)+ " extends Exception{");
+	    ret.append(writeString("public class "+getExceptionName(module)+ " extends Exception{"));
 		increaseIdent();
-		ret += emptyline();
-		ret += writeString("public "+getExceptionName(module)+"(String message){");
-		ret += writeIncreasedStatement("super(message)");
-		ret += writeString("}");
+		ret.append(emptyline());
+		ret.append(writeString("public "+getExceptionName(module)+"(String message){"));
+		ret.append(writeIncreasedStatement("super(message)"));
+		ret.append(writeString("}"));
 		
-		ret += writeString("public "+getExceptionName(module)+"(SQLException e){");
-		ret += writeIncreasedStatement("super("+quote("Undelying DB Error: ")+"+e.getMessage())");
-		ret += writeString("}");
+		ret.append(writeString("public "+getExceptionName(module)+"(SQLException e){"));
+		ret.append(writeIncreasedStatement("super("+quote("Undelying DB Error: ")+"+e.getMessage())"));
+		ret.append(writeString("}"));
 
-		ret += writeString("public "+getExceptionName(module)+"(DAOException e){");
-		ret += writeIncreasedStatement("super("+quote("Undelying DAO Error: ")+"+e.getMessage())");
-		ret += writeString("}");
+		ret.append(writeString("public "+getExceptionName(module)+"(DAOException e){"));
+		ret.append(writeIncreasedStatement("super("+quote("Undelying DAO Error: ")+"+e.getMessage())"));
+		ret.append(writeString("}"));
 		
-		ret += closeBlock();
-		return ret; 
+		ret.append(closeBlock());
+		return ret.toString(); 
 	}
 	
 	private String generateInterface(MetaModule module){
-	    String ret = "";
+		StringBuilder ret = new StringBuilder(5000);
 	    
-	    ret += CommentGenerator.generateJavaTypeComment(getInterfaceName(module));
+	    ret.append(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
  
-	    ret += writeStatement("package "+getPackageName(module));
-	    ret += emptyline();
-	    ret += writeImport("java.util.List");
-	    ret += emptyline();
-	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
-	    ret += emptyline();
+	    ret.append(writeStatement("package "+getPackageName(module)));
+	    ret.append(emptyline());
+	    ret.append(writeImport("java.util.List"));
+	    ret.append(emptyline());
+	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryProperty"));
+	    ret.append(emptyline());
 	    
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
 	    }
-	    ret += emptyline();
+	    ret.append(emptyline());
 
-	    ret += writeString("public interface "+getInterfaceName(module)+"{");
+	    ret.append(writeString("public interface "+getInterfaceName(module)+"{"));
 	    increaseIdent();
 	    
 	    String throwsClause = " throws "+getExceptionName(module);
@@ -95,35 +95,38 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
-	        ret += writeComment("Returns all "+doc.getMultiple()+" objects stored.");
-	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause);
-	        ret += emptyline();
-	        ret += writeComment("Deletes a "+doc.getName()+" object by id.");
-	        ret += writeStatement("public void delete"+doc.getName()+"(String id)"+throwsClause);
-	        ret += emptyline();
-	        ret += writeComment("Returns the "+doc.getName()+" object with the specified id.");
-	        ret += writeStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
-	        ret += emptyline();
-	        ret += writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
-	        ret += writeStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        ret += emptyline();
-	        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
-	        ret += writeStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        ret += emptyline();
-	        ret += writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
-	        ret += writeStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        ret += emptyline();
-	        ret += writeComment("Returns all "+doc.getName()+" objects which match the given property or properties.");
-	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty"+"(QueryProperty... properties)"+throwsClause);
-	        ret += emptyline();
+	        ret.append(writeComment("Returns all "+doc.getMultiple()+" objects stored."));
+	        ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause));
+	        ret.append(emptyline());
+	        ret.append(writeComment("Deletes a "+doc.getName()+" object by id."));
+	        ret.append(writeStatement("public void delete"+doc.getName()+"(String id)"+throwsClause));
+	        ret.append(emptyline());
+	        ret.append(writeComment("Returns the "+doc.getName()+" object with the specified id."));
+	        ret.append(writeStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause));
+	        ret.append(emptyline());
+	        ret.append(writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version."));
+	        ret.append(writeStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+	        ret.append(emptyline());
+	        ret.append(writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions."));
+	        ret.append(writeStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause));
+	        ret.append(emptyline());
+	        ret.append(writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version."));
+	        ret.append(writeStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+	        ret.append(emptyline());
+	        ret.append(writeComment("Updates multiple "+doc.getName()+" object.\nReturns the updated versions."));
+	        ret.append(writeStatement("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause));
+	        ret.append(emptyline());
+	        ret.append(writeComment("Returns all "+doc.getName()+" objects which match the given property or properties."));
+	        ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty"+"(QueryProperty... properties)"+throwsClause));
+	        ret.append(emptyline());
 	    }
 	    
-//		ret += writeComment("creates an xml element with all contained data.");
-//		ret += writeStatement("public Element exportToXML()");
-//		ret += emptyline();
+//		ret.append(writeComment("creates an xml element with all contained data."));
+//		ret.append(writeStatement("public Element exportToXML()"));
+//		ret.append(emptyline());
 	    
-	    ret += closeBlock();
-	    return ret;
+	    ret.append(closeBlock());
+	    return ret.toString();
 	}
 	
 	private String getDAOVariableName(MetaDocument doc){
@@ -131,88 +134,88 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	}
 	
 	private String generateImplementation(MetaModule module){
-	    String ret = "";
+		StringBuilder ret = new StringBuilder(5000);
 
-		ret += CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+".");
+		ret.append(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+"."));
 
-	    ret += writeStatement("package "+getPackageName(module));
-	    ret += emptyline();
-	    ret += writeImport("java.util.List");
-	    ret += writeImport("java.util.ArrayList");
-	    ret += writeImport("java.util.Arrays");
-		ret += writeImport("net.anotheria.util.sorter.SortType");
-		ret += writeImport("net.anotheria.util.Date");
-	    ret += writeImport("net.anotheria.anodoc.query2.QueryProperty");
-	    ret += emptyline();
+	    ret.append(writeStatement("package "+getPackageName(module)));
+	    ret.append(emptyline());
+	    ret.append(writeImport("java.util.List"));
+	    ret.append(writeImport("java.util.ArrayList"));
+	    ret.append(writeImport("java.util.Arrays"));
+		ret.append(writeImport("net.anotheria.util.sorter.SortType"));
+		ret.append(writeImport("net.anotheria.util.Date"));
+	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryProperty"));
+	    ret.append(emptyline());
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (MetaDocument doc : docs){
-	        ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
 	    }
-	    ret += emptyline();
-	    ret += writeImport("net.anotheria.db.service.BasePersistenceServiceJDBCImpl");
-	    ret += writeImport("net.anotheria.db.dao.DAOException");
-	    ret += writeImport("java.sql.Connection");
-	    ret += writeImport("java.sql.SQLException");
-	    ret += emptyline();
+	    ret.append(emptyline());
+	    ret.append(writeImport("net.anotheria.db.service.BasePersistenceServiceJDBCImpl"));
+	    ret.append(writeImport("net.anotheria.db.dao.DAOException"));
+	    ret.append(writeImport("java.sql.Connection"));
+	    ret.append(writeImport("java.sql.SQLException"));
+	    ret.append(emptyline());
 	    
-	    ret += writeString("public class "+getImplementationName(module)+" extends BasePersistenceServiceJDBCImpl implements "+getInterfaceName(module)+" {");
+	    ret.append(writeString("public class "+getImplementationName(module)+" extends BasePersistenceServiceJDBCImpl implements "+getInterfaceName(module)+" {"));
 	    increaseIdent();
-	    ret += writeStatement("private static "+getImplementationName(module)+" instance");
-	    ret += emptyline();
+	    ret.append(writeStatement("private static "+getImplementationName(module)+" instance"));
+	    ret.append(emptyline());
 	    
-	    ret += writeCommentLine("DAO Objects for data access.");
+	    ret.append(writeCommentLine("DAO Objects for data access."));
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        ret += writeStatement("private "+PersistenceServiceDAOGenerator.getDAOName(doc)+" "+getDAOVariableName(doc));
+	        ret.append(writeStatement("private "+PersistenceServiceDAOGenerator.getDAOName(doc)+" "+getDAOVariableName(doc)));
 	    }
-	    ret += emptyline();
+	    ret.append(emptyline());
 	    
-	    ret += writeString("private "+getImplementationName(module)+"(){");
+	    ret.append(writeString("private "+getImplementationName(module)+"(){"));
 	    increaseIdent();
-	    ret += closeBlock();
-	    ret += emptyline();
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
-	    ret += writeString("static final "+getImplementationName(module)+" getInstance(){");
+	    ret.append(writeString("static final "+getImplementationName(module)+" getInstance(){"));
 	    increaseIdent();
-	    ret += writeString("if (instance==null){");
+	    ret.append(writeString("if (instance==null){"));
 	    increaseIdent();
-	    ret += writeStatement("instance = new "+getImplementationName(module)+"()");
-	    ret += closeBlock();
-	    ret += writeStatement("return instance");
-	    ret += closeBlock();
-	    ret += emptyline();
+	    ret.append(writeStatement("instance = new "+getImplementationName(module)+"()"));
+	    ret.append(closeBlock());
+	    ret.append(writeStatement("return instance"));
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
-	    ret += writeString("public void init(){");
+	    ret.append(writeString("public void init(){"));
 	    increaseIdent();
-	    ret += writeStatement("super.init()");
+	    ret.append(writeStatement("super.init()"));
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        ret += writeStatement(getDAOVariableName(doc) +" = new "+PersistenceServiceDAOGenerator.getDAOName(doc)+"()");
+	        ret.append(writeStatement(getDAOVariableName(doc) +" = new "+PersistenceServiceDAOGenerator.getDAOName(doc)+"()"));
 	    }
-	    ret += writeStatement("String currentDAO = null");
-	    ret += openTry();
-	    ret += writeStatement("Connection c = getConnection()");
+	    ret.append(writeStatement("String currentDAO = null"));
+	    ret.append(openTry());
+	    ret.append(writeStatement("Connection c = getConnection()"));
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        ret += writeStatement("log.info(\"Initializing DAO for "+doc.getName()+"\" )");
-	        ret += writeStatement("currentDAO = "+quote(doc.getName()));
-	        ret += writeStatement(getDAOVariableName(doc)+".init(c)");
+	        ret.append(writeStatement("log.info(\"Initializing DAO for "+doc.getName()+"\" )"));
+	        ret.append(writeStatement("currentDAO = "+quote(doc.getName())));
+	        ret.append(writeStatement(getDAOVariableName(doc)+".init(c)"));
 	    }
 	
 	    decreaseIdent();
-	    ret += writeString("}catch(DAOException e){");
-		ret += writeIncreasedStatement("log.fatal(\"init failed (dao:\"+currentDAO+\") \",e )");
-		//ret += writeIncreasedStatement("throw new RuntimeException(\"init failed (dao:\"+currentDAO+\") cause: \"+e.getMessage())");
-	    ret += writeString("}catch(SQLException e){");
-		ret += writeIncreasedStatement("log.fatal(\"init failed (sql) \",e )");
-		//ret += writeIncreasedStatement("throw new RuntimeException(\"init failed (sql) cause: \"+e.getMessage())");
-	    ret += writeString("}catch(Exception e){");
-	    ret += writeIncreasedStatement("System.out.println(e.getMessage()+\" \"+e.getClass())");
-		ret += writeIncreasedStatement("log.fatal(\"init failed (e) \",e )");
-		//ret += writeIncreasedStatement("throw new RuntimeException(\"init failed (sql) cause: \"+e.getMessage())");
-		ret += writeString("}");
-	    ret += closeBlock();
-	    ret += emptyline();
+	    ret.append(writeString("}catch(DAOException e){"));
+		ret.append(writeIncreasedStatement("log.fatal(\"init failed (dao:\"+currentDAO+\") \",e )"));
+		//ret.append(writeIncreasedStatement("throw new RuntimeException(\"init failed (dao:\"+currentDAO+\") cause: \"+e.getMessage())"));
+	    ret.append(writeString("}catch(SQLException e){"));
+		ret.append(writeIncreasedStatement("log.fatal(\"init failed (sql) \",e )"));
+		//ret.append(writeIncreasedStatement("throw new RuntimeException(\"init failed (sql) cause: \"+e.getMessage())"));
+	    ret.append(writeString("}catch(Exception e){"));
+	    ret.append(writeIncreasedStatement("System.out.println(e.getMessage()+\" \"+e.getClass())"));
+		ret.append(writeIncreasedStatement("log.fatal(\"init failed (e) \",e )"));
+		//ret.append(writeIncreasedStatement("throw new RuntimeException(\"init failed (sql) cause: \"+e.getMessage())"));
+		ret.append(writeString("}"));
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
 	    
 	    String throwsClause = " throws "+getExceptionName(module);
@@ -223,84 +226,93 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        String listDecl = "List<"+doc.getName()+">";
 
 	        callLog = "\"Call get"+doc.getMultiple()+"() \"";
-	        ret += writeComment("Returns all "+doc.getMultiple()+" objects stored.");
-	        ret += openFun("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause);
-	        ret += generateMethodStart(callLog);
-	        ret += writeStatement("return "+getDAOVariableName(doc)+".get"+doc.getMultiple()+"(c)");
-	        ret += generateMethodEnd(module, callLog);
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeComment("Returns all "+doc.getMultiple()+" objects stored."));
+	        ret.append(openFun("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement("return "+getDAOVariableName(doc)+".get"+doc.getMultiple()+"(c)"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 
 	        callLog = "\"Call delete"+doc.getName()+"(\"+id+\") \"";
-	        ret += writeComment("Deletes a "+doc.getName()+" object by id.");
-	        ret += openFun("public void delete"+doc.getName()+"(String id)"+throwsClause);
-	        ret += generateMethodStart(callLog);
-	        ret += writeStatement(getDAOVariableName(doc)+".delete"+doc.getName()+"(c, id)");
-	        ret += generateMethodEnd(module, callLog);
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeComment("Deletes a "+doc.getName()+" object by id."));
+	        ret.append(openFun("public void delete"+doc.getName()+"(String id)"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement(getDAOVariableName(doc)+".delete"+doc.getName()+"(c, id)"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 
 	        callLog = "\"Call get"+doc.getName()+"(\"+id+\") \"";
-	        ret += writeComment("Returns the "+doc.getName()+" object with the specified id.");
-	        ret += openFun("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
-	        ret += generateMethodStart(callLog);
-	        ret += writeStatement("return "+getDAOVariableName(doc)+".get"+doc.getName()+"(c, id)");
-	        ret += generateMethodEnd(module, callLog);
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeComment("Returns the "+doc.getName()+" object with the specified id."));
+	        ret.append(openFun("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement("return "+getDAOVariableName(doc)+".get"+doc.getName()+"(c, id)"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 
 	        callLog = "\"Call create"+doc.getName()+"(\"+"+doc.getVariableName()+"+\") \"";
-	        ret += writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
-	        ret += openFun("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        ret += generateMethodStart(callLog);
-	        ret += writeStatement("return "+getDAOVariableName(doc)+".create"+doc.getName()+"(c, "+doc.getVariableName()+")");
-	        ret += generateMethodEnd(module, callLog);
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version."));
+	        ret.append(openFun("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement("return "+getDAOVariableName(doc)+".create"+doc.getName()+"(c, "+doc.getVariableName()+")"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
 	        callLog = "\"Call create"+doc.getMultiple()+"(\"+list+\") \"";
-	        ret += writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
-	        ret += openFun("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        ret += generateMethodStart(callLog);
-	        ret += writeStatement("return "+getDAOVariableName(doc)+".create"+doc.getMultiple()+"(c, list)");
-	        ret += generateMethodEnd(module, callLog);
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions."));
+	        ret.append(openFun("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement("return "+getDAOVariableName(doc)+".create"+doc.getMultiple()+"(c, list)"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
 
 	        callLog = "\"Call update"+doc.getName()+"(\"+"+doc.getVariableName()+"+\") \"";
-	        ret += writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
-	        ret += openFun("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        ret += generateMethodStart(callLog);
-	        ret += writeStatement("return "+getDAOVariableName(doc)+".update"+doc.getName()+"(c, "+doc.getVariableName()+")");
-	        ret += generateMethodEnd(module, callLog);
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version."));
+	        ret.append(openFun("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement("return "+getDAOVariableName(doc)+".update"+doc.getName()+"(c, "+doc.getVariableName()+")"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
+	        callLog = "\"Call update"+doc.getMultiple()+"(\"+list+\") \"";
+	        ret.append(writeComment("Updates multiple  "+doc.getName()+" objects.\nReturns the updated versions."));
+	        ret.append(openFun("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement("return "+getDAOVariableName(doc)+".update"+doc.getMultiple()+"(c, list)"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+
 	        callLog = "\"Call get"+doc.getMultiple()+"ByProperty(\"+properties+\") \"";
-	        ret += writeComment("Returns all "+doc.getName()+" objects which match the given property.");
-	        ret += openFun("public "+listDecl+" get"+doc.getMultiple()+"ByProperty"+"(QueryProperty... properties)"+throwsClause);
-	        ret += generateMethodStart(callLog);
-	        ret += writeStatement("return "+getDAOVariableName(doc)+".get"+doc.getMultiple()+"ByProperty(c, Arrays.asList(properties))");
-	        ret += generateMethodEnd(module, callLog);
-	        ret += closeBlock();
-	        ret += emptyline();
+	        ret.append(writeComment("Returns all "+doc.getName()+" objects which match the given property."));
+	        ret.append(openFun("public "+listDecl+" get"+doc.getMultiple()+"ByProperty"+"(QueryProperty... properties)"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement("return "+getDAOVariableName(doc)+".get"+doc.getMultiple()+"ByProperty(c, Arrays.asList(properties))"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
 	        
 /*	        
-	        ret += writeComment("Returns all "+doc.getName()+" objects which match given properties.");
-	        ret += writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperties"+"(List<QueryProperty> properties)"+throwsClause);
-	        ret += emptyline();
+	        ret.append(writeComment("Returns all "+doc.getName()+" objects which match given properties."));
+	        ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperties"+"(List<QueryProperty> properties)"+throwsClause));
+	        ret.append(emptyline());
 */	        
 	    }
 	    
 
 	    
 	    //generate export function
-	    ret += emptyline();
+	    ret.append(emptyline());
 	    
 	    
-	    ret += closeBlock();
-	    return ret;
+	    ret.append(closeBlock());
+	    return ret.toString();
 	}
 	
 	private String generateMethodStart(String callLog){

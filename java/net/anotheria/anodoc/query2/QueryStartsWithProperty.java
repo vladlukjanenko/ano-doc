@@ -13,5 +13,11 @@ public class QueryStartsWithProperty extends QueryProperty{
 	public Object getValue() {
 		return super.getValue()+"%";
 	}
+
 	
+	public boolean doesMatch(Object o){
+		return o== null ?getOriginalValue() == null :
+			o.toString().startsWith(getOriginalValue().toString());
+	}
+
 }

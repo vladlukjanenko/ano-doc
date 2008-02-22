@@ -21,6 +21,10 @@ public class AbstractGenerator{
 		return "\""+s+"\"";
 	}
 	
+	protected String quote(StringBuilder s){
+		return "\""+s.toString()+"\"";
+	}
+
 	protected String quote(int a){
 		return quote(""+a);
 	}
@@ -121,6 +125,10 @@ public class AbstractGenerator{
 		return CRLF;
 	}
 	
+	protected static void emptyline(StringBuilder b){
+		b.append(CRLF);
+	}
+
 	protected String writeImport(String imp){
 		return writeString("import "+imp+";");
 	}
@@ -129,6 +137,11 @@ public class AbstractGenerator{
 		return writeString("import "+packagename+"."+classname+";");
 	}
 
+	protected void closeBlock(StringBuilder b){
+		decreaseIdent();
+		b.append(writeString("}"));
+	}
+	
 	protected String closeBlock(){
 		decreaseIdent();
 		String ret = writeString("}");
