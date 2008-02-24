@@ -8,6 +8,7 @@ public class MetaViewElement {
 	private boolean readonly;
 	private String name;
 	private boolean comparable;
+	private boolean rich;
 	
 	private MetaDecorator decorator;
 	
@@ -75,5 +76,13 @@ public class MetaViewElement {
 
 	public boolean equals(Object o){
 		return (o instanceof MetaViewElement) && ((MetaViewElement)o).getName().equals(getName());
+	}
+
+	public boolean isRich() {
+		return rich;
+	}
+
+	public void setRich(boolean rich) {
+		this.rich = rich;
 	}
 }

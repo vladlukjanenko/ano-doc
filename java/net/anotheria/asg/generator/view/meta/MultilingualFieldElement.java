@@ -37,6 +37,11 @@ public class MultilingualFieldElement extends MetaFieldElement{
 		return mappedElement.isReadonly();
 	}
 	
+	@Override
+	public boolean isRich() {
+		return mappedElement.isRich();
+	}
+	
 	public String getVariableName(){
 		return getName()+StringUtils.capitalize(language);
 	}

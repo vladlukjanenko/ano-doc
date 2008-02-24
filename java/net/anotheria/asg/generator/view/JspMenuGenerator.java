@@ -8,7 +8,6 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.util.StringUtils;
 
 public class JspMenuGenerator extends AbstractJSPGenerator {
 

@@ -212,6 +212,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	protected String getCurrentJSPath(String jsName){
 		return getJSPath(jsName, context);
 	}
+	
+	protected String getCurrentYUIPath(String yuiName){
+		return getYUIPath(yuiName, context);
+	}
 
 	public static String getCSSPath(String stylesheetName, Context context){
 		return "/"+context.getApplicationName()+"/css/"+stylesheetName;
@@ -221,6 +225,9 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return "/"+context.getApplicationName()+"/js/"+jsName;
 	}
 
+	public static String getYUIPath(String yuiName, Context context){
+		return "/"+context.getApplicationName()+"/yui/"+yuiName;
+	}
 	protected String getPackage(){
 		return getPackage(GeneratorDataRegistry.getInstance().getContext());
 	}

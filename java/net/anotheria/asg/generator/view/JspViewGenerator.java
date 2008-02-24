@@ -495,9 +495,9 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("</head>");
 		ret += writeString("<body>");
 		increaseIdent();		
+		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
 		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
-		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
 		ret += writeString("<tr>");
 		ret += writeIncreasedString("<td class=\"menuTitleSelected\">");
 		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
@@ -543,6 +543,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		}
 		
+		List<MetaViewElement> richTextElements = new ArrayList<MetaViewElement>();
+		
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument(), GeneratorDataRegistry.getInstance().getContext()); 
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
@@ -566,13 +568,17 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			ret += writeString("</td>");
 			
 			ret += writeString("</tr>");
-
-			
+			if(element.isRich()){
+				MetaProperty p = section.getDocument().getField(element.getName());
+				if(!p.getType().equals("text"))
+					break;
+				richTextElements.add(element);
+			}
 		}
 		
-		ret += writeString("</html:form>");
 		decreaseIdent();
 		ret += writeString("</table>");
+		ret += writeString("</html:form>");
 		ret += writeString("<br/>");
 		
 		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
@@ -630,11 +636,83 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		decreaseIdent();
 		ret += writeString("</body>");
 		decreaseIdent();
+		
+		ret += generateRichTextEditors(section.getDocument(), richTextElements);
+		
+		decreaseIdent();
 		ret += writeString("</html:html>");
 		
 		ret += getBaseJSPFooter();
 		
 		return ret;
+	}
+	
+	private String getElementName(MetaDocument doc, MetaViewElement element){
+		MetaProperty p = doc.getField(element.getName());
+		String lang = getElementLanguage(element);
+		return p.getName(lang);
+	}
+	
+	private String getEditorVarName(MetaDocument doc, MetaViewElement element){
+		 return getElementName(doc, element) + "Editor";
+	}
+	
+	private String generateRichTextEditors(MetaDocument doc, List<MetaViewElement> richTextElements){
+		
+		String ret = "";
+		if(richTextElements.size() == 0){
+			ret += writeString("<script type=\"text/javascript\">");
+			ret += writeString("function handleSubmit(){");
+			ret += writeString("	}");
+			ret += writeString("</script>");
+			return ret;
+		}
+		ret += writeString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("editor/assets/skins/sam/editor.css")) + " />");
+		ret += writeString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("editor/assets/skins/sam/container.css")) + " />");
+		ret += writeString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("utilities/utilities.js")) + "></script>");
+		ret += writeString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("container/container.js")) + "></script>");
+		ret += writeString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("editor/editor-beta-min.js")) + "></script>");
+		ret += writeString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("editor/editor-switcher.js")) + "></script>");
+		ret += writeString("<script type=\"text/javascript\">");
+		increaseIdent();
+		for(MetaViewElement el: richTextElements){
+			ret += writeStatement("var " + getEditorVarName(doc, el));
+		}
+		ret += writeString("function handleSubmit(){");
+		increaseIdent();
+		for(MetaViewElement el: richTextElements){
+			ret += writeString("if(isActiveEditor(" + getEditorVarName(doc, el) + "))");
+			ret += writeIncreasedString(getEditorVarName(doc, el) + ".saveHTML();");
+		}
+		decreaseIdent();
+		ret += writeString("}");
+
+		ret += writeString("(function() {");
+		increaseIdent();
+		ret += writeString("var Dom = YAHOO.util.Dom,");
+		ret += writeString("Event = YAHOO.util.Event,");
+		ret += writeString("status = null;"); 
+		ret += writeString("//The Editor config");
+		ret += writeString("var myConfig = {");
+		ret += writeString("width: '660px',"); 
+		ret += writeString("height: '200px',"); 
+		ret += writeString("dompath: false, ");
+		ret += writeString("animate: true, ");
+		ret += writeString("}; ");
+		ret += writeString("//Now let's load the Editor.."); 
+		for(MetaViewElement el: richTextElements){
+			ret += writeString(getEditorVarName(doc, el) + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"', myConfig);"); 
+			ret += writeString(getEditorVarName(doc, el) + ".render(); ");
+		}
+		ret += writeString("Event.onDOMReady(function() {"); 
+		ret += writeString("status = Dom.get('status');"); 
+		ret += writeString("});");
+		decreaseIdent();
+		ret += writeString("})();"); 
+		decreaseIdent();
+		ret += writeString("</script>");
+		return ret;
+		
 	}
 	
 	private String generateElementEditor(MetaDocument doc, MetaViewElement element){
@@ -786,10 +864,14 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private String generateTextEditor(MetaFieldElement element, MetaProperty p){
 		String lang = getElementLanguage(element);
 		String ret ="";
-		ret += "<textarea cols=\"80\" rows=\"15\" name="+quote(p.getName(lang));
+		ret += "<div class=\"yui-skin-sam\">";	
+		if(element.isRich())
+			ret += "<button onclick=\"toggleRichEditor(this,"+ getEditorVarName(((MetaModuleSection)currentSection).getDocument(), element) +");\" type=\"button\">Hide Editor</button>";
+		ret += "<textarea cols=\"80\" rows=\"15\" id="+quote(p.getName(lang))+" name="+quote(p.getName(lang));
 		ret += ">";
 		ret += "<bean:write filter=\"false\" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
 		ret += "</textarea>";
+		ret += "</div>";
 		return ret;
 	}
 
@@ -1289,10 +1371,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	}
 	
 	private String generateUpdateAndStayFunction(MetaDocument doc, MetaFunctionElement element){
-		return "<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>";
+		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>";
 	}
 	private String generateUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
-		return "<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a>";
+		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a>";
 	}
 	
 	
@@ -1351,7 +1433,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			return "<input type="+quote("checkbox")+" name="+quote(name)+" class="+quote(className)+"/>";
 
 		if (field.getType().equals("text"))
-			return "<textarea  name="+quote(name)+" class="+quote(className)+" rows="+quote(3)+" cols="+quote(quote(field.getSize()))+"></textarea>";
+			return "<textarea id="+quote(name)+"  name="+quote(name)+" class="+quote(className)+" rows="+quote(3)+" cols="+quote(quote(field.getSize()))+"></textarea>";
 		
 		if (field.getType().equals("string"))
 			return "<input type=\"text\" size="+quote(field.getSize())+" name="+quote(name)+" class="+quote(className)+"/>";

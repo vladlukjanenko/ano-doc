@@ -188,9 +188,12 @@ public class XMLViewParser {
 	private MetaFieldElement parseFieldElement(Element elem){
 		String name = elem.getAttributeValue("name");
 		String readonly = elem.getAttributeValue("readonly");
+		String rich = elem.getAttributeValue("rich");
 		MetaFieldElement field = new MetaFieldElement(name); 
 		if (readonly!=null && readonly.equals("true"))
 			field.setReadonly(true);
+		if (rich!=null && rich.equals("true"))
+			field.setRich(true);
 		return field;
 	}
 	
