@@ -130,7 +130,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		timer.stopExecution(section.getModule().getName()+"-additional");
 		timer.stopExecution(section.getModule().getName()+"-"+section.getTitle()+"-All");
 
-		timer.printExecutionTimesOrderedByCreation();
+		//timer.printExecutionTimesOrderedByCreation();
 			
 		return files;
 	}
@@ -198,7 +198,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		List<MetaViewElement> elements = section.getElements();
 	    
 	    boolean containsComparable = section.containsComparable();
-	    ret.append(writeStatement("package "+getPackage(section.getModule())));
+	    appendStatement(ret, "package "+getPackage(section.getModule()));
 	    ret.append(emptyline());
 	    
 	    //write imports...
@@ -251,19 +251,19 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 		}
 		
-	    ret.append(writeString("public class "+getShowActionName(section)+" extends "+getBaseActionName(section)+" {"));
+	    appendString(ret, "public class "+getShowActionName(section)+" extends "+getBaseActionName(section)+" {");
 	    increaseIdent();
 	    ret.append(emptyline());
 	    
 	    //generate session attributes constants
-	    ret.append(writeStatement("public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+"+quote(doc.getName())));
-	    ret.append(writeStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+"+quote(doc.getName())));
-	    ret.append(writeStatement("private static final List<String> ITEMS_ON_PAGE_SELECTOR = java.util.Arrays.asList(new String[]{\"5\",\"10\",\"20\",\"25\",\"50\",\"100\",\"500\",\"1000\"})"));
+	    appendStatement(ret, "public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+", quote(doc.getName()));
+	    appendStatement(ret, "public static final String SA_FILTER = SA_FILTER_PREFIX+", quote(doc.getName()));
+	    appendStatement(ret, "private static final List<String> ITEMS_ON_PAGE_SELECTOR = java.util.Arrays.asList(new String[]{\"5\",\"10\",\"20\",\"25\",\"50\",\"100\",\"500\",\"1000\"})");
 	    
 	    boolean containsDecorators = neededDecorators.size() >0;
 	    
 		if (containsComparable){
-			ret.append(writeStatement("private Sorter<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> sorter"));
+			appendStatement(ret, "private Sorter<", ModuleBeanGenerator.getListItemBeanName(doc), "> sorter");
 			ret.append(emptyline());
 		}
 		
@@ -271,7 +271,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			for (int i=0; i<elements.size();i++){
 				MetaViewElement element = (MetaViewElement)elements.get(i);
 				if (element.getDecorator()!=null){
-					ret.append(writeStatement("private IAttributeDecorator "+getDecoratorVariableName(element)));
+					appendStatement(ret, "private IAttributeDecorator "+getDecoratorVariableName(element));
 				}
 			}
 			ret.append(emptyline());
@@ -279,47 +279,47 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		if (section.getFilters().size()>0){
 			for (MetaFilter f : section.getFilters()){
-				ret.append(writeStatement("private DocumentFilter "+getFilterVariableName(f)));
+				appendStatement(ret, "private DocumentFilter "+getFilterVariableName(f));
 			}
 			ret.append(emptyline());
 		}
 			
 		
-		ret.append(writeString("public "+getShowActionName(section)+"(){"));
+		appendString(ret, "public "+getShowActionName(section)+"(){");
 		increaseIdent();
-		ret.append(writeStatement("super()"));
+		appendStatement(ret, "super()");
 		if (containsComparable)
-			ret.append(writeStatement("sorter = new QuickSorter<"+ModuleBeanGenerator.getListItemBeanName(doc)+">()"));
+			appendStatement(ret, "sorter = new QuickSorter<"+ModuleBeanGenerator.getListItemBeanName(doc)+">()");
 		if (containsDecorators){
-			ret.append(writeString("try{ "));
+			appendString(ret, "try{ ");
 			increaseIdent();
 			for (int i=0; i<elements.size();i++){
 				MetaViewElement element = elements.get(i);
 				if (element.getDecorator()!=null){
-					ret.append(writeStatement(getDecoratorVariableName(element)+" = (IAttributeDecorator)Class.forName("+quote(element.getDecorator().getClassName())+").newInstance()"));
+					appendStatement(ret, getDecoratorVariableName(element)+" = (IAttributeDecorator)Class.forName("+quote(element.getDecorator().getClassName())+").newInstance()");
 				}
 			}
 			decreaseIdent();
-			ret.append(writeString("} catch(Exception e){"));
-			ret.append(writeIncreasedStatement("log.fatal(\"Couldn't instantiate decorator:\", e)"));
-			ret.append(writeString("}"));
+			appendString(ret, "} catch(Exception e){");
+			appendIncreasedStatement(ret, "log.fatal(\"Couldn't instantiate decorator:\", e)");
+			appendString(ret, "}");
 		}
 	    //add filters
 		if (section.getFilters().size()>0){
-			ret.append(writeString("try{ "));
+			appendString(ret, "try{ ");
 			increaseIdent();
 			for (MetaFilter f : section.getFilters()){
-				ret.append(writeStatement(getFilterVariableName(f)+" = (DocumentFilter) Class.forName("+quote(f.getClassName())+").newInstance()"));
+				appendStatement(ret, getFilterVariableName(f), " = (DocumentFilter) Class.forName(", quote(f.getClassName()), ").newInstance()");
 			}
 			decreaseIdent();
-			ret.append(writeString("} catch(Exception e){"));
+			appendString(ret, "} catch(Exception e){");
 			ret.append(writeIncreasedStatement("log.fatal(\"Couldn't instantiate filter:\", e)"));
-			ret.append(writeString("}"));
+			appendString(ret, "}");
 		}
-		ret.append(closeBlock());
+		closeBlock(ret);
 		
 
-	    ret.append(writeString(getExecuteDeclaration()));
+	    appendString(ret, getExecuteDeclaration());
 	    increaseIdent();
 	    
 	    if (section.getFilters().size()>0){
@@ -327,18 +327,18 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    		MetaFilter f = section.getFilters().get(i);
 	    		String filterParameterName = "filterParameter"+i;
 		    	//hacky, only one filter at time allowed. otherwise, we must submit the filter name.
-		    	ret.append(writeStatement("String filterParameter"+i+" = "+quote("")));
-		    	ret.append(writeString("try{ "));
-		    	ret.append(writeIncreasedStatement(filterParameterName+" = getStringParameter(req, "+quote("pFilter"+i)+")"));
-		    	ret.append(writeIncreasedStatement("addBeanToSession(req, SA_FILTER+"+quote(i)+", "+filterParameterName+")"));
-		    	ret.append(writeString("}catch(Exception ignored){"));
+		    	appendStatement(ret, "String filterParameter"+i+" = "+quote(""));
+		    	appendString(ret, "try{ ");
+		    	appendIncreasedStatement(ret, filterParameterName+" = getStringParameter(req, "+quote("pFilter"+i)+")");
+		    	appendIncreasedStatement(ret, "addBeanToSession(req, SA_FILTER+"+quote(i)+", "+filterParameterName+")");
+		    	appendString(ret, "}catch(Exception ignored){");
 		    	increaseIdent();
 		    	ret.append(writeCommentLine("no filter parameter given, tring to check in the session."));
-		    	ret.append(writeStatement(filterParameterName+" = (String)getBeanFromSession(req, SA_FILTER+"+quote(i)+")"));
-		    	ret.append(writeString("if ("+filterParameterName+"==null)"));
+		    	appendStatement(ret, filterParameterName+" = (String)getBeanFromSession(req, SA_FILTER+"+quote(i)+")");
+		    	appendString(ret, "if ("+filterParameterName+"==null)");
 		    	ret.append(writeIncreasedStatement(filterParameterName+" = "+quote("")));
-		    	ret.append(closeBlock());
-		    	ret.append(writeStatement("req.setAttribute("+quote("currentFilterParameter"+i)+", "+filterParameterName+")"));
+		    	closeBlock(ret);
+		    	appendStatement(ret, "req.setAttribute("+quote("currentFilterParameter"+i)+", "+filterParameterName+")");
 		    	ret.append(emptyline());
 	    	}
 	    }
@@ -346,41 +346,41 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    //check if its sortable.
 		if (containsComparable){
 			String sortType = ModuleBeanGenerator.getListItemBeanSortTypeName(doc);
-			ret.append(writeStatement("int sortMethod = "+sortType+".SORT_BY_DEFAULT"));
-			ret.append(writeStatement("boolean sortOrder = "+sortType+".ASC"));
-			ret.append(writeStatement("boolean sortParamSet = false"));
+			appendStatement(ret, "int sortMethod = "+sortType+".SORT_BY_DEFAULT");
+			appendStatement(ret, "boolean sortOrder = "+sortType+".ASC");
+			appendStatement(ret, "boolean sortParamSet = false");
 			ret.append(emptyline());
-			ret.append(writeString("try{"));
-			ret.append(writeIncreasedStatement("sortMethod = getIntParameter(req, PARAM_SORT_TYPE)"));
-			ret.append(writeIncreasedStatement("sortParamSet = true"));
-			ret.append(writeString("}catch(Exception ignored){}"));
+			appendString(ret, "try{");
+			appendIncreasedStatement(ret, "sortMethod = getIntParameter(req, PARAM_SORT_TYPE)");
+			appendIncreasedStatement(ret, "sortParamSet = true");
+			appendString(ret, "}catch(Exception ignored){}");
 			ret.append(emptyline());	    
-			ret.append(writeString("try{"));
+			appendString(ret, "try{");
 			ret.append(writeIncreasedStatement("String sortMethodName = getStringParameter(req, PARAM_SORT_TYPE_NAME)"));
 			ret.append(writeIncreasedStatement("sortMethod = "+sortType+".name2method(sortMethodName)"));
 			ret.append(writeIncreasedStatement("sortParamSet = true"));
-			ret.append(writeString("}catch(Exception ignored){}"));
+			appendString(ret, "}catch(Exception ignored){}");
 			ret.append(emptyline());	    
-			ret.append(writeString("try{"));
+			appendString(ret, "try{");
 			increaseIdent();
-			ret.append(writeString("sortOrder = getStringParameter(req, PARAM_SORT_ORDER).equals("+quote(ViewConstants.VALUE_SORT_ORDER_ASC)+") ? "));
+			appendString(ret, "sortOrder = getStringParameter(req, PARAM_SORT_ORDER).equals("+quote(ViewConstants.VALUE_SORT_ORDER_ASC)+") ? ");
 			ret.append(writeIncreasedStatement(""+sortType+".ASC : "+sortType+".DESC"));
 			decreaseIdent();
-			ret.append(writeString("}catch(Exception ignored){}"));
+			appendString(ret, "}catch(Exception ignored){}");
 			ret.append(emptyline());
-			ret.append(writeStatement(ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+" sortType = null"));
-			ret.append(writeString("if (sortParamSet){"));
+			appendStatement(ret, ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+" sortType = null");
+			appendString(ret, "if (sortParamSet){");
 			increaseIdent();
-			ret.append(writeStatement("sortType = new "+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+"(sortMethod, sortOrder)"));
-			ret.append(writeStatement("addBeanToSession(req, SA_SORT_TYPE, sortType)"));
+			appendStatement(ret, "sortType = new "+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+"(sortMethod, sortOrder)");
+			appendStatement(ret, "addBeanToSession(req, SA_SORT_TYPE, sortType)");
 			decreaseIdent();
-			ret.append(writeString("}else{"));
+			appendString(ret, "}else{");
 			increaseIdent();
-			ret.append(writeStatement("sortType = ("+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+")getBeanFromSession(req, SA_SORT_TYPE)"));
-			ret.append(writeString("if (sortType==null)"));
+			appendStatement(ret, "sortType = ("+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+")getBeanFromSession(req, SA_SORT_TYPE)");
+			appendString(ret, "if (sortType==null)");
 			ret.append(writeIncreasedStatement("sortType = new "+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+"(sortMethod, sortOrder)"));
-			ret.append(closeBlock());
-			ret.append(writeStatement("req.setAttribute("+quote("currentSortCode")+", sortType.getMethodAndOrderCode())"));
+			closeBlock(ret);
+			appendStatement(ret, "req.setAttribute("+quote("currentSortCode")+", sortType.getMethodAndOrderCode())");
 			ret.append(emptyline());
 		}
 	    
@@ -388,103 +388,103 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    if (section.getFilters().size()>0){
 		    String unfilteredListName = "_unfiltered_"+listName;
 		    //change this if more than one filter can be triggered at once.
-		    ret.append(writeStatement("List<"+doc.getName()+"> "+unfilteredListName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()"));
-		    ret.append(writeStatement("List<"+doc.getName()+"> "+listName+" = new ArrayList<"+doc.getName()+">()"));
-		    ret.append(writeString("for (int i=0; i<"+unfilteredListName+".size(); i++){"));
+		    appendStatement(ret, "List<"+doc.getName()+"> "+unfilteredListName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
+		    appendStatement(ret, "List<"+doc.getName()+"> "+listName+" = new ArrayList<"+doc.getName()+">()");
+		    appendString(ret, "for (int i=0; i<"+unfilteredListName+".size(); i++){");
 		    increaseIdent();
-		    ret.append(writeStatement("boolean mayPass = true"));
+		    appendStatement(ret, "boolean mayPass = true");
 		    for (int i=0; i<section.getFilters().size(); i++){
 			    MetaFilter activeFilter = section.getFilters().get(i);
 			    String filterVarName = getFilterVariableName(activeFilter);
-			    ret.append(writeStatement("mayPass = mayPass && ("+filterVarName+".mayPass("+unfilteredListName+".get(i), "+quote(activeFilter.getFieldName())+", filterParameter"+i+"))"));
+			    appendStatement(ret, "mayPass = mayPass && ("+filterVarName+".mayPass("+unfilteredListName+".get(i), "+quote(activeFilter.getFieldName())+", filterParameter"+i+"))");
 		    	
 		    }
-		    ret.append(writeString("if (mayPass)"));
+		    appendString(ret, "if (mayPass)");
 		    ret.append(writeIncreasedStatement(listName+".add("+unfilteredListName+".get(i))"));
-		    ret.append(closeBlock());
+		    closeBlock(ret);
 	    }else{
-		    ret.append(writeStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()"));
+		    appendStatement(ret, "List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
 	    }
 
-		ret.append(writeStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())"));
-		ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){"));
+		appendStatement(ret, "List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
+		appendString(ret, "for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){");
 		increaseIdent();
-		ret.append(writeStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")"));
-		ret.append(writeStatement("beans.add(bean)"));
-		ret.append(closeBlock());
+		appendStatement(ret, ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
+		appendStatement(ret, "beans.add(bean)");
+		closeBlock(ret);
 	    ret.append(emptyline());
 	    if (containsComparable){
-	    	ret.append(writeStatement("beans = sorter.sort(beans, sortType)"));
+	    	appendStatement(ret, "beans = sorter.sort(beans, sortType)");
 	    }
 
 	    //paging start
 	    ret.append(writeCommentLine("paging"));
-	    ret.append(writeStatement("int pageNumber = 1")); 
-	    ret.append(writeString("try{"));
+	    appendStatement(ret, "int pageNumber = 1"); 
+	    appendString(ret, "try{");
 	    ret.append(writeIncreasedStatement("pageNumber = Integer.parseInt(req.getParameter("+quote("pageNumber")+"))"));
-	    ret.append(writeString("}catch(Exception ignored){}"));
-	    ret.append(writeStatement("Integer lastItemsOnPage = (Integer)req.getSession().getAttribute(\"currentItemsOnPage\")"));
-	    ret.append(writeStatement("int itemsOnPage = lastItemsOnPage == null ? 20 : lastItemsOnPage")); 
-	    ret.append(writeString("try{"));
-	    ret.append(writeIncreasedStatement("itemsOnPage = Integer.parseInt(req.getParameter("+quote("itemsOnPage")+"))"));
-	    ret.append(writeString("}catch(Exception ignored){}"));
-	    ret.append(writeStatement("Slice<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> slice = Slicer.slice(new Segment(pageNumber, itemsOnPage), beans)"));
-	    ret.append(writeStatement("beans = slice.getSliceData()"));
+	    appendString(ret, "}catch(Exception ignored){}");
+	    appendStatement(ret, "Integer lastItemsOnPage = (Integer)req.getSession().getAttribute(\"currentItemsOnPage\")");
+	    appendStatement(ret, "int itemsOnPage = lastItemsOnPage == null ? 20 : lastItemsOnPage"); 
+	    appendString(ret, "try{");
+	    appendIncreasedStatement(ret, "itemsOnPage = Integer.parseInt(req.getParameter("+quote("itemsOnPage")+"))");
+	    appendString(ret, "}catch(Exception ignored){}");
+	    appendStatement(ret, "Slice<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> slice = Slicer.slice(new Segment(pageNumber, itemsOnPage), beans)");
+	    appendStatement(ret, "beans = slice.getSliceData()");
 	    ret.append(emptyline());
 	    
 	    ret.append(writeCommentLine("prepare paging links"));
-	    ret.append(writeStatement("ArrayList<PagingLink> pagingLinks = new ArrayList<PagingLink>()"));
-		ret.append(writeStatement("pagingLinks.add(new PagingLink(slice.isFirstSlice() ? null : \"1\", \"|<<\"))"));
-		ret.append(writeStatement("pagingLinks.add(new PagingLink(slice.hasPrevSlice() ? \"\"+(slice.getCurrentSlice()-1) : null, \"<<\"))"));
+	    appendStatement(ret, "ArrayList<PagingLink> pagingLinks = new ArrayList<PagingLink>()");
+		appendStatement(ret, "pagingLinks.add(new PagingLink(slice.isFirstSlice() ? null : \"1\", \"|<<\"))");
+		appendStatement(ret, "pagingLinks.add(new PagingLink(slice.hasPrevSlice() ? \"\"+(slice.getCurrentSlice()-1) : null, \"<<\"))");
 		
-		ret.append(writeString("for (int i=1; i<slice.getCurrentSlice(); i++){"));
+		appendString(ret, "for (int i=1; i<slice.getCurrentSlice(); i++){");
 		increaseIdent();
-		ret.append(writeString("if (slice.getCurrentSlice()-i<=7)"));
+		appendString(ret, "if (slice.getCurrentSlice()-i<=7)");
 		ret.append(writeIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))"));
-		ret.append(closeBlock());
+		closeBlock(ret);
 		
-		ret.append(writeStatement("pagingLinks.add(new PagingLink(null, \"Page \"+(slice.getCurrentSlice()+\" of \"+slice.getTotalNumberOfSlices())))"));
+		appendStatement(ret, "pagingLinks.add(new PagingLink(null, \"Page \"+(slice.getCurrentSlice()+\" of \"+slice.getTotalNumberOfSlices())))");
 		
-		ret.append(writeString("for (int i=slice.getCurrentSlice()+1; i<=slice.getTotalNumberOfSlices(); i++){"));
+		appendString(ret, "for (int i=slice.getCurrentSlice()+1; i<=slice.getTotalNumberOfSlices(); i++){");
 		increaseIdent();
-		ret.append(writeString("if (i-slice.getCurrentSlice()<=7)"));
+		appendString(ret, "if (i-slice.getCurrentSlice()<=7)");
 		ret.append(writeIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))"));
-		ret.append(closeBlock());
+		closeBlock(ret);
 		
 		
-		ret.append(writeStatement("pagingLinks.add(new PagingLink(slice.hasNextSlice() ?  \"\"+(slice.getCurrentSlice()+1) : null, \">>\"))"));
-		ret.append(writeStatement("pagingLinks.add(new PagingLink(slice.isLastPage() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))"));
+		appendStatement(ret, "pagingLinks.add(new PagingLink(slice.hasNextSlice() ?  \"\"+(slice.getCurrentSlice()+1) : null, \">>\"))");
+		appendStatement(ret, "pagingLinks.add(new PagingLink(slice.isLastPage() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))");
 	    ret.append(writeCommentLine(" paging links end"));
 	    
-	    ret.append(writeStatement("req.setAttribute("+quote("paginglinks")+", pagingLinks)"));
-	    ret.append(writeStatement("req.setAttribute("+quote("currentpage")+", pageNumber)"));
-	    ret.append(writeStatement("req.setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)"));
-	    ret.append(writeStatement("req.getSession().setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)"));
-	    ret.append(writeStatement("req.setAttribute("+quote("PagingSelector")+", ITEMS_ON_PAGE_SELECTOR)"));
+	    appendStatement(ret, "req.setAttribute("+quote("paginglinks")+", pagingLinks)");
+	    appendStatement(ret, "req.setAttribute("+quote("currentpage")+", pageNumber)");
+	    appendStatement(ret, "req.setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)");
+	    appendStatement(ret, "req.getSession().setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)");
+	    appendStatement(ret, "req.setAttribute("+quote("PagingSelector")+", ITEMS_ON_PAGE_SELECTOR)");
 	    ret.append(emptyline());
 	    //paging end
 	    
 	    
 	    
-	    ret.append(writeStatement("addBeanToRequest(req, "+quote(listName)+", beans)"));
+	    appendStatement(ret, "addBeanToRequest(req, "+quote(listName)+", beans)");
 	    
 	    //add filters
 	    for (MetaFilter f : section.getFilters()){
-	    	ret.append(writeStatement("addBeanToRequest(req, "+quote(getFilterVariableName(f))+", "+getFilterVariableName(f)+".getTriggerer(\"\"))"));
+	    	appendStatement(ret, "addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\"\"))");
 	    }
 	    
-	    ret.append(writeStatement("return mapping.findForward(\"success\")"));
-	    ret.append(closeBlock());
+	    appendStatement(ret, "return mapping.findForward(\"success\")");
+	    closeBlock(ret);
 	    ret.append(emptyline());
 	    
 	    
 	    // BEAN creation function
-	    ret.append(writeString("protected "+ModuleBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+"){"));
+	    appendString(ret, "protected "+ModuleBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	    increaseIdent();
-	    ret.append(writeStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = new "+ModuleBeanGenerator.getListItemBeanName(doc)+"()"));
+	    appendStatement(ret, ModuleBeanGenerator.getListItemBeanName(doc)+" bean = new "+ModuleBeanGenerator.getListItemBeanName(doc)+"()");
 	    //set the properties.
 	    //this is a hack...
-	    ret.append(writeStatement("bean.setPlainId("+doc.getVariableName()+".getId())"));
+	    appendStatement(ret, "bean.setPlainId("+doc.getVariableName()+".getId())");
 
 		elements = createMultilingualList(elements, doc, context);
 		for (int i=0; i<elements.size(); i++){
@@ -506,11 +506,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						else
 							tmp = new MetaProperty(p.getName()+"ForSorting", p.getType());
 							
-						ret.append(writeStatement("bean."+tmp.toBeanSetter(lang)+"("+value+")"));
+						appendStatement(ret, "bean."+tmp.toBeanSetter(lang)+"("+value+")");
 						MetaDecorator d = element.getDecorator();
 						value = getDecoratorVariableName(element)+".decorate("+doc.getVariableName()+", "+quote(p.getName())+", "+quote(d.getRule())+")";
 					}
-					ret.append(writeStatement("bean."+p.toBeanSetter(lang)+"("+value+")"));
+					appendStatement(ret, "bean."+p.toBeanSetter(lang)+"("+value+")");
 				}else{
 					String value = "";
 					if (p instanceof MetaEnumerationProperty){
@@ -526,24 +526,24 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 							else
 								tmp = new MetaProperty(p.getName()+"ForSorting", p.getType());
 
-							ret.append(writeStatement("bean."+tmp.toBeanSetter()+"("+value+")"));
+							appendStatement(ret, "bean."+tmp.toBeanSetter()+"("+value+")");
 							MetaDecorator d = element.getDecorator();
 							value = getDecoratorVariableName(element)+".decorate("+doc.getVariableName()+", "+quote(p.getName()+(lang==null?"":"_"+lang))+", "+quote(d.getRule())+")";
 						}
 					}
-					ret.append(writeStatement("bean."+p.toBeanSetter(lang)+"("+value+")"));
+					appendStatement(ret, "bean."+p.toBeanSetter(lang)+"("+value+")");
 				}
 			}
 		}
 		
-		ret.append(writeStatement("bean.setDocumentLastUpdateTimestamp(NumberUtils.makeISO8601TimestampString("+doc.getVariableName()+".getLastUpdateTimestamp()))"));
+		appendStatement(ret, "bean.setDocumentLastUpdateTimestamp(NumberUtils.makeISO8601TimestampString("+doc.getVariableName()+".getLastUpdateTimestamp()))");
 	    
-	    ret.append(writeStatement("return bean"));
-	    ret.append(closeBlock());
+	    appendStatement(ret, "return bean");
+	    closeBlock(ret);
 	    ret.append(emptyline());
 	    
 	    
-	    ret.append(closeBlock());
+	    closeBlock(ret);
 	    return ret.toString();
 	}
 	
@@ -1271,64 +1271,64 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private String generateDeleteAction(MetaModuleSection section){
-	    String ret = "";
+	    StringBuilder ret = new StringBuilder(1000);
 	    MetaDocument doc = section.getDocument();
-	    ret += writeStatement("package "+getPackage(section.getModule()));
-	    ret += emptyline();
+	    appendStatement(ret, "package "+getPackage(section.getModule()));
+	    emptyline(ret);
 
 	    //write imports...
-	    ret += getStandardActionImports();
+	    appendStandardActionImports(ret);
 	    
-	    ret += writeString("public class "+getDeleteActionName(section)+" extends "+getBaseActionName(section)+" {");
+	    appendString(ret, "public class "+getDeleteActionName(section)+" extends "+getBaseActionName(section)+" {");
 	    increaseIdent();
-	    ret += emptyline();
+	    emptyline(ret);
 	    
-	    ret += writeString(getExecuteDeclaration());
+	    appendString(ret, getExecuteDeclaration());
 	    increaseIdent();
-	    ret += writeStatement("String id = getStringParameter(req, PARAM_ID)");
-	    ret += writeStatement(getServiceGetterCall(section.getModule())+".delete"+doc.getName()+"(id)");
-	    ret += writeStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
-	    ret += writeStatement("return null");
-	    ret += closeBlock();
-	    ret += emptyline();
+	    appendStatement(ret, "String id = getStringParameter(req, PARAM_ID)");
+	    appendStatement(ret, getServiceGetterCall(section.getModule())+".delete"+doc.getName()+"(id)");
+	    appendStatement(ret, "res.sendRedirect("+getShowActionRedirect(doc)+")");
+	    appendStatement(ret, "return null");
+	    closeBlock(ret);
+	    emptyline(ret);
 	    
-	    ret += closeBlock();
-	    return ret;
+	    closeBlock(ret);
+	    return ret.toString();
 	}
 
 	private String generateDuplicateAction(MetaModuleSection section){
-		String ret = "";
+		StringBuilder ret = new StringBuilder(1000);
 		MetaDocument doc = section.getDocument();
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
+		appendStatement(ret, "package "+getPackage(section.getModule()));
+		emptyline(ret);
 
 		//write imports...
-		ret += getStandardActionImports();
-		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		ret += writeImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+		appendStandardActionImports(ret);
+		appendImport(ret, DataFacadeGenerator.getDocumentImport(context, doc));
+		appendImport(ret, DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	    
-		ret += writeString("public class "+getDuplicateActionName(section)+" extends "+getBaseActionName(section)+" {");
+		appendString(ret, "public class "+getDuplicateActionName(section)+" extends "+getBaseActionName(section)+" {");
 		increaseIdent();
-		ret += emptyline();
+		emptyline(ret);
 	    
-		ret += writeString(getExecuteDeclaration());
+		appendString(ret, getExecuteDeclaration());
 		increaseIdent();
-		ret += writeStatement("String id = getStringParameter(req, PARAM_ID)");
-		ret += writeStatement(doc.getName()+" "+doc.getVariableName()+"Src = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
-		ret += writeStatement(doc.getName()+" "+doc.getVariableName()+"Dest = "+DataFacadeGenerator.getDocumentFactoryName(doc)+".create"+doc.getName()+"("+doc.getVariableName()+"Src)");
+		appendStatement(ret, "String id = getStringParameter(req, PARAM_ID)");
+		appendStatement(ret, doc.getName()+" "+doc.getVariableName()+"Src = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+		appendStatement(ret, doc.getName()+" "+doc.getVariableName()+"Dest = "+DataFacadeGenerator.getDocumentFactoryName(doc)+".create"+doc.getName()+"("+doc.getVariableName()+"Src)");
 
-		ret += writeStatement(getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+"Dest"+")");
-	    ret += writeStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
-	    ret += writeStatement("return null");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement(ret, getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+"Dest"+")");
+	    appendStatement(ret, "res.sendRedirect("+getShowActionRedirect(doc)+")");
+	    appendStatement(ret, "return null");
+		closeBlock(ret);
+		emptyline(ret);
 	    
-		ret += closeBlock();
-		return ret;
+		closeBlock(ret);
+		return ret.toString();
 	}
 
 	private String generateNewAction(MetaModuleSection section){
-		String ret = "";
+		StringBuilder ret = new StringBuilder(2500);
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
 		//List<MetaViewElement> elements = dialog.getElements();
@@ -1336,13 +1336,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		EnumerationPropertyGenerator enumPropGen = new EnumerationPropertyGenerator(doc);
 		
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
+		appendStatement(ret, "package "+getPackage(section.getModule()));
+		emptyline(ret);
 
 		//write imports...
-		ret += getStandardActionImports();
-		ret += writeImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
-		ret += emptyline();
+		appendStandardActionImports(ret);
+		appendImport(ret, ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
+		emptyline(ret);
 
 		//check if we have to import list.
 		for (int i=0; i<elements.size(); i++){
@@ -1351,9 +1351,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());
 				if (p.isLinked() || p instanceof MetaEnumerationProperty){
-					ret += writeImport("java.util.List");
-					ret += writeImport("java.util.ArrayList");
-					ret += writeImport("net.anotheria.webutils.bean.LabelValueBean");
+					appendImport(ret, "java.util.List");
+					appendImport(ret, "java.util.ArrayList");
+					appendImport(ret, "net.anotheria.webutils.bean.LabelValueBean");
 					break;
 				}
 			}
@@ -1371,7 +1371,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
 					if (importedEnumerations.get(mep.getName())==null){
 						EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-						ret += writeImport(EnumerationGenerator.getUtilsImport(type));
+						appendImport(ret, EnumerationGenerator.getUtilsImport(type));
 						//System.out.println("Adding enumeration import: "+mep.getType()+", "+mep+", "+mep.getName());
 						importedEnumerations.put(mep.getName(), mep);
 					}
@@ -1379,17 +1379,17 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 		}
 		
-		ret += emptyline();
+		emptyline(ret);
 	    
-		ret += writeString("public class "+getNewActionName(section)+" extends "+getShowActionName(section)+" {");
+		appendString(ret, "public class "+getNewActionName(section)+" extends "+getShowActionName(section)+" {");
 		increaseIdent();
-		ret += emptyline();
+		emptyline(ret);
 	    
-		ret += writeString(getExecuteDeclaration());
+		appendString(ret, getExecuteDeclaration());
 		increaseIdent();
 	
-		ret += writeStatement(ModuleBeanGenerator.getDialogBeanName(dialog, doc)+" form = new "+ModuleBeanGenerator.getDialogBeanName(dialog, doc)+"() ");	
-		ret += writeStatement("form.setId("+quote("")+")");
+		appendStatement(ret, ModuleBeanGenerator.getDialogBeanName(dialog, doc)+" form = new "+ModuleBeanGenerator.getDialogBeanName(dialog, doc)+"() ");	
+		appendStatement(ret, "form.setId("+quote("")+")");
 		
 		Set<String> linkTargets = new HashSet<String>();
 		
@@ -1405,72 +1405,72 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
 					MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
 					String listName = targetDocument.getMultiple().toLowerCase();
-					ret += emptyline();
+					emptyline(ret);
 					
 					if (linkTargets.contains(link.getLinkTarget())){
-						ret += writeString("//link "+link.getName()+" to "+link.getLinkTarget()+" reuses collection.");
+						appendString(ret, "//link "+link.getName()+" to "+link.getLinkTarget()+" reuses collection.");
 					}else{
-						ret += writeString("//link "+link.getName()+" to "+link.getLinkTarget());
-						ret += writeStatement("List<"+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
-						ret += writeStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
-						ret += writeStatement(listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
-						ret += writeString("for ("+(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
+						appendString(ret, "//link "+link.getName()+" to "+link.getLinkTarget());
+						appendStatement(ret, "List<"+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
+						appendStatement(ret, "List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
+						appendStatement(ret, listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
+						appendString(ret, "for ("+(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
 						increaseIdent();
 						
-						ret += writeStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+".getId(), "+targetDocument.getVariableName()+".getName() )");
-						ret += writeStatement(listName+"Values.add(bean)");
-						ret += closeBlock();
+						appendStatement(ret, "LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+".getId(), "+targetDocument.getVariableName()+".getName() )");
+						appendStatement(ret, listName+"Values.add(bean)");
+						closeBlock(ret);
 					}
 					
 					String lang = getElementLanguage(element);
-					ret += writeStatement("form."+p.toBeanSetter()+"Collection"+(lang==null ? "" : lang)+"("+listName+"Values"+")");
+					appendStatement(ret, "form."+p.toBeanSetter()+"Collection"+(lang==null ? "" : lang)+"("+listName+"Values"+")");
 					linkTargets.add(link.getLinkTarget());
 				}//...end if (p.isLinked())
 
 				if (p instanceof MetaEnumerationProperty){
-				    ret += enumPropGen.generateEnumerationPropertyHandling((MetaEnumerationProperty)p, false);
+				    ret.append(enumPropGen.generateEnumerationPropertyHandling((MetaEnumerationProperty)p, false));
 				}
 				
 			}
 		}
 
-		ret += emptyline();
-		ret += writeStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
-		ret += writeStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Create")+")");
+		emptyline(ret);
+		appendStatement(ret, "addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
+		appendStatement(ret, "addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Create")+")");
 
-		ret += writeStatement("return mapping.findForward(\"success\")");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement(ret, "return mapping.findForward(\"success\")");
+		closeBlock(ret);
+		emptyline(ret);
 	    
-		ret += closeBlock();
-		return ret;
+		closeBlock(ret);
+		return ret.toString();
 	}
 
 	private String generateBaseAction(MetaModuleSection section){
-	    String ret = "";
+	    StringBuilder ret = new StringBuilder(1000);
 
 	    //MetaDocument doc = section.getDocument();
 //	    MetaModule mod = section.getModule();
 	    
-	    ret += writeStatement("package "+getPackage(section.getModule()));
-	    ret += emptyline();
-	    ret += writeImport(context.getPackageName(MetaModule.SHARED)+".action."+BaseViewActionGenerator.getViewActionName(view));
-	    ret += emptyline();
+	    appendStatement(ret, "package "+getPackage(section.getModule()));
+	    emptyline(ret);
+	    appendImport(ret, context.getPackageName(MetaModule.SHARED)+".action."+BaseViewActionGenerator.getViewActionName(view));
+	    emptyline(ret);
 	    
-	    ret += writeString("public abstract class "+getBaseActionName(section)+" extends "+BaseViewActionGenerator.getViewActionName(view)+" {");
+	    appendString(ret, "public abstract class "+getBaseActionName(section)+" extends "+BaseViewActionGenerator.getViewActionName(view)+" {");
 	    increaseIdent();
-	    ret += emptyline();
+	    emptyline(ret);
 
 	    //generate getTitle
-	    ret += writeString("public String getTitle(){");
+	    appendString(ret, "public String getTitle(){");
 	    increaseIdent();
-	    ret += writeStatement("return "+quote(section.getTitle()));
-	    ret += closeBlock();
-	    ret += emptyline();
+	    appendStatement(ret, "return "+quote(section.getTitle()));
+	    closeBlock(ret);
+	    emptyline(ret);
 	    
 	    
-	    ret += closeBlock();
-	    return ret;
+	    closeBlock(ret);
+	    return ret.toString();
 	}
 	
 	/**
@@ -1618,40 +1618,40 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private String generateListAddRowAction(MetaModuleSection section, MetaListProperty list){
-		String ret = "";
+		StringBuilder ret = new StringBuilder(1000);
 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
+		appendStatement(ret, "package ", getPackage(section.getModule()));
+		emptyline(ret);
 	    
 		//write imports...
-		ret += getStandardActionImports();
-		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
-		ret += emptyline();
+		appendStandardActionImports(ret);
+		appendImport(ret, DataFacadeGenerator.getDocumentImport(context, doc));
+		appendImport(ret, ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
+		emptyline(ret);
 		
-		ret += writeString("public class "+getContainerAddEntryActionName(doc, list)+" extends "+getContainerShowActionName(doc, list)+"{");	
+		appendString(ret, "public class "+getContainerAddEntryActionName(doc, list)+" extends "+getContainerShowActionName(doc, list)+"{");	
 		increaseIdent();
-		ret += emptyline();
-		ret += writeString(getExecuteDeclaration());
+		emptyline(ret);
+		appendString(ret, getExecuteDeclaration());
 		increaseIdent();
-		ret += writeStatement(ModuleBeanGenerator.getContainerEntryFormName(list)+" form = ("+ModuleBeanGenerator.getContainerEntryFormName(list)+") af");
-		ret += writeStatement("String id = form.getOwnerId()");
-		ret += writeStatement(doc.getName()+" "+doc.getVariableName());
-		ret += writeStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+		appendStatement(ret, ModuleBeanGenerator.getContainerEntryFormName(list)+" form = ("+ModuleBeanGenerator.getContainerEntryFormName(list)+") af");
+		appendStatement(ret, "String id = form.getOwnerId()");
+		appendStatement(ret, doc.getName()+" "+doc.getVariableName());
+		appendStatement(ret, doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
 		
 		String call = "";
 		MetaProperty p = list.getContainedProperty();
 		String getter = "form."+p.toBeanGetter()+"()";
 		call += getter;
-		ret += writeStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"("+call+")");
-		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
-		ret += writeStatement("return "+getSuperCall());
-		ret += closeBlock();
-		ret += closeBlock();
+		appendStatement(ret, doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"("+call+")");
+		appendStatement(ret, getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
+		appendStatement(ret, "return "+getSuperCall());
+		closeBlock(ret);
+		closeBlock(ret);
 		
-		return ret;
+		return ret.toString();
 
 
 	}
@@ -1974,80 +1974,80 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private String generateListShowAction(MetaModuleSection section, MetaListProperty list){
-		String ret = "";
+		StringBuilder ret = new StringBuilder(5000);
 
 
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
+		appendStatement(ret, "package "+getPackage(section.getModule()));
+		emptyline(ret);
 	    
 		//write imports...
-		ret += writeImport("java.util.List");
-		ret += writeImport("java.util.ArrayList");
-		ret += getStandardActionImports();
-		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
+		appendImport(ret, "java.util.List");
+		appendImport(ret, "java.util.ArrayList");
+		appendStandardActionImports(ret);
+		appendImport(ret, DataFacadeGenerator.getDocumentImport(context, doc));
+		appendImport(ret, ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
 		if (list.getContainedProperty().isLinked()){
-			ret += writeImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
+			appendImport(ret, ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
 			MetaLink link = (MetaLink)list.getContainedProperty();
 			String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
 			MetaModule targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
 			MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
-			ret += writeImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
-			ret += writeImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
-			ret += writeImport("net.anotheria.anodoc.data.NoSuchDocumentException");
+			appendImport(ret, DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
+			appendImport(ret, DataFacadeGenerator.getSortTypeImport(targetDocument));
+			appendImport(ret, "net.anotheria.anodoc.data.NoSuchDocumentException");
 
 		}
-		ret += emptyline();
+		emptyline(ret);
 
-		ret += writeString("public class "+getContainerShowActionName(doc, list)+" extends "+getBaseActionName(section)+" {");
+		appendString(ret, "public class "+getContainerShowActionName(doc, list)+" extends "+getBaseActionName(section)+" {");
 		increaseIdent();
-		ret += emptyline();
-		ret += writeString(getExecuteDeclaration());
+		emptyline(ret);
+		appendString(ret, getExecuteDeclaration());
 		increaseIdent();
-		ret += writeStatement("String id = getStringParameter(req, PARAM_ID)");
-		ret += writeStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
-		ret += emptyline();
+		appendStatement(ret, "String id = getStringParameter(req, PARAM_ID)");
+		appendStatement(ret, doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+		emptyline(ret);
 		
-		ret += writeStatement(ModuleBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(list)+"() ");
-		ret += writeStatement("form.setPosition(-1)"); //hmm?
-		ret += writeStatement("form.setOwnerId("+doc.getVariableName()+".getId())");	
-		ret += writeStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerEntryFormName(doc, list))+", form)");
-		ret += emptyline();
+		appendStatement(ret, ModuleBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(list)+"() ");
+		appendStatement(ret, "form.setPosition(-1)"); //hmm?
+		appendStatement(ret, "form.setOwnerId("+doc.getVariableName()+".getId())");	
+		appendStatement(ret, "addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerEntryFormName(doc, list))+", form)");
+		emptyline(ret);
 		
 		if (list.getContainedProperty().isLinked()){
-			ret += writeStatement(ModuleBeanGenerator.getContainerQuickAddFormName(list)+" quickAddForm = new "+ModuleBeanGenerator.getContainerQuickAddFormName(list)+"() ");
-			ret += writeStatement("quickAddForm.setOwnerId("+doc.getVariableName()+".getId())");	
-			ret += writeStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerQuickAddFormName(doc, list))+", quickAddForm)");
-			ret += emptyline();
+			appendStatement(ret, ModuleBeanGenerator.getContainerQuickAddFormName(list)+" quickAddForm = new "+ModuleBeanGenerator.getContainerQuickAddFormName(list)+"() ");
+			appendStatement(ret, "quickAddForm.setOwnerId("+doc.getVariableName()+".getId())");	
+			appendStatement(ret, "addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerQuickAddFormName(doc, list))+", quickAddForm)");
+			emptyline(ret);
 		}
 
 		if (list.getContainedProperty().isLinked()){
 			//generate list collection
 			MetaLink link = (MetaLink)list.getContainedProperty();
-			ret += emptyline();
-			ret += writeString("//link "+link.getName()+" to "+link.getLinkTarget());
+			emptyline(ret);
+			appendString(ret, "//link "+link.getName()+" to "+link.getLinkTarget());
 			MetaModule targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
 			String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
 			MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
 			String listName = targetDocument.getMultiple().toLowerCase();
 			String sortType = "new "+DataFacadeGenerator.getSortTypeName(targetDocument);
 			sortType += "("+DataFacadeGenerator.getSortTypeName(targetDocument)+".SORT_BY_NAME)";
-			ret += writeStatement("List<"+targetDocument.getName()+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"("+sortType+")");
-			ret += writeStatement("List<net.anotheria.webutils.bean.LabelValueBean> "+listName+"Values = new ArrayList<net.anotheria.webutils.bean.LabelValueBean>("+listName+".size())");
-			ret += writeString("for (int i=0; i<"+listName+".size(); i++){");
+			appendStatement(ret, "List<"+targetDocument.getName()+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"("+sortType+")");
+			appendStatement(ret, "List<net.anotheria.webutils.bean.LabelValueBean> "+listName+"Values = new ArrayList<net.anotheria.webutils.bean.LabelValueBean>("+listName+".size())");
+			appendString(ret, "for (int i=0; i<"+listName+".size(); i++){");
 			increaseIdent();
-			ret += writeStatement(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+" "+targetDocument.getTemporaryVariableName()+" = ("+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+") "+listName+".get(i)");
-			ret += writeStatement("net.anotheria.webutils.bean.LabelValueBean bean = new net.anotheria.webutils.bean.LabelValueBean("+targetDocument.getTemporaryVariableName()+".getId(), "+targetDocument.getTemporaryVariableName()+".getName()+\" [\"+"+targetDocument.getTemporaryVariableName()+".getId()+\"]\" )");
-			ret += writeStatement(listName+"Values.add(bean)");
-			ret += closeBlock();
-			ret += writeStatement("addBeanToRequest(req, "+quote(listName+"Values")+", "+listName+"Values"+")");
-			ret += writeStatement("form."+list.getContainedProperty().toBeanSetter()+"Collection("+listName+"Values"+")");
+			appendStatement(ret, DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+" "+targetDocument.getTemporaryVariableName()+" = ("+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+") "+listName+".get(i)");
+			appendStatement(ret, "net.anotheria.webutils.bean.LabelValueBean bean = new net.anotheria.webutils.bean.LabelValueBean("+targetDocument.getTemporaryVariableName()+".getId(), "+targetDocument.getTemporaryVariableName()+".getName()+\" [\"+"+targetDocument.getTemporaryVariableName()+".getId()+\"]\" )");
+			appendStatement(ret, listName+"Values.add(bean)");
+			closeBlock(ret);
+			appendStatement(ret, "addBeanToRequest(req, "+quote(listName+"Values")+", "+listName+"Values"+")");
+			appendStatement(ret, "form."+list.getContainedProperty().toBeanSetter()+"Collection("+listName+"Values"+")");
 			
 		}
 		
-		ret += writeString("// generate list ...");
+		appendString(ret, "// generate list ...");
 		MetaModule targetModule = null;
 		MetaDocument targetDocument = null;
 		
@@ -2061,38 +2061,38 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}		
 		
 		
-		ret += writeStatement("int size = "+doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName(list)+"()");
-		ret += writeStatement("List<"+ModuleBeanGenerator.getContainerEntryFormName(list)+"> beans = new ArrayList<"+ModuleBeanGenerator.getContainerEntryFormName(list)+">(size)");
-		//ret += writeStatement("List elements = "+doc.getVariableName()+".get"+list.getAccesserName()+"()");
+		appendStatement(ret, "int size = "+doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName(list)+"()");
+		appendStatement(ret, "List<"+ModuleBeanGenerator.getContainerEntryFormName(list)+"> beans = new ArrayList<"+ModuleBeanGenerator.getContainerEntryFormName(list)+">(size)");
+		//appendStatement(ret, "List elements = "+doc.getVariableName()+".get"+list.getAccesserName()+"()");
 		
 		
-		ret += writeString("for (int i=0; i<size; i++){");
+		appendString(ret, "for (int i=0; i<size; i++){");
 		increaseIdent();
-		ret += writeStatement(list.getContainedProperty().toJavaType() + " value = "+doc.getVariableName()+"."+DataFacadeGenerator.getListElementGetterName(list)+"(i)");
-		ret += writeStatement(ModuleBeanGenerator.getContainerEntryFormName(list)+" bean = new "+ModuleBeanGenerator.getContainerEntryFormName(list)+"()");
-		ret += writeStatement("bean.setOwnerId("+doc.getVariableName()+".getId())");
-		ret += writeStatement("bean.setPosition(i)");
-		ret += writeStatement("bean."+list.getContainedProperty().toSetter()+"(value)");
+		appendStatement(ret, list.getContainedProperty().toJavaType() + " value = "+doc.getVariableName()+"."+DataFacadeGenerator.getListElementGetterName(list)+"(i)");
+		appendStatement(ret, ModuleBeanGenerator.getContainerEntryFormName(list)+" bean = new "+ModuleBeanGenerator.getContainerEntryFormName(list)+"()");
+		appendStatement(ret, "bean.setOwnerId("+doc.getVariableName()+".getId())");
+		appendStatement(ret, "bean.setPosition(i)");
+		appendStatement(ret, "bean."+list.getContainedProperty().toSetter()+"(value)");
 		if (list.getContainedProperty().isLinked()){
-			ret += writeString("try{");
+			appendString(ret, "try{");
 			increaseIdent();
-			ret += writeStatement(targetDocument.getName()+" "+targetDocument.getTemporaryVariableName()+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getName()+"(value)");
+			appendStatement(ret, targetDocument.getName()+" "+targetDocument.getTemporaryVariableName()+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getName()+"(value)");
 			//THIS is the hack
-			ret += writeStatement("bean.setDescription("+targetDocument.getTemporaryVariableName()+".getName())");
+			appendStatement(ret, "bean.setDescription("+targetDocument.getTemporaryVariableName()+".getName())");
 			decreaseIdent();
-			ret += writeString("}catch(NoSuchDocumentException e){");
-			ret += writeIncreasedStatement("bean.setDescription(\"*** DELETED ***\")");
-			ret += writeString("}");
+			appendString(ret, "}catch(NoSuchDocumentException e){");
+			appendIncreasedStatement(ret, "bean.setDescription(\"*** DELETED ***\")");
+			appendString(ret, "}");
 		}
-		ret += writeStatement("beans.add(bean)");
-		ret += closeBlock();		
-		ret += writeStatement("addBeanToRequest(req, "+quote("elements")+", beans)");
+		appendStatement(ret, "beans.add(bean)");
+		closeBlock(ret);		
+		appendStatement(ret, "addBeanToRequest(req, "+quote("elements")+", beans)");
 //*/		
-		ret += writeStatement("return mapping.findForward("+quote("success")+")");
-		ret += closeBlock();
-		ret += closeBlock();
+		appendStatement(ret, "return mapping.findForward(", quote("success"), ")");
+		closeBlock(ret);
+		closeBlock(ret);
 		
-		return ret;
+		return ret.toString();
 	}	
 
 	private String generateTableShowAction(MetaModuleSection section, MetaTableProperty table){

@@ -65,7 +65,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		
 		writeFiles(files);
 		
-		timer.printExecutionTimesOrderedByCreation();
+	//	timer.printExecutionTimesOrderedByCreation();
 	}
 	
 	public List<FileEntry> generateView(String path, MetaView view){
