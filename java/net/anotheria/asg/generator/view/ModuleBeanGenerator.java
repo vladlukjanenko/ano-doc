@@ -46,6 +46,7 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -77,7 +78,12 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		
 		//System.out.println("Generate section: "+section);
 		
+		ExecutionTimer timer = new ExecutionTimer("BeanGenerator");
+		timer.startExecution("All");
+
+		timer.startExecution(section.getModule().getName()+"-"+section.getTitle()+"-ListItem");
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getListItemBeanName(section.getDocument()), generateListItemBean(section)));
+		timer.stopExecution(section.getModule().getName()+"-"+section.getTitle()+"-ListItem");
 		String sortTypeContent = generateListItemSortType(section);
 		if (sortTypeContent!=null)
 			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getListItemBeanSortTypeName(section.getDocument()), sortTypeContent));
@@ -99,6 +105,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	//	files.add(new FileEntry(FileEntry.package2path(getPackage()), getShowActionName(section), generateShowAction(section)));
 		//files.add(new FileEntry(FileEntry.package2path(getPackage()), getDeleteActionName(section), generateDeleteAction(section)));
 		
+		timer.stopExecution("All");
+//		timer.printExecutionTimesOrderedByCreation();
 		
 		
 		
