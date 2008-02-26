@@ -110,22 +110,22 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
 	    }
-	    ret.append(emptyline());
-	    ret.append(writeImport("net.anotheria.asg.util.listener.IServiceListener"));
-	    ret.append(writeImport("net.anotheria.anodoc.query2.DocumentQuery"));
-	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResult"));
-	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResultEntry"));
-	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryProperty"));
+	    emptyline(ret);
+	    appendImport(ret, "net.anotheria.asg.util.listener.IServiceListener");
+	    appendImport(ret, "net.anotheria.anodoc.query2.DocumentQuery");
+	    appendImport(ret, "net.anotheria.anodoc.query2.QueryResult");
+	    appendImport(ret, "net.anotheria.anodoc.query2.QueryResultEntry");
+	    appendImport(ret, "net.anotheria.anodoc.query2.QueryProperty");
 	    
-	    ret.append(emptyline());
-	    ret.append(writeImport("net.anotheria.util.xml.XMLNode"));
-	    ret.append(emptyline());
-	    ret.append(writeImport("net.anotheria.asg.exception.ASGRuntimeException"));
-	    ret.append(writeImport("net.anotheria.asg.service.InMemoryService"));
-	    ret.append(writeImport("net.anotheria.asg.service.InMemoryObjectWrapper"));
-	    ret.append(writeImport(ServiceGenerator.getInterfaceImport(context, module)));
-	    ret.append(writeImport(ServiceGenerator.getExceptionImport(context, module)));
-	    ret.append(emptyline());
+	    emptyline(ret);
+	    appendImport(ret, "net.anotheria.util.xml.XMLNode");
+	    emptyline(ret);
+	    appendImport(ret, "net.anotheria.asg.exception.ASGRuntimeException");
+	    appendImport(ret, "net.anotheria.asg.service.InMemoryService");
+	    appendImport(ret, "net.anotheria.asg.service.InMemoryObjectWrapper");
+	    appendImport(ret, ServiceGenerator.getInterfaceImport(context, module));
+	    appendImport(ret, ServiceGenerator.getExceptionImport(context, module));
+	    emptyline(ret);
 	    
 	    
 	    ret.append(writeString("public class "+getImplementationName(module)+" extends BasicService implements "+getInterfaceName(module)+", InMemoryService<"+getInterfaceName(module)+"> {"));
