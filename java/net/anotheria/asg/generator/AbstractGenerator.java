@@ -36,10 +36,22 @@ public class AbstractGenerator{
 		return ret;
 	}
 	
+	protected void appendIncreasedString(StringBuilder target, String... strings){
+		increaseIdent();
+		appendString(target, strings);
+		decreaseIdent();
+	}
+
 	protected String writeIncreasedStatement(String s){
 		return writeIncreasedString(s+";");
 	}
 	
+	protected void appendIncreasedStatement(StringBuilder target, String... strings){
+		increaseIdent();
+		appendStatement(target, strings);
+		decreaseIdent();
+	}
+
 	public static final String CRLF = "\n";
 	
 	/**
@@ -59,6 +71,13 @@ public class AbstractGenerator{
 		return ret; 
 	}
 	
+	protected void appendString(StringBuilder target, String... strings){
+		appendIdent(target);
+		for (String s : strings)
+			target.append(s);
+		target.append(CRLF);
+	}
+
 	protected String openTry(){
 		String ret = writeString("try{");
 		increaseIdent();
@@ -87,6 +106,20 @@ public class AbstractGenerator{
 		return ret; 
 	}
 
+	protected void appendStatement(StringBuilder target, String... strings){
+		appendIdent(target);
+		for (String s : strings)
+			target.append(s);
+		target.append(';');
+		target.append(CRLF);
+	}
+
+	
+	private void appendIdent(StringBuilder target){
+		for (int i=0; i<ident; i++)
+			target.append('\t');
+	}
+	
 	/**
 	 * Returns current ident as string.
 	 * @return a string with "\t"s.
@@ -133,6 +166,10 @@ public class AbstractGenerator{
 		return writeString("import "+imp+";");
 	}
 
+	protected void appendImport(StringBuilder target, String imp){
+		appendString(target, "import ", imp, ";");
+	}
+
 	protected String writeImport(String packagename, String classname){
 		return writeString("import "+packagename+"."+classname+";");
 	}
@@ -174,6 +211,25 @@ public class AbstractGenerator{
 	    }
 	    ret += writeString(" */");
 	    return ret;
+	}
+
+	protected void appendCommentLine(StringBuilder target, String commentline){
+		String tokens[] = StringUtils.tokenize(commentline, '\n');
+		if (tokens.length!=1)
+			appendComment(target, commentline);
+		else
+			appendString(target, "// ",commentline);
+	}
+
+	protected void appendComment(StringBuilder target, String commentline){
+	    String tokens[] = StringUtils.tokenize(commentline, '\n');
+	    
+	    
+	    appendString(target, "/**");
+	    for (int i=0; i<tokens.length; i++){
+	    	appendString(target, " * "+tokens[i]); 
+	    }
+	    appendString(target, " */");
 	}
 
 	protected static List<MetaViewElement> createMultilingualList(List<MetaViewElement> source, MetaDocument doc, Context context){

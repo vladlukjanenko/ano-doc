@@ -136,7 +136,7 @@ public class Generator {
 
 		System.out.println("DONE.");
 		printTime("Total ", s10, s1);
-		/*
+		///*
 		printTime("Till s2", s2, s1);
 		printTime("Till s3", s3, s1);
 		printTime("Till s4", s4, s1);
