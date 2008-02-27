@@ -411,7 +411,8 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		String ret = "";
 		ret += writeString("public Object getPropertyValue(String propertyName){");
 		increaseIdent();
-		List <MetaProperty>properties = doc.getProperties();
+		List <MetaProperty>properties = new ArrayList<MetaProperty>(doc.getProperties());
+		properties.addAll(doc.getLinks());
 		for (MetaProperty p : properties){
 			ret += writeString("if ("+p.toNameConstant()+".equals(propertyName))");
 			ret += writeIncreasedStatement("return get"+p.getAccesserName()+"()");
