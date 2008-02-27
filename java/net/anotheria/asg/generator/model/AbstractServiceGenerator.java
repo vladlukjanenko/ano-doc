@@ -15,7 +15,7 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    return m.getName()+"Service";
 	}
 
-	public static final String getFactoryName(MetaModule m){
+	public String getFactoryName(MetaModule m){
 	    return getServiceName(m)+"Factory";
 	}
 	
