@@ -72,8 +72,6 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		this.context = context;
 		this.view = (MetaView)g;
 		
-		//System.out.println("Generate struts : "+view);
-	
 		String mappings = generateMappings(view, context);
 		String file = "";
 		try{
