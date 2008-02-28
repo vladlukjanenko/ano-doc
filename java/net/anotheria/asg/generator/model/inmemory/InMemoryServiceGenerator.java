@@ -14,6 +14,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
+import net.anotheria.asg.generator.model.db.VOGenerator;
 import net.anotheria.util.ExecutionTimer;
 
 /**
@@ -97,7 +98,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 
 	    ret.append(writeStatement("package "+getPackageName(module)));
 	    ret.append(emptyline());
-	    ret.append(writeImport("java.util.List"));
+	    appendImport(ret, "java.util.List");
 	    ret.append(writeImport("java.util.Map"));
 	    ret.append(writeImport("java.util.ArrayList"));
 	    ret.append(writeImport("java.util.HashMap"));
@@ -113,7 +114,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
+	        appendImport(ret, DataFacadeGenerator.getDocumentImport(context, doc));
+	        appendImport(ret, DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	    }
 	    emptyline(ret);
 	    appendImport(ret, "net.anotheria.asg.util.listener.IServiceListener");
@@ -193,7 +195,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(writeString("if (wrapper.get()!=null)"));
 	        ret.append(writeIncreasedStatement("tmp.add(wrapper.get())"));
 	        closeBlock(ret);
-	        ret.append(writeStatement(getCachedListName(doc)+" = tmp"));
+	        appendStatement(ret, getCachedListName(doc)+" = tmp");
 	        ret.append(writeStatement("return "+getCachedListName(doc)));
 	        closeBlock(ret);
 	        closeBlock(ret);
@@ -209,8 +211,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{"));
 			increaseIdent();
 			ret.append(writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)"));
-			ret.append(closeBlock());
-			ret.append(emptyline());
+			closeBlock(ret);
+			emptyline(ret);
 	        
 	        ret.append(writeString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
 	        increaseIdent();
@@ -248,6 +250,10 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        ret.append(writeString("if (template instanceof net.anotheria.asg.data.AbstractVO){"));
 	        increaseIdent();
+	        appendStatement(ret, doc.getName(), " ret = ",DataFacadeGenerator.getDocumentFactoryName(doc), ".create", doc.getName(), "(template)");
+	    	appendStatement(ret, "((", VOGenerator.getDocumentImport(context, doc), ")ret).copyAttributesFrom(template)" );
+	    	appendStatement(ret, "return ret");
+	        
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
 
@@ -331,10 +337,10 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(old.get(i), list.get(i))"));
 	        ret.append(writeString("}"));
 	        decreaseIdent();
-	        ret.append(closeBlock());
+	        closeBlock(ret);
 	        ret.append(writeStatement("return list"));
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        closeBlock(ret);
+	        emptyline(ret);
 //*/
 	        
 	        ret.append(writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
