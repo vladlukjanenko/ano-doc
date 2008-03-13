@@ -28,4 +28,7 @@ public interface DataObject extends Cloneable{
 	public long getLastUpdateTimestamp();
 
 	public XMLNode toXMLNode();
+	
+	//public void copyAttributesFrom(DataObject object);
 }
+ 

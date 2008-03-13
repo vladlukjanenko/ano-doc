@@ -9,18 +9,18 @@ public interface InMemoryService<T extends ASGService> {
 	 * to perform bulk write operations and let them be written back to the original service. Pairing will force all current data to be thrown away.
 	 * @param instance
 	 */
-	public void pairTo(T instance);
+	public void pairTo(T instance)throws ASGRuntimeException;
 
 	/**
 	 * Unpairs the service. Only previously paired service can be unpaired.
 	 * @param instance
 	 */
-	public void unpair(T instance);
+	public void unpair(T instance)throws ASGRuntimeException;
 	
 	/**
 	 * Synchs the data back to the paired instance. Should be called before unpairing.
 	 */
-	public void synchBack();
+	public void synchBack()throws ASGRuntimeException;
 	
 	
 	/**
@@ -33,12 +33,12 @@ public interface InMemoryService<T extends ASGService> {
 	 * Synches current data to a service instance. The results are quite unpredictable.
 	 * @param anInstance
 	 */
-	public void synchTo(T anInstance);
+	public void synchTo(T anInstance)throws ASGRuntimeException;
 	
 	/**
 	 * Clears all data if the instance is unpaired.
 	 */
-	public void clear();
+	public void clear()throws ASGRuntimeException;
 	
 	
 }

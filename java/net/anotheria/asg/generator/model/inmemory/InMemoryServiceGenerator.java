@@ -141,6 +141,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    ret.append(emptyline());
 	    
 	    ret.append(writeStatement("private boolean paired"));
+	    appendStatement(ret, getInterfaceName(module)+" pairedInstance = null");
+	    emptyline(ret);
 
 	    //generate storage
 	    for (MetaDocument doc : docs){
@@ -150,7 +152,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(writeStatement("private Object "+doc.getName()+"Lock = new Object()"));
 
 	    }
-	    ret.append(emptyline());
+	    emptyline(ret);
 	    
 	    
 	    ret.append(writeString("private "+getImplementationName(module)+"(){"));
@@ -250,9 +252,10 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        ret.append(writeString("if (template instanceof net.anotheria.asg.data.AbstractVO){"));
 	        increaseIdent();
-	        appendStatement(ret, doc.getName(), " ret = ",DataFacadeGenerator.getDocumentFactoryName(doc), ".create", doc.getName(), "(template)");
-	    	appendStatement(ret, "((", VOGenerator.getDocumentImport(context, doc), ")ret).copyAttributesFrom(template)" );
-	    	appendStatement(ret, "return ret");
+	        appendStatement(ret, "throw new RuntimeException(",quote("Not yet implemented"), ")");
+	        //appendStatement(ret, doc.getName(), " ret = ",DataFacadeGenerator.getDocumentFactoryName(doc), ".create", doc.getName(), "(anId)");
+	    	//appendStatement(ret, "((net.anotheria.asg.data.AbstractVO)ret).copyAttributesFrom(template)" );
+	    	//appendStatement(ret, "return ret");
 	        
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
@@ -273,6 +276,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(writeStatement(wrapperDecl+" wrapper = new "+wrapperDecl+"("+doc.getVariableName()+", paired)"));
 	        ret.append(writeStatement("// should check whether an object with this id already exists... which however can only happen in case of an error "));
 	        ret.append(writeStatement(getCacheName(doc)+".put(wrapper.getId(), wrapper)"));
+	        appendStatement(ret, getCachedListName(doc), " = null");
 	        ret.append(writeString("if (hasServiceListeners()){"));
 	        increaseIdent();
 	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
@@ -357,7 +361,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        ret.append(writeString("if (hasServiceListeners()){"));
 	        increaseIdent();
-	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
+	        ret.append(writeStatement("List<IServiceListener> myListeners = tgetServiceListeners()"));
 	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
 	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")"));
 	        ret.append(closeBlock());
@@ -477,23 +481,32 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    
 	    //*/
 
-	    ret.append(writeString("public void pairTo("+getInterfaceName(module)+" instance){"));
+	    appendString(ret, "public synchronized void pairTo("+getInterfaceName(module)+" instance) throws ASGRuntimeException{");
 	    increaseIdent();
-	    ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
-	    ret.append(closeBlock());
-	    ret.append(emptyline());
 	    
-	    ret.append(writeString("public void unpair("+getInterfaceName(module)+" instance){"));
+	    appendString(ret, "if (paired)");
+	    appendIncreasedStatement(ret, "throw new ASGRuntimeException(", quote("Already paired"), ")");
+	    appendStatement(ret, "paired = true");
+	    appendStatement(ret, "pairedInstance = instance");
+	    appendStatement(ret, "reset()");
+	    
+	    closeBlock(ret);
+	    emptyline(ret);
+	    
+	    ret.append(writeString("public synchronized void unpair("+getInterfaceName(module)+" instance){"));
 	    increaseIdent();
 	    ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
 	    ret.append(closeBlock());
 	    ret.append(emptyline());
 
-	    ret.append(writeString("public void synchBack(){"));
+	    appendString(ret, "public synchronized void synchBack()throws ASGRuntimeException{");
 	    increaseIdent();
-	    ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
-	    ret.append(closeBlock());
-	    ret.append(emptyline());
+	    appendString(ret, "if (!paired)");
+	    appendIncreasedStatement(ret, "throw new ASGRuntimeException(", quote("Not paired"), ")");
+	    
+	    appendStatement(ret, "throw new RuntimeException(\"Not yet implemented\")");
+	    closeBlock(ret);
+	    emptyline(ret);
 
 	    
 	    for (MetaDocument doc : docs){
@@ -522,7 +535,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    ret.append(closeBlock());
 	    ret.append(emptyline());
 		
-	    ret.append(writeString("public void synchTo("+getInterfaceName(module)+" instance){"));
+	    ret.append(writeString("public void synchTo("+getInterfaceName(module)+" instance)throws ASGRuntimeException{"));
 	    increaseIdent();
 	    ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
 	    ret.append(closeBlock());
@@ -541,6 +554,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(writeStatement(getCacheName(doc)+" = new HashMap<String, InMemoryObjectWrapper<"+doc.getName()+">>()"));
 		    ret.append(writeStatement(getLastIdName(doc)+" = new AtomicLong(0)"));
 		    ret.append(writeStatement(getCachedListName(doc)+" = null"));
+		    emptyline(ret);
 	    }
 	    ret.append(closeBlock());
     
