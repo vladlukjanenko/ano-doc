@@ -90,86 +90,85 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	 * @return
 	 */
 	private String generateImplementation(MetaModule module){
-	    StringBuilder ret = new StringBuilder(5000);
 
+		startNewJob();
 	    ExecutionTimer timer = new ExecutionTimer("InMemory-generateImplementation");
 	    timer.startExecution("pre");
-		ret.append(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The in memory implementation of the "+getInterfaceName(module)+"."));
+		append(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The in memory implementation of the "+getInterfaceName(module)+"."));
 
-	    ret.append(writeStatement("package "+getPackageName(module)));
-	    ret.append(emptyline());
-	    appendImport(ret, "java.util.List");
-	    ret.append(writeImport("java.util.Map"));
-	    ret.append(writeImport("java.util.ArrayList"));
-	    ret.append(writeImport("java.util.HashMap"));
-	    ret.append(writeImport("java.util.concurrent.atomic.AtomicLong"));
+	    appendStatement("package "+getPackageName(module));
+	    appendEmptyline();
+	    appendImport("java.util.List");
+	    appendImport("java.util.Map");
+	    appendImport("java.util.ArrayList");
+	    appendImport("java.util.HashMap");
+	    appendImport("java.util.concurrent.atomic.AtomicLong");
 
 
-	    ret.append(writeImport("net.anotheria.util.sorter.SortType"));
-	    ret.append(writeImport("net.anotheria.util.sorter.StaticQuickSorter"));
-		//ret.append(writeImport("net.anotheria.util.Date"));
-	    ret.append(writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService"));
-	    ret.append(emptyline());
+	    appendImport("net.anotheria.util.sorter.SortType");
+	    appendImport("net.anotheria.util.sorter.StaticQuickSorter");
+	    appendImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
+	    appendEmptyline();
 
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        appendImport(ret, DataFacadeGenerator.getDocumentImport(context, doc));
-	        appendImport(ret, DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+	        appendImport( DataFacadeGenerator.getDocumentImport(context, doc));
+	        appendImport( DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	    }
-	    emptyline(ret);
-	    appendImport(ret, "net.anotheria.asg.util.listener.IServiceListener");
-	    appendImport(ret, "net.anotheria.anodoc.query2.DocumentQuery");
-	    appendImport(ret, "net.anotheria.anodoc.query2.QueryResult");
-	    appendImport(ret, "net.anotheria.anodoc.query2.QueryResultEntry");
-	    appendImport(ret, "net.anotheria.anodoc.query2.QueryProperty");
+	    appendEmptyline();
+	    appendImport( "net.anotheria.asg.util.listener.IServiceListener");
+	    appendImport( "net.anotheria.anodoc.query2.DocumentQuery");
+	    appendImport( "net.anotheria.anodoc.query2.QueryResult");
+	    appendImport( "net.anotheria.anodoc.query2.QueryResultEntry");
+	    appendImport( "net.anotheria.anodoc.query2.QueryProperty");
 	    
-	    emptyline(ret);
-	    appendImport(ret, "net.anotheria.util.xml.XMLNode");
-	    emptyline(ret);
-	    appendImport(ret, "net.anotheria.asg.exception.ASGRuntimeException");
-	    appendImport(ret, "net.anotheria.asg.service.InMemoryService");
-	    appendImport(ret, "net.anotheria.asg.service.InMemoryObjectWrapper");
-	    appendImport(ret, ServiceGenerator.getInterfaceImport(context, module));
-	    appendImport(ret, ServiceGenerator.getExceptionImport(context, module));
-	    emptyline(ret);
+	    appendEmptyline();
+	    appendImport( "net.anotheria.util.xml.XMLNode");
+	    appendEmptyline();
+	    appendImport( "net.anotheria.asg.exception.ASGRuntimeException");
+	    appendImport( "net.anotheria.asg.service.InMemoryService");
+	    appendImport( "net.anotheria.asg.service.InMemoryObjectWrapper");
+	    appendImport( ServiceGenerator.getInterfaceImport(context, module));
+	    appendImport( ServiceGenerator.getExceptionImport(context, module));
+	    appendEmptyline();
 	    
 	    
-	    ret.append(writeString("public class "+getImplementationName(module)+" extends BasicService implements "+getInterfaceName(module)+", InMemoryService<"+getInterfaceName(module)+"> {"));
+	    appendString("public class "+getImplementationName(module)+" extends BasicService implements "+getInterfaceName(module)+", InMemoryService<"+getInterfaceName(module)+"> {");
 	    increaseIdent();
-	    ret.append(writeStatement("private static "+getImplementationName(module)+" instance"));
-	    ret.append(emptyline());
+	    appendStatement("private static "+getImplementationName(module)+" instance");
+	    append(emptyline());
 	    
-	    ret.append(writeStatement("private boolean paired"));
-	    appendStatement(ret, getInterfaceName(module)+" pairedInstance = null");
-	    emptyline(ret);
+	    appendStatement("private boolean paired");
+	    appendStatement(getInterfaceName(module)," pairedInstance = null");
+	    appendEmptyline();
 
 	    //generate storage
 	    for (MetaDocument doc : docs){
-	        ret.append(writeStatement("private Map<String, InMemoryObjectWrapper<"+doc.getName()+">> "+getCacheName(doc)));
-		    ret.append(writeStatement("private AtomicLong "+getLastIdName(doc)+" = new AtomicLong()"));
-	        ret.append(writeStatement("private List<"+doc.getName()+"> "+getCachedListName(doc)));
-	        ret.append(writeStatement("private Object "+doc.getName()+"Lock = new Object()"));
+	        appendStatement("private Map<String, InMemoryObjectWrapper<"+doc.getName()+">> "+getCacheName(doc));
+		    appendStatement("private AtomicLong "+getLastIdName(doc)+" = new AtomicLong()");
+	        appendStatement("private List<"+doc.getName()+"> "+getCachedListName(doc));
+	        appendStatement("private Object "+doc.getName()+"Lock = new Object()");
 
 	    }
-	    emptyline(ret);
+	    appendEmptyline();
 	    
 	    
-	    ret.append(writeString("private "+getImplementationName(module)+"(){"));
+	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
-	    ret.append(writeStatement("reset()"));
-	    ret.append(closeBlock());
-	    ret.append(emptyline());
+	    appendStatement("reset()");
+	    append(closeBlock());
+	    appendEmptyline();
 	    
-	    ret.append(writeString("static final "+getImplementationName(module)+" getInstance(){"));
+	    appendString("static final "+getImplementationName(module)+" getInstance(){");
 	    increaseIdent();
-	    ret.append(writeString("if (instance==null){"));
+	    appendString("if (instance==null){");
 	    increaseIdent();
-	    ret.append(writeStatement("instance = new "+getImplementationName(module)+"()"));
-	    ret.append(closeBlock());
-	    ret.append(writeStatement("return instance"));
-	    ret.append(closeBlock());
-	    ret.append(emptyline());
+	    appendStatement("instance = new "+getImplementationName(module)+"()");
+	    append(closeBlock());
+	    appendStatement("return instance");
+	    append(closeBlock());
+	    append(emptyline());
 	    
 	    String throwsClause = " throws "+getExceptionName(module)+" ";
 	    boolean containsAnyMultilingualDocs = false;
@@ -182,276 +181,276 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        String listDecl = "List<"+doc.getName()+">";
 	        String wrapperDecl = getWrapperDecl(doc);
 	        
-	        ret.append(writeString("private "+listDecl+" _getCached"+doc.getMultiple()+"()"+throwsClause+"{"));
+	        appendString("private "+listDecl+" _getCached"+doc.getMultiple()+"()"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeString("if ("+getCachedListName(doc)+" != null )"));
-	        ret.append(writeIncreasedStatement("return "+getCachedListName(doc)));
-	        ret.append(writeString("synchronized("+doc.getName()+"Lock){"));
+	        appendString("if ("+getCachedListName(doc)+" != null )");
+	        appendIncreasedStatement("return "+getCachedListName(doc));
+	        appendString("synchronized("+doc.getName()+"Lock){");
 	        increaseIdent();
-	        ret.append(writeString("if ("+getCachedListName(doc)+" != null )"));
-	        ret.append(writeIncreasedStatement("return "+getCachedListName(doc)));
+	        appendString("if ("+getCachedListName(doc)+" != null )");
+	        appendIncreasedStatement("return "+getCachedListName(doc));
 
-	        ret.append(writeStatement(listDecl+"tmp = new ArrayList<"+doc.getName()+">("+getCacheName(doc)+".size())"));
-	        ret.append(writeString("for ("+wrapperDecl+" wrapper  : "+getCacheName(doc)+".values()){"));
+	        appendStatement(listDecl+"tmp = new ArrayList<"+doc.getName()+">("+getCacheName(doc)+".size())");
+	        appendString("for ("+wrapperDecl+" wrapper  : "+getCacheName(doc)+".values()){");
 	        increaseIdent();
-	        ret.append(writeString("if (wrapper.get()!=null)"));
-	        ret.append(writeIncreasedStatement("tmp.add(wrapper.get())"));
-	        closeBlock(ret);
-	        appendStatement(ret, getCachedListName(doc)+" = tmp");
-	        ret.append(writeStatement("return "+getCachedListName(doc)));
-	        closeBlock(ret);
-	        closeBlock(ret);
-	        emptyline(ret);
+	        appendString("if (wrapper.get()!=null)");
+	        appendIncreasedStatement("tmp.add(wrapper.get())");
+	        append(closeBlock());
+	        appendStatement( getCachedListName(doc)+" = tmp");
+	        appendStatement("return "+getCachedListName(doc));
+	        append(closeBlock());
+	        append(closeBlock());
+	        appendEmptyline();
 	        
 	        
-	        ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause+"{"));
+	        appendString("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement("return _getCached"+doc.getMultiple()+"()"));
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        appendStatement("return _getCached"+doc.getMultiple()+"()");
+	        append(closeBlock());
+	        append(emptyline());
 
-	        ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{"));
+	        appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{");
 			increaseIdent();
-			ret.append(writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)"));
-			closeBlock(ret);
-			emptyline(ret);
+			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
+			append(closeBlock());
+			appendEmptyline();
 	        
-	        ret.append(writeString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
+	        appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())"));
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
+	        append(closeBlock());
+	        append(emptyline());
 	        
-	        ret.append(writeString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{"));
+	        appendString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeString("if (paired){"));
+	        appendString("if (paired){");
 	        increaseIdent();
-	        ret.append(writeStatement(getWrapperDecl(doc)+" w = "+getCacheName(doc)+".get(id)"));
-	        ret.append(writeString("if (w!=null)"));
-	        ret.append(writeIncreasedStatement("w.delete()"));
+	        appendStatement(getWrapperDecl(doc)+" w = "+getCacheName(doc)+".get(id)");
+	        appendString("if (w!=null)");
+	        appendIncreasedStatement("w.delete()");
 	        decreaseIdent();
-	        ret.append(writeString("}else{"));
+	        appendString("}else{");
 	        increaseIdent();
-	        ret.append(writeStatement(getCacheName(doc)+".remove(id)"));
-	        ret.append(closeBlock());
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        appendStatement(getCacheName(doc)+".remove(id)");
+	        append(closeBlock());
+	        append(closeBlock());
+	        append(emptyline());
 	        
 //*/	        
 
-	        ret.append(writeString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{"));
+	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement(wrapperDecl+" w = "+getCacheName(doc)+".get(id)"));
-	        ret.append(writeString("if (w==null || w.get()==null)"));
-	        ret.append(writeIncreasedStatement("throw new "+getExceptionName(module)+"(\"No such "+doc.getName()+" with id: \"+id)"));
-	        ret.append(writeStatement("return w.get()"));
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        appendStatement(wrapperDecl+" w = "+getCacheName(doc)+".get(id)");
+	        appendString("if (w==null || w.get()==null)");
+	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"No such "+doc.getName()+" with id: \"+id)");
+	        appendStatement("return w.get()");
+	        append(closeBlock());
+	        append(emptyline());
 	        
-	        ret.append(writeString("private "+doc.getName()+" createNewObject(String anId, "+doc.getName()+" template){"));
+	        appendString("private "+doc.getName()+" createNewObject(String anId, "+doc.getName()+" template){");
 	        increaseIdent();
-	        ret.append(writeString("if (template instanceof net.anotheria.asg.data.AbstractVO){"));
+	        appendString("if (template instanceof net.anotheria.asg.data.AbstractVO){");
 	        increaseIdent();
-	        appendStatement(ret, "throw new RuntimeException(",quote("Not yet implemented"), ")");
+	        appendStatement("throw new RuntimeException(",quote("Not yet implemented"), ")");
 	        //appendStatement(ret, doc.getName(), " ret = ",DataFacadeGenerator.getDocumentFactoryName(doc), ".create", doc.getName(), "(anId)");
 	    	//appendStatement(ret, "((net.anotheria.asg.data.AbstractVO)ret).copyAttributesFrom(template)" );
 	    	//appendStatement(ret, "return ret");
 	        
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        append(closeBlock());
+	        append(emptyline());
 
-	        ret.append(writeString("if (template instanceof net.anotheria.anodoc.data.Document){"));
+	        appendString("if (template instanceof net.anotheria.anodoc.data.Document){");
 	        increaseIdent();
-	        ret.append(writeStatement("throw new RuntimeException(\"Document creation not yet supported\")"));
-	        ret.append(closeBlock());
+	        appendStatement("throw new RuntimeException(\"Document creation not yet supported\")");
+	        append(closeBlock());
 	        
-	        ret.append(writeStatement("throw new RuntimeException(\"Unknown document type: \"+template.getClass())"));
+	        appendStatement("throw new RuntimeException(\"Unknown document type: \"+template.getClass())");
 
-	        ret.append(closeBlock());
+	        append(closeBlock());
 ///*	        
-	        ret.append(writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
+	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement("long nextId = "+getLastIdName(doc)+".incrementAndGet()"));
-	        ret.append(writeStatement(doc.getVariableName()+" = createNewObject(\"\"+nextId, "+doc.getVariableName()+")"));
-	        ret.append(writeStatement(wrapperDecl+" wrapper = new "+wrapperDecl+"("+doc.getVariableName()+", paired)"));
-	        ret.append(writeStatement("// should check whether an object with this id already exists... which however can only happen in case of an error "));
-	        ret.append(writeStatement(getCacheName(doc)+".put(wrapper.getId(), wrapper)"));
-	        appendStatement(ret, getCachedListName(doc), " = null");
-	        ret.append(writeString("if (hasServiceListeners()){"));
+	        appendStatement("long nextId = "+getLastIdName(doc)+".incrementAndGet()");
+	        appendStatement(doc.getVariableName()+" = createNewObject(\"\"+nextId, "+doc.getVariableName()+")");
+	        appendStatement(wrapperDecl+" wrapper = new "+wrapperDecl+"("+doc.getVariableName()+", paired)");
+	        appendStatement("// should check whether an object with this id already exists... which however can only happen in case of an error ");
+	        appendStatement(getCacheName(doc)+".put(wrapper.getId(), wrapper)");
+	        appendStatement(getCachedListName(doc), " = null");
+	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
-	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
-	        ret.append(writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")"));
-	        ret.append(closeBlock());
-	        ret.append(writeStatement("return "+doc.getVariableName()));
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
+	        appendString("for (int i=0; i<myListeners.size(); i++)");
+	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
+	        append(closeBlock());
+	        appendStatement("return "+doc.getVariableName());
+	        append(closeBlock());
+	        append(emptyline());
 	        
 ///*	        
 	        
-	        ret.append(writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions."));
-	        ret.append(writeString("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{"));
+	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
+	        appendString("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">(list.size())"));
+	        appendStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">(list.size())");
 	        
-	        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){"));
+	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
 	        increaseIdent();
-	        ret.append(writeStatement("long nextId = "+getLastIdName(doc)+".incrementAndGet()"));
-	        ret.append(writeStatement(doc.getVariableName()+" = createNewObject(\"\"+nextId, "+doc.getVariableName()+")"));
-	        ret.append(writeStatement(wrapperDecl+" wrapper = new "+wrapperDecl+"("+doc.getVariableName()+", paired)"));
-	        ret.append(writeStatement("// should check whether an object with this id already exists... which however can only happen in case of an error "));
-	        ret.append(writeStatement(getCacheName(doc)+".put(wrapper.getId(), wrapper)"));
-	        ret.append(writeStatement("ret.add("+doc.getVariableName()+")"));
-	        ret.append(closeBlock());
+	        appendStatement("long nextId = "+getLastIdName(doc)+".incrementAndGet()");
+	        appendStatement(doc.getVariableName()+" = createNewObject(\"\"+nextId, "+doc.getVariableName()+")");
+	        appendStatement(wrapperDecl+" wrapper = new "+wrapperDecl+"("+doc.getVariableName()+", paired)");
+	        appendStatement("// should check whether an object with this id already exists... which however can only happen in case of an error ");
+	        appendStatement(getCacheName(doc)+".put(wrapper.getId(), wrapper)");
+	        appendStatement("ret.add("+doc.getVariableName()+")");
+	        append(closeBlock());
 	        
-	        ret.append(writeString("if (hasServiceListeners()){"));
+	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
-	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
+	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
+	        appendString("for (int i=0; i<myListeners.size(); i++)");
 	        increaseIdent();
-	        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)"));
-	        ret.append(writeIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")"));
+	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
+	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
 	        decreaseIdent();
-	        ret.append(closeBlock());
-	        ret.append(writeStatement("return ret"));
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        append(closeBlock());
+	        appendStatement("return ret");
+	        append(closeBlock());
+	        append(emptyline());
 
 	        //*/
 	        
-	        ret.append(writeComment("Updates multiple new "+doc.getName()+" objects.\nReturns the updated versions."));
-	        ret.append(writeString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{"));
+	        appendComment("Updates multiple new "+doc.getName()+" objects.\nReturns the updated versions.");
+	        appendString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement(listDecl+" old = new ArrayList<"+doc.getName()+">(list.size())"));
-	        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){"));
+	        appendStatement(listDecl+" old = new ArrayList<"+doc.getName()+">(list.size())");
+	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
 	        increaseIdent();
-	        ret.append(writeStatement(wrapperDecl+" wrapper = "+getCacheName(doc)+".get("+doc.getVariableName()+".getId())"));
-	        ret.append(writeString("if (wrapper==null || wrapper.get()==null)"));
-	        ret.append(writeIncreasedStatement("throw new "+getExceptionName(module)+"(\"No such "+doc.getName()+" with id: \"+"+doc.getVariableName()+".getId())"));
-	        ret.append(writeStatement("old.add(wrapper.get())"));
-	        ret.append(writeStatement("wrapper.update("+doc.getVariableName()+")"));
-	        ret.append(closeBlock());
+	        appendStatement(wrapperDecl+" wrapper = "+getCacheName(doc)+".get("+doc.getVariableName()+".getId())");
+	        appendString("if (wrapper==null || wrapper.get()==null)");
+	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"No such "+doc.getName()+" with id: \"+"+doc.getVariableName()+".getId())");
+	        appendStatement("old.add(wrapper.get())");
+	        appendStatement("wrapper.update("+doc.getVariableName()+")");
+	        append(closeBlock());
 	        
-	        ret.append(writeString("if (hasServiceListeners()){"));
+	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
-	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
+	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
+	        appendString("for (int i=0; i<myListeners.size(); i++)");
 	        increaseIdent();
-	        ret.append(writeString("for (int t = 0; t<list.size(); t++){"));
-	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(old.get(i), list.get(i))"));
-	        ret.append(writeString("}"));
+	        appendString("for (int t = 0; t<list.size(); t++){");
+	        appendIncreasedStatement("myListeners.get(i).documentUpdated(old.get(i), list.get(i))");
+	        appendString("}");
 	        decreaseIdent();
-	        closeBlock(ret);
-	        ret.append(writeStatement("return list"));
-	        closeBlock(ret);
-	        emptyline(ret);
+	        append(closeBlock());
+	        appendStatement("return list");
+	        append(closeBlock());
+	        appendEmptyline();
 //*/
 	        
-	        ret.append(writeString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
+	        appendString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement("String id = "+doc.getVariableName()+".getId()"));
-	        ret.append(writeStatement(doc.getName()+" oldVersion = null"));
-	        ret.append(writeStatement(wrapperDecl+" w = "+getCacheName(doc)+".get(id)"));
-	        ret.append(writeString("if (w==null || w.get()==null)"));
-	        ret.append(writeIncreasedStatement("throw new "+getExceptionName(module)+"(\"No such "+doc.getName()+" with id: \"+id)"));
-	        ret.append(writeString("if (hasServiceListeners())"));
-	        ret.append(writeIncreasedStatement("oldVersion = w.get()"));
-	        ret.append(writeStatement("w.update("+doc.getVariableName()+")"));
+	        appendStatement("String id = "+doc.getVariableName()+".getId()");
+	        appendStatement(doc.getName()+" oldVersion = null");
+	        appendStatement(wrapperDecl+" w = "+getCacheName(doc)+".get(id)");
+	        appendString("if (w==null || w.get()==null)");
+	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"No such "+doc.getName()+" with id: \"+id)");
+	        appendString("if (hasServiceListeners())");
+	        appendIncreasedStatement("oldVersion = w.get()");
+	        appendStatement("w.update("+doc.getVariableName()+")");
 	        
 	        
-	        ret.append(writeString("if (hasServiceListeners()){"));
+	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        ret.append(writeStatement("List<IServiceListener> myListeners = tgetServiceListeners()"));
-	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
-	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")"));
-	        ret.append(closeBlock());
+	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
+	        appendString("for (int i=0; i<myListeners.size(); i++)");
+	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
+	        append(closeBlock());
 	        
-	        ret.append(writeStatement("return "+doc.getVariableName()));
-	        ret.append(closeBlock());
-	        ret.append(emptyline());
+	        appendStatement("return "+doc.getVariableName());
+	        append(closeBlock());
+	        append(emptyline());
 ///*	        
-	        ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{"));
+	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
-/*			ret.append(writeStatement("QueryProperty p = new QueryProperty(propertyName, value)");
-			ret.append(writeString("try{");
-			ret.append(writeIncreasedStatement("return pService.get"+doc.getMultiple()+"ByProperty(p)");
-			ret.append(writeString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
-			ret.append(writeIncreasedStatement("throw new RuntimeException(\"Persistence failed: \"+e.getMessage())");
-			ret.append(writeString("}");
+	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+/*			appendStatement("QueryProperty p = new QueryProperty(propertyName, value)");
+			appendString("try{");
+			appendIncreasedStatement("return pService.get"+doc.getMultiple()+"ByProperty(p)");
+			appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
+			appendIncreasedStatement("throw new RuntimeException(\"Persistence failed: \"+e.getMessage())");
+			appendString("}");
 */			
-      		ret.append(closeBlock());
-	        ret.append(emptyline());
+      		append(closeBlock());
+	        append(emptyline());
 //*/
 	        
-			ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{"));
+			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{");
 			increaseIdent();
-			ret.append(writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)"));
-			ret.append(closeBlock());
-	        ret.append(emptyline());
+			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
+			append(closeBlock());
+	        append(emptyline());
 
 	        // /*			
-			ret.append(writeComment("Executes a query on "+doc.getMultiple()));
-			ret.append(writeString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause+"{"));
+			appendComment("Executes a query on "+doc.getMultiple());
+			appendString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause+"{");
 			increaseIdent();
-			ret.append(writeStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()"));
-			ret.append(writeStatement("QueryResult result = new QueryResult()"));
-			ret.append(writeString("for (int i=0; i<all"+doc.getMultiple()+".size(); i++){"));
+			appendStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()");
+			appendStatement("QueryResult result = new QueryResult()");
+			appendString("for (int i=0; i<all"+doc.getMultiple()+".size(); i++){");
 			increaseIdent();
-			ret.append(writeStatement("List<QueryResultEntry> partialResult = query.match(all"+doc.getMultiple()+".get(i))"));
-			ret.append(writeStatement("result.add(partialResult)"));
-			ret.append(closeBlock());
+			appendStatement("List<QueryResultEntry> partialResult = query.match(all"+doc.getMultiple()+".get(i))");
+			appendStatement("result.add(partialResult)");
+			append(closeBlock());
 			
-			ret.append(writeStatement("return result"));
-			ret.append(closeBlock());
-			ret.append(emptyline());
+			appendStatement("return result");
+			append(closeBlock());
+			append(emptyline());
 
-			ret.append(writeComment("Returns all "+doc.getName()+" objects, where property matches."));
-	        ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause+"{"));
+			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
+	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause+"{");
 			increaseIdent();
-			ret.append(writeString("//first the slow version, the fast version is a todo."));
-			ret.append(writeStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()"));
-			ret.append(writeStatement(listDecl+" src = get"+doc.getMultiple()+"()"));
-			ret.append(writeStatement("for ( "+doc.getName()+" "+doc.getVariableName() +" : src){"));
+			appendString("//first the slow version, the fast version is a todo.");
+			appendStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
+			appendStatement(listDecl+" src = get"+doc.getMultiple()+"()");
+			appendStatement("for ( "+doc.getName()+" "+doc.getVariableName() +" : src){");
 			increaseIdent();
-			ret.append(writeStatement("boolean mayPass = true"));
-			ret.append(writeStatement("for (QueryProperty qp : property){"));
+			appendStatement("boolean mayPass = true");
+			appendStatement("for (QueryProperty qp : property){");
 			increaseIdent();
-			ret.append(writeStatement("mayPass = mayPass && qp.doesMatch("+doc.getVariableName()+".getPropertyValue(qp.getName()))"));
-			closeBlock(ret);
+			appendStatement("mayPass = mayPass && qp.doesMatch("+doc.getVariableName()+".getPropertyValue(qp.getName()))");
+			append(closeBlock());
 			
-			ret.append(writeString("if (mayPass)"));
-			ret.append(writeIncreasedStatement("ret.add("+doc.getVariableName()+")"));
-			closeBlock(ret);
+			appendString("if (mayPass)");
+			appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
+			append(closeBlock());
 			
-			ret.append(writeStatement("return ret"));
-			ret.append(closeBlock());
-	        ret.append(emptyline());
+			appendStatement("return ret");
+			append(closeBlock());
+	        append(emptyline());
 /*
 	        increaseIdent();
-			ret.append(writeString("try{");
-			ret.append(writeIncreasedStatement("return pService.get"+doc.getMultiple()+"ByProperty(property)");
-			ret.append(writeString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
-			ret.append(writeIncreasedStatement("throw new RuntimeException(\"Persistence failed: \"+e.getMessage())");
-			ret.append(writeString("}");
+			appendString("try{");
+			appendIncreasedStatement("return pService.get"+doc.getMultiple()+"ByProperty(property)");
+			appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
+			appendIncreasedStatement("throw new RuntimeException(\"Persistence failed: \"+e.getMessage())");
+			appendString("}");
 	        ret.append(closeBlock();
 	        ret.append(emptyline();
 	*/        
-			ret.append(writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted"));
-			ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause+"{"));
+			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
+			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause+"{");
 	        increaseIdent();
-	        ret.append(writeStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)"));
-	        ret.append(closeBlock());
-			ret.append(emptyline());
+	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
+	        append(closeBlock());
+			append(emptyline());
 		//	*/
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
-				ret.append(writeComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage"));
-				ret.append(writeStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)"+throwsClause+"{"));
+				appendComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage");
+				appendStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)"+throwsClause+"{");
 				increaseIdent();
-		        ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
-				ret.append(closeBlock());
-				ret.append(emptyline());
+		        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+				append(closeBlock());
+				append(emptyline());
 				containsAnyMultilingualDocs = true;
 			}
 	    
@@ -463,107 +462,107 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 
 	    
 	    if (containsAnyMultilingualDocs){
-			ret.append(writeComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service"));
-			ret.append(writeString("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)"+throwsClause+"{"));
+			appendComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
+			appendString("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)"+throwsClause+"{");
 			increaseIdent();
-	        ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
-			ret.append(closeBlock());
-			ret.append(emptyline());
+	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+			append(closeBlock());
+			append(emptyline());
 			
 	    }
 
 	    //generate export function
-	    ret.append(emptyline());
-	    ret.append(writeString("public XMLNode exportToXML()"+throwsClause+"{"));
+	    append(emptyline());
+	    appendString("public XMLNode exportToXML()"+throwsClause+"{");
 	    increaseIdent();
-        ret.append(writeStatement("return new XMLNode("+quote("unimplemented_inmemory_export_"+module.getName())+")"));
-	    ret.append(closeBlock());
+        appendStatement("return new XMLNode("+quote("unimplemented_inmemory_export_"+module.getName())+")");
+	    append(closeBlock());
 	    
 	    //*/
 
-	    appendString(ret, "public synchronized void pairTo("+getInterfaceName(module)+" instance) throws ASGRuntimeException{");
+	    appendString("public synchronized void pairTo("+getInterfaceName(module)+" instance) throws ASGRuntimeException{");
 	    increaseIdent();
 	    
-	    appendString(ret, "if (paired)");
-	    appendIncreasedStatement(ret, "throw new ASGRuntimeException(", quote("Already paired"), ")");
-	    appendStatement(ret, "paired = true");
-	    appendStatement(ret, "pairedInstance = instance");
-	    appendStatement(ret, "reset()");
+	    appendString("if (paired)");
+	    appendIncreasedStatement("throw new ASGRuntimeException(", quote("Already paired"), ")");
+	    appendStatement( "paired = true");
+	    appendStatement( "pairedInstance = instance");
+	    appendStatement( "reset()");
 	    
-	    closeBlock(ret);
-	    emptyline(ret);
+		append(closeBlock());
+	    appendEmptyline();
 	    
-	    ret.append(writeString("public synchronized void unpair("+getInterfaceName(module)+" instance){"));
+	    appendString("public synchronized void unpair("+getInterfaceName(module)+" instance){");
 	    increaseIdent();
-	    ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
-	    ret.append(closeBlock());
-	    ret.append(emptyline());
+	    appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+	    append(closeBlock());
+	    append(emptyline());
 
-	    appendString(ret, "public synchronized void synchBack()throws ASGRuntimeException{");
+	    appendString("public synchronized void synchBack()throws ASGRuntimeException{");
 	    increaseIdent();
-	    appendString(ret, "if (!paired)");
-	    appendIncreasedStatement(ret, "throw new ASGRuntimeException(", quote("Not paired"), ")");
+	    appendString("if (!paired)");
+	    appendIncreasedStatement( "throw new ASGRuntimeException(", quote("Not paired"), ")");
 	    
-	    appendStatement(ret, "throw new RuntimeException(\"Not yet implemented\")");
-	    closeBlock(ret);
-	    emptyline(ret);
+	    appendStatement( "throw new RuntimeException(\"Not yet implemented\")");
+		append(closeBlock());
+	    appendEmptyline();
 
 	    
 	    for (MetaDocument doc : docs){
-		    ret.append(writeString("public void read"+doc.getName()+"From("+getInterfaceName(module)+" instance) throws ASGRuntimeException{"));
+		    appendString("public void read"+doc.getName()+"From("+getInterfaceName(module)+" instance) throws ASGRuntimeException{");
 		    increaseIdent();
-		    ret.append(writeStatement("List<"+doc.getName()+"> list = instance.get"+doc.getMultiple()+"()"));
-		    ret.append(writeStatement("long maxId = 0"));
-		    ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){ "));
+		    appendStatement("List<"+doc.getName()+"> list = instance.get"+doc.getMultiple()+"()");
+		    appendStatement("long maxId = 0");
+		    appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){ ");
 		    increaseIdent();
-		    ret.append(writeStatement("long id = Long.parseLong("+doc.getVariableName()+".getId())"));
-		    ret.append(writeString("if (id>maxId)"));
-		    ret.append(writeIncreasedStatement("maxId = id"));
-		    ret.append(writeStatement(getCacheName(doc)+".put("+doc.getVariableName()+".getId(), new InMemoryObjectWrapper<"+doc.getName()+">("+doc.getVariableName()+"))"));
-		    closeBlock(ret);
-		    ret.append(writeStatement(getLastIdName(doc)+" = new AtomicLong(maxId)"));
-		    ret.append(writeStatement(getCachedListName(doc)+" = null"));
-		    closeBlock(ret);
-		    ret.append(emptyline());
+		    appendStatement("long id = Long.parseLong("+doc.getVariableName()+".getId())");
+		    appendString("if (id>maxId)");
+		    appendIncreasedStatement("maxId = id");
+		    appendStatement(getCacheName(doc)+".put("+doc.getVariableName()+".getId(), new InMemoryObjectWrapper<"+doc.getName()+">("+doc.getVariableName()+"))");
+			append(closeBlock());
+		    appendStatement(getLastIdName(doc)+" = new AtomicLong(maxId)");
+		    appendStatement(getCachedListName(doc)+" = null");
+			append(closeBlock());
+		    append(emptyline());
 	    }
 
-	    ret.append(writeString("public void readFrom("+getInterfaceName(module)+" instance) throws ASGRuntimeException {"));
+	    appendString("public void readFrom("+getInterfaceName(module)+" instance) throws ASGRuntimeException {");
 	    increaseIdent();
 	    for (MetaDocument doc : docs){
-	    	ret.append(writeStatement("read"+doc.getName()+"From(instance)"));
+	    	appendStatement("read"+doc.getName()+"From(instance)");
 	    }
-	    ret.append(closeBlock());
-	    ret.append(emptyline());
+	    append(closeBlock());
+	    append(emptyline());
 		
-	    ret.append(writeString("public void synchTo("+getInterfaceName(module)+" instance)throws ASGRuntimeException{"));
+	    appendString("public void synchTo("+getInterfaceName(module)+" instance)throws ASGRuntimeException{");
 	    increaseIdent();
-	    ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
-	    ret.append(closeBlock());
-	    ret.append(emptyline());
+	    appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+	    append(closeBlock());
+	    append(emptyline());
 	    
-	    ret.append(writeString("public void clear(){"));
+	    appendString("public void clear(){");
 	    increaseIdent();
-	    ret.append(writeString("if (paired) "));
-	    ret.append(writeIncreasedStatement("throw new RuntimeException(\"Cant reset a paired copy, unpair it first\")"));
-	    ret.append(writeStatement("reset()"));
-	    ret.append(closeBlock());
+	    appendString("if (paired) ");
+	    appendIncreasedStatement("throw new RuntimeException(\"Cant reset a paired copy, unpair it first\")");
+	    appendStatement("reset()");
+	    append(closeBlock());
 	    
-	    ret.append(writeString("private void reset(){"));
+	    appendString("private void reset(){");
 	    increaseIdent();
 	    for (MetaDocument doc : docs){
-	        ret.append(writeStatement(getCacheName(doc)+" = new HashMap<String, InMemoryObjectWrapper<"+doc.getName()+">>()"));
-		    ret.append(writeStatement(getLastIdName(doc)+" = new AtomicLong(0)"));
-		    ret.append(writeStatement(getCachedListName(doc)+" = null"));
-		    emptyline(ret);
+	        appendStatement(getCacheName(doc)+" = new HashMap<String, InMemoryObjectWrapper<"+doc.getName()+">>()");
+		    appendStatement(getLastIdName(doc)+" = new AtomicLong(0)");
+		    appendStatement(getCachedListName(doc)+" = null");
+		    appendEmptyline();
 	    }
-	    ret.append(closeBlock());
+	    append(closeBlock());
     
 
-	    closeBlock(ret);
+		append(closeBlock());
 	    timer.stopExecution("foot");
 	    //timer.printExecutionTimesOrderedByCreation();
 	    
-	    return ret.toString();
+	    return getCurrentJobContent().toString();
 	}
 	
 	
