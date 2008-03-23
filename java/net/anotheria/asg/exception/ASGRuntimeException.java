@@ -13,4 +13,8 @@ public class ASGRuntimeException extends Exception{
 	public ASGRuntimeException(Throwable cause){
 		super(cause);
 	}
+
+	public ASGRuntimeException(String message, Throwable cause){
+		super(message, cause);
+	}
 }
