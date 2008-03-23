@@ -7,7 +7,7 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 
 public class AbstractServiceGenerator extends AbstractGenerator{
-	public static final String getInterfaceName(MetaModule m){
+	public static String getInterfaceName(MetaModule m){
 	    return "I"+getServiceName(m);
 	}
 	
@@ -32,54 +32,54 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	}
 	
 	protected String generateFactory(MetaModule module){
-	    String ret = "";
 
-		ret += CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation.");
+		startNewJob();
+		append(CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation."));
 
-	    ret += writeStatement("package "+getPackageName(module));
-	    ret += emptyline();
+	    appendStatement("package "+getPackageName(module));
+	    append(emptyline());
 	    
-	    ret += writeImport("java.util.concurrent.atomic.AtomicInteger");
-	    ret += writeImport("net.java.dev.moskito.core.dynamic.MoskitoInvokationProxy");
-	    ret += writeImport("net.java.dev.moskito.core.predefined.ServiceStatsCallHandler");
-	    ret += writeImport("net.java.dev.moskito.core.predefined.ServiceStatsFactory");
-	    ret += writeImport("net.anotheria.asg.service.ASGService");
-	    ret += writeAdditionalFactoryImports(module);
-	    ret += emptyline();
+	    appendImport("java.util.concurrent.atomic.AtomicInteger");
+	    appendImport("net.java.dev.moskito.core.dynamic.MoskitoInvokationProxy");
+	    appendImport("net.java.dev.moskito.core.predefined.ServiceStatsCallHandler");
+	    appendImport("net.java.dev.moskito.core.predefined.ServiceStatsFactory");
+	    appendImport("net.anotheria.asg.service.ASGService");
+	    append(writeAdditionalFactoryImports(module));
+	    append(emptyline());
 	    
 	    
 	    
-	    ret += writeString("public class "+getFactoryName(module)+"{");
+	    appendString("public class "+getFactoryName(module)+"{");
 	    increaseIdent();
-	    ret += emptyline();
-	    ret += writeStatement("private static AtomicInteger instanceCounter = new AtomicInteger(0)");
-	    ret += emptyline();
+	    append(emptyline());
+	    appendStatement("private static AtomicInteger instanceCounter = new AtomicInteger(0)");
+	    append(emptyline());
 	    
-	    ret += writeString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");
+	    appendString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");
 	    increaseIdent();
-	    ret += writeString("MoskitoInvokationProxy proxy = new MoskitoInvokationProxy(");
+	    appendString("MoskitoInvokationProxy proxy = new MoskitoInvokationProxy(");
 	    increaseIdent();
-	    ret += writeString("createInstance(),");
-	    ret += writeString("new ServiceStatsCallHandler(),");
-	    ret += writeString("new ServiceStatsFactory(),");
-	    ret += writeString("\""+getInterfaceName(module)+"-\"+instanceCounter.incrementAndGet(),");
-	    ret += writeString("\"service\",");
-	    ret += writeString("\"asg\",");
-	    ret += writeString(getSupportedInterfacesList(module));
+	    appendString("createInstance(),");
+	    appendString("new ServiceStatsCallHandler(),");
+	    appendString("new ServiceStatsFactory(),");
+	    appendString("\""+getInterfaceName(module)+"-\"+instanceCounter.incrementAndGet(),");
+	    appendString(quote("service"),",");
+	    appendString("\"asg\",");
+	    appendString(getSupportedInterfacesList(module));
 	    decreaseIdent();
-	    ret += writeString(");");
-	    ret += writeStatement("return ("+getInterfaceName(module)+") proxy.createProxy()");
+	    appendString(");");
+	    appendStatement("return ("+getInterfaceName(module)+") proxy.createProxy()");
 	    
-	    ret += closeBlock();
-	    ret += emptyline();
+	    append(closeBlock());
+	    append(emptyline());
 	    
-	    ret += writeString("public static "+getInterfaceName(module)+" createInstance(){");
+	    appendString("public static "+getInterfaceName(module)+" createInstance(){");
 	    increaseIdent();
-	    ret += writeString("return "+getImplementationName(module)+".getInstance();");
-	    ret += closeBlock();
+	    appendString("return "+getImplementationName(module)+".getInstance();");
+	    append(closeBlock());
 	    
-	    ret += closeBlock();
-	    return ret;
+	    append(closeBlock());
+	    return getCurrentJobContent().toString();
 	}
 	
 	//returns a comma-separated list of all interfaces supported by this impl, which the proxy must map.

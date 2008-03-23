@@ -20,8 +20,6 @@ package net.anotheria.asg.generator.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import quicktime.std.clocks.TimeRecord;
-
 import net.anotheria.asg.exception.ASGRuntimeException;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
@@ -39,6 +37,7 @@ import net.anotheria.asg.generator.model.db.PersistenceServiceDAOGenerator;
 import net.anotheria.asg.generator.model.docs.CMSBasedServiceGenerator;
 import net.anotheria.asg.generator.model.federation.FederationServiceGenerator;
 import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
+import net.anotheria.asg.generator.model.rmi.RMIServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
 
 /**
@@ -75,6 +74,13 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		ret.addAll(inMemGen.generate(gmodule, context));
 		timer.stopExecution(mod.getName()+"-InMem");
 		// - end in memory
+
+		//addrmi genererator
+		timer.startExecution(mod.getName()+"-RMI");
+		RMIServiceGenerator rmiGen = new RMIServiceGenerator();
+		ret.addAll(rmiGen.generate(gmodule, context));
+		timer.stopExecution(mod.getName()+"-RMI");
+		// - end rmiy
 		
 		
 		if (mod.getStorageType()==StorageType.CMS){
@@ -124,55 +130,65 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	}
 	
 	private String generateException(MetaModule module){
-	    String ret = "";
-	    
-	    ret += CommentGenerator.generateJavaTypeComment(getExceptionName(module));
+
+		startNewJob();
+		append(CommentGenerator.generateJavaTypeComment(getExceptionName(module)));
  
-	    ret += writeStatement("package "+getPackageName(module));
-	    ret += emptyline();
-	    ret += writeImport(ASGRuntimeException.class.getName());
+	    appendStatement("package "+getPackageName(module));
+	    append(emptyline());
+	    appendImport(ASGRuntimeException.class.getName());
 	    
-	    ret += writeComment("Base class for all exceptions thrown by implementations of "+getInterfaceName(module));
-	    ret += writeString("public class "+getExceptionName(module)+" extends ASGRuntimeException{");
+	    appendComment("Base class for all exceptions thrown by implementations of "+getInterfaceName(module));
+	    appendString("public class "+getExceptionName(module)+" extends ASGRuntimeException{");
 	    increaseIdent();
 	    
-	    ret += writeString("public "+getExceptionName(module)+" (String message){" );
-	    ret += writeIncreasedStatement("super(message)");
-	    ret += writeString("}");
+	    appendString("public "+getExceptionName(module)+" (String message){" );
+	    appendIncreasedStatement("super(message)");
+	    appendString("}");
+	    append(emptyline());
 	    
-	    ret += closeBlock();
-	    return ret;
+	    appendString("public "+getExceptionName(module)+" (Throwable cause){" );
+	    appendIncreasedStatement("super(cause)");
+	    appendString("}");
+	    append(emptyline());
+	    
+	    appendString("public "+getExceptionName(module)+" (String message, Throwable cause){" );
+	    appendIncreasedStatement("super(message, cause)");
+	    appendString("}");
+
+	    append(closeBlock());
+	    return getCurrentJobContent().toString();
 	}
 
 	private String generateInterface(MetaModule module){
-	    StringBuilder ret = new StringBuilder(5000);
 	    
-	    ret.append(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
+		startNewJob();
+		append(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
  
-	    ret.append(writeStatement("package "+getPackageName(module)));
-	    ret.append(emptyline());
-	    ret.append(writeImport("java.util.List"));
-	    ret.append(writeImport("net.anotheria.util.sorter.SortType"));
-	    ret.append(emptyline());
+	    appendStatement("package "+getPackageName(module));
+	    appendEmptyline();
+	    appendImport("java.util.List");
+	    appendImport("net.anotheria.util.sorter.SortType");
+	    appendEmptyline();
 	    
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
-	        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
+	        appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    }
-	    ret.append(emptyline());
+	    appendEmptyline();
 	    
-	    ret.append(writeImport("net.anotheria.util.xml.XMLNode"));
-	    ret.append(emptyline());
-	    ret.append(writeImport("net.anotheria.anodoc.query2.DocumentQuery"));
+	    appendImport("net.anotheria.util.xml.XMLNode");
+	    appendEmptyline();
+	    appendImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
-	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResult"));
-	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryProperty"));
-	    ret.append(emptyline());
-	    ret.append(writeImport("net.anotheria.asg.service.ASGService"));
-	    ret.append(emptyline());
+	    appendImport("net.anotheria.anodoc.query2.QueryResult");
+	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
+	    appendEmptyline();
+	    appendImport("net.anotheria.asg.service.ASGService");
+	    appendEmptyline();
 
-	    ret.append(writeString("public interface "+getInterfaceName(module)+" extends ASGService {"));
+	    appendString("public interface "+getInterfaceName(module)+" extends ASGService {");
 	    increaseIdent();
 	    
 	    boolean containsAnyMultilingualDocs = false;
@@ -182,75 +198,75 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
-	        ret.append(writeComment("Returns all "+doc.getMultiple()+" objects stored."));
-	        ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause));
-	        ret.append(emptyline());
-			ret.append(writeComment("Returns all "+doc.getMultiple()+" objects sorted by given sortType."));
-			ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause));
-			ret.append(emptyline());
-	        ret.append(writeComment("Deletes a "+doc.getName()+" object by id."));
-	        ret.append(writeStatement("public void delete"+doc.getName()+"(String id)"+throwsClause));
-	        ret.append(emptyline());
-	        ret.append(writeComment("Deletes a "+doc.getName()+" object."));
-	        ret.append(writeStatement("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
-	        ret.append(emptyline());
-	        ret.append(writeComment("Returns the "+doc.getName()+" object with the specified id."));
-	        ret.append(writeStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause));
-	        ret.append(emptyline());
-	        ret.append(writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version."));
-	        ret.append(writeStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
-	        ret.append(emptyline());
+	        appendComment("Returns all "+doc.getMultiple()+" objects stored.");
+	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause);
+	        appendEmptyline();
+			appendComment("Returns all "+doc.getMultiple()+" objects sorted by given sortType.");
+			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause);
+			appendEmptyline();
+	        appendComment("Deletes a "+doc.getName()+" object by id.");
+	        appendStatement("public void delete"+doc.getName()+"(String id)"+throwsClause);
+	        appendEmptyline();
+	        appendComment("Deletes a "+doc.getName()+" object.");
+	        appendStatement("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
+	        appendEmptyline();
+	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
+	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
+	        appendEmptyline();
+	        appendComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
+	        appendStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
+	        appendEmptyline();
 	        
-	        ret.append(writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions."));
-	        ret.append(writeStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause));
-	        ret.append(emptyline());
+	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
+	        appendStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
+	        appendEmptyline();
 
-	        ret.append(writeComment("Updates a "+doc.getName()+" object.\nReturns the updated version."));
-	        ret.append(writeStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
-	        ret.append(emptyline());
+	        appendComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
+	        appendStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
+	        appendEmptyline();
 
-	        ret.append(writeComment("Updates mutiple "+doc.getName()+" objects.\nReturns the updated versions."));
-	        ret.append(writeStatement("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause));
-	        ret.append(emptyline());
+	        appendComment("Updates mutiple "+doc.getName()+" objects.\nReturns the updated versions.");
+	        appendStatement("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
+	        appendEmptyline();
 	        
 	        
 	        //special functions
-	        ret.append(writeComment("Returns all "+doc.getName()+" objects, where property with given name equals object."));
-	        ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause));
-	        ret.append(emptyline());
-			ret.append(writeComment("Returns all "+doc.getName()+" objects, where property with given name equals object, sorted"));
-			ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause));
-			ret.append(emptyline());
-			ret.append(writeComment("Executes a query"));
-			ret.append(writeStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause));
-			ret.append(emptyline());
-	        ret.append(writeComment("Returns all "+doc.getName()+" objects, where property matches."));
-	        ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause));
-	        ret.append(emptyline());
-			ret.append(writeComment("Returns all "+doc.getName()+" objects, where property matches, sorted"));
-			ret.append(writeStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause));
-			ret.append(emptyline());
+	        appendComment("Returns all "+doc.getName()+" objects, where property with given name equals object.");
+	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause);
+	        appendEmptyline();
+			appendComment("Returns all "+doc.getName()+" objects, where property with given name equals object, sorted");
+			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause);
+			appendEmptyline();
+			appendComment("Executes a query");
+			appendStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause);
+			appendEmptyline();
+	        appendComment("Returns all "+doc.getName()+" objects, where property matches.");
+	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause);
+	        appendEmptyline();
+			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
+			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause);
+			appendEmptyline();
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
-				ret.append(writeComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage"));
-				ret.append(writeStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)"+throwsClause));
-				ret.append(emptyline());
+				appendComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage");
+				appendStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)"+throwsClause);
+				appendEmptyline();
 				containsAnyMultilingualDocs = true;
 			}
 	    }
 	    
 	    if (containsAnyMultilingualDocs){
-			ret.append(writeComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service"));
-			ret.append(writeStatement("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)"+throwsClause));
-			ret.append(emptyline());
+			appendComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
+			appendStatement("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)"+throwsClause);
+			appendEmptyline();
 	    }
 	    
-		ret.append(writeComment("creates an xml element with all contained data."));
-		ret.append(writeStatement("public XMLNode exportToXML()"+throwsClause));
-		ret.append(emptyline());
+		appendComment("creates an xml element with all contained data.");
+		appendStatement("public XMLNode exportToXML()"+throwsClause);
+		appendEmptyline();
 	    
-	    ret.append(closeBlock());
-	    return ret.toString();
+	    append(closeBlock());
+	    return getCurrentJobContent().toString();
 	}
 	
 	
@@ -259,8 +275,8 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	}
 
 	
-	public static String getInterfaceName(MetaModule m){
-	    return "I"+getServiceName(m);
+	public static String getInterfaceName(MetaModule module){
+	    return "I"+getServiceName(module);
 	}
 	
 	public static String getInterfaceImport(Context ctx, MetaModule m){
