@@ -46,6 +46,10 @@ public class AbstractGenerator{
 		return writeIncreasedString(s+";");
 	}
 	
+	protected void appendIncreasedStatement(String... strings){
+		appendIncreasedStatement(getCurrentJobContent(), strings);
+	}
+	
 	protected void appendIncreasedStatement(StringBuilder target, String... strings){
 		increaseIdent();
 		appendStatement(target, strings);
@@ -71,6 +75,10 @@ public class AbstractGenerator{
 		return ret; 
 	}
 	
+	protected void appendString(String... strings){
+		appendString(getCurrentJobContent(), strings);
+	}
+
 	protected void appendString(StringBuilder target, String... strings){
 		appendIdent(target);
 		for (String s : strings)
@@ -82,6 +90,12 @@ public class AbstractGenerator{
 		String ret = writeString("try{");
 		increaseIdent();
 		return ret;
+	}
+
+	//later replace with openTry
+	protected void appendTry(){
+		appendString("try{");
+		increaseIdent();
 	}
 
 	protected String openFun(String s){
@@ -106,6 +120,16 @@ public class AbstractGenerator{
 		return ret; 
 	}
 
+	protected void append(String... strings){
+		StringBuilder target = getCurrentJobContent();
+		for (String s: strings)
+			target.append(s);
+	}
+	
+	protected void appendStatement(String... strings){
+		appendStatement(getCurrentJobContent(), strings);
+	}
+	
 	protected void appendStatement(StringBuilder target, String... strings){
 		appendIdent(target);
 		for (String s : strings)
@@ -162,8 +186,16 @@ public class AbstractGenerator{
 		b.append(CRLF);
 	}
 
+	protected static void appendEmptyline(){
+		emptyline(getCurrentJobContent());
+	}
+
 	protected String writeImport(String imp){
 		return writeString("import "+imp+";");
+	}
+
+	protected void appendImport(String imp){
+		appendString(getCurrentJobContent(), "import ", imp, ";");
 	}
 
 	protected void appendImport(StringBuilder target, String imp){
@@ -213,6 +245,10 @@ public class AbstractGenerator{
 	    return ret;
 	}
 
+	protected void appendCommentLine(String commentline){
+		appendCommentLine(getCurrentJobContent(), commentline);
+	}
+	
 	protected void appendCommentLine(StringBuilder target, String commentline){
 		String tokens[] = StringUtils.tokenize(commentline, '\n');
 		if (tokens.length!=1)
@@ -221,6 +257,10 @@ public class AbstractGenerator{
 			appendString(target, "// ",commentline);
 	}
 
+	protected void appendComment(String commentline){
+		appendComment(getCurrentJobContent(), commentline);
+	}
+	
 	protected void appendComment(StringBuilder target, String commentline){
 	    String tokens[] = StringUtils.tokenize(commentline, '\n');
 	    
@@ -260,5 +300,23 @@ public class AbstractGenerator{
 	protected String getElementLanguage(MetaViewElement element){
 		return element instanceof MultilingualFieldElement ? ((MultilingualFieldElement)element).getLanguage() : null;
 	}
+	
+	///////// NEW GENERATION INTERFACE ///////////
+	public static final void startNewJob(){
+		GenerationJobManager.startNewJob();
+	}
+	
+	public static final StringBuilder getCurrentJobContent(){
+		return GenerationJobManager.getCurrentJob().getStringBuilder();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 }
