@@ -110,6 +110,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		}
 		
 		ret += writeImport("net.anotheria.asg.data.AbstractVO");
+		ret += writeImport("java.io.Serializable");
 		
 		ret += emptyline();
 		
@@ -118,7 +119,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 			ret += writeImport("net.anotheria.util.sorter.IComparable");
 			ret += writeImport("net.anotheria.util.BasicComparable");
 			ret += emptyline();
-			interfaceDecl += ", IComparable ";
+			interfaceDecl += ", IComparable, Serializable ";
 		}
 		
 

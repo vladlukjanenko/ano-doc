@@ -29,10 +29,11 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 		ret += emptyline();
 		
 		ret += writeImport("net.anotheria.anodoc.util.context.CallContext");
+		ret += writeImport("java.io.Serializable");
 		ret += emptyline(); 
 		
 		String className = getCallContextName(context);
-		String classDecl = "public class "+className+" extends CallContext{";
+		String classDecl = "public class "+className+" extends CallContext implements Serializable{";
 		ret += writeString(classDecl);
 		ret += emptyline();
 		increaseIdent();
