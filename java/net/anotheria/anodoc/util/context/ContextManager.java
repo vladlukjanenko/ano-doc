@@ -14,6 +14,11 @@ public class ContextManager {
 	public static CallContext getCallContext(){
 		return callContext.get();
 	}
+	
+	public static void setCallContext(CallContext value){
+		callContext.set(value);
+	}
+	
 
 	public static CallContextFactory getFactory() {
 		return factory;

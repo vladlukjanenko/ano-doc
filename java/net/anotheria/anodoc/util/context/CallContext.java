@@ -1,7 +1,9 @@
 package net.anotheria.anodoc.util.context;
 
+import java.io.Serializable;
 
-public abstract class CallContext {
+
+public abstract class CallContext implements Serializable{
 	
 	private String currentLanguage;
 	private DBContext dbContext; 

@@ -1,6 +1,8 @@
 package net.anotheria.anodoc.util.context;
 
-public class DBContext {
+import java.io.Serializable;
+
+public class DBContext implements Serializable{
 	private String tableNamePrefix;
 	private String tableNamePostfix;
 	
