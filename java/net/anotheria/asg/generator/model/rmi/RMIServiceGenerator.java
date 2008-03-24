@@ -1,6 +1,6 @@
 package net.anotheria.asg.generator.model.rmi;
 
-import java.rmi.server.UnicastRemoteObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +15,6 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
-import net.anotheria.asg.generator.model.db.VOGenerator;
-import net.anotheria.asg.util.listener.IServiceListener;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
@@ -153,6 +151,8 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendEmptyline();
 	    appendImport(ServiceGenerator.getExceptionImport(context, module));
 	    appendEmptyline();
+	    appendImport("net.anotheria.anodoc.util.context.CallContext");
+	    appendEmptyline();
 
 	    appendString("public interface "+getInterfaceName(module)+" extends Remote {");
 	    increaseIdent();
@@ -164,72 +164,137 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
-	        appendComment("Returns all "+doc.getMultiple()+" objects stored.");
-	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause);
-	        appendEmptyline();
-			appendComment("Returns all "+doc.getMultiple()+" objects sorted by given sortType.");
-			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause);
-			appendEmptyline();
-	        appendComment("Deletes a "+doc.getName()+" object by id.");
-	        appendStatement("public void delete"+doc.getName()+"(String id)"+throwsClause);
-	        appendEmptyline();
-	        appendComment("Deletes a "+doc.getName()+" object.");
-	        appendStatement("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
-	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
-	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
-	        appendEmptyline();
-	        appendComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
-	        appendStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
 	        
-	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
-	        appendStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        appendEmptyline();
-
-	        appendComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
-	        appendStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
-
-	        appendComment("Updates mutiple "+doc.getName()+" objects.\nReturns the updated versions.");
-	        appendStatement("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        appendEmptyline();
 	        
+	        writeInterfaceFun(
+	        			"Returns all "+doc.getMultiple()+" objects stored.", 
+	        			listDecl, 
+	        			"get"+doc.getMultiple(), 
+	        			""
+	        			);
+	        
+	        writeInterfaceFun(
+	        		"Returns all "+doc.getMultiple()+" objects sorted by given sortType.", 
+        			listDecl, 
+        			"get"+doc.getMultiple(), 
+        			"SortType sortType"
+        			);
+	        
+	        writeInterfaceFun(
+	        		"Deletes a "+doc.getName()+" object by id.", 
+        			"", 
+        			"delete"+doc.getName(), 
+        			"String id"
+        			);
+
+	        writeInterfaceFun(
+	        		"Deletes a "+doc.getName()+" object.", 
+        			"", 
+        			"delete"+doc.getName(), 
+        			doc.getName()+" "+doc.getVariableName()
+        			);
+
+	        writeInterfaceFun(
+	        		"Returns the "+doc.getName()+" object with the specified id.", 
+        			doc.getName(), 
+        			"get"+doc.getName(), 
+        			"String id"
+        			);
+	        
+	        writeInterfaceFun(
+	        		"Creates a new "+doc.getName()+" object.\nReturns the created version.", 
+        			doc.getName(), 
+        			"create"+doc.getName(), 
+        			doc.getName()+" "+doc.getVariableName()
+        			);
+
+	        writeInterfaceFun(
+	        		"Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.", 
+        			listDecl, 
+        			"create"+doc.getMultiple(), 
+        			listDecl+" list"
+        			);
+
+	        writeInterfaceFun(
+	        		"Updates a "+doc.getName()+" object.\nReturns the updated version.", 
+        			doc.getName(), 
+        			"update"+doc.getName(), 
+        			doc.getName()+" "+doc.getVariableName()
+        			);
+
+	        writeInterfaceFun(
+	        		"Updates mutiple "+doc.getName()+" objects.\nReturns the updated versions.", 
+        			listDecl, 
+        			"update"+doc.getMultiple(), 
+        			listDecl+" list"
+        			);
+
 	        
 	        //special functions
-	        appendComment("Returns all "+doc.getName()+" objects, where property with given name equals object.");
-	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause);
-	        appendEmptyline();
-			appendComment("Returns all "+doc.getName()+" objects, where property with given name equals object, sorted");
-			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause);
-			appendEmptyline();
-			appendComment("Executes a query");
-			appendStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause);
-			appendEmptyline();
-	        appendComment("Returns all "+doc.getName()+" objects, where property matches.");
-	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause);
-	        appendEmptyline();
-			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
-			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause);
-			appendEmptyline();
+	        writeInterfaceFun(
+	        		"Returns all "+doc.getName()+" objects, where property with given name equals object.", 
+        			listDecl, 
+        			"get"+doc.getMultiple()+"ByProperty", 
+        			"String propertyName, Object value"
+        			);
+
+	        writeInterfaceFun(
+	        		"Returns all "+doc.getName()+" objects, where property with given name equals object, sorted.", 
+        			listDecl, 
+        			"get"+doc.getMultiple()+"ByProperty", 
+        			"String propertyName, Object value, SortType sortType"
+        			);
+	        
+	        writeInterfaceFun(
+	        		"Executes a query", 
+        			"QueryResult", 
+        			"executeQueryOn"+doc.getMultiple(), 
+        			"DocumentQuery query"
+        			);
+			
+			
+	        writeInterfaceFun(
+	        		"Returns all "+doc.getName()+" objects, where property matches.", 
+        			listDecl, 
+        			"get"+doc.getMultiple()+"ByProperty", 
+        			"QueryProperty... property"
+        			);
+
+	        writeInterfaceFun(
+	        		"Returns all "+doc.getName()+" objects, where property matches, sorted", 
+        			listDecl, 
+        			"get"+doc.getMultiple()+"ByProperty", 
+        			"SortType sortType, QueryProperty... property"
+        			);
+
+	        
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
-				appendComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage");
-				appendStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)"+throwsClause);
-				appendEmptyline();
+		        writeInterfaceFun(
+		        		"In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage", 
+	        			"", 
+	        			"copyMultilingualAttributesInAll"+doc.getMultiple(), 
+	        			"String sourceLanguage, String targetLanguage"
+	        			);
 				containsAnyMultilingualDocs = true;
 			}
 	    }
 	    
 	    if (containsAnyMultilingualDocs){
-			appendComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
-			appendStatement("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)"+throwsClause);
-			appendEmptyline();
+	        writeInterfaceFun(
+	        		"Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service", 
+	    			"", 
+	    			"copyMultilingualAttributesInAllObjects", 
+	    			"String sourceLanguage, String targetLanguage"
+	    			);
 	    }
 	    
-		appendComment("creates an xml element with all contained data.");
-		appendStatement("public XMLNode exportToXML()"+throwsClause);
-		appendEmptyline();
+        writeInterfaceFun(
+        		"creates an xml element with all contained data.", 
+    			"XMLNode", 
+    			"exportToXML", 
+    			""
+    			);
 	    
 	    append(closeBlock());
 	    return getCurrentJobContent().toString();
@@ -397,12 +462,14 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendEmptyline();
 	    //appendImport("net.anotheria.asg.service.ASGService");
 	    appendImport("net.anotheria.asg.util.listener.IServiceListener");
+	    appendImport("net.anotheria.anodoc.util.context.ContextManager");
 	    appendEmptyline();
 	    appendImport("java.rmi.RemoteException");
 	    appendEmptyline();
 	    appendImport(ServiceGenerator.getExceptionImport(context, module));
 	    appendImport(ServiceGenerator.getInterfaceImport(context, module));
 	    appendEmptyline();
+	    
 
 	    appendImport("org.apache.log4j.Logger");
 	    appendEmptyline();
@@ -665,7 +732,10 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	   
 	    appendImport("net.anotheria.anodoc.query2.QueryResult");
 	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
+	    appendImport("net.anotheria.anodoc.util.context.CallContext");
+	    appendImport("net.anotheria.anodoc.util.context.ContextManager");
 	    appendEmptyline();
+	    
 	    //appendImport("net.anotheria.asg.service.ASGService");
 	    appendEmptyline();
 	    appendImport(ServiceGenerator.getExceptionImport(context, module));
@@ -874,7 +944,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendString("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+", RemoteExceptionWrapper{");
         increaseIdent();
         appendTry();
-        appendStatement((returnType.length()>0 ? "return " : "" ),"getDelegate().",funName, "(", parametersStripped ,")");
+        appendStatement((returnType.length()>0 ? "return " : "" ),"getDelegate().",funName, "(ContextManager.getCallContext()", (parametersStripped!=null && parametersStripped.length()>0 ? ", ":""),  parametersStripped ,")");
         decreaseIdent();
         appendString("} catch (RemoteException e){");
         if (parametersForLogging!=null && parametersForLogging.length()>0)
@@ -885,6 +955,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendIncreasedStatement("throw new RemoteExceptionWrapper(e)");
         appendString("}");
         append(closeBlock());
+	    appendEmptyline();
+	}
+
+	private void writeInterfaceFun(String comment, String returnType, String funName, String parametersFull){
+        appendComment(comment);
+        appendStatement("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+", RemoteException");
+	    appendEmptyline();
+        appendComment(comment);
+        appendStatement("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "(CallContext callContext"+(parametersFull.length()>0 ? ", ": "")+ parametersFull+") throws "+getExceptionName(module)+", RemoteException");
 	    appendEmptyline();
 	}
 
@@ -909,6 +988,30 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
     	appendString("}");
         append(closeBlock());
 	    appendEmptyline();
+
+	    //version with callcontext
+        appendComment(comment);
+        appendString("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "(CallContext callContext", (parametersStripped!=null && parametersStripped.length()>0 ? ", ":""), parametersFull, ")"+" throws "+getExceptionName(module)+"{");
+        increaseIdent();
+        appendTry();
+        appendStatement("ContextManager.setCallContext(callContext)");
+        appendStatement((returnType.length()>0 ? "return " : "" ),"service.",funName, "(", parametersStripped ,")");
+        decreaseIdent();
+        appendString("} catch ("+ServiceGenerator.getExceptionName(module)+" e){");
+        appendIncreasedStatement("throw(e)");
+        appendString("} catch (Throwable unexpectedError){");
+        if (parametersForLogging!=null && parametersForLogging.length()>0){
+        	appendIncreasedStatement("String errorMessage = ", quote(funName+"("), " + "+parametersForLogging+" + ", quote(")"));
+        }else{
+        	appendIncreasedStatement("String errorMessage = ", quote(funName+"()"));
+        }
+    	appendIncreasedStatement("log.error(errorMessage, unexpectedError)");
+    	appendIncreasedStatement("throw new "+ServiceGenerator.getExceptionName(module)+"(errorMessage, unexpectedError)");
+
+    	appendString("}");
+        append(closeBlock());
+	    appendEmptyline();
+
 	}
 
 }
