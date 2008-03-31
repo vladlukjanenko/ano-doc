@@ -10,6 +10,7 @@ import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaGenericProperty;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
@@ -194,6 +195,13 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		return ret;
 	}
 	
+	private MetaProperty getMetaGenericProperty(MetaListProperty p){
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		if (p.isMultilingual())
+			tmp.setMultilingual(true);
+		return tmp;
+	}
+	
 	private String _generatePropertyFields(List<MetaProperty> propertyList){
 		String ret = "";
 		for (int i=0; i<propertyList.size(); i++){
@@ -202,7 +210,10 @@ public class VOGenerator extends AbstractDataObjectGenerator
 				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
 				for (int t=0; t<columns.size(); t++)
 					ret += _generatePropertyField(columns.get(t));
-			}else{
+			}
+			else if (p instanceof MetaListProperty)
+				ret += _generatePropertyField(getMetaGenericProperty((MetaListProperty)p));
+			else{
 				ret += _generatePropertyField(p);
 			}
 		}
@@ -297,7 +308,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 	
 	
 	private String generateListPropertyGetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		MetaProperty tmp = getMetaGenericProperty(p);
 		return generatePropertyGetterMethod(tmp);
 	}
 	
@@ -345,7 +356,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 	}
 
 	private String generateListPropertySetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		MetaProperty tmp = getMetaGenericProperty(p);
 		return generatePropertySetterMethod(tmp);
 	}
 
@@ -461,7 +472,8 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		MetaProperty pr = container instanceof MetaTableProperty ? 
 			(MetaProperty) ((MetaTableProperty)container).getColumns().get(0) :
 			container;
-		ret += writeStatement("return getList("+pr.toNameConstant()+").size()"); 
+//		ret += writeStatement("return getList("+pr.toNameConstant()+").size()"); 
+		ret += writeStatement("return get"+container.getAccesserName()+"().size()");
 		ret += closeBlock();
 		ret += emptyline();
 		
@@ -471,7 +483,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 	
 	private String generateListMethods(MetaListProperty list){
 		String ret = "";
-
+		MetaProperty genericList = getMetaGenericProperty(list);
 		MetaProperty c = list.getContainedProperty();
 
 		String decl = "public void "+getContainerEntryAdderName(list)+"(";
@@ -480,34 +492,42 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		ret += writeString(decl);
 		increaseIdent();
 		
-		ret += writeStatement(c.toJavaType()+"Property p = new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+")");
-		ret += writeStatement("List tmp = get"+list.getAccesserName()+"()");
+		ret += writeStatement(c.toJavaObjectType()+" p = new "+c.toJavaObjectType()+"("+c.getName()+")");
+		ret += writeStatement(genericList.toJavaType() + " tmp = get"+list.getAccesserName()+"()");
 		ret += writeStatement("tmp.add(p)");
-		ret += writeStatement("set"+list.getAccesserName()+"(tmp)");
+//		ret += writeStatement("set"+list.getAccesserName()+"(tmp)");
 		ret += closeBlock();
 		ret += emptyline();
 		
 		
 		ret += writeString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
-		ret += writeStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
+//		ret += writeStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
+		ret += writeStatement("get"+list.getAccesserName()+"().remove(index)");
 		ret += closeBlock();
 		ret += emptyline();
 		
 		ret += writeString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
 		increaseIdent();
 		ret += writeStatement(c.toJavaType()+" tmp1, tmp2");
-		ret += writeStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).get"+c.toJavaType()+"()");
-		ret += writeStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).get"+c.toJavaType()+"()");
-		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+c.toJavaType()+"(tmp2)");
-		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+c.toJavaType()+"(tmp1)");
+//		ret += writeStatement("tmp1 = (("+c.toJavaType()+")getList("+list.toNameConstant()+").get(index1)).get"+c.toJavaType()+"()");
+//		ret += writeStatement("tmp2 = (("+c.toJavaType()+")getList("+list.toNameConstant()+").get(index2)).get"+c.toJavaType()+"()");
+//		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+c.toJavaType()+"(tmp2)");
+//		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+c.toJavaType()+"(tmp1)");
+		ret += writeStatement(genericList.toJavaType() + " tmpList = get"+list.getAccesserName()+"()");
+		ret += writeStatement("tmp1 = (("+c.toJavaObjectType()+")tmpList.get(index1))");
+		ret += writeStatement("tmp2 = (("+c.toJavaObjectType()+")tmpList.get(index2))");
+		ret += writeStatement("tmpList.set(index1, tmp2)");
+		ret += writeStatement("tmpList.set(index2, tmp1)");
 		ret += closeBlock();
 		ret += emptyline();
 
 		ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
 		increaseIdent();
-		ret += writeStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index)");
-		ret += writeStatement("return p.get"+c.toJavaType()+"()");
+//		ret += writeStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index)");
+//		ret += writeStatement("return p.get"+c.toJavaType()+"()");
+		ret += writeStatement(c.toJavaType()+" p = ("+c.toJavaObjectType()+""+")get"+list.getAccesserName()+"().get(index)");
+		ret += writeStatement("return p");
 		ret += closeBlock();
 		ret += emptyline();
 

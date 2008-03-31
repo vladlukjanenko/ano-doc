@@ -9,7 +9,7 @@ public class MetaListProperty extends MetaContainerProperty{
 	private MetaProperty containedProperty;
 	
 	public MetaListProperty(String name){
-		super(name);
+		super(name, "list");
 	}
 	/**
 	 * @return

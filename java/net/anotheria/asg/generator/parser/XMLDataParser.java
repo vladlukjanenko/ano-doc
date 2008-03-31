@@ -190,6 +190,7 @@ public class XMLDataParser implements IDataParser {
 	
 	private MetaProperty parseList(Element p){
 		String name = p.getAttributeValue("name");
+		System.out.println("PARSE LIST: " + name);
 		MetaListProperty ret = new MetaListProperty(name);
 		
 		Element content = p.getChild("content");

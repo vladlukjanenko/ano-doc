@@ -6,7 +6,7 @@ import net.anotheria.util.xml.XMLAttribute;
 import net.anotheria.util.xml.XMLNode;
 
 public class XMLHelper {
-	public static XMLNode createXMLNodeForListValue(String name, String[] language, List<String>... value){
+	public static <T> XMLNode createXMLNodeForListValue(String name, String[] language, List<T>... value){
 		return createXMLNodeWithContent(name, language, "list", "not_yet_implemented");
 	}
 	

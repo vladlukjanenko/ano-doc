@@ -370,7 +370,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				}else{
 					p = doc.getField(field.getName());
 				}
-				ret += writeStatement("private "+p.toJavaType()+" "+p.getName(lang));
+				MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
+				ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
 				if (p.isLinked()){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),"list");
 					ret += writeStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
@@ -594,20 +595,24 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				if (p instanceof MetaEnumerationProperty)
 					ret += writeStatement("private String "+p.getName());
 				else{
+
+					MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(), "int"):p;
 					if (field instanceof MultilingualFieldElement){
 						if (field.getDecorator()!=null){
-							ret += writeStatement("private String "+p.getName(((MultilingualFieldElement)field).getLanguage()));
-							ret += writeStatement("private "+p.toJavaType()+" "+p.getName("ForSorting", ((MultilingualFieldElement)field).getLanguage()));
+							ret += writeStatement("private String "+tmp.getName(((MultilingualFieldElement)field).getLanguage()));
+							ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName("ForSorting", ((MultilingualFieldElement)field).getLanguage()));
 						}else{
-							ret += writeStatement("private "+p.toJavaType()+" "+p.getName(((MultilingualFieldElement)field).getLanguage()));
+							ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName(((MultilingualFieldElement)field).getLanguage()));
 						}
 					}else{
 						//ret += writeString("//p: "+p.getName()+", "+p.toJavaType()+", "+p.getClass());
 						if (field.getDecorator()!=null){
-							ret += writeStatement("private String "+p.getName());
-							ret += writeStatement("private "+p.toJavaType()+" "+p.getName()+"ForSorting");
+							ret += writeStatement("private String "+tmp.getName());
+//							ret += writeStatement("private "+p.toJavaType()+" "+p.getName()+"ForSorting");
+							ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName()+"ForSorting");
 						}else{
-							ret += writeStatement("private "+p.toJavaType()+" "+p.getName());
+//							ret += writeStatement("private "+p.toJavaType()+" "+p.getName());
+							ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName());
 						}
 					}
 				}
@@ -643,6 +648,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 					lang = ((MultilingualFieldElement)element).getLanguage();
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());
+				
 				String caseDecl = null;
 				if (field instanceof MultilingualFieldElement)
 					caseDecl = getListItemBeanSortTypeName(doc)+".SORT_BY_"+p.getName(((MultilingualFieldElement)field).getLanguage()).toUpperCase();
@@ -655,7 +661,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				}else{
 					type2compare = StringUtils.capitalize(p.toJavaType());
 				}
-				String retDecl = "return BasicComparable.compare"+type2compare;
+				String retDecl = p instanceof MetaListProperty? "//List comparison not implemented":"return BasicComparable.compare"+type2compare;
 				if (field.getDecorator()!=null){
 					retDecl += "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")";
 				}else{
@@ -702,7 +708,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			}
 			
 		}
-		ret += generateMethods(element, p);
+		MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
+		ret += generateMethods(element, tmp);
 		return ret;
 	}
 
@@ -716,11 +723,16 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 
 		if (p instanceof MetaListProperty && element.getDecorator()!=null){
 			MetaProperty tmp = new MetaProperty(p.getName(), "string");
-			MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", p.getType());
+			MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", "int");
 			return generateMethods(element, tmp)+generateMethods(element, tmpForSorting);		
 		}
+		
 
 		String additionalMethods = "";
+
+		if (p instanceof MetaListProperty)
+			p = new MetaProperty(p.getName(), "int");
+		
 		if (element.getDecorator()!=null){
 			MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", p.getType());
 			additionalMethods = generateMethods(element, tmpForSorting);

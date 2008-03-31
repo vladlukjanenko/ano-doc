@@ -662,4 +662,74 @@ public class Document extends DataHolder
 			ret.add(new StringProperty(s,s));
 		return ret;
 	}
+	
+	protected  List<Integer> copyToIntegerList(List<Property> properties){
+		ArrayList<Integer> ret = new ArrayList<Integer>(properties.size());
+		for (Property p : properties)
+			ret.add(((IntProperty)p).getInt());
+		return ret;
+	}
+	
+	protected List<Property> copyFromIntegerList(List<Integer> integers){
+		ArrayList<Property> ret = new ArrayList<Property>();
+		for (int i : integers)
+			ret.add(new IntProperty(""+ i,i));
+		return ret;
+	}
+	
+	protected  List<Long> copyToLongList(List<Property> properties){
+		ArrayList<Long> ret = new ArrayList<Long>(properties.size());
+		for (Property p : properties)
+			ret.add(((LongProperty)p).getLong());
+		return ret;
+	}
+	
+	protected List<Property> copyFromLongList(List<Long> longs){
+		ArrayList<Property> ret = new ArrayList<Property>();
+		for (long l: longs)
+			ret.add(new LongProperty(""+ l, l));
+		return ret;
+	}
+	
+	protected  List<Boolean> copyToBooleanList(List<Property> properties){
+		ArrayList<Boolean> ret = new ArrayList<Boolean>(properties.size());
+		for (Property p : properties)
+			ret.add(((BooleanProperty)p).getBoolean());
+		return ret;
+	}
+	
+	protected List<Property> copyFromBooleanList(List<Boolean> booleans){
+		ArrayList<Property> ret = new ArrayList<Property>();
+		for (boolean b: booleans)
+			ret.add(new BooleanProperty(""+ b, b));
+		return ret;
+	}
+	
+	protected  List<Double> copyToDoubleList(List<Property> properties){
+		ArrayList<Double> ret = new ArrayList<Double>(properties.size());
+		for (Property p : properties)
+			ret.add(((DoubleProperty)p).getDouble());
+		return ret;
+	}
+	
+	protected List<Property> copyFromDoubleList(List<Double> doubles){
+		ArrayList<Property> ret = new ArrayList<Property>();
+		for (double d: doubles)
+			ret.add(new DoubleProperty(""+ d, d));
+		return ret;
+	}
+	
+	protected  List<Float> copyToFloatList(List<Property> properties){
+		ArrayList<Float> ret = new ArrayList<Float>(properties.size());
+		for (Property p : properties)
+			ret.add(((FloatProperty)p).getFloat());
+		return ret;
+	}
+	
+	protected List<Property> copyFromFloatList(List<Float> floats){
+		ArrayList<Property> ret = new ArrayList<Property>();
+		for (float d: floats)
+			ret.add(new FloatProperty(""+ d, d));
+		return ret;
+	}
 }

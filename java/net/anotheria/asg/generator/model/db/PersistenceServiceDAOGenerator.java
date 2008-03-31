@@ -1,7 +1,9 @@
 package net.anotheria.asg.generator.model.db;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
@@ -10,6 +12,7 @@ import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.ModuleParameter;
@@ -125,7 +128,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	}
 
 	private String generateRowMapper(MetaDocument doc){
-	    StringBuilder ret = new StringBuilder(5000);
+	    
+		
+		StringBuilder ret = new StringBuilder(5000);
 	    
 	    ret.append(CommentGenerator.generateJavaTypeComment(getRowMapperName(doc)));
 	    
@@ -141,6 +146,16 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    ret.append(emptyline());
 	    ret.append(writeImport("org.apache.log4j.Logger"));
 	    ret.append(emptyline());
+	    
+//	    List<MetaProperty> properties = new ArrayList<MetaProperty>();
+//	    properties.addAll(doc.getProperties());
+//	    properties.addAll(doc.getLinks());
+//	    for (MetaProperty p : properties)
+//	    	if(p instanceof MetaListProperty){
+//	    		ret.append(writeImport("java.util.Arrays"));
+//	    		ret.append(emptyline());
+//	    		break;
+//	    	}
 	    
         ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
         ret.append(writeImport(VOGenerator.getDocumentImport(context, doc)));
@@ -187,6 +202,14 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	}
 	
 	private String generateProperty2DBMapping(MetaProperty p, int position){
+		if (p instanceof MetaListProperty)
+			return _generateArrayProperty2DBMapping((MetaListProperty)p, position);
+		else {
+			return _generateProperty2DBMapping(p, position);
+		}
+	}
+
+	private String _generateProperty2DBMapping(MetaProperty p, int position){
 		String call = "";
 		
 		call += "ret.set";
@@ -196,10 +219,25 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		call += p.toPropertyGetter();
 		call += "("+position+"))";
 		
+		return writeStatement(call);
+	}
+	
+	private String _generateArrayProperty2DBMapping(MetaListProperty p, int position){
+		String call = "";
+		
+		call += "ret.set";
+		call += p.getAccesserName();
+		call += "(";
+		call += "convertToList(";
+		call += "(" + p.getContainedProperty().toJavaType() + "[])";
+		call += "row.getArray";
+		call += "("+position+")";
+		call += ".getArray";
+		call += "()))";
 		
 		return writeStatement(call);
 	}
-
+	
 	private String generateProperty2DBMappingPrivate(MetaDocument doc, MetaProperty p, int position){
 		String call = "";
 		
@@ -210,11 +248,18 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		call += p.toPropertyGetter();
 		call += "("+position+"))";
 		
-		
 		return writeStatement(call);
 	}
 
 	private String generateDB2PropertyMapping(String variableName, MetaProperty p, int position){
+		if (p instanceof MetaListProperty)
+			return _generateDB2ArrayPropertyMapping(variableName, (MetaListProperty)p, position);
+		else {
+			return _generateDB2PropertyMapping(variableName, p, position);
+		}
+	}
+	
+	private String _generateDB2PropertyMapping(String variableName, MetaProperty p, int position){
 		String call = "";
 		
 		call += "ps.";
@@ -228,7 +273,28 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		return writeStatement(call);
 	}
 	
+	private String _generateDB2ArrayPropertyMapping(String variableName, MetaListProperty p, int position){
+		String call = "";
+		
+		call += "ps.setArray";
+		call += "("+position+", ";
+		call += "new " + p.getContainedProperty().toJavaObjectType() + "Array(";
+		call += variableName+".";
+		call += p.toGetter();
+		call += "()))";
+		
+		return writeStatement(call);
+	}
+	
 	private String generateDB2PropertyCallMapping(String variableName, MetaProperty p, String position){
+		if (p instanceof MetaListProperty)
+			return _generateDB2ArrayPropertyCallMapping(variableName, (MetaListProperty)p, position);
+		else {
+			return _generateDB2PropertyCallMapping(variableName, p, position);
+		}
+	}
+	
+	private String _generateDB2PropertyCallMapping(String variableName, MetaProperty p, String position){
 		String call = "";
 		
 		call += "ps.";
@@ -240,8 +306,26 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		
 		return call;
 	}
+	
+	private String _generateDB2ArrayPropertyCallMapping(String variableName, MetaListProperty p, String position){
+		String call = "//Not implemented";
+		
+//		call += "ps.setArray";
+//		call += "("+position+", ";
+//		call += "new " + p.getContainedProperty().toJavaObjectType() + "Array(";
+//		call += variableName+".";
+//		call += p.toGetter();
+//		call += "()))";
+		
+		return call;
+	}
 
 	private String generateDAO(MetaDocument doc){
+		
+	    List<MetaProperty> properties = new ArrayList<MetaProperty>();
+	    properties.addAll(doc.getProperties());
+	    properties.addAll(doc.getLinks());
+		
 		StringBuilder ret = new StringBuilder(5000);
 	    
 	    ret.append(CommentGenerator.generateJavaTypeComment(getDAOName(doc)));
@@ -281,6 +365,15 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    
 	    ret.append(writeImport("org.apache.log4j.Logger"));
 	    ret.append(emptyline());
+	    
+	    Set<String> arrayImports = new HashSet<String>();
+	    for (MetaProperty p : properties){
+	    	if(p instanceof MetaListProperty)
+	    		arrayImports.add("net.anotheria.db.array." + ((MetaListProperty)p).getContainedProperty().toJavaObjectType() + "Array");
+	    }
+	    for(String imp: arrayImports)
+	    	ret.append(writeImport(imp));
+	    ret.append(emptyline());
 
 	    ret.append(writeString("public class "+getDAOName(doc)+" implements DAO{"));
 	    increaseIdent();
@@ -294,9 +387,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    MetaProperty id = new MetaProperty("id", "string");
 	    MetaProperty dao_created = new MetaProperty("dao_created", "long");
 	    MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
-	    List<MetaProperty> properties = new ArrayList<MetaProperty>();
-	    properties.addAll(doc.getProperties());
-	    properties.addAll(doc.getLinks());
+
 	    ret.append(writeStatement(constDecl+getAttributeConst(id)+" = "+quote(getAttributeName(id))));
 	    for (MetaProperty p : properties){
 		    ret.append(writeStatement(constDecl+getAttributeConst(p)+" \t = "+quote(getAttributeName(p))));

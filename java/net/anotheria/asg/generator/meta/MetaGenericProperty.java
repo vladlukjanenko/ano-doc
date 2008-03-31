@@ -23,7 +23,7 @@ public class MetaGenericProperty extends MetaProperty{
 		for (MetaProperty p : containedProperties){
 			if (ret.length()>0)
 				ret += ",";
-			ret += p.toJavaType();
+			ret += p.toJavaObjectType();
 		}
 			
 		return ret;

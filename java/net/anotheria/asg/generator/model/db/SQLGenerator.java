@@ -10,6 +10,7 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.StorageType;
@@ -143,6 +144,8 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 			return "float4";
 		if (p.getType().equals("boolean"))
 			return "boolean";
+		if (p instanceof MetaListProperty)
+			return getSQLPropertyType(((MetaListProperty)p).getContainedProperty()) + "[]";
 		return "UNKNOWN!";
 	}
 

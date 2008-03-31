@@ -1611,7 +1611,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 	
 	private String generateContainerQuickAddAction(MetaModuleSection section, MetaContainerProperty container){
-		if (container instanceof MetaListProperty)
+		if (container instanceof MetaListProperty && ((MetaListProperty)container).getContainedProperty().isLinked())
 			return generateListQuickAddAction(section, (MetaListProperty)container);
 		return "";
 		//throw new RuntimeException("Unsupported container type: "+container.getClass().getName());
