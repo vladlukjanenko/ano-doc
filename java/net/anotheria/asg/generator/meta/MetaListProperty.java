@@ -1,10 +1,14 @@
 package net.anotheria.asg.generator.meta;
 
+import net.anotheria.util.StringUtils;
+
+
 /**
  * TODO please remined another to comment this class
  * @author another
  */
 public class MetaListProperty extends MetaContainerProperty{
+	
 	
 	private MetaProperty containedProperty;
 	
@@ -33,5 +37,13 @@ public class MetaListProperty extends MetaContainerProperty{
 	}
 	
 	
+//	@Override
+//	public String toJavaObjectType(){
+//		return super.toJavaObjectType()+getGenericTypeDeclaration();
+//	}
+//	
+//	protected String getGenericTypeDeclaration(){			
+//		return containedProperty != null? StringUtils.surroundWith(containedProperty.toJavaObjectType(), '<', '>'): "";
+//	}
 
 }

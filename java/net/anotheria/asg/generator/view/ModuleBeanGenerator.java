@@ -34,7 +34,6 @@ import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaGenericListProperty;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
@@ -43,8 +42,8 @@ import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
 import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
@@ -581,6 +580,18 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			ret += writeImport("net.anotheria.util.BasicComparable");
 			ret += emptyline();
 		}
+		
+		for(MetaViewElement element: elements){
+			if (!(element instanceof MetaFieldElement))
+				continue;
+			MetaFieldElement field = (MetaFieldElement)element;
+			MetaProperty p = doc.getField(field.getName());
+			if(!(p instanceof MetaListProperty))
+				continue;
+			ret += writeImport("java.util.List");
+			ret += emptyline();
+			break;
+		}
 
 		String decl = "public class "+getListItemBeanName(section.getDocument());
 		if (containsComparable)
@@ -596,7 +607,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 					ret += writeStatement("private String "+p.getName());
 				else{
 
-					MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(), "int"):p;
+//					MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(), "int"):p;
+					MetaProperty tmp = p;
 					if (field instanceof MultilingualFieldElement){
 						if (field.getDecorator()!=null){
 							ret += writeStatement("private String "+tmp.getName(((MultilingualFieldElement)field).getLanguage()));
@@ -632,49 +644,12 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				ret += generateFunctionMethods((MetaFunctionElement)element);
 			
 		}
-
+		
 		if (containsComparable){
-			ret += writeString("public int compareTo(IComparable anotherComparable, int method){");
-			increaseIdent();
-			ret += writeStatement(getListItemBeanName(doc)+" anotherBean = ("+getListItemBeanName(doc)+") anotherComparable");
-			ret += writeString("switch(method){");
-			increaseIdent();
-			for (int i=0; i<elements.size(); i++){
-				MetaViewElement element = elements.get(i);
-				if (!element.isComparable())
-					continue;
-				String lang = null;
-				if (element instanceof MultilingualFieldElement)
-					lang = ((MultilingualFieldElement)element).getLanguage();
-				MetaFieldElement field = (MetaFieldElement)element;
-				MetaProperty p = doc.getField(field.getName());
-				
-				String caseDecl = null;
-				if (field instanceof MultilingualFieldElement)
-					caseDecl = getListItemBeanSortTypeName(doc)+".SORT_BY_"+p.getName(((MultilingualFieldElement)field).getLanguage()).toUpperCase();
-				else
-					caseDecl = getListItemBeanSortTypeName(doc)+".SORT_BY_"+p.getName().toUpperCase();
-				ret += writeString("case "+caseDecl+":");
-				String type2compare = null; 
-				if (p instanceof MetaEnumerationProperty ){
-					type2compare = "String"; 
-				}else{
-					type2compare = StringUtils.capitalize(p.toJavaType());
-				}
-				String retDecl = p instanceof MetaListProperty? "//List comparison not implemented":"return BasicComparable.compare"+type2compare;
-				if (field.getDecorator()!=null){
-					retDecl += "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")";
-				}else{
-					retDecl += "("+p.getName(lang)+", anotherBean."+p.getName(lang)+")";
-				}
-				ret += writeIncreasedStatement(retDecl);
-			}
-			ret += writeString("default:");
-			ret += writeIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
-			ret += closeBlock();
-			ret += closeBlock();
+			ret += emptyline();
+			ret += generateCompareMethod(doc, elements);
 		}
-
+		
 		ret += closeBlock();
 		return ret;
 	}
@@ -686,7 +661,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	private String generateFieldMethodsInDialog(MetaFieldElement element, MetaDocument doc){
 		String ret = "";
 		MetaProperty p = null;
-		String lang = getElementLanguage(element);
+//		String lang = getElementLanguage(element);
 		if (element.getName().equals(FLAG_FORM_SUBMITTED)){
 			MetaProperty pControlFlag = new MetaProperty(FLAG_FORM_SUBMITTED, "boolean");
 			p = pControlFlag;
@@ -721,17 +696,17 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			return generateMethods(element, tmp);		
 		}
 
-		if (p instanceof MetaListProperty && element.getDecorator()!=null){
-			MetaProperty tmp = new MetaProperty(p.getName(), "string");
-			MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", "int");
-			return generateMethods(element, tmp)+generateMethods(element, tmpForSorting);		
-		}
+//		if (p instanceof MetaListProperty && element.getDecorator()!=null){
+//			MetaProperty tmp = new MetaProperty(p.getName(), "string");
+//			MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", "int");
+//			return generateMethods(element, tmp)+generateMethods(element, tmpForSorting);		
+//		}
 		
 
 		String additionalMethods = "";
 
-		if (p instanceof MetaListProperty)
-			p = new MetaProperty(p.getName(), "int");
+//		if (p instanceof MetaListProperty)
+//			p = new MetaProperty(p.getName(), "int");
 		
 		if (element.getDecorator()!=null){
 			MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", p.getType());
@@ -785,6 +760,41 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		ret += emptyline();
 		return ret;
 		
+	}
+	
+	private String generateCompareMethod(MetaDocument doc, List<MetaViewElement> elements){
+		String ret ="";
+		ret += writeString("public int compareTo(IComparable anotherComparable, int method){");
+		increaseIdent();
+		ret += writeStatement(getListItemBeanName(doc)+" anotherBean = ("+getListItemBeanName(doc)+") anotherComparable");
+		ret += writeString("switch(method){");
+		increaseIdent();
+		for (MetaViewElement element: elements){
+			if (!element.isComparable())
+				continue;
+			
+			MetaFieldElement field = (MetaFieldElement)element;
+			MetaProperty p = doc.getField(field.getName());
+			
+			String lang = getElementLanguage(element);
+			String caseDecl = lang != null? getListItemBeanSortTypeName(doc)+".SORT_BY_"+p.getName(lang).toUpperCase():
+				getListItemBeanSortTypeName(doc)+".SORT_BY_"+p.getName().toUpperCase();
+			
+			ret += writeString("case "+caseDecl+":");
+			
+			String type2compare = p instanceof MetaEnumerationProperty? "String": StringUtils.capitalize(p.toJavaType());
+
+			String retDecl = "return BasicComparable.compare"+type2compare;
+			retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
+				"("+p.getName(lang)+", anotherBean."+p.getName(lang)+")";
+
+			ret += writeIncreasedStatement(retDecl);
+		}
+		ret += writeString("default:");
+		ret += writeIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
+		ret += closeBlock();
+		ret += closeBlock();
+		return ret;
 	}
 	
 	@Deprecated

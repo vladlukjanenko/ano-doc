@@ -495,23 +495,23 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				if (field instanceof MultilingualFieldElement)
 					lang = ((MultilingualFieldElement)field).getLanguage();
 				MetaProperty p = doc.getField(field.getName());
-				if (p instanceof MetaContainerProperty){
-					String value = "";
-					value = doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName((MetaContainerProperty)p, lang)+"()";
-					if (element.getDecorator()!=null){
-						//if decorated, save original value for sorting and replace with decorated value
-						MetaProperty tmp ;
-						if (element instanceof MultilingualFieldElement)
-							tmp = new MetaProperty(p.getName("ForSorting", ((MultilingualFieldElement)element).getLanguage()), p.getType());
-						else
-							tmp = new MetaProperty(p.getName()+"ForSorting", p.getType());
-							
-						appendStatement(ret, "bean."+tmp.toBeanSetter(lang)+"("+value+")");
-						MetaDecorator d = element.getDecorator();
-						value = getDecoratorVariableName(element)+".decorate("+doc.getVariableName()+", "+quote(p.getName())+", "+quote(d.getRule())+")";
-					}
-					appendStatement(ret, "bean."+p.toBeanSetter(lang)+"("+value+")");
-				}else{
+//				if (p instanceof MetaContainerProperty){
+//					String value = "";
+//					value = doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName((MetaContainerProperty)p, lang)+"()";
+//					if (element.getDecorator()!=null){
+//						//if decorated, save original value for sorting and replace with decorated value
+//						MetaProperty tmp ;
+//						if (element instanceof MultilingualFieldElement)
+//							tmp = new MetaProperty(p.getName("ForSorting", ((MultilingualFieldElement)element).getLanguage()), p.getType());
+//						else
+//							tmp = new MetaProperty(p.getName()+"ForSorting", p.getType());
+//							
+//						appendStatement(ret, "bean."+tmp.toBeanSetter(lang)+"("+value+")");
+//						MetaDecorator d = element.getDecorator();
+//						value = getDecoratorVariableName(element)+".decorate("+doc.getVariableName()+", "+quote(p.getName())+", "+quote(d.getRule())+")";
+//					}
+//					appendStatement(ret, "bean."+p.toBeanSetter(lang)+"("+value+")");
+//				}else{
 					String value = "";
 					if (p instanceof MetaEnumerationProperty){
 						MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
@@ -532,7 +532,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						}
 					}
 					appendStatement(ret, "bean."+p.toBeanSetter(lang)+"("+value+")");
-				}
+//				}
 			}
 		}
 		
