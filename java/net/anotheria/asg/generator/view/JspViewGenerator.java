@@ -226,10 +226,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		String parameter = "pId=<bean:write name="+quote("element")+" property="+quote("ownerId")+"/>";
 		parameter += "&pPosition=<bean:write name="+quote("element")+" property="+quote("position")+"/>";
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE_TOP)+"?"+parameter)+">"+getTopImage("move to top")+"</a></td>");
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE_UP)+"?"+parameter)+">"+getUpImage("move up")+"</a></td>");
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE_DOWN)+"?"+parameter)+">"+getDownImage("move down")+"</a></td>");
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE_BOTTOM)+"?"+parameter)+">"+getBottomImage("move to bottom")+"</a></td>");
+		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=top&"+parameter)+">"+getTopImage("move to top")+"</a></td>");
+		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=up&"+parameter)+">"+getUpImage("move up")+"</a></td>");
+		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=down&"+parameter)+">"+getDownImage("move down")+"</a></td>");
+		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?=bottom&"+parameter)+">"+getBottomImage("move to bottom")+"</a></td>");
 		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_DELETE)+"?"+parameter)+">"+getDeleteImage("delete row")+"</a></td>");
 		decreaseIdent();
 		ret += writeString("</tr>");

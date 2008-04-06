@@ -48,10 +48,16 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	public static final String ACTION_EXPORT = "export";
 	public static final String ACTION_SHOW_QUERIES = "showQueries";
 	public static final String ACTION_EXECUTE_QUERY = "execQuery";
+
+	public static final String ACTION_MOVE = "move";
+	/*
+	 
 	public static final String ACTION_MOVE_UP = "moveUp";
 	public static final String ACTION_MOVE_DOWN = "moveDown";
 	public static final String ACTION_MOVE_TOP = "moveTop";
 	public static final String ACTION_MOVE_BOTTOM = "moveBottom";
+	*/
+	
 	public static final String ACTION_SEARCH = "search";
 	public static final String ACTION_COPY_LANG ="copyLang";
 	
@@ -88,6 +94,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		FileEntry entry = new FileEntry("/etc/appdata", getConfigFileName(view), fileContent);
 		entry.setType(".xml");
 		files.add(entry);
+		
+		System.out.println("Generated "+entry);
 	
 		return files;
 	}
@@ -224,29 +232,12 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
 	            );
 	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_MOVE_UP),
-	            ModuleActionsGenerator.getPackage(context,doc )+"."+ModuleActionsGenerator.getContainerMoveUpEntryActionName(doc, container),
+	            "/"+getContainerPath(doc, container, ACTION_MOVE),
+	            ModuleActionsGenerator.getPackage(context,doc )+"."+ModuleActionsGenerator.getContainerMoveEntryActionName(doc, container),
 	            "success",
 	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
 	            );
-	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_MOVE_DOWN),
-	            ModuleActionsGenerator.getPackage(context,doc)+"."+ModuleActionsGenerator.getContainerMoveDownEntryActionName(doc, container),
-	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-	            );
-	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_MOVE_TOP),
-	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerMoveTopEntryActionName(doc, container),
-	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-	            );
-	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_MOVE_BOTTOM),
-	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerMoveBottomEntryActionName(doc, container),
-	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-	            );
+
 	    ret += generateActionMapping(
 	            "/"+getContainerPath(doc, container, ACTION_ADD),
 	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerAddEntryActionName(doc, container),
@@ -445,10 +436,11 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return ret;
 	}
 
+	/*
 	private String getBaseActionName(MetaModuleSection section){
 		return "Base"+getActionSuffix(section);
 	}
-
+*/
 	public static String getActionSuffix(MetaModuleSection section){
 		return section.getDocument().getName()+"Action";
 	}

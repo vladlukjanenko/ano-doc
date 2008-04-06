@@ -55,12 +55,15 @@ import net.anotheria.util.StringUtils;
  */
 public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator {
     
-    public static final String FLAG_FORM_SUBMITTED = "formSubmittedFlag";
-	
 	//private MetaView view;
 	
 	private Context context;
     
+	/**
+	 * Implementation is moved into ano-web, the constant remains.
+	 */
+	public static final String FLAG_FORM_SUBMITTED = "formSubmittedFlag";
+
     public ModuleBeanGenerator(MetaView aView){
         //view = aView;
     }
@@ -349,11 +352,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			}
 		}
 		
-		
-		MetaFieldElement  controlFlag = new MetaFieldElement(FLAG_FORM_SUBMITTED);
-		elements.add(controlFlag);
-
-		
 		ret += writeString("public class "+getDialogBeanName(dialog, doc)+" extends BaseActionForm{");
 		increaseIdent();
 	
@@ -362,13 +360,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				MetaFieldElement field = (MetaFieldElement)element;
 				String lang = getElementLanguage(field);
 				
-				MetaProperty p = null;
-				if (field.getName().equals(FLAG_FORM_SUBMITTED)){
-					MetaProperty pControlFlag = new MetaProperty(FLAG_FORM_SUBMITTED, "boolean");
-					p = pControlFlag;
-				}else{
-					p = doc.getField(field.getName());
-				}
+				MetaProperty p = doc.getField(field.getName());
 				MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
 				ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
 				if (p.isLinked()){
@@ -662,12 +654,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		String ret = "";
 		MetaProperty p = null;
 //		String lang = getElementLanguage(element);
-		if (element.getName().equals(FLAG_FORM_SUBMITTED)){
-			MetaProperty pControlFlag = new MetaProperty(FLAG_FORM_SUBMITTED, "boolean");
-			p = pControlFlag;
-		}else{
-			p = doc.getField(element.getName());
-		}
+		p = doc.getField(element.getName());
 
 		if (p.isLinked() || p instanceof MetaEnumerationProperty){
 			MetaFieldElement pColl = new MetaFieldElement(element.getName()+"Collection");
@@ -685,7 +672,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 		MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
 		ret += generateMethods(element, tmp);
-		return ret;
+		return ret; 
 	}
 
 	private String generateFieldMethods(MetaFieldElement element, MetaDocument doc){
@@ -709,7 +696,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 //			p = new MetaProperty(p.getName(), "int");
 		
 		if (element.getDecorator()!=null){
-			MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", p.getType());
+			MetaProperty tmpForSorting = (MetaProperty) p.clone();//new MetaProperty(p.getName()+"ForSorting", p.getType());
+			tmpForSorting.setName(tmpForSorting.getName()+"ForSorting");
 			additionalMethods = generateMethods(element, tmpForSorting);
 			//if this field has a decorator we have to generate string methods instaed of original methods.
 			p = new MetaProperty(p.getName(), "string");
@@ -782,7 +770,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			
 			ret += writeString("case "+caseDecl+":");
 			
-			String type2compare = p instanceof MetaEnumerationProperty? "String": StringUtils.capitalize(p.toJavaType());
+			String type2compare = p instanceof MetaEnumerationProperty? "String": StringUtils.capitalize(p.toJavaErasedType());
 
 			String retDecl = "return BasicComparable.compare"+type2compare;
 			retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
@@ -861,9 +849,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		ret += writeString("public class "+getFormBeanName(form)+" extends BaseActionForm{");
 		increaseIdent();
 
-		ret += writeStatement("private boolean formSubmittedFlag");
-
-		
 		for (int i=0; i<elements.size(); i++){
 			MetaFormField element = elements.get(i);
 			if (element.isSingle())
@@ -906,7 +891,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 					List<MetaFormTableColumn> columns = table.getColumns();
 					for (int c = 0; c<columns.size(); c++){
 						MetaFormTableColumn col = columns.get(c);
-
+						
 						ret += emptyline();
 						ret += writeString("public "+col.getField().getJavaType()+" get"+StringUtils.capitalize(table.getVariableName(r, c))+"(){");
 						increaseIdent();

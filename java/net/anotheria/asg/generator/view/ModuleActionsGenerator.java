@@ -107,10 +107,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerAddEntryActionName(doc, (MetaContainerProperty)pp), generateContainerAddRowAction(section, (MetaContainerProperty)pp)));
 						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerQuickAddActionName(doc, (MetaContainerProperty)pp), generateContainerQuickAddAction(section, (MetaContainerProperty)pp)));
 						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerDeleteEntryActionName(doc, (MetaContainerProperty)pp), generateContainerDeleteEntryAction(section, (MetaContainerProperty)pp)));
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveUpEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveUpEntryAction(section, (MetaContainerProperty)pp)));
+
+						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveEntryAction(section, (MetaContainerProperty)pp)));
+/*						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveUpEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveUpEntryAction(section, (MetaContainerProperty)pp)));
 						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveDownEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveDownEntryAction(section, (MetaContainerProperty)pp)));
 						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveTopEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveTopEntryAction(section, (MetaContainerProperty)pp)));
 						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveBottomEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveBottomEntryAction(section, (MetaContainerProperty)pp)));
+*/
 					}
 				}
 				timer.stopExecution(section.getModule().getName()+"-dialog-container");
@@ -1580,6 +1583,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return "Delete"+doc.getMultiple()+StringUtils.capitalize(property.getName())+getContainerNameAddy(property)+"Action";
 	}
 	
+	public static String getContainerMoveEntryActionName(MetaDocument doc, MetaContainerProperty property){
+		return "Move"+doc.getMultiple()+StringUtils.capitalize(property.getName())+getContainerNameAddy(property)+"Action";
+	}
+
+	/*
 	public static String getContainerMoveUpEntryActionName(MetaDocument doc, MetaContainerProperty property){
 		return "MoveUp"+doc.getMultiple()+StringUtils.capitalize(property.getName())+getContainerNameAddy(property)+"Action";
 	}
@@ -1595,7 +1603,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	public static String getContainerMoveBottomEntryActionName(MetaDocument doc, MetaContainerProperty property){
 		return "MoveBottom"+doc.getMultiple()+StringUtils.capitalize(property.getName())+getContainerNameAddy(property)+"Action";
 	}
-
+*/
 	private static String getContainerNameAddy(MetaContainerProperty p){
 		return p.getContainerEntryName();
 	}
@@ -1782,63 +1790,17 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return ret;
 	}
 
-	private String generateContainerMoveUpEntryAction(MetaModuleSection section, MetaContainerProperty container){
+	private String generateContainerMoveEntryAction(MetaModuleSection section, MetaContainerProperty container){
 		if (!(container instanceof MetaListProperty)){
 			//TODO decomment
 			//System.out.println("WARN moveUp only supported by lists, "+container+" is not a list");
 			return null;
 		}
 			
-		String ret = "";
-		 
-		MetaDocument doc = section.getDocument();
-
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
-	    
-		//write imports...
-		ret += getStandardActionImports();
-		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		ret += emptyline();
-		
-		ret += writeString("public class "+getContainerMoveUpEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
-		increaseIdent();
-		ret += emptyline();
-		ret += writeString(getExecuteDeclaration());
-		increaseIdent();
-		ret += writeStatement("String id = getStringParameter(req, PARAM_ID)");
-		ret += writeStatement("int position = getIntParameter(req, "+quote("pPosition")+")");
-		ret += writeString("if (position!=0){");
-		increaseIdent();
-		ret += writeStatement(doc.getName()+" "+doc.getVariableName());
-		ret += writeStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
-		
-		ret += writeStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntrySwapperName(container)+"(position, position-1)");
-		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
-		ret += closeBlock();
-		ret += writeStatement("return "+getSuperCall());
-		ret += closeBlock();
-		ret += closeBlock();
-		
-		return ret;
-	}
-
-	/**
-	 * Generates a move to the top of the interal list action for a container. Currently only MetaListProperty is container which supports 
-	 * it.
-	 * @param section
-	 * @param container
-	 * @return
-	 */
-	private String generateContainerMoveTopEntryAction(MetaModuleSection section, MetaContainerProperty container){
-		if (!(container instanceof MetaListProperty)){
-			//TODO re-comment
-			//System.out.println("WARN moveTop only supported by lists, "+container+" is not a list");
-			return null;
-		}
 		MetaListProperty sourceProperty = (MetaListProperty)container;
 		MetaGenericProperty generic = new MetaGenericListProperty(sourceProperty.getName(), sourceProperty.getContainedProperty());
-			
+		
+		
 		String ret = "";
 		 
 		MetaDocument doc = section.getDocument();
@@ -1849,34 +1811,83 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//write imports...
 		ret += getStandardActionImports();
 		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		ret += writeImport("net.anotheria.asg.exception.ASGRuntimeException");
 		ret += writeImport("java.util.List");
 		ret += emptyline();
 		
-		ret += writeString("public class "+getContainerMoveTopEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
+		ret += writeString("public class "+getContainerMoveEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
 		increaseIdent();
 		ret += emptyline();
 		ret += writeString(getExecuteDeclaration());
 		increaseIdent();
 		ret += writeStatement("String id = getStringParameter(req, PARAM_ID)");
 		ret += writeStatement("int position = getIntParameter(req, "+quote("pPosition")+")");
-		ret += writeString("if (position!=0){");
-		increaseIdent();
-		ret += writeStatement(doc.getName()+" "+doc.getVariableName());
-		ret += writeStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+		ret += writeStatement("String direction = getStringParameter(req, "+quote("dir")+")");
 
+		ret += writeStatement(doc.getName()+" "+doc.getVariableName() + " = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+
+		ret += writeString("if ("+quote("top")+".equalsIgnoreCase(direction))");
+		ret += writeIncreasedStatement("moveTop("+doc.getVariableName()+", position)");
+		ret += writeString("if ("+quote("up")+".equalsIgnoreCase(direction))");
+		ret += writeIncreasedStatement("moveUp("+doc.getVariableName()+", position)");
+		ret += writeString("if ("+quote("down")+".equalsIgnoreCase(direction))");
+		ret += writeIncreasedStatement("moveDown("+doc.getVariableName()+", position)");
+		ret += writeString("if ("+quote("bottom")+".equalsIgnoreCase(direction))");
+		ret += writeIncreasedStatement("moveBottom("+doc.getVariableName()+", position)");
+		
+
+		ret += writeStatement("return "+getSuperCall());
+		ret += closeBlock();
+		ret += emptyline();
+		
+		String moveMethodParameter = doc.getName()+" "+doc.getVariableName()+", int position";
+		
+		ret += writeString("private void moveUp("+moveMethodParameter+") throws ASGRuntimeException {");
+		increaseIdent();
+		ret += writeString("if (position==0) ");
+		ret += writeIncreasedStatement("return");
+		ret += writeStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntrySwapperName(container)+"(position, position-1)");
+		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
+		ret += closeBlock();
+		ret += emptyline();
+		
+		ret += writeString("private void moveTop("+moveMethodParameter+") throws ASGRuntimeException {");
+		increaseIdent();
 		ret += writeStatement(generic.toJavaType()+" targetList = "+doc.getVariableName()+".get"+container.getAccesserName()+"()");
 		ret += writeStatement(sourceProperty.getContainedProperty().toJavaType()+" toSwap = targetList.remove(position)");
 		ret += writeStatement("targetList.add(0, toSwap)");
 		ret += writeStatement(doc.getVariableName()+".set"+container.getAccesserName()+"(targetList)"); 
 		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 		ret += closeBlock();
-		ret += writeStatement("return "+getSuperCall());
+		ret += emptyline();
+
+		ret += writeString("private void moveDown("+moveMethodParameter+") throws ASGRuntimeException {");
+		increaseIdent();
+		ret += writeString("if (position<"+doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName(container)+"()-1){");
+		increaseIdent();
+		
+		ret += writeStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntrySwapperName(container)+"(position, position+1)");
+		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 		ret += closeBlock();
+		ret += closeBlock();
+		ret += emptyline();
+
+		ret += writeString("private void moveBottom("+moveMethodParameter+") throws ASGRuntimeException {");
+		increaseIdent();
+		ret += writeStatement(generic.toJavaType()+" targetList = "+doc.getVariableName()+".get"+container.getAccesserName()+"()");
+		ret += writeStatement(sourceProperty.getContainedProperty().toJavaType()+" toSwap = targetList.remove(position)");
+		ret += writeStatement("targetList.add(toSwap)");
+		ret += writeStatement(doc.getVariableName()+".set"+container.getAccesserName()+"(targetList)"); 
+		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
+		ret += closeBlock();
+		ret += emptyline();
+
 		ret += closeBlock();
 		
 		return ret;
 	}
 
+	/*
 	private String generateContainerMoveBottomEntryAction(MetaModuleSection section, MetaContainerProperty container){
 		if (!(container instanceof MetaListProperty)){
 			//System.out.println("WARN moveTop only supported by lists, "+container+" is not a list");
@@ -1922,7 +1933,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		return ret;
 	}
+	*/
 
+	/*
 	private String generateContainerMoveDownEntryAction(MetaModuleSection section, MetaContainerProperty container){		
 		if (!(container instanceof MetaListProperty)){
 			//System.out.println("WARN moveDown only supported by lists, "+container+" is not a list");
@@ -1962,6 +1975,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		return ret;
 	}
+	*/
 	
 	private String generateContainerShowAction(MetaModuleSection section, MetaContainerProperty container){
 		if (container instanceof MetaTableProperty)
