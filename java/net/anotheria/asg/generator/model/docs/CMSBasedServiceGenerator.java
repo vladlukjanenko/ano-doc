@@ -105,6 +105,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
 	        
+	        ret.append(writeString("@SuppressWarnings(\"unchecked\")"));
 	        ret.append(writeString("public "+listDecl+" get"+doc.getMultiple()+"(){"));
 	        increaseIdent();
 	        ret.append(writeStatement("List "+doc.getMultiple().toLowerCase()+" = "+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()"));
