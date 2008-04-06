@@ -53,7 +53,9 @@ public class Generator {
 		///*
 		try{
 			viewContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/editview_def.xml"));
-		}catch(IOException ignored){}
+		}catch(IOException ignored){
+			ignored.printStackTrace();
+		}
 		//*/
 		XMLContextParser contextParser = new XMLContextParser(contextContent);
 		Context c = contextParser.parseContext();
@@ -118,6 +120,8 @@ public class Generator {
 		//	System.out.println("Parsed views: "+views);
 			ViewGenerator v = new ViewGenerator();
 			v.generate("java", views);
+		}else{
+			System.out.println("VIEW_CONTENT = NULL");
 		}
 		
 		long s9 = System.currentTimeMillis();
@@ -164,7 +168,7 @@ public class Generator {
 	}
 	
 	public static final String getVersionString(){
-		return "1.3.2";
+		return "1.3.3";
 	}
 	
 	public static final String getProductString(){
