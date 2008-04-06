@@ -7,7 +7,7 @@ import net.anotheria.util.StringUtils;
  * TODO please remined another to comment this class
  * @author another
  */
-public class MetaProperty {
+public class MetaProperty implements Cloneable{
 	private String type;
 	private String name;
 	private IMetaType metaType;
@@ -92,6 +92,10 @@ public class MetaProperty {
 		return metaType.toJava();
 	}
 	
+	public String toJavaErasedType(){
+		return metaType.toJava();
+	}
+
 	public String toJavaObjectType(){
 		return metaType.toJavaObject();
 	}
@@ -161,6 +165,15 @@ public class MetaProperty {
 	}
 	public void setReadonly(boolean readonly) {
 		this.readonly = readonly;
+	}
+	
+	public Object clone(){
+		try{
+			return super.clone();
+		}catch(CloneNotSupportedException e){
+			//ignore
+		}
+		throw new Error("Can't happen");
 	}
 
 }
