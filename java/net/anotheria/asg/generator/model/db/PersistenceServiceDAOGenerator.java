@@ -717,7 +717,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         increaseIdent();
         ret.append(writeString("if (whereClause.length()>0)"));
         ret.append(writeIncreasedStatement("whereClause += "+quote(" AND ")));
-        ret.append(writeStatement("whereClause += p.getName()+p.getComparator()+"+quote("?")));
+        ret.append(writeStatement("String statement = p.unprepaireable()? (String) p.getValue(): " + quote("?")));
+        ret.append(writeStatement("whereClause += p.getName()+p.getComparator()+statement"));
         ret.append(closeBlock());
         ret.append(writeStatement("SQL += whereClause"));
         //ret.append(writeStatement("System.out.println(SQL)"));
@@ -739,6 +740,10 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         
         //setProperty
         ret.append(openFun("private void setProperty(int position, PreparedStatement ps, QueryProperty property) throws SQLException"));
+        ret.append(writeString("if(property.unprepaireable()){"));
+        increaseIdent();	
+        ret.append(writeStatement("return"));
+    	ret.append(closeBlock());
         for (MetaProperty p : properties){
         	ret.append(writeString("if ("+getAttributeConst(p)+".equals(property.getName())){"));
         	increaseIdent();

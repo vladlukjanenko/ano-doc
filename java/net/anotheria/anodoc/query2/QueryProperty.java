@@ -35,6 +35,10 @@ public class QueryProperty {
 			o.equals(value);
 	}
 	
+	public boolean unprepaireable(){
+		return false;
+	}
+	
 	protected Object getOriginalValue(){
 		return value;
 	}
