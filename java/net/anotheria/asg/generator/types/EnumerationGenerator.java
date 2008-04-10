@@ -134,12 +134,21 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 		ret += writeIncreasedStatement("return \"Unknown: \"+value");
 			
 		ret += closeBlock();//...switch
-		ret += closeBlock();
+		ret += closeBlock();//getName(...)
 
-		ret += closeBlock();
-
+		ret += writeString("public static int getValue(String name){");
+		increaseIdent();
+		for (int i=0; i<values.size(); i++){
+			String v = values.get(i);
+			ret += writeString("if( "+v+"_NAME.equals(name))");
+			ret += writeIncreasedStatement("return "+v);
+		}
+		ret += writeIncreasedStatement("return 0");
+			
+		ret += closeBlock();//getValue(...)
 		
-		return ret;
+		ret += closeBlock();		
+		return ret;		
 	}
 
 }
