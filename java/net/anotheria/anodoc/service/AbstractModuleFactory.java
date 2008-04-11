@@ -60,29 +60,24 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	}
 
 	/**
-	 * Creates and returns a BGLDocumentList
-	 * @return newly created BGLDocumentList
-	 * @see biz.beaglesoft.bgldoc.service.IModuleFactory#createDocumentList(String, BGLDataHolder)
+	 * Creates and returns a DocumentList
+	 * @return newly created DocumentList
 	 */
-	public DocumentList createDocumentList(String name, DataHolder context) {
+	public <D extends Document>DocumentList<D> createDocumentList(String name, DataHolder context) {
 		getLog().debug("This Factory doesn't overwrite create document list(listname:"+name+")");
-		return new DocumentList(name);
+		return new DocumentList<D>(name);
 	}
 
 	/**
-	 * Creates and returns a BGLDocumentList
-	 * @return newly created BGLDocumentList
-	 * @see biz.beaglesoft.bgldoc.service.IModuleFactory#createDocumentList(String)
+	 * Creates and returns a DocumentList
+	 * @return newly created DocumentList
 	 */
-	public DocumentList createDocumentList(String name) {
+	public <D extends Document>DocumentList<D> createDocumentList(String name) {
 		getLog().debug("This Factory doesn't overwrite create document list(listname:"+name+")");
-		return new DocumentList(name);
+		return new DocumentList<D>(name);
 	}
 
 
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleFactory#createModule(String, String)
-	 */
 	public final Module createModule(String ownerId, String copyId) {
 		Module module = recreateModule(ownerId, copyId);
 		module.setOwnerId(ownerId);

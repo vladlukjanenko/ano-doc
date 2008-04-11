@@ -40,10 +40,10 @@ public interface IModuleFactory {
 	 * Creates a new BGLDocumentList with given name and without a context. Normally
 	 * you don't need this method, since list is seldom overwritten. 
 	 */
-	public DocumentList createDocumentList(String name);
+	public <D extends Document>DocumentList<D> createDocumentList(String name);
 	/**
 	 * Creates a new BGLDocumentList with given name and context.
 	 */
-	public DocumentList createDocumentList(String name, DataHolder context);
+	public <D extends Document>DocumentList<D> createDocumentList(String name, DataHolder context);
 	
 }
