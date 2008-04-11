@@ -20,6 +20,8 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import sun.rmi.transport.ObjectTable;
+
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
@@ -38,6 +40,7 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.ObjectType;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
 import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
@@ -662,10 +665,10 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			//;
 			if (p.isMultilingual()){
 				String l = getElementLanguage(element);
-				ret += generateMethods(new MultilingualFieldElement(l, pColl), new MetaProperty(element.getName()+"Collection", "list"));
+				ret += generateMethods(new MultilingualFieldElement(l, pColl), new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
 				ret += generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", "string"));
 			}else{
-				ret += generateMethods(pColl, new MetaProperty(element.getName()+"Collection", "list"));
+				ret += generateMethods(pColl, new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
 				ret += generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", "string"));
 			}
 			
