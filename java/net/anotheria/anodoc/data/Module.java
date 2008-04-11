@@ -91,6 +91,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * Returns the documentlist with given name (if there is any).
 	 */
+	@SuppressWarnings("unchecked")
 	public <D extends Document>DocumentList<D> getList(String name) throws NoSuchDocumentListException{
 		DataHolder list = getDataHolder(name);
 		if (list==null || (!(list instanceof DocumentList)))
@@ -101,6 +102,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * Puts the given list into this module. 
 	 */
+	@SuppressWarnings("unchecked")
 	public void putList(DocumentList aList){
 		putDataHolder(aList);
 	}
@@ -214,6 +216,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	 * it's not saved as is, but only it's contents (which recursively matches for contained documents too).
 	 * If a Module instance is loaded, it have to be reassembled which happens in this function.
 	 */
+	@SuppressWarnings("unchecked")
 	public void fillFromContainer(Hashtable container){
 		log.debug("Filling from container, this:"+this+" container:"+container);
 		Enumeration e = container.keys();
@@ -251,6 +254,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	 * @param context	the context in which the resulting Document previously existed and will exists now.
 	 * @return the newly assembled Document
 	 */
+	@SuppressWarnings("unchecked")
 	private Document assembleDocument(String key, Object o, DataHolder context){
 		Hashtable myContainer = (Hashtable)o;
 		String myName = KeyUtility.getDocumentName(key);
@@ -291,6 +295,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	 * @param o		the object which represented the assemblee (Hashtable)
 	 * @return the newly assembled DocumentList
 	 */
+	@SuppressWarnings("unchecked")
 	private DocumentList assembleList(String key, Object o){
 		Hashtable myContainer = (Hashtable)o;
 		String myName = KeyUtility.getDocumentName(key);
