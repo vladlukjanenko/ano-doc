@@ -35,7 +35,7 @@ public class XMLDataParser implements IDataParser {
 		this.content = content;
 	}
 	
-	
+	@SuppressWarnings("unchecked")
 	public List<MetaModule> parseModules(){
 		
 		SAXBuilder reader = new SAXBuilder();
@@ -122,6 +122,7 @@ public class XMLDataParser implements IDataParser {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	private MetaDocument parseDocument(Element d){
 		MetaDocument doc = new MetaDocument(d.getAttributeValue("name"));
 		List<Element> properties = d.getChildren("property");
@@ -174,6 +175,7 @@ public class XMLDataParser implements IDataParser {
 		return ret;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private MetaProperty parseTable(Element p){
 		String name = p.getAttributeValue("name");
 		MetaTableProperty ret = new MetaTableProperty(name);
