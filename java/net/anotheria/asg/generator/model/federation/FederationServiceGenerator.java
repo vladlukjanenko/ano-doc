@@ -70,6 +70,8 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    Map<String,MetaModule> targetModules = new HashMap<String, MetaModule>();
 	    for (FederatedModuleDef fedDef : federatedModules){
 	    	MetaModule target = GeneratorDataRegistry.getInstance().getModule(fedDef.getName());
+	    	if (target==null)
+	    		throw new RuntimeException("No such module: "+fedDef.getName());
 	    	ret.append(writeImport(ServiceGenerator.getInterfaceImport(context, target)));
 	    	ret.append(writeImport(ServiceGenerator.getExceptionImport(context, target)));
 	    	ret.append(writeImport(ServiceGenerator.getFactoryImport(context, target)));
