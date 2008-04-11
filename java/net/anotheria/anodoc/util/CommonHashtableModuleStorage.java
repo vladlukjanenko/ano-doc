@@ -87,6 +87,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		save();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void saveObject(String asKey, IBasicStoreableObject o, Hashtable<String,Hashtable> target){
 		if (o instanceof ICompositeDataObject)
 			saveComposite(asKey, (ICompositeDataObject)o, target);
@@ -94,6 +95,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 			savePlain((IPlainDataObject)o, target);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void saveComposite(String asKey, ICompositeDataObject c, Hashtable<String,Hashtable>  target){
 		Hashtable mySubTarget = new Hashtable();
 		//saving subobjects
@@ -106,7 +108,9 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		target.put(asKey, mySubTarget);
 		
 	}
-	
+
+
+	@SuppressWarnings("unchecked")
 	private void savePlain(IPlainDataObject o, Hashtable target){
 		target.put(o.getStorageId(), o);
 	}
@@ -162,6 +166,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		return storageDir + File.separator + filename;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void save(){
 		//erstmal konvertieren
 		Enumeration<String> allKeys = storage.keys();
@@ -189,6 +194,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void load(){
 		try{
 			ObjectInputStream oIn = new ObjectInputStream(new FileInputStream(getFile(filename)));
@@ -228,6 +234,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void printStorage(Hashtable holder){
 		System.err.println("======= PRINT STORAGE =======");
 		Enumeration<String> e = holder.keys();
