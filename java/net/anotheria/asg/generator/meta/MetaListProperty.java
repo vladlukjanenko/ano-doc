@@ -1,7 +1,5 @@
 package net.anotheria.asg.generator.meta;
 
-import net.anotheria.util.StringUtils;
-
 
 /**
  * TODO please remined another to comment this class
@@ -15,6 +13,12 @@ public class MetaListProperty extends MetaContainerProperty{
 	public MetaListProperty(String name){
 		super(name, "list");
 	}
+
+	public MetaListProperty(String name, MetaProperty aContainedProperty){
+		super(name, "list");
+		containedProperty = aContainedProperty;
+	}
+
 	/**
 	 * @return
 	 */
@@ -37,7 +41,7 @@ public class MetaListProperty extends MetaContainerProperty{
 	}
 	
 	public String toJavaType(){
-		return super.toJavaType()+"<"+containedProperty.toJavaObjectType()+">";
+		return super.toJavaType()+"<"+containedProperty.toJavaType()+">";
 	}
 	
 	public String toJavaErasedType(){
