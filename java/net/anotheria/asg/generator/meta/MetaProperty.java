@@ -21,6 +21,13 @@ public class MetaProperty implements Cloneable{
 		metaType = TypeFactory.createType(aType);
 		multilingual = false;
 	}
+	
+	public MetaProperty(String aName, IMetaType aType){
+		this.name = aName;
+		metaType = aType;
+		multilingual = false;
+	}
+
 	/**
 	 * @return
 	 */
