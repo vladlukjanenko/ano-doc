@@ -103,8 +103,12 @@ public class GeneratorDataRegistry {
 	public DataType getType(String name){
 		
 		DataType ret = types.get(name);
-		if (ret == null)
-			throw new RuntimeException("No such type: "+name);
+		if (ret == null){
+			RuntimeException e = new RuntimeException("No such type: "+name);
+			e.fillInStackTrace();
+			e.printStackTrace();
+			throw e;
+		}
 		return ret;
 	}
 	
