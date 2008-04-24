@@ -14,7 +14,6 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
-import net.anotheria.asg.generator.model.db.VOGenerator;
 import net.anotheria.util.ExecutionTimer;
 
 /**
@@ -115,6 +114,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        appendImport( DataFacadeGenerator.getDocumentImport(context, doc));
 	        appendImport( DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+	        appendImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 	    }
 	    appendEmptyline();
 	    appendImport( "net.anotheria.asg.util.listener.IServiceListener");
@@ -125,6 +125,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    
 	    appendEmptyline();
 	    appendImport( "net.anotheria.util.xml.XMLNode");
+	    appendImport("net.anotheria.util.xml.XMLAttribute");
 	    appendEmptyline();
 	    appendImport( "net.anotheria.asg.exception.ASGRuntimeException");
 	    appendImport( "net.anotheria.asg.service.InMemoryService");
@@ -471,12 +472,42 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 			
 	    }
 
-	    //generate export function
+	  //generate export function
 	    append(emptyline());
-	    appendString("public XMLNode exportToXML()"+throwsClause+"{");
+	    for (MetaDocument d : docs){
+	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(){");
+	    	increaseIdent();
+	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
+	    	
+	    	appendStatement("try{");
+	    	increaseIdent();
+	    	appendStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()");
+	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
+	    	appendString("for ("+d.getName()+" object : list)");
+	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
+	    	appendStatement("return ret");
+	    	append(closeBlock());
+	    	appendString("catch("+getExceptionName(module)+" e){");
+	    	increaseIdent();
+	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
+	    	append(closeBlock());
+	    	append(closeBlock());
+	    	append(emptyline());
+	    }
+	    
+
+	    appendString("public XMLNode exportToXML(){");
 	    increaseIdent();
-        appendStatement("return new XMLNode("+quote("unimplemented_inmemory_export_"+module.getName())+")");
+	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
+	    append(emptyline());
+	    for (MetaDocument d : docs){
+	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML())");
+	    }
+	    append(emptyline());
+	    appendStatement("return ret");
 	    append(closeBlock());
+	    
+	    
 	    
 	    //*/
 

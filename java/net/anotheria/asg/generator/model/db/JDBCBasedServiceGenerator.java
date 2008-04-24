@@ -64,6 +64,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
+	        ret.append(writeImport(DataFacadeGenerator.getXMLHelperImport(context, doc)));
 	    }
 	    ret.append(emptyline());
 	    ret.append(writeImport("net.anotheria.asg.util.listener.IServiceListener"));
@@ -74,6 +75,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    
 	    ret.append(emptyline());
 	    ret.append(writeImport("net.anotheria.util.xml.XMLNode"));
+	    ret.append(writeImport("net.anotheria.util.xml.XMLAttribute"));
 	    ret.append(emptyline());
 	    
 	    ret.append(writeString("public class "+getImplementationName(module)+" extends BasicService implements "+getInterfaceName(module)+" {"));
@@ -329,16 +331,42 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    
 	    //generate export function
 	    ret.append(emptyline());
-	    ret.append(writeString("public XMLNode exportToXML()"+throwsClause+"{"));
+	    for (MetaDocument d : docs){
+	    	ret.append(writeString("public XMLNode export"+d.getMultiple()+"ToXML(){"));
+	    	increaseIdent();
+	    	ret.append(writeStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")"));
+	    	
+	    	ret.append(writeString("try{"));
+	    	increaseIdent();
+	    	ret.append(writeStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()"));
+	    	ret.append(writeStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))"));
+	    	ret.append(writeString("for ("+d.getName()+" object : list)"));
+	    	ret.append(writeIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))"));
+	    	ret.append(writeStatement("return ret"));
+	    	ret.append(closeBlock());
+	    	ret.append(writeStatement("catch("+getExceptionName(module)+" e){"));
+	    	increaseIdent();
+	    	ret.append(writeStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())"));
+	    	ret.append(closeBlock());
+	    	ret.append(closeBlock());
+	    	ret.append(emptyline());
+	    }
+	    
+
+	    ret.append(writeString("public XMLNode exportToXML(){"));
 	    increaseIdent();
-        ret.append(writeStatement("return new XMLNode("+quote("unimplemented_jdbc_export_"+module.getName())+")"));
+	    ret.append(writeStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")"));
+	    ret.append(emptyline());
+	    for (MetaDocument d : docs){
+	    	ret.append(writeStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML())"));
+	    }
+	    ret.append(emptyline());
+	    ret.append(writeStatement("return ret"));
 	    ret.append(closeBlock());
 	    
 	    
 	    ret.append(closeBlock());
 	    return ret.toString();
 	}
-	
-	
-	
+		
 }

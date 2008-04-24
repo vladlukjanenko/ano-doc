@@ -90,4 +90,5 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	protected String getExceptionName(MetaModule module){
 		return ServiceGenerator.getExceptionName(module);
 	}
+	
 }
