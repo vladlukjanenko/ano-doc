@@ -789,6 +789,12 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		increaseIdent();
 		ret += writeStatement("return new "+getDocumentName(doc)+"(\"\")");
 		ret += closeBlock();
+		ret += emptyline();
+
+		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"ForImport(String id){");
+		increaseIdent();
+		ret += writeStatement("return new "+getDocumentName(doc)+"(id)");
+		ret += closeBlock();
 
 		ret += emptyline();
 

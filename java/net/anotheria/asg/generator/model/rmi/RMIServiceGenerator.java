@@ -202,6 +202,13 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         			);
 	        
 	        writeInterfaceFun(
+	        		"Imports a "+doc.getName()+" object.\nReturns the imported version.", 
+        			doc.getName(), 
+        			"import"+doc.getName(), 
+        			doc.getName()+" "+doc.getVariableName()
+        			);
+
+	        writeInterfaceFun(
 	        		"Creates a new "+doc.getName()+" object.\nReturns the created version.", 
         			doc.getName(), 
         			"create"+doc.getName(), 
@@ -572,6 +579,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		);
 	        
 		    writeStubFun(
+		    		"Imports a new "+doc.getName()+" object.\nReturns the imported version.",
+		    		doc.getName(),
+		    		"import"+doc.getName(),
+		    		doc.getName()+" "+doc.getVariableName(),
+		    		doc.getVariableName(),
+		    		doc.getVariableName()
+		    		);
+
+		    writeStubFun(
 		    		"Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.",
 		    		listDecl,
 		    		"create"+doc.getMultiple(),
@@ -811,6 +827,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		"id"
 		    		);
 	        
+		    writeSkeletonFun(
+		    		"Imports a new "+doc.getName()+" object.\nReturns the imported version.",
+		    		doc.getName(),
+		    		"import"+doc.getName(),
+		    		doc.getName()+" "+doc.getVariableName(),
+		    		doc.getVariableName(),
+		    		doc.getVariableName()
+		    		);
+
 		    writeSkeletonFun(
 		    		"Creates a new "+doc.getName()+" object.\nReturns the created version.",
 		    		doc.getName(),

@@ -198,6 +198,19 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		ret += closeBlock();
 		ret += emptyline();
 
+		ret += writeString("public "+DocumentGenerator.getDocumentName(doc)+" import"+doc.getName()+"("+DocumentGenerator.getDocumentName(doc)+" "+doc.getVariableName()+" ){");
+		increaseIdent();
+		ret += writeStatement("IDHolder idh = _getIdHolder("+doc.getIdHolderName()+")");
+		ret += writeStatement("idh.adjustTill("+doc.getVariableName()+".getId())");
+		ret += writeStatement("putDocument(idh)");
+		ret += emptyline();
+		ret += writeStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
+		ret += writeStatement(doc.getVariableName()+".setLastUpdateNow()");
+		ret += writeStatement("entries.addDocument("+doc.getVariableName()+")");
+		ret += writeStatement("_update"+doc.getMultiple()+"(entries)");
+		ret += writeStatement("return "+doc.getVariableName());
+		ret += closeBlock();
+		ret += emptyline();
 
 		return ret;
 

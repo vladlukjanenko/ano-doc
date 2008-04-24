@@ -139,6 +139,16 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
 	        
+	        //import
+	        ret.append(writeString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){"));
+	        increaseIdent();
+	        ret.append(writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module)));
+	        ret.append(writeStatement("module.import"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")"));
+	        ret.append(writeStatement("updateModule(module)"));
+	        ret.append(writeStatement("return "+doc.getVariableName()));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+
 	        //create
 	        ret.append(writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){"));
 	        increaseIdent();

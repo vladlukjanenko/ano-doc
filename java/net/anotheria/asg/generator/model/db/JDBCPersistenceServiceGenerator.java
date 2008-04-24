@@ -104,6 +104,9 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        ret.append(writeComment("Returns the "+doc.getName()+" object with the specified id."));
 	        ret.append(writeStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause));
 	        ret.append(emptyline());
+	        ret.append(writeComment("Imports a new "+doc.getName()+" object.\nReturns the imported version."));
+	        ret.append(writeStatement("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+	        ret.append(emptyline());
 	        ret.append(writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version."));
 	        ret.append(writeStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
 	        ret.append(emptyline());
@@ -252,6 +255,16 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
 
+	        callLog = "\"Call import"+doc.getName()+"(\"+"+doc.getVariableName()+"+\") \"";
+	        ret.append(writeComment("Imports a new "+doc.getName()+" object.\nReturns the imported version."));
+	        ret.append(openFun("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement("return "+getDAOVariableName(doc)+".import"+doc.getName()+"(c, "+doc.getVariableName()+")"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+
+	        
 	        callLog = "\"Call create"+doc.getName()+"(\"+"+doc.getVariableName()+"+\") \"";
 	        ret.append(writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version."));
 	        ret.append(openFun("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));

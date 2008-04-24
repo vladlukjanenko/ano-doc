@@ -506,6 +506,19 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    ret.append(closeBlock());
 	    ret.append(emptyline());
 	    
+	    //get last id method
+	    ret.append(writeString("private void adjustLastId(Connection con, long lastIdValue) throws DAOException {"));
+	    increaseIdent();
+	    if (moduleDbContextSensitive){
+	    	ret.append(writeStatement("throw new RuntimeException(\"Not yet implemented\")"));
+	    }else{
+	    	ret.append(writeString("if (lastId.get()<lastIdValue)"));
+	    	ret.append(writeIncreasedStatement("lastId.set(lastIdValue)"));
+	    }
+	    ret.append(closeBlock());
+	    ret.append(emptyline());
+
+	    
 	    //createSQL Method
 	    ret.append(writeString("private String createSQL(String sql1, String sql2){"));
 	    increaseIdent();
@@ -570,6 +583,38 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         
         int ii = 0;
         
+        //ImportXYZ method
+        callLog = quote("import"+doc.getName()+"(")+"+con+"+quote(", ")+"+"+doc.getVariableName()+"+"+quote(")");
+        ret.append(writeComment("Imports a new "+doc.getName()+" object.\nReturns the imported version."));
+        ret.append(openFun("public "+doc.getName()+" import"+doc.getName()+"(Connection con, "+doc.getName()+" "+doc.getVariableName()+")"+throwsClause));
+        ret.append(generateFunctionStart("SQL_CREATE", callLog, true));
+        //ret.append(writeStatement("long nextId = getLastId(con).incrementAndGet()"));
+        ret.append(writeStatement("ps.setLong(1, Long.parseLong("+doc.getVariableName()+".getId()))"));
+        for (int i=0; i<properties.size(); i++){
+        	ret.append(generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2));
+        	ii = i +2;
+        }
+        ret.append(writeCommentLine("set create timestamp"));
+        ret.append(writeStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())"));
+
+        ret.append(writeStatement("int rows = ps.executeUpdate()"));
+        ret.append(writeString("if (rows!=1)"));
+        ret.append(writeIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)"));
+        
+        String copyResVarName = "new"+StringUtils.capitalize(doc.getVariableName());
+        String createCopyCall = VOGenerator.getDocumentImplName(doc)+" "+copyResVarName + " = new "+VOGenerator.getDocumentImplName(doc);
+        createCopyCall += "("+doc.getVariableName()+".getId())";
+        ret.append(writeStatement(createCopyCall));
+        ret.append(writeStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")"));
+        ret.append(writeStatement("adjustLastId(con, Long.parseLong("+doc.getVariableName()+".getId()))"));
+        
+        ret.append(writeStatement("return "+copyResVarName));
+        ret.append(generateFunctionEnd(callLog, true));
+        
+        ret.append(closeBlock());
+        ret.append(emptyline());
+        ii = 0;
+        
         //createXYZ method
         callLog = quote("create"+doc.getName()+"(")+"+con+"+quote(", ")+"+"+doc.getVariableName()+"+"+quote(")");
         ret.append(writeComment("Creates a new "+doc.getName()+" object.\nReturns the created version."));
@@ -588,8 +633,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         ret.append(writeString("if (rows!=1)"));
         ret.append(writeIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)"));
         
-        String copyResVarName = "new"+StringUtils.capitalize(doc.getVariableName());
-        String createCopyCall = VOGenerator.getDocumentImplName(doc)+" "+copyResVarName + " = new "+VOGenerator.getDocumentImplName(doc);
+        copyResVarName = "new"+StringUtils.capitalize(doc.getVariableName());
+        createCopyCall = VOGenerator.getDocumentImplName(doc)+" "+copyResVarName + " = new "+VOGenerator.getDocumentImplName(doc);
         createCopyCall += "(\"\"+nextId)";
         ret.append(writeStatement(createCopyCall));
         ret.append(writeStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")"));

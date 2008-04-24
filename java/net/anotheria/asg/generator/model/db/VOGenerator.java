@@ -687,6 +687,13 @@ public class VOGenerator extends AbstractDataObjectGenerator
 
 		ret += emptyline();
 
+		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"ForImport(String anId){");
+		increaseIdent();
+		ret += writeStatement("return new "+getDocumentImplName(doc)+"(anId)");
+		ret += closeBlock();
+
+		ret += emptyline();
+
 		ret += writeComment("For internal use only!");
 		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"(String anId){");
 		increaseIdent();

@@ -159,6 +159,20 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
 	        
+	        
+	        ret.append(writeString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
+	        increaseIdent();
+	        ret.append(openTry());
+	        ret.append(writeStatement(doc.getVariableName() + " = pService.import"+doc.getName()+"("+doc.getVariableName()+")"));
+	        decreaseIdent();
+	        ret.append(writeString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){"));
+	        ret.append(writeIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())"));
+	        ret.append(writeString("}"));
+	        ret.append(writeStatement("return "+doc.getVariableName()));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+
+	        
 	        ret.append(writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
 	        increaseIdent();
 	        ret.append(openTry());

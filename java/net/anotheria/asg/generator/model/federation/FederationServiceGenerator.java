@@ -259,6 +259,13 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
 	        
+	        ret.append(writeString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
+	        increaseIdent();
+	        ret.append(writeStatement("throw new RuntimeException(\"no import in federated services.\")"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+
+
 	        ret.append(writeString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{"));
 	        increaseIdent();
 	        ret.append(writeStatement("if (1==1) throw new RuntimeException(\"not implemented.\")"));
