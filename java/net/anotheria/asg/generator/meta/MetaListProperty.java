@@ -41,7 +41,7 @@ public class MetaListProperty extends MetaContainerProperty{
 	}
 	
 	public String toJavaType(){
-		return super.toJavaType()+"<"+containedProperty.toJavaType()+">";
+		return super.toJavaType()+"<"+containedProperty.toJavaObjectType()+">";
 	}
 	
 	public String toJavaErasedType(){
