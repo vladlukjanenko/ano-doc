@@ -44,9 +44,16 @@ public class AbstractDataObjectGenerator extends AbstractGenerator{
 	
 	protected String generatePropertyListFootprint(List<MetaProperty> properties){
 		String ret = "";
+		
+		Context c = GeneratorDataRegistry.getInstance().getContext();
 
 		for (MetaProperty p : properties){
-			ret += writeStatement("footprint.append(get"+p.getAccesserName()+"())");
+			if (c.areLanguagesSupported() && p.isMultilingual()){
+				for (String l : c.getLanguages())
+					ret += writeStatement("footprint.append(get"+p.getAccesserName(l)+"())");
+			}else{
+				ret += writeStatement("footprint.append(get"+p.getAccesserName()+"())");
+			}
 		}
 		
 		return ret;
