@@ -103,6 +103,7 @@ public class Document extends DataHolder
 	 * Returns the DocumentList contained in this Document under the given name. 
 	 * @see net.anotheria.anodoc.data.NoSuchDocumentListException 
 	 */
+	@SuppressWarnings("unchecked")
 	public <D extends Document>DocumentList<D> getDocumentList(String name) throws NoSuchDocumentListException{
 		try{
 			DataHolder holder = getDataHolder(name);
