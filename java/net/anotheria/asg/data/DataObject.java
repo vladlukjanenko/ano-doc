@@ -30,5 +30,9 @@ public interface DataObject extends Cloneable{
 	public XMLNode toXMLNode();
 	
 	//public void copyAttributesFrom(DataObject object);
+	
+	public String getFootprint();
+	
+	public ObjectInfo getObjectInfo();
 }
  

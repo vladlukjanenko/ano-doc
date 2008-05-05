@@ -16,4 +16,10 @@ public abstract class AbstractVO implements DataObject{
 	public XMLNode toXMLNode(){
 		return new XMLNode("NotImplemented "+getId());
 	}
+	
+	public ObjectInfo getObjectInfo(){
+		ObjectInfo ret = new ObjectInfo(this);
+		ret.setAuthor("none");
+		return ret;
+	}
 }
