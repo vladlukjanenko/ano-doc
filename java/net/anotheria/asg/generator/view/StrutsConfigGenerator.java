@@ -95,7 +95,7 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		entry.setType(".xml");
 		files.add(entry);
 		
-		System.out.println("Generated "+entry);
+		//System.out.println("Generated "+entry);
 	
 		return files;
 	}
