@@ -3,7 +3,6 @@ package net.anotheria.asg.generator.model.federation;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.IGenerateable;
@@ -13,6 +12,7 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
@@ -20,7 +20,7 @@ import net.anotheria.util.StringUtils;
  * This generator generates VO objects for a Module Federation.
  * @author another
  */
-public class FederationVOGenerator extends AbstractGenerator
+public class FederationVOGenerator extends AbstractDataObjectGenerator
 	implements IGenerator{
 
 	private Context context;
@@ -38,10 +38,6 @@ public class FederationVOGenerator extends AbstractGenerator
 		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentImplName(doc), generateDocument(doc)));
 		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
 		return _ret;
-	}
-	
-	private String getPackageName(MetaDocument doc){
-		return context.getPackageName(doc)+".data";
 	}
 	
 	public static String getDocumentImplName(MetaDocument doc){
@@ -104,6 +100,9 @@ public class FederationVOGenerator extends AbstractGenerator
 		}
 		ret += emptyline();
 		ret += writeImport("net.anotheria.util.xml.XMLNode");
+		ret += writeImport("net.anotheria.util.crypt.MD5Util");
+		ret += writeImport("net.anotheria.asg.data.AbstractFederatedVO");
+
 		
 		String interfaceDecl = "implements "+doc.getName();
 		if (doc.isComparable()){
@@ -114,7 +113,7 @@ public class FederationVOGenerator extends AbstractGenerator
 		}
 		
 		
-		ret += writeString("public class "+getDocumentImplName(doc)+" "+interfaceDecl+"{");
+		ret += writeString("public class "+getDocumentImplName(doc)+" extends AbstractFederatedVO "+interfaceDecl+"{");
 		increaseIdent();
 		ret += emptyline();
 		ret += generatePropertyFields(doc);
@@ -143,6 +142,9 @@ public class FederationVOGenerator extends AbstractGenerator
 		ret +=emptyline();
 		ret += generateDefNameMethod(doc);
 		
+		ret +=emptyline();
+		ret += generateGetFootprintMethod(doc);
+
 		ret += closeBlock();
 		return ret;
 	}

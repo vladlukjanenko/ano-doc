@@ -26,8 +26,7 @@ import net.anotheria.util.StringUtils;
  * by the DataFacadeGenerator. It also generates an according factory. 
  * @author another
  */
-public class DocumentGenerator extends AbstractDataObjectGenerator
-	implements IGenerator{
+public class DocumentGenerator extends AbstractDataObjectGenerator implements IGenerator{
 
 	public static final String PROPERTY_DECLARATION = "public static final String ";	
 	public static final String GET_CURRENT_LANG = "ContextManager.getCallContext().getCurrentLanguage()";
@@ -88,7 +87,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		ret += writeStatement("package "+getPackageName(doc));
 		ret += emptyline();
 
-		ret += writeImport("net.anotheria.anodoc.data.Document");
+		ret += writeImport("net.anotheria.asg.data.AbstractASGDocument");
 //		boolean listImported = false;
 		Set<String> imports = new HashSet<String>();
 		for (MetaProperty p:doc.getProperties()){
@@ -126,6 +125,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 				break;
 			}
 		}
+		
+		ret += writeImport("net.anotheria.util.crypt.MD5Util");
+
+		
 		ret += emptyline();
 		
 		String interfaceDecl = "implements "+doc.getName();
@@ -137,7 +140,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		}
 		
 		
-		ret += writeString("public class "+getDocumentName(doc)+" extends Document "+interfaceDecl+"{");
+		ret += writeString("public class "+getDocumentName(doc)+" extends AbstractASGDocument "+interfaceDecl+"{");
 		increaseIdent();
 		ret += emptyline();
 		ret += generateDefaultConstructor(doc);
@@ -157,6 +160,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator
 		
 		ret +=emptyline();
 		ret += generateDefNameMethod(doc);
+		ret +=emptyline();
+		ret += generateGetFootprintMethod(doc);
 		
 		if (DataFacadeGenerator.hasLanguageCopyMethods(doc)){
 			ret += generateLanguageCopyMethods(doc);

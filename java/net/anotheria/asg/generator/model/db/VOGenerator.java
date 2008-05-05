@@ -111,6 +111,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		}
 		
 		ret += writeImport("net.anotheria.asg.data.AbstractVO");
+		ret += writeImport("net.anotheria.util.crypt.MD5Util");
 		ret += writeImport("java.io.Serializable");
 		
 		ret += emptyline();
@@ -157,6 +158,9 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		
 		ret +=emptyline();
 		ret += generateDefNameMethod(doc);
+
+		ret +=emptyline();
+		ret += generateGetFootprintMethod(doc);
 		
 		ret += closeBlock();
 		return ret;
@@ -638,6 +642,8 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		ret += closeBlock();
 		return ret;
 	}
+	
+	
 
 	public static String getContainerSizeGetterName(MetaContainerProperty p){
 		return "get"+StringUtils.capitalize(p.getName())+"Size"; 
