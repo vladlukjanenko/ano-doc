@@ -2,6 +2,10 @@ package net.anotheria.asg.data;
 
 import net.anotheria.anodoc.data.Document;
 
+/**
+ * Root object for all generated classes of type Document (instead of ano-doc Document used previously).
+ * @author another
+ */
 public abstract class AbstractASGDocument extends Document implements DataObject{
 	
 	protected AbstractASGDocument(String anId){
@@ -17,4 +21,5 @@ public abstract class AbstractASGDocument extends Document implements DataObject
 		ret.setAuthor("rfu");
 		return ret;
 	}
+	
 }
