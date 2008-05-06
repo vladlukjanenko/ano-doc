@@ -1,12 +1,14 @@
 package net.anotheria.asg.service;
 
+import net.anotheria.asg.exception.ASGRuntimeException;
+
 public interface CRUDService<T> {
-	public T get(String id);
+	public T get(String id) throws ASGRuntimeException;
 	
-	public void delete(T t);
+	public void delete(T t) throws ASGRuntimeException;
 	
-	public T update(T t);
+	public T update(T t) throws ASGRuntimeException;
 	
-	public T create(T t);
+	public T create(T t) throws ASGRuntimeException;
 
 }

@@ -6,8 +6,6 @@ import java.util.List;
 import net.anotheria.asg.generator.apputil.CallContextGenerator;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
-import net.anotheria.asg.generator.model.ServiceGenerator;
-import net.anotheria.util.StringUtils;
 
 /**
  * TODO please remined another to comment this class

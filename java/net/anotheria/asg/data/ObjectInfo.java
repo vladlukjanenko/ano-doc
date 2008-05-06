@@ -1,5 +1,9 @@
 package net.anotheria.asg.data;
 
+import net.anotheria.util.NumberUtils;
+import net.anotheria.util.xml.XMLAttribute;
+import net.anotheria.util.xml.XMLNode;
+
 public class ObjectInfo {
 	
 	
@@ -23,6 +27,8 @@ public class ObjectInfo {
 	 */
 	private String footprint;
 
+	private String type;
+	
 	public ObjectInfo(){
 		
 	}
@@ -31,6 +37,7 @@ public class ObjectInfo {
 		setId(object.getId());
 		setLastChangeTimestamp(object.getLastUpdateTimestamp());
 		setFootprint(object.getFootprint());
+		setType(object.getDefinedName());
 	}
 
 	
@@ -68,6 +75,31 @@ public class ObjectInfo {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+	
+	public XMLNode toXML(){
+		XMLNode ret = new XMLNode("objectinfo");
+		ret.addAttribute(new XMLAttribute("id",getId()));
+		ret.addChildNode(getChildNode("id", getId()));
+		ret.addChildNode(getChildNode("type", getType()));
+		ret.addChildNode(getChildNode("timestamp", ""+getLastChangeTimestamp()));
+		ret.addChildNode(getChildNode("iso8601timestamp", NumberUtils.makeISO8601TimestampString(getLastChangeTimestamp())));
+		ret.addChildNode(getChildNode("footprint", getFootprint()));
+		return ret;
+	}
+	
+	private XMLNode getChildNode(String name, String text){
+		XMLNode ret = new XMLNode(name);
+		ret.setContent(text);
+		return ret;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 }

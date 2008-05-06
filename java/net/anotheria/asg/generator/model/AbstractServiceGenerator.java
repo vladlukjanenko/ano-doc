@@ -53,6 +53,7 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    increaseIdent();
 	    append(emptyline());
 	    appendStatement("private static AtomicInteger instanceCounter = new AtomicInteger(0)");
+	    appendStatement("private static "+getInterfaceName(module)+" defaultInstance = create"+getServiceName(module)+"()");
 	    append(emptyline());
 	    
 	    appendString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");
@@ -73,14 +74,22 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    append(closeBlock());
 	    append(emptyline());
 	    
-	    appendString("public static "+getInterfaceName(module)+" createInstance(){");
+	    appendString("private static "+getInterfaceName(module)+" createInstance(){");
 	    increaseIdent();
 	    appendString("return "+getImplementationName(module)+".getInstance();");
 	    append(closeBlock());
+	    append(emptyline());
+	    
+	    appendString("static "+getInterfaceName(module)+" getDefaultInstance(){");
+	    increaseIdent();
+	    appendString("return defaultInstance;");
+	    append(closeBlock());
+	    append(emptyline());
+
 	    
 	    append(closeBlock());
 	    return getCurrentJobContent().toString();
-	}
+	} 
 	
 	//returns a comma-separated list of all interfaces supported by this impl, which the proxy must map.
 	protected String getSupportedInterfacesList(MetaModule module){

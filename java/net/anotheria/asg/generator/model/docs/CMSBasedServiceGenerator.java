@@ -27,8 +27,87 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getImplementationName(mod), generateImplementation(mod)));
+		ret.addAll(generateCRUDServices(mod));
 		
 		return ret;
+	}
+	
+	private List<FileEntry> generateCRUDServices(MetaModule module){
+		List<FileEntry> ret = new ArrayList<FileEntry>();
+		
+		String packageName = GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module);
+
+		for (MetaDocument doc : module.getDocuments())
+			ret.add(new FileEntry(FileEntry.package2path(packageName), getCRUDServiceName(doc), generateCRUDService(module, doc)));
+
+		return ret;
+	}
+	
+	private String getCRUDServiceName(MetaDocument doc){
+		return doc.getName()+"CRUDServiceImpl";
+	}
+	
+	private String generateCRUDService(MetaModule module, MetaDocument doc){
+		startNewJob();
+		
+		append(CommentGenerator.generateJavaTypeComment(getCRUDServiceName(doc),"The implementation of the "+getCRUDServiceName(doc)+"."));
+		append(writeStatement("package "+getPackageName(module))); 
+	    append(emptyline());
+	    
+	    
+	    append(writeImport("net.anotheria.asg.service.CRUDService"));
+	    append(writeImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc)));
+	    append(writeImport("net.anotheria.asg.exception.ASGRuntimeException"));
+	    append(emptyline());
+	    
+	    append(writeString("public class "+getCRUDServiceName(doc)+ " implements CRUDService<"+doc.getName()+">{"));
+	    increaseIdent();
+	    
+	    append(emptyline());
+	    
+	    appendStatement(getInterfaceName(module)+" service");
+	    append(emptyline());
+	    appendString("public ", getCRUDServiceName(doc), "(){");
+	    increaseIdent();
+	    appendStatement("this("+getFactoryName(module)+".getDefaultInstance())");
+	    append(closeBlock());
+	    
+	    append(emptyline());
+	    appendString("public ", getCRUDServiceName(doc), "("+getInterfaceName(module)+" aService){");
+	    increaseIdent();
+	    appendStatement("service = aService");
+	    append(closeBlock());
+	    
+	    append(emptyline());
+	    appendString("public "+doc.getName()+" create("+doc.getName()+" "+doc.getVariableName()+")  throws ASGRuntimeException {");
+	    increaseIdent();
+		appendStatement("return service.create"+doc.getName()+"(", doc.getVariableName(), ")");
+		append(closeBlock());
+	    append(emptyline());
+
+		appendString("public void delete(", doc.getName(), " ", doc.getVariableName(), ") throws ASGRuntimeException {");
+	    increaseIdent();
+	    appendStatement("service.delete",doc.getName(),"(",doc.getVariableName(),")");
+		append(closeBlock());
+	    append(emptyline());
+
+		appendString("public "+doc.getName()+" get(String id) throws ASGRuntimeException {");
+	    increaseIdent();
+	    appendStatement("return service.get",doc.getName(),"(id)");
+		append(closeBlock());
+	    append(emptyline());
+
+		appendString("public ", doc.getName(), " update(", doc.getName(), " ", doc.getVariableName(), ") throws ASGRuntimeException {");
+	    increaseIdent();
+	    appendStatement("return service.update",doc.getName(),"(",doc.getVariableName(),")");
+		append(closeBlock());
+	    append(emptyline());
+
+	    
+	    append(closeBlock());
+		
+		
+		return getCurrentJobContent().toString();
 	}
 	
 	private String generateImplementation(MetaModule module){
@@ -48,14 +127,14 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    ret.append(writeImport(context.getPackageName(module)+".data."+ module.getModuleClassName()));
 	    ret.append(writeImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService"));
 	    List<MetaDocument> docs = module.getDocuments();
-	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	    for (MetaDocument doc : docs){
 	        ret.append(writeImport(DataFacadeGenerator.getDocumentImport(context, doc)));
 	        ret.append(writeImport(DataFacadeGenerator.getXMLHelperImport(context, doc)));
 	        ret.append(writeImport(DocumentGenerator.getDocumentImport(context, doc)));
 	    }
 	    ret.append(emptyline());
 	    ret.append(writeImport("net.anotheria.asg.util.listener.IServiceListener"));
+	    ret.append(writeImport("net.anotheria.asg.service.CRUDService"));
 	    ret.append(writeImport("net.anotheria.anodoc.query2.DocumentQuery"));
 	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResult"));
 	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResultEntry"));
@@ -66,7 +145,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    ret.append(writeImport("net.anotheria.util.xml.XMLAttribute"));
 	    ret.append(emptyline());
 	    
-	    ret.append(writeString("public class "+getImplementationName(module)+" extends BasicCMSService implements "+getInterfaceName(module)+" {"));
+	    String implementedInterfaces = getInterfaceName(module);
+	    
+	    ret.append(writeString("public class "+getImplementationName(module)+" extends BasicCMSService implements "+implementedInterfaces+" {"));
 	    increaseIdent();
 	    ret.append(writeStatement("private static "+getImplementationName(module)+" instance"));
 	    ret.append(emptyline());

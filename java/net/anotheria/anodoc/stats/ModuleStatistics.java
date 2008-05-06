@@ -81,6 +81,7 @@ public class ModuleStatistics extends Module{
 		return IStatisticsConstants._PRE_SIZE + anId;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public long getFutureCumulativeSize(String exchangedId, long exchangedSize){
 		String eId = getSizeId(exchangedId);
 		Enumeration allDocNames = getHolderNames();
