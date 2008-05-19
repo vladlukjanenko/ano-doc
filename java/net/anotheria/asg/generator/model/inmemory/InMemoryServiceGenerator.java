@@ -237,6 +237,30 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        append(emptyline());
 	        
+	        appendComment("Deletes multiple "+doc.getName()+" objects.");
+	        appendString("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
+	        increaseIdent();
+	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
+	        increaseIdent();
+	        appendStatement(wrapperDecl+" wrapper = "+getCacheName(doc)+".get("+doc.getVariableName()+".getId())");
+	        appendString("if (wrapper==null || wrapper.get()==null)");
+	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"No such "+doc.getName()+" with id: \"+"+doc.getVariableName()+".getId())");
+	        appendStatement("wrapper.delete()");
+	        append(closeBlock());
+	        
+	        appendString("if (hasServiceListeners()){");
+	        increaseIdent();
+	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
+	        appendString("for (int i=0; i<myListeners.size(); i++)");
+	        increaseIdent();
+	        appendString("for (int t = 0; t<list.size(); t++){");
+	        appendIncreasedStatement("myListeners.get(i).documentDeleted(list.get(t))");
+	        appendString("}");
+	        decreaseIdent();
+	        append(closeBlock());
+	        append(closeBlock());
+	        appendEmptyline();
+	        
 //*/	        
 
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
@@ -345,7 +369,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("for (int i=0; i<myListeners.size(); i++)");
 	        increaseIdent();
 	        appendString("for (int t = 0; t<list.size(); t++){");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(old.get(i), list.get(i))");
+	        appendIncreasedStatement("myListeners.get(i).documentUpdated(old.get(t), list.get(t))");
 	        appendString("}");
 	        decreaseIdent();
 	        append(closeBlock());

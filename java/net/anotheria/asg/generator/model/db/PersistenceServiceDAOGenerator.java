@@ -567,6 +567,31 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         ret.append(closeBlock());
         ret.append(emptyline());
         
+        //deleteListXYZ method
+        String listDecl = "List<"+doc.getName()+">";
+        ret.append(writeComment("Deletes multiple "+doc.getName()+" objects."));
+        callLog = quote("delete"+doc.getMultiple()+"(")+"+con+"+quote(", ")+"+list+"+quote(")");
+        
+        ret.append(openFun("public void delete"+doc.getMultiple()+"(Connection con, "+listDecl+" list)"+throwsClause));
+        ret.append(writeStatement("PreparedStatement ps = null"));
+        ret.append(writeString("try{"));
+        increaseIdent();
+        ret.append(writeStatement("con.setAutoCommit(false)"));
+        ret.append(writeStatement("ps = con.prepareStatement(createSQL(SQL_DELETE_1, SQL_DELETE_2))"));
+        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){"));
+        increaseIdent();
+        ret.append(writeStatement("ps.setLong(1, Long.parseLong("+doc.getVariableName()+".getId()))"));
+        ret.append(writeStatement("int rows = ps.executeUpdate()"));
+        ret.append(writeString("if (rows!=1 && rows!=0){"));
+        increaseIdent();
+        ret.append(writeStatement("log.warn(\"Deleted more than one row of "+doc.getName()+": \"+"+doc.getVariableName()+".getId())"));
+		ret.append(closeBlock());
+		ret.append(closeBlock());
+		ret.append(writeStatement("con.commit()"));
+		ret.append(generateFunctionEnd(callLog, true));
+        ret.append(closeBlock());
+        ret.append(emptyline());
+        
         //getXYZ method
         callLog = quote("get"+doc.getName()+"(")+"+con+"+quote(", ")+"+id+"+quote(")");
         ret.append(writeComment("Returns the "+doc.getName()+" object with the specified id."));
@@ -647,7 +672,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
 
         //createListXYZ method
-        String listDecl = "List<"+doc.getName()+">";
+//        String listDecl = "List<"+doc.getName()+">";
         callLog = quote("create"+doc.getMultiple()+"(")+"+con+"+quote(", ")+"+list+"+quote(")");
         ret.append(writeComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions."));
         ret.append(openFun("public "+listDecl+" create"+doc.getMultiple()+"(Connection con, "+listDecl+" list)"+throwsClause));

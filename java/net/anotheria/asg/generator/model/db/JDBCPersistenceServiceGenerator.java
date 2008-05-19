@@ -101,6 +101,9 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        ret.append(writeComment("Deletes a "+doc.getName()+" object by id."));
 	        ret.append(writeStatement("public void delete"+doc.getName()+"(String id)"+throwsClause));
 	        ret.append(emptyline());
+	        ret.append(writeComment("Deletes multiple "+doc.getName()+" object."));
+	        ret.append(writeStatement("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause));
+	        ret.append(emptyline());
 	        ret.append(writeComment("Returns the "+doc.getName()+" object with the specified id."));
 	        ret.append(writeStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause));
 	        ret.append(emptyline());
@@ -246,6 +249,16 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
 
+	        callLog = "\"Call delete"+doc.getMultiple()+"(\"+list+\") \"";
+	        ret.append(writeComment("Deletes multiple  "+doc.getName()+" objects."));
+	        ret.append(openFun("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause));
+	        ret.append(generateMethodStart(callLog));
+	        ret.append(writeStatement(getDAOVariableName(doc)+".delete"+doc.getMultiple()+"(c, list)"));
+	        ret.append(writeStatement("return"));
+	        ret.append(generateMethodEnd(module, callLog));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+	        
 	        callLog = "\"Call get"+doc.getName()+"(\"+id+\") \"";
 	        ret.append(writeComment("Returns the "+doc.getName()+" object with the specified id."));
 	        ret.append(openFun("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause));

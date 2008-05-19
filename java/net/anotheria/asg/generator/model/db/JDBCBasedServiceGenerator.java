@@ -145,9 +145,38 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        ret.append(writeString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){"));
 	        ret.append(writeIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())"));
 	        ret.append(writeString("}"));
+//	        TODO: fix service delete listening
+//	        ret.append(writeString("if (hasServiceListeners()){"));
+//	        increaseIdent();
+//	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
+//	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
+//	        ret.append(writeIncreasedStatement("myListeners.get(i).documentDeleted(oldVersion, "+doc.getVariableName()+")"));
+//	        ret.append(closeBlock());
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
 
+	        ret.append(writeComment("Deletes multiple "+doc.getName()+" objects."));
+	        ret.append(writeString("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{"));
+	        increaseIdent();
+	        ret.append(openTry());
+	        ret.append(writeStatement("pService.delete"+doc.getMultiple()+"(list)"));
+	        decreaseIdent();
+	        ret.append(writeString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){"));
+	        ret.append(writeIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())"));
+	        ret.append(writeString("}"));
+	        ret.append(writeString("if (hasServiceListeners()){"));
+	        increaseIdent();
+	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
+	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
+	        increaseIdent();
+	        ret.append(writeString("for (int t = 0; t<list.size(); t++){"));
+	        ret.append(writeIncreasedStatement("myListeners.get(i).documentDeleted(list.get(t))"));
+	        ret.append(writeString("}"));
+	        decreaseIdent();
+	        ret.append(closeBlock());	
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+	        
 	        ret.append(writeString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{"));
 	        increaseIdent();
 	        ret.append(openTry());
@@ -231,7 +260,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
 	        increaseIdent();
 	        ret.append(writeString("for (int t = 0; t<ret.size(); t++){"));
-	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(list.get(i), ret.get(i))"));
+	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(list.get(t), ret.get(t))"));
 	        ret.append(writeString("}"));
 	        decreaseIdent();
 	        ret.append(closeBlock());	

@@ -234,7 +234,15 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        ret.append(writeStatement("throw new RuntimeException(\"not implemented.\")"));
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
-
+	        
+	        //delete multiple
+	        ret.append(writeComment("Deletes multiple "+doc.getName()+" objects."));
+	        ret.append(writeStatement("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{"));
+	        increaseIdent();
+	        ret.append(writeStatement("throw new RuntimeException("+quote("Not yet implemented")+")"));
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+	        
 	        ret.append(writeString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{"));
 	        increaseIdent();
 	        ret.append(writeStatement("String tokens[] = StringUtils.tokenize(id, ID_DELIMITER)"));

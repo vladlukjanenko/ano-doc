@@ -159,7 +159,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 	    boolean containsAnyMultilingualDocs = false;
 
-	    String throwsClause = " throws "+getExceptionName(module)+", RemoteException";
+//	    String throwsClause = " throws "+getExceptionName(module)+", RemoteException";
 	    
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
@@ -192,6 +192,13 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         			"", 
         			"delete"+doc.getName(), 
         			doc.getName()+" "+doc.getVariableName()
+        			);
+	        
+	        writeInterfaceFun(
+	        		"Deltes mutiple "+doc.getName()+" objects.", 
+        			"", 
+        			"delete"+doc.getMultiple(), 
+        			listDecl+" list"
         			);
 
 	        writeInterfaceFun(
@@ -559,7 +566,16 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		doc.getVariableName(),
 		    		doc.getVariableName()
 		    		);
-			
+		    
+		    writeStubFun(
+		    		"Deletes multiple "+doc.getName()+" objects.",
+		    		"",
+		    		"delete"+doc.getMultiple(),
+		    		listDecl+" list",
+		    		"list",
+		    		"list"
+		    		);
+		    
 		    writeStubFun(
 		    		"Returns the "+doc.getName()+" object with the specified id.",
 		    		doc.getName(),
@@ -816,6 +832,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		doc.getName()+" "+doc.getVariableName(),
 		    		doc.getVariableName(),
 		    		doc.getVariableName()
+		    		);
+		    
+		    writeSkeletonFun(
+		    		"Deletes mutiple "+doc.getName()+" objects.",
+		    		"",
+		    		"delete"+doc.getMultiple(),
+		    		listDecl+" list",
+		    		"list",
+		    		"list"
 		    		);
 			
 		    writeSkeletonFun(

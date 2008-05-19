@@ -139,6 +139,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    appendImport(ASGRuntimeException.class.getName());
 	    
 	    appendComment("Base class for all exceptions thrown by implementations of "+getInterfaceName(module));
+	    appendString("@SuppressWarnings(" + quote("serial") + ")");
 	    appendString("public class "+getExceptionName(module)+" extends ASGRuntimeException{");
 	    increaseIdent();
 	    
@@ -209,6 +210,9 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	        appendEmptyline();
 	        appendComment("Deletes a "+doc.getName()+" object.");
 	        appendStatement("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
+	        appendEmptyline();
+	        appendComment("Deletes multiple "+doc.getName()+" object.");
+	        appendStatement("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
 	        appendEmptyline();
 	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
 	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);

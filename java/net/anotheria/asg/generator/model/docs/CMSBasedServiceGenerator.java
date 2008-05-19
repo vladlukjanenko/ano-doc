@@ -134,7 +134,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    }
 	    ret.append(emptyline());
 	    ret.append(writeImport("net.anotheria.asg.util.listener.IServiceListener"));
-	    ret.append(writeImport("net.anotheria.asg.service.CRUDService"));
+//	    ret.append(writeImport("net.anotheria.asg.service.CRUDService"));
 	    ret.append(writeImport("net.anotheria.anodoc.query2.DocumentQuery"));
 	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResult"));
 	    ret.append(writeImport("net.anotheria.anodoc.query2.QueryResultEntry"));
@@ -214,6 +214,32 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(closeBlock());
 	        ret.append(emptyline());
 
+
+	        //deletemultiple
+	        ret.append(writeString("public void delete"+doc.getMultiple()+"("+listDecl+" list){"));
+	        increaseIdent();
+
+	        ret.append(writeStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module)));
+
+	        ret.append(writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){"));
+	        increaseIdent();
+	        ret.append(writeStatement("module.delete"+doc.getName()+"("+doc.getVariableName()+".getId())"));
+	        ret.append(closeBlock());
+	        ret.append(writeStatement("updateModule(module)"));
+	        
+	        ret.append(writeString("if (hasServiceListeners()){"));
+	        increaseIdent();
+	        ret.append(writeStatement("List<IServiceListener> myListeners = getServiceListeners()"));
+	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
+	        increaseIdent();
+	        ret.append(writeString("for (int t=0; t<list.size(); t++)"));
+	        ret.append(writeIncreasedStatement("myListeners.get(i).documentDeleted(list.get(t))"));
+	        decreaseIdent();
+	        ret.append(closeBlock());
+	        
+	        ret.append(closeBlock());
+	        ret.append(emptyline());
+	        
 	        ret.append(writeString("public "+doc.getName()+" get"+doc.getName()+"(String id){"));
 	        increaseIdent();
 	        ret.append(writeStatement("return "+getModuleGetterCall(module)+".get"+doc.getName()+"(id)"));
@@ -307,7 +333,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        //updatemultiple
 	        ret.append(writeString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list){"));
 	        increaseIdent();
-	        ret.append(writeStatement(listDecl+" oldList = null;"));
+	        ret.append(writeStatement(listDecl+" oldList = null"));
 	        ret.append(writeString("if (hasServiceListeners())"));
 	        ret.append(writeIncreasedStatement("oldList = new ArrayList<"+doc.getName()+">(list.size())"));
 	        
@@ -327,7 +353,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        ret.append(writeString("for (int i=0; i<myListeners.size(); i++)"));
 	        increaseIdent();
 	        ret.append(writeString("for (int t=0; t<list.size(); t++)"));
-	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(oldList.get(i), list.get(i))"));
+	        ret.append(writeIncreasedStatement("myListeners.get(i).documentUpdated(oldList.get(t), list.get(t))"));
 	        decreaseIdent();
 	        ret.append(closeBlock());
 	        
