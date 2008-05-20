@@ -1,6 +1,12 @@
 package net.anotheria.anodoc.query2;
 
-public class QueryProperty {
+import java.io.Serializable;
+
+public class QueryProperty implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2030752289719048811L;
 	private String name;
 	private Object value;
 	
