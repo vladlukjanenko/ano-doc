@@ -20,8 +20,6 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import sun.rmi.transport.ObjectTable;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
@@ -173,7 +171,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			ret += emptyline();
 		}
 		
-		
 		List<MetaProperty> elements = new ArrayList<MetaProperty>();
 		elements.add(new MetaProperty("ownerId","string"));
 		elements.add(new MetaProperty("position","int"));
@@ -188,6 +185,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			ret += writeStatement("private "+p.toJavaType()+" "+p.getName());
 			if (p.isLinked()){
 				MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
+				ret += writeString("@SuppressWarnings(\"unchecked\")");
 				ret += writeStatement("private "+collection.toJavaType()+" "+collection.getName());
 			}
 		}
@@ -198,11 +196,13 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			ret += generateMethods(null, p);
 			if (p.isLinked()){
 				String propName = p.getName()+"Collection";
+				ret += writeString("@SuppressWarnings(\"unchecked\")");
 				ret += writeStatement("public void set"+StringUtils.capitalize(propName)+"(List l){");
 				increaseIdent();
 				ret += writeStatement(propName+" = l");
 				ret += closeBlock();
 				ret += emptyline();
+				ret += writeString("@SuppressWarnings(\"unchecked\")");
 				ret += writeStatement("public List get"+StringUtils.capitalize(propName)+"(){");
 				increaseIdent();
 				ret += writeStatement("return "+propName);
@@ -339,7 +339,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		ret += writeImport("org.apache.struts.action.ActionMapping");
 		
 		ret += emptyline();
-
+		
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
 
 		for (MetaViewElement element : elements){
