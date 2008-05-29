@@ -16,7 +16,7 @@ import net.anotheria.util.StringUtils;
  */
 public class QueryInProperty extends QueryProperty{
 	
-	public QueryInProperty(String aName, Collection<String> aValues){
+	public <T> QueryInProperty(String aName, Collection<T> aValues){
 		super(aName, aValues);
 	}
 
