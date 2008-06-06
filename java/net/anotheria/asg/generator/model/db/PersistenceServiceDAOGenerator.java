@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.anotheria.anodoc.query2.QueryProperty;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
@@ -794,9 +795,12 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         //ret.append(writeStatement("System.out.println(SQL)"));
         ret.append(writeStatement("ps = con.prepareStatement(SQL)"));
         //set properties
-        ret.append(writeString("for (int i=0; i<properties.size(); i++){"));
+		ret.append(writeStatement("int propertyPosition = 0"));
+        ret.append(writeString("for (QueryProperty property: properties){"));
         increaseIdent();
-        ret.append(writeStatement("setProperty(i+1, ps, properties.get(i))"));
+        ret.append(writeString("if(property.unprepaireable())"));
+        ret.append(writeIncreasedStatement("continue"));
+        ret.append(writeStatement("setProperty(++propertyPosition, ps, property)"));
         ret.append(closeBlock());        
         
         ret.append(writeStatement("ResultSet result = ps.executeQuery()"));
