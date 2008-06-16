@@ -495,14 +495,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("</head>");
 		ret += writeString("<body>");
 		increaseIdent();		
-		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
 		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
 		ret += writeString("<tr>");
 		ret += writeIncreasedString("<td class=\"menuTitleSelected\">");
-		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
-		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
-		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
 		ret += writeIncreasedString(dialog.getTitle()+"</td>");
 		ret += writeString("</tr>");
 		decreaseIdent();
@@ -519,6 +515,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		if (GeneratorDataRegistry.hasLanguageCopyMethods(section.getDocument())){
 			ret += writeString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
+/*
 			ret += writeString("<tr>");
 			increaseIdent();
 			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\">");
@@ -532,16 +529,47 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 						l += "&pDestLang="+dl;
 						l += "&ts=<%=System.currentTimeMillis()%>";
 						link += "<a href=\""+l+"\">"+sl+"-->"+dl+"</a>&nbsp;";
-					}
+					} 
 				}
 			}
 			ret += writeString(link);
 			ret += writeString("</td>");
 			decreaseIdent(); 
 			ret += writeString("</tr>");
+*/
+			ret += writeString("<tr>");
+			increaseIdent();
+			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\"><form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG)+"\">");
+			ret += writeString("<input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>From&nbsp;");
+			ret += writeString("<select name=\"pSrcLang\">");
+			for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+				ret += writeString("<option value=\""+sl+"\">"+sl+"</option>"); 
+			}
+			ret += writeString("</select>");
+
+			
+			ret += writeString("To&nbsp;");
+			ret += writeString("<select name=\"pDestLang\">");
+			for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+				ret += writeString("<option value=\""+sl+"\">"+sl+"</option>");
+			}
+			ret += writeString("</select>");
+			
+			ret += writeString("&nbsp;");
+			ret += writeString("<a href=\"#\" onclick=\"document.CopyLang.submit(); return false\">Copy</a>&nbsp;");
+			
+			ret += writeString("</form></td>");
+			decreaseIdent(); 
+			ret += writeString("</tr>");
 			ret += writeString("</logic:notEqual>");
 		
 		}
+		
+		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
+		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
+		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
+		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
+
 		
 		List<MetaViewElement> richTextElements = new ArrayList<MetaViewElement>();
 		
