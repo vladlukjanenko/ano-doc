@@ -725,7 +725,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("width: '660px',"); 
 		ret += writeString("height: '200px',"); 
 		ret += writeString("dompath: false, ");
-		ret += writeString("animate: true, ");
+		ret += writeString("animate: true ");
 		ret += writeString("}; ");
 		ret += writeString("//Now let's load the Editor.."); 
 		for(MetaViewElement el: richTextElements){
