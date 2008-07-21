@@ -825,9 +825,10 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         	ret.append(writeStatement("return"));
         	ret.append(closeBlock());
         }
+        MetaProperty rawId = new MetaProperty("id","long");
     	ret.append(writeString("if ("+getAttributeConst(id)+".equals(property.getName())){"));
     	increaseIdent();
-    	ret.append(writeStatement(generateDB2PropertyCallMapping("property.getValue()", id, "position")));
+    	ret.append(writeStatement(generateDB2PropertyCallMapping("property.getValue()", rawId, "position")));
     	ret.append(writeStatement("return"));
     	ret.append(closeBlock());
     	ret.append(writeString("if ("+quote(dao_created.getName())+".equals(property.getName())){"));
