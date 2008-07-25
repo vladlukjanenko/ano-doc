@@ -115,7 +115,7 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 		ret += writeString("public class "+getUtilsClassName(type)+" implements "+getDefinitionClassName(type)+" {");
 		increaseIdent();
 
-		ret += writeString("public static List get"+type.getName()+"List(){");
+		ret += writeString("public static List<String> get"+type.getName()+"List(){");
 		increaseIdent();
 		ret += writeStatement("return Arrays.asList("+type.getName().toUpperCase()+"_NAMES)"); 
 		ret += closeBlock();
