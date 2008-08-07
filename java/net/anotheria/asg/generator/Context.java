@@ -187,7 +187,7 @@ public class Context {
 	}
 
 	public String getApplicationURLPath() {
-		return applicationURLPath == null ? "" : applicationURLPath;
+		return applicationURLPath == null || applicationURLPath.length() == 0? "" : "/" + applicationURLPath;
 	}
 
 	public void setApplicationURLPath(String applicationURLPath) {
