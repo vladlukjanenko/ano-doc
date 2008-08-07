@@ -36,6 +36,7 @@ public class XMLContextParser {
 			ret.setPackageName(context.getChildText("package"));
 			ret.setOwner(context.getChildText("owner"));
 			ret.setApplicationName(context.getChildText("applicationName"));
+			ret.setApplicationURLPath(context.getChildText("applicationURLPath"));
 			ret.setServletMapping(context.getChildText("servletMapping"));
 			ret.setEncoding(context.getChildText("encoding"));
 			try{
