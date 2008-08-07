@@ -202,7 +202,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	public static String getImagePath(String imageName, Context context){
-		return "/"+context.getApplicationName()+"/img/"+imageName;
+		return "/"+context.getApplicationURLPath()+"/img/"+imageName;
 	}
 
 	protected String getCurrentCSSPath(String stylesheetName){
@@ -218,15 +218,15 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 
 	public static String getCSSPath(String stylesheetName, Context context){
-		return "/"+context.getApplicationName()+"/css/"+stylesheetName;
+		return "/"+context.getApplicationURLPath()+"/css/"+stylesheetName;
 	}
 
 	public static String getJSPath(String jsName, Context context){
-		return "/"+context.getApplicationName()+"/js/"+jsName;
+		return "/"+context.getApplicationURLPath()+"/js/"+jsName;
 	}
 
 	public static String getYUIPath(String yuiName, Context context){
-		return "/"+context.getApplicationName()+"/yui/"+yuiName;
+		return "/"+context.getApplicationURLPath()+"/yui/"+yuiName;
 	}
 	protected String getPackage(){
 		return getPackage(GeneratorDataRegistry.getInstance().getContext());
@@ -294,7 +294,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	protected String getImage(String name, String alt){
-		return "<img src=\"/"+context.getApplicationName()+"/img/"+name+".gif"+"\" border=\"0\" alt="+quote(alt)+" title="+quote(alt)+">";
+		return "<img src=\"/"+context.getApplicationURLPath()+"/img/"+name+".gif"+"\" border=\"0\" alt="+quote(alt)+" title="+quote(alt)+">";
 	}
 
 	public Context getContext() {

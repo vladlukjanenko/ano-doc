@@ -134,8 +134,8 @@ public class BaseActionGenerator extends AbstractGenerator {
 		ret += writeIncreasedStatement("queryString = \"?\"+queryString");
 		ret += writeString("else");
 		ret += writeIncreasedStatement("queryString = \"\"");
-		ret += writeStatement("addBeanToSession(req, BEAN_TARGET_ACTION, \"/"+context.getApplicationName()+"/"+context.getServletMapping()+"\"+req.getPathInfo()+queryString)");
-		ret += writeStatement("String redUrl = "+quote("/"+context.getApplicationName()+"/"+context.getServletMapping()+"/login"));
+		ret += writeStatement("addBeanToSession(req, BEAN_TARGET_ACTION, \"/"+context.getApplicationURLPath()+"/"+context.getServletMapping()+"\"+req.getPathInfo()+queryString)");
+		ret += writeStatement("String redUrl = "+quote("/"+context.getApplicationURLPath()+"/"+context.getServletMapping()+"/login"));
 		ret += writeStatement("res.sendRedirect(redUrl)");
 		ret += writeStatement("return null");					
 		ret += closeBlock();	
