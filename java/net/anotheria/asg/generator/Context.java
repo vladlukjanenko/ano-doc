@@ -18,6 +18,10 @@ public class Context {
 	private String applicationName;
 	private String servletMapping;
 	private String encoding;
+	/**
+	 * Part of application url path between / and /, for example if you want the cms to be accessible under /xyz/cms/pagexShow the application url path is xyz. 
+	 */
+	private String applicationURLPath;
 	
 	private boolean multilanguageSupport;
 	
@@ -180,6 +184,14 @@ public class Context {
 	
 	public ContextParameter getContextParameter(String name){
 		return parameters.get(name);
+	}
+
+	public String getApplicationURLPath() {
+		return applicationURLPath == null ? "" : applicationURLPath;
+	}
+
+	public void setApplicationURLPath(String applicationURLPath) {
+		this.applicationURLPath = applicationURLPath;
 	}
 
 }
