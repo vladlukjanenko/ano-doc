@@ -294,7 +294,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	protected String getImage(String name, String alt){
-		return "<img src=\"/"+context.getApplicationURLPath()+"/img/"+name+".gif"+"\" border=\"0\" alt="+quote(alt)+" title="+quote(alt)+">";
+		return "<img src=\""+context.getApplicationURLPath()+"/img/"+name+".gif"+"\" border=\"0\" alt="+quote(alt)+" title="+quote(alt)+">";
 	}
 
 	public Context getContext() {
