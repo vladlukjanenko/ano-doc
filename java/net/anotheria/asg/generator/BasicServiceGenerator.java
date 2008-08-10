@@ -49,8 +49,6 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		ret += emptyline();
 
 
-		ret += writeImport("net.anotheria.util.sorter.Sorter");
-		ret += writeImport("net.anotheria.util.sorter.QuickSorter");
 		ret += writeImport("org.apache.log4j.Logger");
 		ret += emptyline();
 		ret += writeImport("net.anotheria.asg.util.listener.IServiceListener");
@@ -66,7 +64,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		increaseIdent();
 		ret += emptyline();
 
-		ret += writeStatement("private Sorter sorter");
+		//ret += writeStatement("private Sorter sorter");
 
 		ret += writeStatement("protected Logger log");
 		ret += emptyline();
@@ -78,7 +76,6 @@ public class BasicServiceGenerator extends AbstractGenerator{
         ret += writeString("protected BasicService(){");
         increaseIdent();
         ret += writeStatement("log = Logger.getLogger(this.getClass())");
-        ret += writeStatement("sorter = new QuickSorter()");
         ret += writeStatement("listeners = new ArrayList<IServiceListener>()");
         ret += closeBlock();
         ret += emptyline();
