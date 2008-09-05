@@ -132,6 +132,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return ret;
 	}
 	
+	protected String getDuplicateImage(){
+		return getDuplicateImage("duplicate");
+	}
+
 	private String defineLinkToViewCms(MetaView view){
 		String ret = "#";
 		List<MetaSection> sections = view.getSections();
@@ -247,10 +251,6 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 
 	public static String getPackage(Context context, MetaDocument doc){
 		return context.getJspPackageName(doc);
-	}
-
-	protected String getDuplicateImage(){
-		return getDuplicateImage("duplicate");
 	}
 
 	protected String getDeleteImage(){
