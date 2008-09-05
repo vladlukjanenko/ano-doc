@@ -21,7 +21,7 @@ public class InMemoryObjectWrapper <T extends DataObject> {
 	
 	public InMemoryObjectWrapper(T aT, boolean created){
 		t = aT;
-		created = true;
+		this.created = created;
 		createdTimestamp = System.currentTimeMillis();
 	}
 

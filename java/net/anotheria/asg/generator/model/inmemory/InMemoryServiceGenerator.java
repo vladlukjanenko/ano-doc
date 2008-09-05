@@ -296,9 +296,13 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 
 	        appendString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
-	        appendStatement("throw new RuntimeException(",quote("Import in memory is neither implemented nor supported"), ")");
+	        appendStatement("InMemoryObjectWrapper<", doc.getName(),"> wrapper = new InMemoryObjectWrapper<",doc.getName(),">(",doc.getVariableName(),")");
+	        appendStatement(getCacheName(doc), ".put(wrapper.getId(), wrapper)");
+	        appendStatement(getCachedListName(doc), " = null");
+	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        append(emptyline());
+	        
 ///*	        
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
