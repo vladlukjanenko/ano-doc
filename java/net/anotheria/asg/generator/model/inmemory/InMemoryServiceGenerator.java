@@ -52,10 +52,18 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    return "InMemory"+getServiceName(m)+"Impl";
 	}
 	
-	public String getFactoryName(MetaModule m){
-	    return "InMemory"+getServiceName(m)+"Factory";
+	
+	public static String getInMemoryFactoryName(MetaModule m){
+		return "InMemory"+getServiceName(m)+"Factory";
 	}
-
+	
+	public String getFactoryName(MetaModule m){
+	    return getInMemoryFactoryName(m);
+	}
+	
+	public static String getInMemoryFactoryImport(Context ctx, MetaModule m){
+	    return getPackageName(ctx, m)+"."+getInMemoryFactoryName(m);
+	}
 	
 	protected String getPackageName(MetaModule module){
 		return getPackageName(context, module);

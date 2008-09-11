@@ -15,6 +15,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
+import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
@@ -399,6 +400,9 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendEmptyline();
 	    appendImport(ServiceGenerator.getInterfaceImport(context, module));
 	    appendImport(ServiceGenerator.getFactoryImport(context, module));
+	    appendEmptyline();
+	    appendImport("net.anotheria.asg.service.InMemoryService");
+	    appendImport(InMemoryServiceGenerator.getInMemoryFactoryImport(context, module));
 	    
 
 	    appendString("public class "+getServerName(module)+"{");
@@ -430,10 +434,32 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("}");
 	    append(closeBlock());
 	    
-
+	    appendString("@SuppressWarnings(", quote("unchecked"), ")");
 	    appendString("public static void startService(Registry registry) throws Exception{");
 	    increaseIdent();
+	    appendStatement("log.info(", quote("Starting " + getServerName(module)) + ")");
 	    appendStatement(ServiceGenerator.getInterfaceName(module)+" myService = "+ServiceGenerator.getFactoryName(module)+".create"+module.getName()+"Service()");
+	    appendStatement("String mode = System.getProperty(", quote("rmi.server.service.mode"),")");
+	    appendString("if(mode != null && mode.equals(", quote("inMemory"),")){");
+	    increaseIdent();
+	    appendStatement("log.info(", quote("Switch to InMemory mode"), ")");
+	    appendTry();
+	    appendStatement(ServiceGenerator.getInterfaceName(module), " inMemoryService = ", InMemoryServiceGenerator.getInMemoryFactoryName(module)+".create"+module.getName()+"Service()");
+	    appendStatement("log.info(", quote("Reading " + ServiceGenerator.getInterfaceName(module) + " In Memory ..."), ")");
+	    appendStatement("long startTime = System.currentTimeMillis()");
+	    appendStatement("((InMemoryService<", ServiceGenerator.getInterfaceName(module), ">)inMemoryService).readFrom(myService)");
+	    appendStatement("long duration = System.currentTimeMillis() - startTime");
+	    appendStatement("log.info(", quote("InMemory " + ServiceGenerator.getInterfaceName(module) + " Fillage = "), "+ duration + ", quote(" ms."), ")");
+	    appendStatement("myService = inMemoryService");
+	    decreaseIdent();
+	    appendString("} catch (Exception e) {");
+	    increaseIdent();	
+	    appendStatement("log.fatal(", quote("Could not read UserService In Memory: "), "+ e)");
+	    appendStatement("throw e");
+	    append(closeBlock());
+	    append(closeBlock());
+	    
+	    
 	    appendStatement(getInterfaceName(module)+" mySkeleton = new "+getSkeletonName(module)+"(myService)");
 	    appendStatement(getInterfaceName(module)+" rmiServant = ("+getInterfaceName(module)+") UnicastRemoteObject.exportObject(mySkeleton, 0);");
 		appendCommentLine("//register service.");
