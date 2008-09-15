@@ -2,8 +2,6 @@ package net.anotheria.anodoc.query2;
 
 import java.util.Collection;
 
-import net.anotheria.anodoc.query2.QueryProperty;
-import net.anotheria.asg.data.DataObject;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -14,16 +12,21 @@ import net.anotheria.util.StringUtils;
  * @author denis
  *
  */
-public class QueryInProperty extends QueryProperty{
+public class QueryInProperty <T>extends QueryProperty{
 	
-	public <T> QueryInProperty(String aName, Collection<T> aValues){
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8649073486730051958L;
+
+	public QueryInProperty(String aName, Collection<T> aValues){
 		super(aName, aValues);
 	}
 
 	@Override
 	public boolean doesMatch(Object o) {
 		return o== null ?getOriginalValue() == null :
-			getListValue().contains(((DataObject)o).getId());
+			getListValue().contains(o);
 	}
 
 	@Override
@@ -33,13 +36,13 @@ public class QueryInProperty extends QueryProperty{
 
 	@Override
 	public Object getValue() {
-		Collection<String> values = getListValue(); 
+		Collection<T> values = getListValue(); 
 		return StringUtils.surroundWith(StringUtils.concatenateTokens(values, ',', '\'', '\''), '(', ')');
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Collection<String> getListValue(){
-		return (Collection<String>) getOriginalValue();
+	private Collection<T> getListValue(){
+		return (Collection<T>) getOriginalValue();
 	}
 
 	@Override

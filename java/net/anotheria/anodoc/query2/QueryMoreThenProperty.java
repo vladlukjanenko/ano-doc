@@ -12,6 +12,11 @@ import net.anotheria.anodoc.query2.QueryProperty;
  */
 public class QueryMoreThenProperty extends QueryProperty{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1772130142649741117L;
+
 	public QueryMoreThenProperty(String name, Object value) {
 		super(name, value);
 	}
@@ -25,6 +30,8 @@ public class QueryMoreThenProperty extends QueryProperty{
 	}
 	
 	public boolean doesMatch(Object o){
+		if(o instanceof Long && getValue() instanceof Long)
+			return (Long)o > (Long)getValue();
 		throw new RuntimeException("Not Implemented");
 	}
 }
