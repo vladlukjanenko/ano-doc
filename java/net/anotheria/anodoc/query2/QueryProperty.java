@@ -9,10 +9,16 @@ public class QueryProperty implements Serializable{
 	private static final long serialVersionUID = 2030752289719048811L;
 	private String name;
 	private Object value;
+	private boolean unprepaireable;
 	
 	public QueryProperty(String aName, Object aValue){
+		this(aName, aValue, false);
+	}
+	
+	public QueryProperty(String aName, Object aValue, boolean anUnprepaireable){
 		name = aName;
 		value = aValue;
+		unprepaireable = anUnprepaireable;
 	}
 	
 	public String getName() {
@@ -42,7 +48,7 @@ public class QueryProperty implements Serializable{
 	}
 	
 	public boolean unprepaireable(){
-		return false;
+		return unprepaireable;
 	}
 	
 	protected Object getOriginalValue(){
