@@ -66,5 +66,9 @@ public class MetaLink extends MetaProperty{
 	public boolean doesTargetMath(MetaModule module, MetaDocument document){
 		return linkTarget != null && linkTarget.equals(module.getName()+"."+document.getName());
 	}
+	
+	public boolean isRelative(){
+		return getLinkTarget().indexOf('.') == -1;
+	}
 
 }

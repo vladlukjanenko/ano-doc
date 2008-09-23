@@ -123,7 +123,7 @@ public class MetaDocument implements IGenerateable{
 				return p; 
 		
 		
-		throw new RuntimeException("No such field: "+name);
+		throw new RuntimeException("No such field: "+name+" in document "+getFullName());
 	}
 	
 	public boolean isComparable(){
@@ -141,6 +141,10 @@ public class MetaDocument implements IGenerateable{
 	}
 
 
+	public String getFullName(){
+		return getParentModule() == null ? 
+				"?."+getName() : getParentModule().getName()+"."+getName();
+	}
 
 	public MetaModule getParentModule() {
 		return parentModule;
