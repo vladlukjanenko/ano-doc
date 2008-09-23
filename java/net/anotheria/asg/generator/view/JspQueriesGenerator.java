@@ -102,6 +102,8 @@ public class JspQueriesGenerator
 		for (int i=0; i<links.size(); i++){
 			MetaLink link = (MetaLink)links.get(i);
 			
+			if (link.isRelative())
+				continue;
 			MetaModule mod = GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
 			MetaDocument targetDocument = mod.getDocumentByName(link.getTargetDocumentName());
 			
