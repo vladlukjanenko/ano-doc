@@ -2,6 +2,7 @@ package net.anotheria.asg.generator.parser;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -18,6 +19,7 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.util.StringUtils;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -52,6 +54,7 @@ public class XMLViewParser {
 			
 		}catch(JDOMException e){
 			e.printStackTrace();
+			throw new RuntimeException("Can't parse view because: "+e.getMessage());
 		}
 		return ret;
 	}
@@ -69,6 +72,10 @@ public class XMLViewParser {
 			view.addSection(parseSection(sections.get(i)));
 		
 		view.setTitle(m.getAttributeValue("title"));
+		
+		String roles = m.getAttributeValue("requiredroles");
+		if (roles != null && roles.trim().length()!=0)
+			view.setRequiredRoles(Arrays.asList(StringUtils.tokenize(roles.trim(), ',')));
 		
 		return view;
 	}

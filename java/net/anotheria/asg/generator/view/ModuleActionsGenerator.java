@@ -691,14 +691,18 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			if (linkTargets.contains(lt))
 				continue;
 			int dotIndex = lt.indexOf('.');
-			String targetModuleName = lt.substring(0,dotIndex);
-			String targetDocumentName = lt.substring(dotIndex+1);
-			MetaModule mod = GeneratorDataRegistry.getInstance().getModule(targetModuleName);
-			MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
+			if (dotIndex>0){
+				String targetModuleName = lt.substring(0,dotIndex);
+				String targetDocumentName = lt.substring(dotIndex+1);
+				MetaModule mod = GeneratorDataRegistry.getInstance().getModule(targetModuleName);
+				MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
 			
-			ret += writeImport(DataFacadeGenerator.getDocumentImport(context, targetDocument));
+				ret += writeImport(DataFacadeGenerator.getDocumentImport(context, targetDocument));
 			
-			linkTargets.add(lt);
+				linkTargets.add(lt);
+			}else{
+				//WARN implement relative linking.
+			}
 		}
 		ret += emptyline();
 
@@ -720,27 +724,29 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			if (linkTargets.contains(lt))
 				continue;
 			int dotIndex = lt.indexOf('.');
-			String targetModuleName = lt.substring(0,dotIndex);
-			String targetDocumentName = lt.substring(dotIndex+1);
-			MetaModule mod = GeneratorDataRegistry.getInstance().getModule(targetModuleName);
-			MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
+			if (dotIndex>0){
+				String targetModuleName = lt.substring(0,dotIndex);
+				String targetDocumentName = lt.substring(dotIndex+1);
+				MetaModule mod = GeneratorDataRegistry.getInstance().getModule(targetModuleName);
+				MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
 			
-			ret += writeStatement("List<"+targetDocument.getName()+"> "+targetDocument.getMultiple().toLowerCase()+" = "+getServiceGetterCall(mod)+".get"+targetDocument.getMultiple()+"()");
-			ret += writeStatement("List<LabelValueBean> "+targetDocument.getMultiple().toLowerCase()+"Beans = new ArrayList<LabelValueBean>("+targetDocument.getMultiple().toLowerCase()+".size())");
-			ret += writeString("for(Iterator<"+targetDocument.getName()+"> it="+targetDocument.getMultiple().toLowerCase()+".iterator(); it.hasNext(); ){");
-			increaseIdent();
-			ret += writeStatement(targetDocument.getName()+" "+targetDocument.getVariableName()+" = ("+targetDocument.getName()+") it.next()");
-			String beanCreationCall = targetDocument.getMultiple().toLowerCase()+"Beans";
-			beanCreationCall+=".add(";
-			beanCreationCall+="new LabelValueBean(";
-			beanCreationCall+=targetDocument.getVariableName()+".getId(), ";
-			beanCreationCall+=targetDocument.getVariableName()+".getName()))";
-			ret += writeStatement(beanCreationCall);
-			ret += closeBlock();
-			ret += writeStatement("addBeanToRequest(req, "+quote(targetDocument.getMultiple().toLowerCase())+", "+targetDocument.getMultiple().toLowerCase()+"Beans)"); 
-			ret += emptyline();
-			
-			linkTargets.add(lt);
+				ret += writeStatement("List<"+targetDocument.getName()+"> "+targetDocument.getMultiple().toLowerCase()+" = "+getServiceGetterCall(mod)+".get"+targetDocument.getMultiple()+"()");
+				ret += writeStatement("List<LabelValueBean> "+targetDocument.getMultiple().toLowerCase()+"Beans = new ArrayList<LabelValueBean>("+targetDocument.getMultiple().toLowerCase()+".size())");
+				ret += writeString("for(Iterator<"+targetDocument.getName()+"> it="+targetDocument.getMultiple().toLowerCase()+".iterator(); it.hasNext(); ){");
+				increaseIdent();
+				ret += writeStatement(targetDocument.getName()+" "+targetDocument.getVariableName()+" = ("+targetDocument.getName()+") it.next()");
+				String beanCreationCall = targetDocument.getMultiple().toLowerCase()+"Beans";
+				beanCreationCall+=".add(";
+				beanCreationCall+="new LabelValueBean(";
+				beanCreationCall+=targetDocument.getVariableName()+".getId(), ";
+				beanCreationCall+=targetDocument.getVariableName()+".getName()))";
+				ret += writeStatement(beanCreationCall);
+				ret += closeBlock();
+				ret += writeStatement("addBeanToRequest(req, "+quote(targetDocument.getMultiple().toLowerCase())+", "+targetDocument.getMultiple().toLowerCase()+"Beans)"); 
+				ret += emptyline();
+				
+				linkTargets.add(lt);
+			}
 			
 		}
 		
@@ -1137,11 +1143,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaProperty p = doc.getField(field.getName());
 				if (p.isLinked()){
 					MetaLink link = (MetaLink)p;
-					MetaModule targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
+					
+					MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
+							doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
 					if (targetModule == null){
 						throw new RuntimeException("Can't resolve link: "+p+" in document "+doc.getName()+" and dialog "+dialog.getName());
 					}
-					String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
+					String tDocName = link.getTargetDocumentName(); 
 					MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
 					String listName = targetDocument.getMultiple().toLowerCase();
 					emptyline(ret);
@@ -1404,8 +1412,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				if (p.isLinked()){
 					MetaLink link = (MetaLink)p;
 
-					MetaModule targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
-					String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
+					MetaModule targetModule = link.isRelative() ? 
+							doc.getParentModule() : 
+							GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
+					String tDocName = link.getTargetDocumentName(); 
 					MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
 					String listName = targetDocument.getMultiple().toLowerCase();
 					emptyline(ret);

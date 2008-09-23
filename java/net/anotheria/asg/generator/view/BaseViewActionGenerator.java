@@ -17,7 +17,7 @@ import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
+ * This generator generates the base action for a view.
  * @author another
  */
 public class BaseViewActionGenerator extends AbstractGenerator {
@@ -89,6 +89,10 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 		ret += writeString("protected void init(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
 		ret += writeStatement("super.init(mapping, af, req, res)");
+		//add check for roles
+		if (view.getRequiredRoles()!=null && view.getRequiredRoles().size()>0){
+			ret += writeCommentLine("check whether user has one of following roles: "+view.getRequiredRoles());
+		}
 		ret += writeStatement("prepareMenu(req)");
 		ret += closeBlock();
 		ret += emptyline();

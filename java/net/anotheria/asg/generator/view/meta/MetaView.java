@@ -14,11 +14,15 @@ public class MetaView implements IGenerateable{
 	private boolean passwordProtected;
 	private List<MetaSection> sections;
 	private String title;
+	private List<String> requiredRoles;
 	
 	public MetaView(String aName){
 		name = aName;
 		sections = new ArrayList<MetaSection>();
+		requiredRoles = new ArrayList<String>();
 	}
+	
+	
 	/**
 	 * @return
 	 */
@@ -73,6 +77,16 @@ public class MetaView implements IGenerateable{
 	 */
 	public void setTitle(String string) {
 		title = string;
+	}
+
+
+	public List<String> getRequiredRoles() {
+		return requiredRoles;
+	}
+
+
+	public void setRequiredRoles(List<String> requiredRoles) {
+		this.requiredRoles = requiredRoles;
 	}
 
 }
