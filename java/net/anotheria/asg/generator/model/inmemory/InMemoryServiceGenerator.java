@@ -536,7 +536,27 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	append(closeBlock());
 	    	append(closeBlock());
 	    	append(emptyline());
-	    }
+
+	    
+	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages){");
+	    	increaseIdent();
+	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
+	    	
+	    	appendStatement("try{");
+	    	increaseIdent();
+	    	appendStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()");
+	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
+	    	appendString("for ("+d.getName()+" object : list)");
+	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
+	    	appendStatement("return ret");
+	    	append(closeBlock());
+	    	appendString("catch("+getExceptionName(module)+" e){");
+	    	increaseIdent();
+	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
+	    	append(closeBlock());
+	    	append(closeBlock());
+	    	append(emptyline());
+}
 	    
 
 	    appendString("public XMLNode exportToXML(){");
@@ -549,7 +569,18 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    append(emptyline());
 	    appendStatement("return ret");
 	    append(closeBlock());
+	    append(emptyline());
 	    
+	    appendString("public XMLNode exportToXML(String[] languages){");
+	    increaseIdent();
+	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
+	    append(emptyline());
+	    for (MetaDocument d : docs){
+	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML(languages))");
+	    }
+	    append(emptyline());
+	    appendStatement("return ret");
+	    append(closeBlock());
 	    
 	    
 	    //*/

@@ -181,7 +181,8 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 			ret += writeStatement("public static final String[] LANGUAGES = new String[]{"+langArray+"}");
 		}
 
-		ret += writeString("public static XMLNode toXML("+doc.getName()+" object){");
+		//generates generic to xml method
+		ret += writeString("private static XMLNode _toXML("+doc.getName()+" object, String[] languages){");
 		increaseIdent();
 		ret += writeStatement("XMLNode ret = new XMLNode("+quote(doc.getName())+")");
 		ret += writeStatement("ret.addAttribute(new XMLAttribute("+quote("id")+", object.getId()))");
@@ -197,6 +198,23 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		ret += closeBlock();
 		ret += emptyline();
 		
+		ret += writeString("public static XMLNode toXML("+doc.getName()+" object){");
+		increaseIdent();
+		ret += writeStatement("return _toXML(object, LANGUAGES)");
+		ret += closeBlock();
+		ret += emptyline();
+
+		//generates toXML method for a single language
+		ret += writeString("public static XMLNode toXML("+doc.getName()+" object, String... languages){");
+		increaseIdent();
+		
+		ret += writeString("if (languages==null || languages.length==0)");
+		ret += writeIncreasedStatement("return toXML(object)");
+		ret += writeStatement("return _toXML(object, languages)");
+		ret += closeBlock();
+		ret += emptyline();
+		
+
 		ret += writeString("public static "+doc.getName()+" fromXML(XMLNode node){");
 		increaseIdent();
 		ret += writeStatement("return null");
@@ -238,7 +256,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 				callArr += ", ";
 			callArr += "object.get"+p.getAccesserName(l)+"()";
 		}
-		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", LANGUAGES , "+callArr+"	))");
+		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", languages , "+callArr+"	))");
 		return ret;
 	}
 	

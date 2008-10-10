@@ -311,7 +311,17 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
     			""
     			);
 	    
-	    append(closeBlock());
+        writeInterfaceFun(
+        		"creates an xml element with all contained data.", 
+    			"XMLNode", 
+    			"exportToXML", 
+    			"String[] languages"
+    			);
+	    
+        append(closeBlock());
+	    
+	    
+	    
 	    return getCurrentJobContent().toString();
 	}
 	
@@ -742,6 +752,14 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    		null
 	    		);
 	    		
+	    writeStubFun(
+	    		"creates an xml element with all contained data in selected languages",
+	    		"XMLNode",
+	    		"exportToXML",
+	    		"String[] languages",
+	    		"languages",
+	    		null
+	    		);
 	    
 	    ////********** //////
 	    appendString("public void addServiceListener(IServiceListener listener){");
@@ -1009,6 +1027,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    		null
 	    		);
 	    		
+	    writeSkeletonFun(
+	    		"creates an xml element with all contained data.",
+	    		"XMLNode",
+	    		"exportToXML",
+	    		"String languages[]",
+	    		"languages",
+	    		null
+	    		);
+
 	    
 	    append(closeBlock());
 	    return getCurrentJobContent().toString();

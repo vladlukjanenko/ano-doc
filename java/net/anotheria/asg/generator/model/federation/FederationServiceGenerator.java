@@ -395,7 +395,12 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
         ret.append(writeStatement("return new XMLNode("+quote("unimplemented_federated_export_"+module.getName())+")"));
 	    ret.append(closeBlock());
 	    
-	    
+	    ret.append(emptyline());
+	    ret.append(writeString("public XMLNode exportToXML(String[] languages)"+throwsClause+"{"));
+	    increaseIdent();
+        ret.append(writeStatement("return new XMLNode("+quote("unimplemented_federated_export_"+module.getName())+")"));
+	    ret.append(closeBlock());
+
 	    ret.append(closeBlock());
 	    return ret.toString();
 	}

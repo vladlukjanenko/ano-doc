@@ -40,6 +40,8 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		ret += writeImport("java.io.OutputStream");
 		ret += writeImport("java.io.IOException");
 		ret += writeImport("java.io.OutputStreamWriter");
+		ret += writeImport("java.nio.charset.Charset");
+		ret += writeImport("java.util.concurrent.atomic.AtomicLong");
 		ret += emptyline();
 		//ret += writeImport("org.jdom.Element");
 		//ret += writeImport("org.jdom.Attribute");
@@ -52,6 +54,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		ret += emptyline();
 		ret += writeImport("net.anotheria.util.Date");
 		ret += writeImport("net.anotheria.util.IOUtils");
+		ret += writeImport("net.anotheria.util.StringUtils");
 		ret += writeImport(ASGRuntimeException.class.getName());
 		ret += writeImport("org.apache.log4j.BasicConfigurator");
 		ret += emptyline();
@@ -63,10 +66,15 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		ret += writeString("public class "+getExporterClassName(context)+"{");
 		increaseIdent();
 		ret += emptyline();
-		
+		ret += writeStatement("private static AtomicLong exp = new AtomicLong()");
+		ret += writeStatement("private static String[] LANGUAGES = null");
+
 		ret += writeString("static {");
 		increaseIdent();
 		ret += writeStatement(ConfiguratorGenerator.getConfiguratorClassName()+".configure()");
+		ret += writeStatement("String expLanguages = System.getProperty("+quote("anosite.export.languages")+")");
+		ret += writeString("if (expLanguages!=null && expLanguages.length()>0)");
+		ret += writeIncreasedStatement("LANGUAGES = StringUtils.tokenize(expLanguages, ',')");
 		ret += closeBlock();
 		ret += emptyline();
 		
@@ -76,7 +84,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		increaseIdent();
 		ret += writeStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>()");
 		for (MetaModule m : modules){
-			ret += writeStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML())");
+			ret += writeStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
 		}
 		ret += writeStatement("return createExport(nodes)");
 		ret += closeBlock();
@@ -104,7 +112,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 			ret += writeString("public static XMLTree create"+m.getName()+"XMLExport() throws ASGRuntimeException{");
 			increaseIdent();
 			ret += writeStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>(1)");
-			ret += writeStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML())");
+			ret += writeStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
 			ret += writeStatement("return createExport(nodes)");
 			ret += closeBlock();
 			ret += emptyline();
@@ -178,12 +186,20 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		ret += writeStatement("System.out.println("+quote("Please make your choice:")+")");
 		ret += writeStatement("System.out.println("+quote("0 - Quit")+")");
 		ret += writeStatement("System.out.println("+quote("1 - Complete export")+")");
-		int i=1;
+		int i=2;
 		for (MetaModule m : modules){
-			ret += writeStatement("System.out.println("+quote(""+i+" - Export "+m.getName())+")");
+			ret += writeStatement("System.out.println("+quote(""+i+" - Export "+m.getName()+" ["+m.getStorageType()+"]")+")");
 			i++;
 		}
 		ret += writeStatement("String myInput = IOUtils.readlineFromStdIn()");
+		ret += writeStatement("XMLTree tree = createExportForInput(myInput)");
+		ret += writeString("if (tree==null)");
+		ret += writeIncreasedStatement("System.exit(0)");
+		ret += writeStatement("FileOutputStream fOut = new FileOutputStream(new File(\"export-\"+exp.incrementAndGet()+\".xml\"))");
+		ret += writeStatement("OutputStreamWriter writer = new OutputStreamWriter(fOut, Charset.forName("+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+"))");
+		ret += writeStatement("tree.write(writer)");
+		ret += writeStatement("writer.flush()");
+		ret += writeStatement("writer.close()");
 		ret += closeBlock();
 		
 		ret += closeBlock();
@@ -206,7 +222,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		ret += writeIncreasedStatement("return createCompleteXMLExport()");
 
 		//create"+m.getName()+"XMLExport()
-		i=1;
+		i=2;
 		for (MetaModule m : modules){
 			ret += writeString("if ("+quote(""+i)+".equals(input))");
 			ret += writeIncreasedStatement("return create"+m.getName()+"XMLExport()");

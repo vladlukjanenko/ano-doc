@@ -393,6 +393,25 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	ret.append(closeBlock());
 	    	ret.append(closeBlock());
 	    	ret.append(emptyline());
+	    	
+	    	ret.append(writeString("public XMLNode export"+d.getMultiple()+"ToXML(String languages[]){"));
+	    	increaseIdent();
+	    	ret.append(writeStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")"));
+	    	
+	    	ret.append(writeString("try{"));
+	    	increaseIdent();
+	    	ret.append(writeStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()"));
+	    	ret.append(writeStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))"));
+	    	ret.append(writeString("for ("+d.getName()+" object : list)"));
+	    	ret.append(writeIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))"));
+	    	ret.append(writeStatement("return ret"));
+	    	ret.append(closeBlock());
+	    	ret.append(writeStatement("catch("+getExceptionName(module)+" e){"));
+	    	increaseIdent();
+	    	ret.append(writeStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())"));
+	    	ret.append(closeBlock());
+	    	ret.append(closeBlock());
+	    	ret.append(emptyline());
 	    }
 	    
 
@@ -406,7 +425,19 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    ret.append(emptyline());
 	    ret.append(writeStatement("return ret"));
 	    ret.append(closeBlock());
+	    ret.append(emptyline());
 	    
+	    ret.append(writeString("public XMLNode exportToXML(String[] languages){"));
+	    increaseIdent();
+	    ret.append(writeStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")"));
+	    ret.append(emptyline());
+	    for (MetaDocument d : docs){
+	    	ret.append(writeStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML(languages))"));
+	    }
+	    ret.append(emptyline());
+	    ret.append(writeStatement("return ret"));
+	    ret.append(closeBlock());
+
 	    
 	    ret.append(closeBlock());
 	    return ret.toString();
