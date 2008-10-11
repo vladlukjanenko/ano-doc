@@ -125,7 +125,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 	
 	private void printComposite(ICompositeDataObject c, int tabs){
 		System.out.println("composite");
-		Enumeration e = c.getKeys();
+		Enumeration<String> e = c.getKeys();
 		while(e.hasMoreElements()){
 			String key = (String)e.nextElement();
 			IBasicStoreableObject obj = (IBasicStoreableObject) c.getObject(key);
@@ -234,9 +234,10 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void printStorage(Hashtable holder){
+	@SuppressWarnings("unused")
+	private void printStorage(@SuppressWarnings("unchecked") Hashtable holder){
 		System.err.println("======= PRINT STORAGE =======");
+		@SuppressWarnings("unchecked")
 		Enumeration<String> e = holder.keys();
 		while(e.hasMoreElements()){
 			String key = e.nextElement();
