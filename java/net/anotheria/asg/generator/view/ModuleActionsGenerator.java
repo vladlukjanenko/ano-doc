@@ -1328,8 +1328,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(ret, doc.getName()+" "+doc.getVariableName()+"Src = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
 		appendStatement(ret, doc.getName()+" "+doc.getVariableName()+"Dest = "+DataFacadeGenerator.getDocumentFactoryName(doc)+".create"+doc.getName()+"("+doc.getVariableName()+"Src)");
 
-		appendStatement(ret, getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+"Dest"+")");
-	    appendStatement(ret, "res.sendRedirect("+getShowActionRedirect(doc)+")");
+		appendStatement(ret, doc.getName()+" "+doc.getVariableName()+"Created = "+getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+"Dest"+")");
+	    appendStatement(ret, "res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&")+"+PARAM_ID+"+quote("=")+"+"+doc.getVariableName()+"Created.getId()"+")");
 	    appendStatement(ret, "return null");
 		closeBlock(ret);
 		emptyline(ret);
