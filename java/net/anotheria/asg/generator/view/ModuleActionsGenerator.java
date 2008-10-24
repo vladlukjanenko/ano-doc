@@ -120,6 +120,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 
 		}catch(Exception ignored){
+			System.out.println("Exception occured in generation of section "+section);
 			ignored.printStackTrace();
 		}
 		
@@ -2015,8 +2016,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		if (list.getContainedProperty().isLinked()){
 			appendImport(ret, ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
 			MetaLink link = (MetaLink)list.getContainedProperty();
-			String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
-			MetaModule targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
+			
+			String tDocName = link.getTargetDocumentName(); 
+			MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
+					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
 			MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
 			appendImport(ret, DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
 			appendImport(ret, DataFacadeGenerator.getSortTypeImport(targetDocument));
@@ -2052,9 +2055,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			MetaLink link = (MetaLink)list.getContainedProperty();
 			emptyline(ret);
 			appendString(ret, "//link "+link.getName()+" to "+link.getLinkTarget());
-			MetaModule targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
-			String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
-			MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
+			MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
+					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
+			MetaDocument targetDocument = targetModule.getDocumentByName(link.getTargetDocumentName());
 			String listName = targetDocument.getMultiple().toLowerCase();
 			String sortType = "new "+DataFacadeGenerator.getSortTypeName(targetDocument);
 			sortType += "("+DataFacadeGenerator.getSortTypeName(targetDocument)+".SORT_BY_NAME)";
@@ -2079,9 +2082,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		if (list.getContainedProperty().isLinked()){
 			//generate list collection
 			MetaLink link = (MetaLink)list.getContainedProperty();
-			targetModule = GeneratorDataRegistry.getInstance().getModule(StringUtils.tokenize(link.getLinkTarget(), '.')[0]);
-			String tDocName = StringUtils.tokenize(link.getLinkTarget(), '.')[1]; 
-			targetDocument = targetModule.getDocumentByName(tDocName);
+			targetModule = link.getLinkTarget().indexOf('.')== -1 ?
+					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
+			targetDocument = targetModule.getDocumentByName(link.getTargetDocumentName());
 		}		
 		
 		

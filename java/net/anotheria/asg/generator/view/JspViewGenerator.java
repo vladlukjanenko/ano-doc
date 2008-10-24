@@ -212,9 +212,12 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		if (p.isLinked()){
 			
 			MetaLink link2p = (MetaLink)p;
-			MetaDocument linkTarget = GeneratorDataRegistry.getInstance().resolveLink(link2p.getLinkTarget());
+			MetaModule targetModule = link2p.getLinkTarget().indexOf('.')== -1 ?
+					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link2p.getTargetModuleName());
+
+			MetaDocument linkTarget = targetModule.getDocumentByName(link2p.getTargetDocumentName());
 			String targetLinkAction = StrutsConfigGenerator.getPath(linkTarget, StrutsConfigGenerator.ACTION_EDIT);
-			
+			 
 			
 			ret += writeString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></a></td>");
 			ret += writeString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote("description")+"/></a></td>");

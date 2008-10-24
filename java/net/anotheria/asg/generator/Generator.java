@@ -140,26 +140,28 @@ public class Generator {
 
 		System.out.println("DONE.");
 		printTime("Total ", s10, s1);
-		/*
-		printTime("Till s2", s2, s1);
-		printTime("Till s3", s3, s1);
-		printTime("Till s4", s4, s1);
-		printTime("Till s5", s5, s1);
-		printTime("Till s6", s6, s1);
-		printTime("Till s7", s7, s1);
-		printTime("Till s8", s8, s1);
-		printTime("Till s9", s9, s1);
-		printTime("Till s10", s10, s1);
 		
-		printTime("s2", s2, s1);
-		printTime("s3", s3, s2);
-		printTime("s4", s4, s3);
-		printTime("s5", s5, s4);
-		printTime("s6", s6, s5);
-		printTime("s7", s7, s6);
-		printTime("s8", s8, s7);
-		printTime("s9", s9, s8);
-		printTime("s10", s10, s9);
+		if (false){
+			printTime("Till s2", s2, s1);
+			printTime("Till s3", s3, s1);
+			printTime("Till s4", s4, s1);
+			printTime("Till s5", s5, s1);
+			printTime("Till s6", s6, s1);
+			printTime("Till s7", s7, s1);
+			printTime("Till s8", s8, s1);
+			printTime("Till s9", s9, s1);
+			printTime("Till s10", s10, s1);
+			
+			printTime("s2", s2, s1);
+			printTime("s3", s3, s2);
+			printTime("s4", s4, s3);
+			printTime("s5", s5, s4);
+			printTime("s6", s6, s5);
+			printTime("s7", s7, s6);
+			printTime("s8", s8, s7);
+			printTime("s9", s9, s8);
+			printTime("s10", s10, s9);
+		}
 		// */
 	}
 	
