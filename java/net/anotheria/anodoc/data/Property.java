@@ -86,6 +86,13 @@ public abstract class Property
 		return newP;
 	}
 	
+	public Property cloneAs(String newName) throws CloneNotSupportedException{
+		Property newP = (Property)super.clone();
+		newP.setValue(cloneValue());
+		newP.setId(newName);
+		return newP;
+	}
+	
 	protected abstract Object cloneValue() throws CloneNotSupportedException;
 	
 	public XMLNode toXMLNode(){

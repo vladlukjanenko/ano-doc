@@ -119,11 +119,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 //			}
 //		}
 		
-		for (MetaProperty p : doc.getProperties()){
-			if (p.isMultilingual() && context.areLanguagesSupported()){
-				ret += writeImport("net.anotheria.anodoc.util.context.ContextManager");
-				break;
-			}
+		if (doc.isMultilingual() && context.areLanguagesSupported()){
+			ret += writeImport("net.anotheria.anodoc.util.context.ContextManager");
+			ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
+			ret += writeImport("net.anotheria.anodoc.data.BooleanProperty");
 		}
 		
 		ret += writeImport("net.anotheria.util.crypt.MD5Util");
@@ -137,6 +136,11 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			ret += writeImport("net.anotheria.util.BasicComparable");
 			ret += emptyline();
 			interfaceDecl += ", IComparable ";
+		}
+		
+		if (doc.isMultilingual()){
+			ret += writeImport("net.anotheria.asg.data.MultilingualObject");
+			interfaceDecl += ", MultilingualObject ";
 		}
 		
 		
@@ -167,6 +171,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			ret += generateLanguageCopyMethods(doc);
 			ret += emptyline();
 		}
+		
+		ret += generateMultilingualSwitchSupport(doc);
+		ret += emptyline();
+		
 
 		
 		ret += closeBlock();
@@ -807,8 +815,36 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		return ret;
 	}
 	
+	
 	private String getDocumentFactoryName(MetaDocument doc){
 		return DataFacadeGenerator.getDocumentFactoryName(doc);
 	}
+
+	protected String generateMultilingualSwitchSupport(MetaDocument doc){
+		String ret = "";
+		if (!doc.isMultilingual())
+			return "";
+			
+		ret += writeString("public boolean isMultilingualDisabledInstance(){");
+		increaseIdent();
+		ret += writeString("try{");
+		increaseIdent();
+		ret += writeStatement("return ((BooleanProperty)getInternalProperty(INT_PROPERTY_MULTILINGUAL_DISABLED)).getboolean()");
+		decreaseIdent();
+		ret += writeString("}catch(NoSuchPropertyException e){");
+		ret += writeIncreasedString("return false;");
+		ret += writeString("}");
+		ret += closeBlock();
+
+		ret += emptyline();
+		
+		ret += writeString("public void setMultilingualDisabledInstance(boolean value){");
+		increaseIdent();
+		ret += writeStatement("setInternalProperty(new BooleanProperty(INT_PROPERTY_MULTILINGUAL_DISABLED, value))");
+		ret += closeBlock();
+
+		return ret;
+	}
+
 
 }

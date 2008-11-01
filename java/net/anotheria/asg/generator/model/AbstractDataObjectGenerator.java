@@ -22,6 +22,7 @@ public class AbstractDataObjectGenerator extends AbstractGenerator{
 		return context.getPackageName(module);
 	}
 	
+	
 	/**
 	 * Generates getFootprint method 
 	 * @param doc 

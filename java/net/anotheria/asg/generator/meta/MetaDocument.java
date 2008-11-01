@@ -166,5 +166,17 @@ public class MetaDocument implements IGenerateable{
 		return ret;
 	}
 	
+	public boolean isMultilingual(){
+		for (MetaProperty p : properties){
+			if (p.isMultilingual())
+				return true;
+		}
+		for (MetaProperty p : links){
+			if (p.isMultilingual())
+				return true;
+		}
+		return false;
+	}
+	
 
 }

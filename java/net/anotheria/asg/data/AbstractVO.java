@@ -22,4 +22,5 @@ public abstract class AbstractVO implements DataObject{
 		ret.setAuthor("none");
 		return ret;
 	}
+	
 }

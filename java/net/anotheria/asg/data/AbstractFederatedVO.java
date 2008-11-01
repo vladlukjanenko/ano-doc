@@ -15,5 +15,5 @@ public abstract class AbstractFederatedVO implements DataObject{
 	}
 	
 	public abstract Object clone() throws CloneNotSupportedException;
-
+	
 }

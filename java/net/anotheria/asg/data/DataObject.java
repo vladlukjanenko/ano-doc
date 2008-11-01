@@ -34,5 +34,6 @@ public interface DataObject extends Cloneable{
 	public String getFootprint();
 	
 	public ObjectInfo getObjectInfo();
+
 }
  
