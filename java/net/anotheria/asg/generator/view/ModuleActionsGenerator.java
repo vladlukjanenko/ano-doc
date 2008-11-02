@@ -1243,6 +1243,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		
 		appendStatement(ret, "addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
+		appendStatement(ret, "addBeanToRequest(req, "+quote("objectInfoString")+" , "+doc.getVariableName()+".getObjectInfo().toString())");
 		appendStatement(ret, "addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Update")+")");
 		
 		//add field descriptions ...

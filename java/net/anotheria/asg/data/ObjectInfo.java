@@ -66,7 +66,7 @@ public class ObjectInfo {
 	}
 	
 	public String toString(){
-		return "Id: "+getId()+", Ts: "+getLastChangeTimestamp()+", Footprint: "+getFootprint()+", Author: "+getAuthor();
+		return "Id: "+getId()+", Ts: "+getLastChangeTimestamp()+", Footprint: "+getFootprint()+", Author: "+getAuthor()+", IsoTs: "+NumberUtils.makeISO8601TimestampString(getLastChangeTimestamp());
 	}
 
 	public String getId() {

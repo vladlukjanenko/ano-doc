@@ -359,6 +359,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		decreaseIdent();
 		
+		
 		ret += writeString("</body>");
 		decreaseIdent();
 		ret += writeString("</html:html>");
@@ -701,6 +702,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		decreaseIdent();
 		ret += writeString("</table>");
 		ret += writeString("-->");
+		
+		//object info
+		ret += writeString("<p align="+quote("right")+"><small>ObjectInfo: <bean:write name="+quote("objectInfoString")+"/></small></p>");
+
 
 		decreaseIdent();
 		ret += writeString("</body>");
