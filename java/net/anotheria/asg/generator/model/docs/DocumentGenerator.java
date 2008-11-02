@@ -130,18 +130,24 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		
 		ret += emptyline();
 		
+		boolean addEmptyLine = false;
+		
 		String interfaceDecl = "implements "+doc.getName();
 		if (doc.isComparable()){
 			ret += writeImport("net.anotheria.util.sorter.IComparable");
 			ret += writeImport("net.anotheria.util.BasicComparable");
-			ret += emptyline();
 			interfaceDecl += ", IComparable ";
+			addEmptyLine = true;
 		}
 		
 		if (doc.isMultilingual()){
 			ret += writeImport("net.anotheria.asg.data.MultilingualObject");
 			interfaceDecl += ", MultilingualObject ";
+			addEmptyLine = true;
 		}
+		
+		if (addEmptyLine)
+			ret += emptyline();
 		
 		
 		ret += writeString("public class "+getDocumentName(doc)+" extends AbstractASGDocument "+interfaceDecl+"{");
@@ -298,7 +304,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		}
 		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
-		String v = "ContextManager.getCallContext().getCurrentLanguage()";
+		String v = "(isMultilingualDisabledInstance() ? ContextManager.getCallContext().getDefaultLanguage() : ContextManager.getCallContext().getCurrentLanguage())";
 		if(p instanceof MetaGenericProperty)
 			ret += writeStatement("return "+((MetaGenericProperty)p).toPropertyGetterCallForCurrentLanguage(v));
 		else
@@ -358,7 +364,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		}
 		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
-		String v = "ContextManager.getCallContext().getCurrentLanguage()";
+		String v = "(isMultilingualDisabledInstance() ? ContextManager.getCallContext().getDefaultLanguage() : ContextManager.getCallContext().getCurrentLanguage())";
 		if(p instanceof MetaGenericProperty)
 			ret += writeStatement(""+((MetaGenericProperty)p).toPropertySetterCallForCurrentLanguage(v));
 		else

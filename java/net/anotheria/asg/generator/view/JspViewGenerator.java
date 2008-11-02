@@ -516,30 +516,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		decreaseIdent(); 
 		ret += writeString("</tr>");
 		
-		if (GeneratorDataRegistry.hasLanguageCopyMethods(section.getDocument())){
+		// *** END MULILINGUAL COPY *** //
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()){
+			ret += writeString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
 			ret += writeString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
-/*
-			ret += writeString("<tr>");
-			increaseIdent();
-			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\">");
-			String link = "";
-			for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-				for (String dl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-					if (!sl.equals(dl)){
-						String l = StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG);
-						l += "?pId=<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>";
-						l += "&pSrcLang="+sl;
-						l += "&pDestLang="+dl;
-						l += "&ts=<%=System.currentTimeMillis()%>";
-						link += "<a href=\""+l+"\">"+sl+"-->"+dl+"</a>&nbsp;";
-					} 
-				}
-			}
-			ret += writeString(link);
-			ret += writeString("</td>");
-			decreaseIdent(); 
-			ret += writeString("</tr>");
-*/
 			ret += writeString("<tr>");
 			increaseIdent();
 			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\"><form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG)+"\">");
@@ -564,9 +544,26 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			ret += writeString("</form></td>");
 			decreaseIdent(); 
 			ret += writeString("</tr>");
+			ret += writeString("<tr>");
+			increaseIdent();
+			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+			ret += writeString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+			ret += writeString("&nbsp;Languages enabled.&nbsp;");
+			ret += writeString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Disable</a>&nbsp;");
+			ret += writeString("</form></td>");
+			ret += writeString("</tr>");
 			ret += writeString("</logic:notEqual>");
-		
+			ret += writeString("</logic:equal>");
+			ret += writeString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
+			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+			ret += writeString("<input type=\"hidden\" name=\"value\" value=\"false\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+			ret += writeString("&nbsp;Languages disabled.&nbsp;");
+			ret += writeString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Enable</a>&nbsp;");
+			ret += writeString("</form></td>");
+			ret += writeString("</tr>");
+			ret += writeString("</logic:equal>");
 		}
+		// *** END MULILINGUAL COPY *** //
 		
 		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
 		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
@@ -580,11 +577,49 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 
+			String lang = getElementLanguage(element);
+
+			//ALTERNATIVE EDITOR FOR DISABLED MODE
+			if (lang!=null && lang.equals(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage())){
+				
+				ret += writeString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
+
+				ret += writeString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
+				increaseIdent();
+				ret += writeString("<td align=\"right\" width=\"35%\">");
+				increaseIdent();
+				String name = section.getDocument().getField(element.getName()).getName()+"<b>DEF</b>";
+				if (name==null || name.length()==0)
+					name = "&nbsp;";
+				ret += writeString(name);
+				decreaseIdent(); 
+				ret += writeString("</td>");
+				decreaseIdent();
+				
+				ret += writeString("<td align=\"left\" width=\"65%\">&nbsp;");
+				ret += generateElementEditor(section.getDocument(), element);
+				ret += writeString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
+				ret += writeString("</td>");
+				
+				ret += writeString("</tr>");
+				if(element.isRich()){
+					MetaProperty p = section.getDocument().getField(element.getName());
+					if(!p.getType().equals("text"))
+						break;
+					richTextElements.add(element);
+				}
+
+				
+				ret += writeString("</logic:equal>");
+			}//END ALTERNATIVE EDITOR FOR MULTILANG DISABLED FORM
+
+			if (lang!=null)
+				ret += writeString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
+
 			ret += writeString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
 			increaseIdent();
 			ret += writeString("<td align=\"right\" width=\"35%\">");
 			increaseIdent();
-			String lang = getElementLanguage(element);
 			String name = lang == null ? element.getName() : section.getDocument().getField(element.getName()).getName(lang);
 			if (name==null || name.length()==0)
 				name = "&nbsp;";
@@ -605,6 +640,9 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 					break;
 				richTextElements.add(element);
 			}
+			
+			if (lang!=null)
+				ret += writeString("</logic:equal>");
 		}
 		
 		decreaseIdent();
@@ -791,6 +829,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private String generateFieldEditor(MetaFieldElement element){
 		MetaDocument doc = ((MetaModuleSection)currentSection).getDocument();
 		MetaProperty p = doc.getField(element.getName());
+		String lang = getElementLanguage(element);
 		
 		if (p.isLinked())
 			return generateLinkEditor(element, p);
@@ -876,7 +915,6 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private String generateStringEditor(MetaFieldElement element, MetaProperty p){
 		String ret ="";
 		String lang = getElementLanguage(element); 
-		
 		
 		ret += "<input type=\"text\" name="+quote(p.getName(lang));
 		//ret += "<html:text filter=\"false\" property="+quote(element.getName());

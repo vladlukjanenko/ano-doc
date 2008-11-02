@@ -8,7 +8,6 @@ import java.util.List;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.types.meta.DataType;
 import net.anotheria.asg.generator.util.DirectLink;
 import net.anotheria.asg.generator.view.meta.MetaDecorator;
@@ -161,10 +160,7 @@ public class GeneratorDataRegistry {
 	public static final boolean hasLanguageCopyMethods(MetaDocument doc){
 		if (!getInstance().getContext().areLanguagesSupported())
 			return false;
-		for (MetaProperty p : doc.getProperties())
-			if (p.isMultilingual())
-				return true;
-		return false;
+		return doc.isMultilingual();
 	}
 
 

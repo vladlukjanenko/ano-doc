@@ -111,6 +111,9 @@ public class MetaDocument implements IGenerateable{
 
 		if (name.equals("documentLastUpdateTimestamp"))
 			return new MetaProperty("documentLastUpdateTimestamp","string");
+		
+		if (name.equals("multilingualInstanceDisabled"))
+			return new MetaProperty("multilingualInstanceDisabled", "boolean");
 
 		for (MetaProperty p : properties)
 			if (p.getName().equals(name))

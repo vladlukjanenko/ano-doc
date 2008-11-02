@@ -60,6 +60,7 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	
 	public static final String ACTION_SEARCH = "search";
 	public static final String ACTION_COPY_LANG ="copyLang";
+	public static final String ACTION_SWITCH_MULTILANGUAGE_INSTANCE = "switchMultilang";
 	
 	public static final String SUFFIX_CSV = ".csv";
 	public static final String SUFFIX_XML = ".xml";
@@ -384,6 +385,12 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			ret += generateActionMapping(
 					"/"+getPath(doc, ACTION_COPY_LANG), 
 					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getLanguageCopyActionName(section),
+					"success",
+					FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
+					);
+			ret += generateActionMapping(
+					"/"+getPath(doc, ACTION_SWITCH_MULTILANGUAGE_INSTANCE), 
+					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getSwitchMultilingualityActionName(section),
 					"success",
 					FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
 					);

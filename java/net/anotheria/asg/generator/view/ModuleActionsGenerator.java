@@ -94,6 +94,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				timer.startExecution(section.getModule().getName()+"-dialog-copylang");
 				if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getLanguageCopyActionName(section), generateLanguageCopyAction(section)));
+					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getSwitchMultilingualityActionName(section), generateSwitchMultilingualityAction(section)));
 				}
 				timer.stopExecution(section.getModule().getName()+"-dialog-copylang");
 				
@@ -173,6 +174,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	
 	public static String getLanguageCopyActionName(MetaModuleSection section){
 	    return "CopyLang"+getActionSuffix(section);
+	}
+
+	public static String getSwitchMultilingualityActionName(MetaModuleSection section){
+	    return "SwitchMultilang"+getActionSuffix(section);
 	}
 
 	public static String getVersionInfoActionName(MetaModuleSection section){
@@ -983,6 +988,41 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return ret.toString();
 	}
 
+	private String generateSwitchMultilingualityAction(MetaModuleSection section){
+		StringBuilder ret = new StringBuilder(4000);
+		MetaDocument doc = section.getDocument();
+		appendStatement(ret, "package "+getPackage(section.getModule()));
+		emptyline(ret);
+
+		//write imports...
+		appendStandardActionImports(ret);
+	    appendImport(ret, DataFacadeGenerator.getDocumentImport(context, doc));
+	    appendImport(ret, "net.anotheria.asg.data.MultilingualObject");
+	    emptyline(ret);
+	    
+	    appendComment(ret, "This class enables or disables support for multiple languages for a particular document.");
+		appendString(ret, "public class "+getSwitchMultilingualityActionName(section)+" extends "+getBaseActionName(section)+" {");
+		increaseIdent();
+		emptyline(ret);
+	    
+		appendString(ret, getExecuteDeclaration());
+		increaseIdent();
+		
+		appendStatement(ret, "String id = getStringParameter(req, PARAM_ID)");
+		appendStatement(ret, "String value = getStringParameter(req, "+quote("value")+")");
+
+		appendStatement(ret, doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+		appendStatement(ret, "((MultilingualObject)"+doc.getVariableName()+").setMultilingualDisabledInstance(Boolean.valueOf(value))");
+		appendStatement(ret, getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
+	    appendStatement(ret, "res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+id)");
+		
+	    appendStatement(ret, "return null");
+		closeBlock(ret); //end doExecute
+		closeBlock(ret); // end class
+		return ret.toString();
+	}
+
+	
 	private String generateLanguageCopyAction(MetaModuleSection section){
 		StringBuilder ret = new StringBuilder(4000);
 		MetaDocument doc = section.getDocument();
@@ -1040,6 +1080,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendImport(ret, ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
 		appendImport(ret, DataFacadeGenerator.getDocumentImport(context, doc));
 		appendImport(ret, "net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
+		if (doc.isMultilingual())
+			appendImport(ret, "net.anotheria.asg.data.MultilingualObject");
 		emptyline(ret);
 		
 		boolean listImported = false;
@@ -1131,6 +1173,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					appendStatement(ret, propertyCopy);
 				}
 			}
+		}
+		
+		if (doc.isMultilingual()){
+			MetaProperty p = doc.getField(ModuleBeanGenerator.FIELD_ML_DISABLED);
+			String propertyCopy = "form."+p.toBeanSetter()+"(((MultilingualObject)"+doc.getVariableName()+").isMultilingualDisabledInstance())";
+			appendStatement(ret, propertyCopy);
 		}
 		
 		emptyline(ret);

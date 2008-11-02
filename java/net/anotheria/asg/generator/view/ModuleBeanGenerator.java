@@ -64,6 +64,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	 * Implementation is moved into ano-web, the constant remains.
 	 */
 	public static final String FLAG_FORM_SUBMITTED = "formSubmittedFlag";
+	
+	public static final String FIELD_ML_DISABLED = "multilingualInstanceDisabled";
 
     public ModuleBeanGenerator(MetaView aView){
         //view = aView;
@@ -340,8 +342,11 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		
 		ret += emptyline();
 		
+		//this is only used if the multilingual support is enabled for the project AND document.
+		MetaFieldElement multilingualInstanceDisabledElement = new MetaFieldElement(FIELD_ML_DISABLED);
+		
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
-
+		
 		for (MetaViewElement element : elements){
 			if (element instanceof MetaFieldElement){
 				MetaFieldElement field = (MetaFieldElement)element;
@@ -385,8 +390,14 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		for (MetaViewElement element : elements){
 			if (element instanceof MetaFieldElement)
 				ret += generateFieldMethodsInDialog((MetaFieldElement)element, doc);
-			
 		}
+		
+		if (doc.isMultilingual()){
+			MetaProperty mlDisProp = doc.getField(multilingualInstanceDisabledElement.getName());
+			ret += writeStatement("private "+mlDisProp.toJavaType()+" "+mlDisProp.getName());
+			ret += generateFieldMethodsInDialog(multilingualInstanceDisabledElement, doc);
+		}
+			
 		
 		ret += emptyline();
 		
