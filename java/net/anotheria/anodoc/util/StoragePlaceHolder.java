@@ -2,6 +2,7 @@ package net.anotheria.anodoc.util;
 
 import java.util.List;
 
+import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.service.IModuleStorage;
@@ -39,7 +40,7 @@ public class StoragePlaceHolder implements IModuleStorage{
 	 * Throws a runtime exception - not implemented.
 	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#executeQueryOnDocuments(BasicPredicate)
 	 */
-	public List executeQueryOnDocuments(Predicate p) {
+	public List<Document> executeQueryOnDocuments(Predicate p) {
 		throw new RuntimeException("Not implemented");
 	}
 

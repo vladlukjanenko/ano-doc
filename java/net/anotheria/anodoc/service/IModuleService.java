@@ -2,6 +2,7 @@ package net.anotheria.anodoc.service;
 
 import java.util.List;
 
+import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.query.Predicate;
 
@@ -87,7 +88,7 @@ public interface IModuleService {
 	 * is supported by the storage.<br>
 	 * In current implementation queries are supported for POET but not for file storage.
 	 */
-	public List executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException;
+	public List<Document> executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException;
 	
 	
 	
