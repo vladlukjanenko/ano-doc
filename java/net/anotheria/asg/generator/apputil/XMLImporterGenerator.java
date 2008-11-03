@@ -1,13 +1,7 @@
 package net.anotheria.asg.generator.apputil;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
 import net.anotheria.asg.exception.ASGRuntimeException;
 import net.anotheria.asg.generator.AbstractGenerator;

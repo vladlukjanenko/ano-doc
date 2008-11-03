@@ -36,6 +36,10 @@ public class AbstractGenerator{
 		return ret;
 	}
 	
+	protected void appendIncreasedString(String... strings){
+		appendIncreasedString(getCurrentJobContent(), strings);
+	}
+		
 	protected void appendIncreasedString(StringBuilder target, String... strings){
 		increaseIdent();
 		appendString(target, strings);

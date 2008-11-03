@@ -60,30 +60,3 @@ public class FormsGenerator extends AbstractAnoDocGenerator{
 
 }
 
-/* ------------------------------------------------------------------------- *
- * $Log: FormsGenerator.java,v $
- * Revision 1.3  2006/12/28 22:22:04  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.2  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.1  2005/10/20 21:20:12  lro
- * *** empty log message ***
- *
- * Revision 1.5  2005/06/30 00:03:12  lro
- * *** empty log message ***
- *
- * Revision 1.4  2005/03/28 01:12:39  lro
- * *** empty log message ***
- *
- * Revision 1.3  2005/03/15 02:14:47  lro
- * *** empty log message ***
- *
- * Revision 1.2  2005/03/14 20:03:14  lro
- * *** empty log message ***
- *
- * Revision 1.1  2005/03/14 19:31:26  lro
- * *** empty log message ***
- *
- */

@@ -96,7 +96,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 		appendString(ret, "</appender>");
 		emptyline(ret);
 
-		appendString(ret, "<logger name=", quote(context.getPackageName()), " additivity=", quote("false"), ">");
+		appendString(ret, "<logger name=", quote(context.getTopPackageName()), " additivity=", quote("false"), ">");
 		increaseIdent(); 
 		appendString(ret, "<level value=", quote("INFO"), "/>");
 		for (String cat : categories)
