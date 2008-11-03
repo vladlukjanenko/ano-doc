@@ -919,7 +919,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 					}
 				}
 		    }
-		    
 		}
 
 		ret += emptyline();
@@ -941,5 +940,4 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	    return ret;
 	}
 	
-
 }

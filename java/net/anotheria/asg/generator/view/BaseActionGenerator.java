@@ -172,7 +172,16 @@ public class BaseActionGenerator extends AbstractGenerator {
 		increaseIdent();
 		ret += writeStatement("return "+quote("asg"));
 		ret += closeBlock();
+		ret += emptyline();
 	
+		ret += writeString("protected String stripPath(String path){");
+		increaseIdent();
+		ret += writeString("if (path==null || path.length()==0)");
+		ret += writeIncreasedStatement("throw new IllegalArgumentException("+quote("path null or empty")+")");
+		ret += writeStatement("return path.startsWith("+quote("/")+") ? path.substring(1) : path");
+		ret += closeBlock();
+		ret += emptyline();
+
 
 	
 		ret += closeBlock();

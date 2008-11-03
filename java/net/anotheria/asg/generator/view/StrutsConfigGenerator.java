@@ -297,13 +297,13 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			);
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_DELETE), 
-			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getDeleteActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 			);
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_DUPLICATE), 
-			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getDuplicateActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 			);
@@ -346,7 +346,7 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 				);
 			ret += generateActionMapping(
 				"/"+getPath(doc, ACTION_UPDATE), 
-				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getUpdateActionName(section),
+				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
 				"success",
 				FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp",
 				JspViewGenerator.getEditPageName(doc)+".jsp",
@@ -361,7 +361,7 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 				);
 			ret += generateActionMapping(
 				"/"+getPath(doc, ACTION_UPDATE), 
-				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getUpdateActionName(section),
+				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
 				"success",
 				FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 				);
@@ -398,7 +398,7 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_VERSIONINFO), 
-			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getVersionInfoActionName(section),
+			ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(context, MetaModule.SHARED)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getVersionInfoPageName(doc)+".jsp"
 			);

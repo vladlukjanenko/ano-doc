@@ -834,7 +834,6 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private String generateFieldEditor(MetaFieldElement element){
 		MetaDocument doc = ((MetaModuleSection)currentSection).getDocument();
 		MetaProperty p = doc.getField(element.getName());
-		String lang = getElementLanguage(element);
 		
 		if (p.isLinked())
 			return generateLinkEditor(element, p);
