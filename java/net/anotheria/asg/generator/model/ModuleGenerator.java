@@ -83,9 +83,9 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		ret += generateConstructor(module);
 		ret += emptyline();
 		
-		List documents = module.getDocuments();
+		List<MetaDocument> documents = module.getDocuments();
 		for (int i=0; i<documents.size(); i++){
-			MetaDocument doc = (MetaDocument)documents.get(i);
+			MetaDocument doc = documents.get(i);
 			//do document type related
 			ret += generateDocumentRelatedCode(doc);
 			ret += emptyline();
