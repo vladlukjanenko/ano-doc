@@ -384,13 +384,13 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 			ret += generateActionMapping(
 					"/"+getPath(doc, ACTION_COPY_LANG), 
-					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getLanguageCopyActionName(section),
+					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
 					"success",
 					FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
 					);
 			ret += generateActionMapping(
 					"/"+getPath(doc, ACTION_SWITCH_MULTILANGUAGE_INSTANCE), 
-					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getSwitchMultilingualityActionName(section),
+					ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
 					"success",
 					FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
 					);

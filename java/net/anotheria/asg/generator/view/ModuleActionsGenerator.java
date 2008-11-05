@@ -213,7 +213,39 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private String generateMultiOpAction(MetaModuleSection section){
-		return "";
+		startNewJob();
+		
+		MetaDocument doc = section.getDocument();
+
+	    appendStatement("package "+getPackage(section.getModule()));
+	    appendEmptyline();
+
+	    //write imports...
+	    appendImport("net.anotheria.util.NumberUtils");
+		appendStandardActionImports();
+		appendImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
+
+		appendString( "public class "+getMultiOpActionName(section)+" extends "+getBaseActionName(section)+" {");
+	    increaseIdent();
+	    appendEmptyline();
+	    appendString( getExecuteDeclaration(null));
+	    increaseIdent();
+	    appendStatement("String path = stripPath(mapping.getPath())");
+	    //MOVE THIS TO MULTIOP WITHOUT DIALOG
+	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_VERSIONINFO);
+	    
+	    appendStatement("throw new IllegalArgumentException("+quote("Unknown path: ")+"+path)");
+	    append(closeBlock());
+	    appendEmptyline();
+	    
+		
+	    generateVersionInfoActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_VERSIONINFO));
+	    appendEmptyline();
+
+	    
+	    append(closeBlock());
+		return getCurrentJobContent().toString();
 	}
 	
 	private String generateMultiOpDialogAction(MetaModuleSection section){
@@ -231,6 +263,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		appendImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual())
+			appendImport("net.anotheria.asg.data.MultilingualObject");
+
 	    
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
 		for (int i=0; i<elements.size(); i++){
@@ -256,8 +291,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_DELETE);
 	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_DUPLICATE);
 	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_UPDATE);
-	    //MOVE THIS TO MULTIOP WITHOUT DIALOG
-	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_VERSIONINFO);
+	    if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual()){
+	    	writePathResolveForMultiOpAction(doc, StrutsConfigGenerator.ACTION_COPY_LANG);
+	    	writePathResolveForMultiOpAction(doc, StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE);
+	    }
 	    
 	    appendStatement("throw new IllegalArgumentException("+quote("Unknown path: ")+"+path)");
 	    append(closeBlock());
@@ -268,11 +305,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendEmptyline();
 	    generateDuplicateActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_DUPLICATE));
 	    appendEmptyline();
-	    //MOVE THIS TO MULTIOP WITHOUT DIALOG
-	    generateVersionInfoActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_VERSIONINFO));
-	    appendEmptyline();
 	    generateUpdateActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_UPDATE));
-
+	    appendEmptyline();
+	    if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual()){
+	    	generateLanguageCopyActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_COPY_LANG));
+	    	appendEmptyline();
+	    	generateSwitchMultilingualityActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE));
+	    	appendEmptyline();
+	    }
 	    
 	    append(closeBlock());
 	    return getCurrentJobContent().toString();
@@ -1090,8 +1130,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendStatement("return null");
 		append(closeBlock()); ;
 	}
-
+	
 	private String generateSwitchMultilingualityAction(MetaModuleSection section){
+		if (USE_MULTIOP_ACTIONS)
+			return "";
 		startNewJob();
 		MetaDocument doc = section.getDocument();
 		appendStatement("package "+getPackage(section.getModule()));
@@ -1102,13 +1144,23 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    appendImport("net.anotheria.asg.data.MultilingualObject");
 	    appendEmptyline();
-	    
+
 	    appendComment("This class enables or disables support for multiple languages for a particular document.");
 		appendString( "public class "+getSwitchMultilingualityActionName(section)+" extends "+getBaseActionName(section)+" {");
 		increaseIdent();
 		appendEmptyline();
+		
+		generateSwitchMultilingualityActionMethod(section, null);
+	
+		append(closeBlock()); // end class
+		return getCurrentJobContent().toString();
+	}
+	
+	private void generateSwitchMultilingualityActionMethod(MetaModuleSection section, String methodName){
 	    
-		appendString( getExecuteDeclaration());
+		MetaDocument doc = section.getDocument();
+	    
+		appendString( getExecuteDeclaration(methodName));
 		increaseIdent();
 		
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
@@ -1121,12 +1173,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 	    appendStatement("return null");
 		append(closeBlock()); //end doExecute
-		append(closeBlock()); // end class
-		return getCurrentJobContent().toString();
 	}
 
 	
 	private String generateLanguageCopyAction(MetaModuleSection section){
+		if (USE_MULTIOP_ACTIONS)
+			return "";
 		startNewJob();
 		MetaDocument doc = section.getDocument();
 		appendStatement("package "+getPackage(section.getModule()));
@@ -1141,8 +1193,17 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString( "public class "+getLanguageCopyActionName(section)+" extends "+getBaseActionName(section)+" {");
 		increaseIdent();
 		appendEmptyline();
+
+		generateLanguageCopyActionMethod(section, null);
+		
+		append(closeBlock()); ; // end class
+		return getCurrentJobContent().toString();
+	}
+	
+	private void generateLanguageCopyActionMethod(MetaModuleSection section, String methodName){
 	    
-		appendString( getExecuteDeclaration());
+		MetaDocument doc = section.getDocument();
+		appendString( getExecuteDeclaration(methodName));
 		increaseIdent();
 		
 		appendStatement("String sourceLanguage = req.getParameter("+quote("pSrcLang")+")");
@@ -1163,8 +1224,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 	    appendStatement("return null");
 		append(closeBlock()); ; //end doExecute
-		append(closeBlock()); ; // end class
-		return getCurrentJobContent().toString();
 	}
 
 	private String generateEditAction(MetaModuleSection section){
