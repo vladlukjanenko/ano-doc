@@ -1301,14 +1301,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		appendEmptyline();
 		
-		generateEditActionFunction(section, "anoDocExecute");
+		generateEditActionMethod(section, "anoDocExecute");
 
 		append(closeBlock());
 		return getCurrentJobContent().toString();
 
 	}
 
-	private void generateEditActionFunction(MetaModuleSection section, String methodname){
+	private void generateEditActionMethod(MetaModuleSection section, String methodname){
 
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
@@ -1320,7 +1320,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		increaseIdent();
 		appendEmptyline();
 		
-		appendString( getExecuteDeclaration());
+		appendString( getExecuteDeclaration(methodname));
 		increaseIdent();
 	
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
@@ -1688,6 +1688,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendEmptyline();
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Create")+")");
+		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
+
 
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());
