@@ -197,8 +197,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return doc.getName().toLowerCase()+StringUtils.capitalize(action);
 	}
 	
-	public static final String getContainerPath(MetaDocument doc, MetaContainerProperty table, String action){
-		return doc.getName().toLowerCase()+StringUtils.capitalize(table.getName())+StringUtils.capitalize(action);
+	public static final String getContainerPath(MetaDocument doc, MetaContainerProperty container, String action){
+		return doc.getName().toLowerCase()+StringUtils.capitalize(container.getName())+StringUtils.capitalize(action);
 	}
 	
 	public static final String getContainerEntryFormName(MetaDocument doc, MetaContainerProperty property){
@@ -220,43 +220,81 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	private String generateContainerMappings(MetaDocument doc, MetaContainerProperty container){
 	    String ret = "";
 	    
-	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_SHOW),
-	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerShowActionName(doc, container),
-	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-	            );
-	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_DELETE),
-	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerDeleteEntryActionName(doc, container),
-	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-	            );
-	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_MOVE),
-	            ModuleActionsGenerator.getPackage(context,doc )+"."+ModuleActionsGenerator.getContainerMoveEntryActionName(doc, container),
-	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-	            );
-
-	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_ADD),
-	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerAddEntryActionName(doc, container),
-	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-	            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-	            getContainerEntryFormName(doc, container)
-	            );
-	    
-	    ret += generateActionMapping(
-	            "/"+getContainerPath(doc, container, ACTION_QUICK_ADD),
-	            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerQuickAddActionName(doc, container),
-	            "success",
-	            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-	            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-	            getContainerQuickAddFormName(doc, container)
-	            );
-
+	    if (ModuleActionsGenerator.USE_MULTIOP_ACTIONS){
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_SHOW),
+		            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+		            );
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_DELETE),
+		            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+		            );
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_MOVE),
+		            ModuleActionsGenerator.getPackage(context,doc )+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+		            );
+		
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_ADD),
+		            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+		            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+		            getContainerEntryFormName(doc, container)
+		            );
+		    
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_QUICK_ADD),
+		            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+		            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+		            getContainerQuickAddFormName(doc, container)
+		            );
+	    }else{
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_SHOW),
+		            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerShowActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+		            );
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_DELETE),
+		            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerDeleteEntryActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+		            );
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_MOVE),
+		            ModuleActionsGenerator.getPackage(context,doc )+"."+ModuleActionsGenerator.getContainerMoveEntryActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
+		            );
+		
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_ADD),
+		            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerAddEntryActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+		            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+		            getContainerEntryFormName(doc, container)
+		            );
+		    
+		    ret += generateActionMapping(
+		            "/"+getContainerPath(doc, container, ACTION_QUICK_ADD),
+		            ModuleActionsGenerator.getPackage(context, doc)+"."+ModuleActionsGenerator.getContainerQuickAddActionName(doc, container),
+		            "success",
+		            FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+		            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
+		            getContainerQuickAddFormName(doc, container)
+		            );
+	    }
 	    return ret;
 	}
 	
