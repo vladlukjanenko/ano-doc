@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.anotheria.asg.generator.GenerationOptions;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 
 /**
@@ -21,6 +23,8 @@ public class MetaModule implements IGenerateable{
 	private String storageKey;
 	
 	private Map<String, ModuleParameter> parameters;
+	
+	private GenerationOptions moduleOptions;
 	 
 	public MetaModule(){
 		this(null);
@@ -37,6 +41,17 @@ public class MetaModule implements IGenerateable{
 	public void addDocument(MetaDocument aDocument){
 		documents.add(aDocument);
 		aDocument.setParentModule(this);
+	}
+	
+	//return true if the generation of the specific element is enabled by a scheme.
+	public boolean isEnabledByOptions(String key){
+		if (moduleOptions!=null){
+			if (moduleOptions.isEnabled(key))
+				return true;
+		}
+		
+		return GeneratorDataRegistry.getInstance().getOptions().isEnabled(key);
+		
 	}
 	
 	public String toString(){
@@ -141,6 +156,14 @@ public class MetaModule implements IGenerateable{
 	public boolean isParameterEqual(String name, String value){
 		ModuleParameter p = getModuleParameter(name);
 		return p == null ? false : p.getValue().equals(value);
+	}
+
+	public GenerationOptions getModuleOptions() {
+		return moduleOptions;
+	}
+
+	public void setModuleOptions(GenerationOptions moduleOptions) {
+		this.moduleOptions = moduleOptions;
 	}
 	
 	

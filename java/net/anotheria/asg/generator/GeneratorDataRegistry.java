@@ -26,12 +26,15 @@ public class GeneratorDataRegistry {
 	private Hashtable<String,MetaDecorator> decorators;
 	private Hashtable<String, MetaFilter> filters;
 	
+	private GenerationOptions defaultOptions = createDefaultGenerationOptions();
+	private GenerationOptions options;
 	
 	private GeneratorDataRegistry(){
 		modules = new Hashtable<String,MetaModule>();
 		types   = new Hashtable<String,DataType>();
 		decorators = new Hashtable<String,MetaDecorator>();
 		filters = new Hashtable<String, MetaFilter>();
+		options = defaultOptions;
 	}
 	
 	public static synchronized  GeneratorDataRegistry getInstance(){
@@ -86,6 +89,8 @@ public class GeneratorDataRegistry {
 	 */
 	public void setContext(Context context) {
 		this.context = context;
+		if (context.getOptions()!=null)
+			options = context.getOptions();
 	}
 	
 	public void addType(DataType type){
@@ -163,5 +168,22 @@ public class GeneratorDataRegistry {
 		return doc.isMultilingual();
 	}
 
+	private static GenerationOptions createDefaultGenerationOptions(){
+		GenerationOptions ret = new GenerationOptions();
+		
+		ret.set("rmi", "false");
+		ret.set("inmemory", "false");
+		
+		
+		return ret;
+	}
+
+	public GenerationOptions getOptions() {
+		return options;
+	}
+
+	public void setOptions(GenerationOptions options) {
+		this.options = options;
+	}
 
 }

@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anotheria.asg.generator.GenerationOptions;
 import net.anotheria.asg.generator.meta.FederatedDocumentMapping;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
@@ -117,7 +118,10 @@ public class XMLDataParser implements IDataParser {
 			mod.addModuleParameter(param);
 		}
 		
-		
+		Element optionsEleemnt = m.getChild("options");
+		if (optionsEleemnt!=null)
+			mod.setModuleOptions(OptionsParser.parseOptions(optionsEleemnt));
+
 		return mod; 
 		
 	}

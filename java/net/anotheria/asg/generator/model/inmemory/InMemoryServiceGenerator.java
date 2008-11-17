@@ -6,6 +6,7 @@ import java.util.List;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GenerationOptions;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
@@ -28,7 +29,9 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	public List<FileEntry> generate(IGenerateable gmodule, Context context){
 		
 		MetaModule mod = (MetaModule)gmodule;
-		
+		if (!mod.isEnabledByOptions(GenerationOptions.INMEMORY))
+			return new ArrayList<FileEntry>();
+
 		this.context = context;
 		String packageName = getPackageName(context, mod);
 		

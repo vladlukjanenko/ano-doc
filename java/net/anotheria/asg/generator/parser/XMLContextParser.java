@@ -56,6 +56,11 @@ public class XMLContextParser {
 				
 			}catch(Exception ignored){}
 			
+			Element options = context.getChild("options");
+			if (options!=null){
+				ret.setOptions(OptionsParser.parseOptions(options));
+			}
+			
 		}catch(JDOMException e){
 			e.printStackTrace();
 		}

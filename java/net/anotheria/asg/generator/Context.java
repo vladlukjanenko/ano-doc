@@ -28,6 +28,8 @@ public class Context {
 	private List<String> languages;
 	private String defaultLanguage;
 	
+	private GenerationOptions options;
+	
 	private Map<String, ContextParameter> parameters;
 	
 	public Context(){
@@ -192,6 +194,14 @@ public class Context {
 
 	public void setApplicationURLPath(String applicationURLPath) {
 		this.applicationURLPath = applicationURLPath;
+	}
+
+	public GenerationOptions getOptions() {
+		return options;
+	}
+
+	public void setOptions(GenerationOptions options) {
+		this.options = options;
 	}
 
 }
