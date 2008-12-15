@@ -651,6 +651,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("</html:form>");
 		ret += writeString("<br/>");
 		
+		//HOTFIX: commentation of direct link to me section START
+		ret += writeString("<%--");
 		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
 		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
@@ -673,12 +675,13 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("</tr>");
 		decreaseIdent();
 		ret += writeString("</logic:iterate>");
-		
+		ret += writeString("</table>");
 		
 		ret += writeString("<br/>");
 		ret += writeString("<br/>");
 		ret += writeString("</logic:present>");
-		
+		//HOTFIX: commentation of direct link to me section END
+		ret += writeString("--%>");
 		ret += writeString("<!-- ");
 		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
