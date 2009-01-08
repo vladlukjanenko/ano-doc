@@ -205,7 +205,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("</tr>");
 		ret += writeString("<logic:iterate name="+quote("elements")+" id="+quote("element")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, list))+" indexId="+quote("ind")+">");
 		increaseIdent();
-		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
+		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
 		increaseIdent();
 		ret += writeString("<td width="+quote("1%")+"><bean:write name="+quote("element")+" property="+quote("position")+"/></td>");
 		
@@ -1162,7 +1162,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		String entryName = doc.getName().toLowerCase();
 		ret += writeString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+" indexId=\"ind\">");
 		increaseIdent();
-		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
+		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
 
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
