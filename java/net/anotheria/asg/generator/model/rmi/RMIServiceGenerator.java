@@ -158,8 +158,10 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendEmptyline();
 	    appendImport("net.anotheria.anodoc.util.context.CallContext");
 	    appendEmptyline();
+	    appendImport("net.anotheria.asg.service.RemoteService");
+	    appendEmptyline();
 
-	    appendString("public interface "+getInterfaceName(module)+" extends Remote {");
+	    appendString("public interface "+getInterfaceName(module)+" extends Remote, RemoteService {");
 	    increaseIdent();
 	    
 	    boolean containsAnyMultilingualDocs = false;
@@ -321,11 +323,12 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
     			"exportToXML", 
     			"String[] languages"
     			);
-	    
+        
+		appendComment("Converts echo request to echo response and return it. Is useful for for checking remote object availability");
+        appendStatement("public byte[] getEcho(byte[] echoRequest) throws RemoteException");
+	    appendEmptyline();
+        
         append(closeBlock());
-	    
-	    
-	    
 	    return getCurrentJobContent().toString();
 	}
 	
@@ -514,7 +517,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendImport("net.anotheria.anodoc.query2.QueryResult");
 	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
 	    appendEmptyline();
-	    //appendImport("net.anotheria.asg.service.ASGService");
+	    appendImport("net.anotheria.asg.service.BaseRemoteServiceStub");
 	    appendImport("net.anotheria.asg.util.listener.IServiceListener");
 	    appendImport("net.anotheria.anodoc.util.context.ContextManager");
 	    appendEmptyline();
@@ -528,7 +531,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendImport("org.apache.log4j.Logger");
 	    appendEmptyline();
 
-	    appendString("public class "+getStubName(module)+" implements "+ServiceGenerator.getInterfaceName(module)+" {");
+	    appendString("public class ",getStubName(module),"  extends BaseRemoteServiceStub<",getInterfaceName(module),"> implements ",ServiceGenerator.getInterfaceName(module)," {");
 	    increaseIdent();
 	    appendEmptyline();
 
@@ -539,12 +542,12 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendEmptyline();
 	    appendStatement("private ", getInterfaceName(module), " delegate");
 	    appendEmptyline();
-	    appendString("private void notifyDelegateFailed(){");
+	    appendString("protected void notifyDelegateFailed(){");
 	    appendIncreasedStatement("delegate = null");
 	    appendString("}");
 	    appendEmptyline();
 	    
-	    appendString("private "+getInterfaceName(module)+" getDelegate() throws "+ServiceGenerator.getExceptionName(module)+"{");
+	    appendString("protected "+getInterfaceName(module)+" getDelegate() throws "+ServiceGenerator.getExceptionName(module)+"{");
         increaseIdent();
 	    appendString("if (delegate==null){");
         increaseIdent();
@@ -764,7 +767,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    		"languages",
 	    		null
 	    		);
-	    
+		
 	    ////********** //////
 	    appendString("public void addServiceListener(IServiceListener listener){");
 	    appendIncreasedStatement("throw new RuntimeException(", quote("Method not supported"), ")");
@@ -814,6 +817,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
 	    appendImport("net.anotheria.anodoc.util.context.CallContext");
 	    appendImport("net.anotheria.anodoc.util.context.ContextManager");
+	    appendImport("net.anotheria.asg.service.BaseRemoteServiceSkeleton");
 	    appendEmptyline();
 	    
 	    //appendImport("net.anotheria.asg.service.ASGService");
@@ -825,7 +829,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendImport("org.apache.log4j.Logger");
 	    appendEmptyline();
 
-	    appendString("public class "+getSkeletonName(module)+" implements "+getInterfaceName(module)+" {");
+	    appendString("public class "+getSkeletonName(module)+" extends BaseRemoteServiceSkeleton implements "+getInterfaceName(module)+" {");
 	    increaseIdent();
 	    appendEmptyline();
 
@@ -1039,7 +1043,10 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    		"languages",
 	    		null
 	    		);
-
+	    
+	    appendString("public byte[] getEcho(byte[] echoRequest){");
+		appendIncreasedStatement("return echoRequest");
+		appendString("}");
 	    
 	    append(closeBlock());
 	    return getCurrentJobContent().toString();
@@ -1064,7 +1071,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         append(closeBlock());
 	    appendEmptyline();
 	}
-
+	
 	private void writeInterfaceFun(String comment, String returnType, String funName, String parametersFull){
         appendComment(comment);
         appendStatement("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+", RemoteException");
@@ -1073,7 +1080,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendStatement("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "(CallContext callContext"+(parametersFull.length()>0 ? ", ": "")+ parametersFull+") throws "+getExceptionName(module)+", RemoteException");
 	    appendEmptyline();
 	}
-
+	
 	private void writeSkeletonFun(String comment, String returnType, String funName, String parametersFull, String parametersStripped, String parametersForLogging){
         appendComment(comment);
         appendString("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+"{");
