@@ -151,17 +151,16 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendEmptyline();
 	    //appendImport("net.anotheria.asg.service.ASGService");
 	    //appendEmptyline();
-	    appendImport("java.rmi.Remote");
 	    appendImport("java.rmi.RemoteException");
 	    appendEmptyline();
 	    appendImport(ServiceGenerator.getExceptionImport(context, module));
 	    appendEmptyline();
 	    appendImport("net.anotheria.anodoc.util.context.CallContext");
 	    appendEmptyline();
-	    appendImport("net.anotheria.asg.service.RemoteService");
+	    appendImport("net.anotheria.asg.service.remote.RemoteService");
 	    appendEmptyline();
 
-	    appendString("public interface "+getInterfaceName(module)+" extends Remote, RemoteService {");
+	    appendString("public interface "+getInterfaceName(module)+" extends RemoteService {");
 	    increaseIdent();
 	    
 	    boolean containsAnyMultilingualDocs = false;
@@ -323,10 +322,6 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
     			"exportToXML", 
     			"String[] languages"
     			);
-        
-		appendComment("Converts echo request to echo response and return it. Is useful for for checking remote object availability");
-        appendStatement("public byte[] getEcho(byte[] echoRequest) throws RemoteException");
-	    appendEmptyline();
         
         append(closeBlock());
 	    return getCurrentJobContent().toString();
@@ -517,7 +512,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendImport("net.anotheria.anodoc.query2.QueryResult");
 	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
 	    appendEmptyline();
-	    appendImport("net.anotheria.asg.service.BaseRemoteServiceStub");
+	    appendImport("net.anotheria.asg.service.remote.BaseRemoteServiceStub");
 	    appendImport("net.anotheria.asg.util.listener.IServiceListener");
 	    appendImport("net.anotheria.anodoc.util.context.ContextManager");
 	    appendEmptyline();
@@ -817,7 +812,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
 	    appendImport("net.anotheria.anodoc.util.context.CallContext");
 	    appendImport("net.anotheria.anodoc.util.context.ContextManager");
-	    appendImport("net.anotheria.asg.service.BaseRemoteServiceSkeleton");
+	    appendImport("net.anotheria.asg.service.remote.BaseRemoteServiceSkeleton");
 	    appendEmptyline();
 	    
 	    //appendImport("net.anotheria.asg.service.ASGService");
