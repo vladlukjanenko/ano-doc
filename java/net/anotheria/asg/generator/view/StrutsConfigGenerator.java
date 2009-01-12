@@ -48,7 +48,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	public static final String ACTION_EXPORT = "export";
 	public static final String ACTION_SHOW_QUERIES = "showQueries";
 	public static final String ACTION_EXECUTE_QUERY = "execQuery";
-
+	public static final String ACTION_LINKS_TO_ME = "LinksToMe";
+	
 	public static final String ACTION_MOVE = "move";
 	/*
 	 
@@ -345,6 +346,13 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 			);
+		ret += generateActionMapping(
+				"/"+getPath(doc, ACTION_LINKS_TO_ME), 
+				ModuleActionsGenerator.getPackage(context, module)+"."+ModuleActionsGenerator.getEditActionName(section),
+				"success",
+				FileEntry.package2path(JspViewGenerator.getPackage(context, module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getLinksToMePageName(doc)+".jsp"
+				);
+		
 		
 		if (doc.getLinks().size()>0){
 			ret += generateActionMapping(

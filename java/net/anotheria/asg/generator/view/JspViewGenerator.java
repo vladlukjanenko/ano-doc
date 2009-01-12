@@ -72,8 +72,6 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		versionInfoPage.setType(".jsp");
 		files.add(versionInfoPage);
 		
-		
-		
 		for (int i=0; i<view.getSections().size(); i++){
 			MetaSection s = view.getSections().get(i);
 			if (!(s instanceof MetaModuleSection))
@@ -91,6 +89,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			xmlExportFile.setType(".jsp");
 			files.add(xmlExportFile);
 
+			FileEntry linksToThisFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getLinksToMePageName(section.getDocument()), generateLinksToDocument(section, view));
+			linksToThisFile.setType(".jsp");
+			files.add(linksToThisFile);
+			
 			List<MetaDialog> dialogs = section.getDialogs();
 			for (int d=0; d<dialogs.size(); d++){
 				MetaDialog dialog = dialogs.get(d);
@@ -98,6 +100,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 				FileEntry dialogFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getDialogName(dialog, section.getDocument()), generateDialog(dialog, section, view));
 				dialogFile.setType(".jsp");
 				files.add(dialogFile);
+				
 			}
 			
 			MetaDocument doc = section.getDocument();
@@ -651,6 +654,12 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += writeString("</html:form>");
 		ret += writeString("<br/>");
 		
+		//Link to the Links to Me page
+		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
+		String linksToMePagePath = StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_LINKS_TO_ME)+"?pId=<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property=\"id\"/>";
+		ret += writeString("<a href="+quote("<ano:tslink>"+linksToMePagePath+"</ano:tslink>")+">Show direct links to  this document</a>");
+		ret += writeString("</logic:present>");
+		
 		//HOTFIX: commentation of direct link to me section START
 		ret += writeString("<%--");
 		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
@@ -723,6 +732,88 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		return ret;
 	}
+	
+	private String generateLinksToDocument(MetaModuleSection section, MetaView view){
+		String ret = "";
+		resetIdent();
+		
+		ret += getBaseJSPHeader();
+		
+		ret += writeString("<html:html>");
+		increaseIdent();
+		ret += writeString("<head>");
+		increaseIdent();
+		ret += writeString("<title>Direct links to the "+section.getDocument().getName()+"[<bean:write name=\"objectId\"/>]</title>");
+		ret += generatePragmas(view);
+		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		decreaseIdent();
+		ret += writeString("</head>");
+		ret += writeString("<body>");
+		increaseIdent();		
+		
+		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
+		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		increaseIdent();
+		ret += writeString("<tr>");
+		increaseIdent();
+		ret += writeString("<td>Direct links to the "+section.getDocument().getName()+"[<bean:write name=\"objectId\"/>]</td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+		ret += writeString("<logic:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
+		increaseIdent();
+		ret += writeString("<tr>");
+		increaseIdent();
+	
+		String docDescriptionStatement = "Type: <bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentType")+"/>";
+		docDescriptionStatement += ", Id: <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentId")+"/></a>";
+		docDescriptionStatement += "<logic:equal name="+quote("linkToMe")+" property="+quote("descriptionAvailable") +" value="+quote("true")+">, Name: <b> <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentDescription")+"/></a></b></logic:equal>";
+		docDescriptionStatement += ", in <b><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentProperty")+"/></b>.";
+		ret += writeString("<td>"+docDescriptionStatement+"</td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+		decreaseIdent();
+		ret += writeString("</logic:iterate>");
+		ret += writeString("</table>");
+		
+		ret += writeString("<br/>");
+		ret += writeString("<br/>");
+		ret += writeString("</logic:present>");
+		ret += writeString("<!-- ");
+		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		increaseIdent();
+		ret += writeString("<tr>");
+		increaseIdent();
+		ret += writeString("<td>This "+section.getDocument().getName()+" can be used in following documents:</td>");
+		decreaseIdent();
+		ret += writeString("</tr>");
+		
+		List<DirectLink> linkee = GeneratorDataRegistry.getInstance().findLinksToDocument(section.getDocument());
+		for (DirectLink l : linkee){
+			ret += writeString("<tr>");
+			increaseIdent();
+			ret += writeString("<td>");
+			ret += writeString(l.getModule().getName()+"."+l.getDocument().getName()+", property: "+l.getProperty().getName());
+			ret += writeString("</td>");
+			decreaseIdent();
+			ret += writeString("</tr>");
+		}
+		
+		decreaseIdent();
+		ret += writeString("</table>");
+		ret += writeString("-->");
+		
+
+		decreaseIdent();
+		ret += writeString("</body>");
+		decreaseIdent();
+		
+		decreaseIdent();
+		ret += writeString("</html:html>");
+		
+		ret += getBaseJSPFooter();
+		
+		return ret;
+	}	
 	
 	private String getElementName(MetaDocument doc, MetaViewElement element){
 		MetaProperty p = doc.getField(element.getName());
@@ -1331,7 +1422,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		ret += getBaseJSPFooter(); 
 		return ret;
 	}
-
+	
 	private String generateElementHeader(MetaViewElement element){
 		if (element instanceof MetaFieldElement)
 			return generateFieldHeader((MetaFieldElement)element);

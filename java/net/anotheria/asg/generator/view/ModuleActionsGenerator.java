@@ -214,7 +214,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	public static String getDuplicateActionName(MetaModuleSection section){
 		return "Duplicate"+getActionSuffix(section);
 	}
-
+	
 	private String generateMultiOpAction(MetaModuleSection section){
 		startNewJob();
 		
@@ -465,7 +465,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 	    if (section.getFilters().size()>0){
 	    	for (int i=0 ; i<section.getFilters().size(); i++){
-	    		MetaFilter f = section.getFilters().get(i);
+	    		//FIX: Is never used
+//	    		MetaFilter f = section.getFilters().get(i);
 	    		String filterParameterName = "filterParameter"+i;
 		    	//hacky, only one filter at time allowed. otherwise, we must submit the filter name.
 		    	appendStatement("String filterParameter"+i+" = "+quote(""));
@@ -1424,6 +1425,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		
 		
+		appendStatement("addBeanToRequest(req, "+quote("objectId")+" , "+doc.getVariableName()+".getId())");
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+doc.getVariableName()+".getObjectInfo().toString())");
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Update")+")");

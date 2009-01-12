@@ -190,6 +190,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	public static String getDialogName(MetaDialog dialog, MetaDocument doc){
 		return dialog.getName()+doc.getName()+"Dialog";
 	}
+	
+	public static String getLinksToMePageName(MetaDocument doc){
+		return "LinksTo"+doc.getName();
+	}
 
 	public static String getContainerPageName(MetaDocument doc, MetaContainerProperty table){
 		return "Show"+doc.getName()+StringUtils.capitalize(table.getName());
