@@ -168,7 +168,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		ret += writeImport("org.apache.struts.action.ActionMapping");
 		ret += emptyline();
 		
-		if (list.getContainedProperty().isLinked()){
+		if (list.getContainedProperty().isLinked()  || list.getContainedProperty() instanceof MetaEnumerationProperty){
 			ret += writeImport("java.util.List;");
 			ret += emptyline();
 		}
@@ -185,7 +185,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		for (int i=0; i<elements.size(); i++){
 			MetaProperty p = elements.get(i);
 			ret += writeStatement("private "+p.toJavaType()+" "+p.getName());
-			if (p.isLinked()){
+			if (p.isLinked() || p instanceof MetaEnumerationProperty){
 				MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
 				ret += writeString("@SuppressWarnings(\"unchecked\")");
 				ret += writeStatement("private "+collection.toJavaType()+" "+collection.getName());
@@ -196,7 +196,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		for (int i=0; i<elements.size(); i++){
 			MetaProperty p = elements.get(i);
 			ret += generateMethods(null, p);
-			if (p.isLinked()){
+			if (p.isLinked() || p instanceof MetaEnumerationProperty){
 				String propName = p.getName()+"Collection";
 				ret += writeString("@SuppressWarnings(\"unchecked\")");
 				ret += writeStatement("public void set"+StringUtils.capitalize(propName)+"(List l){");

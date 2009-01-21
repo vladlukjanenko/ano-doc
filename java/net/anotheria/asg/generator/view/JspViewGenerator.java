@@ -32,8 +32,8 @@ import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
 import net.anotheria.asg.generator.view.meta.MetaListElement;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
 import net.anotheria.util.StringUtils;
 
@@ -272,7 +272,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		decreaseIdent();
 	
 		ret += writeString("<td align=\"left\" width=\"65%\">&nbsp;");
-		if (!p.isLinked()){
+		if (!p.isLinked() && !(p instanceof MetaEnumerationProperty)){
 			String field = "";
 			field += "<input type=\"text\" name="+quote(name);
 			field += " value=\"<bean:write name="+quote(StrutsConfigGenerator.getContainerEntryFormName(doc,list ))+" property="+quote(name)+"/>";

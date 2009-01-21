@@ -1876,22 +1876,31 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		appendImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
-		if (containerProperty instanceof MetaListProperty && ((MetaListProperty)containerProperty).getContainedProperty().isLinked()){
-			MetaListProperty list = ((MetaListProperty)containerProperty);
-			appendImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, containerProperty));
-
-			MetaLink link = (MetaLink)list.getContainedProperty();
-			
-			String tDocName = link.getTargetDocumentName(); 
-			MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
-					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
-			MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
-			appendImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
-			appendImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
-			appendImport("net.anotheria.anodoc.data.NoSuchDocumentException");
-		    appendImport("net.anotheria.util.StringUtils");
-
+		if (containerProperty instanceof MetaListProperty){
+			MetaProperty containedProperty = ((MetaListProperty)containerProperty).getContainedProperty();
+			if(containedProperty.isLinked()){
+				MetaListProperty list = ((MetaListProperty)containerProperty);
+				appendImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, containerProperty));
+	
+				MetaLink link = (MetaLink)list.getContainedProperty();
+				
+				String tDocName = link.getTargetDocumentName(); 
+				MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
+						doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
+				MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
+				appendImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
+				appendImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
+				appendImport("net.anotheria.webutils.bean.LabelValueBean");
+				appendImport("net.anotheria.anodoc.data.NoSuchDocumentException");
+			    appendImport("net.anotheria.util.StringUtils");
+			}
+			if(containedProperty instanceof MetaEnumerationProperty){
+				appendImport("net.anotheria.webutils.bean.LabelValueBean");
+				EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) containedProperty).getEnumeration());
+				appendImport(EnumerationGenerator.getUtilsImport(type));
+			}
 		}
+		
 		appendImport("net.anotheria.asg.exception.ASGRuntimeException");
 
 	    appendEmptyline();
@@ -2355,16 +2364,33 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			String sortType = "new "+DataFacadeGenerator.getSortTypeName(targetDocument);
 			sortType += "("+DataFacadeGenerator.getSortTypeName(targetDocument)+".SORT_BY_NAME)";
 			appendStatement("List<"+targetDocument.getName()+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"("+sortType+")");
-			appendStatement("List<net.anotheria.webutils.bean.LabelValueBean> "+listName+"Values = new ArrayList<net.anotheria.webutils.bean.LabelValueBean>("+listName+".size())");
+			appendStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size())");
 			appendString( "for (int i=0; i<"+listName+".size(); i++){");
 			increaseIdent();
 			appendStatement(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+" "+targetDocument.getTemporaryVariableName()+" = ("+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+") "+listName+".get(i)");
-			appendStatement("net.anotheria.webutils.bean.LabelValueBean bean = new net.anotheria.webutils.bean.LabelValueBean("+targetDocument.getTemporaryVariableName()+".getId(), "+targetDocument.getTemporaryVariableName()+".getName()+\" [\"+"+targetDocument.getTemporaryVariableName()+".getId()+\"]\" )");
+			appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getTemporaryVariableName()+".getId(), "+targetDocument.getTemporaryVariableName()+".getName()+\" [\"+"+targetDocument.getTemporaryVariableName()+".getId()+\"]\" )");
 			appendStatement(listName+"Values.add(bean)");
-			append(closeBlock()); ;
+			append(closeBlock());
 			appendStatement("addBeanToRequest(req, "+quote(listName+"Values")+", "+listName+"Values"+")");
 			appendStatement("form."+list.getContainedProperty().toBeanSetter()+"Collection("+listName+"Values"+")");
 			
+		}
+		
+		if(list.getContainedProperty() instanceof MetaEnumerationProperty){
+			EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) list.getContainedProperty()).getEnumeration());
+			appendEmptyline();
+			String arrName = type.getName()+"_values";
+		    String listName = arrName+"List";
+		    appendString("//enumeration "+type.getName());
+		    appendStatement("int[] "+arrName+" = " +EnumerationGenerator.getUtilsClassName(type)+"."+type.getName().toUpperCase()+"_VALUES");
+		    appendStatement("List<LabelValueBean> "+listName+"Values"+" = new ArrayList<LabelValueBean>("+arrName+".length)");
+		    appendString("for (int i=0; i<"+arrName+".length; i++){");
+		    increaseIdent();
+		
+		    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+EnumerationGenerator.getUtilsClassName(type)+".getName("+arrName+"[i]))");
+		    appendStatement(listName+"Values"+".add(bean)");
+		    append(closeBlock());
+		    appendStatement("form."+list.getContainedProperty().toBeanSetter()+"Collection("+listName+"Values"+")");
 		}
 		
 		appendString( "// generate list ...");
@@ -2403,6 +2429,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendString( "}catch(NoSuchDocumentException e){");
 			appendIncreasedStatement("bean.setDescription(\"*** DELETED ***\")");
 			appendString( "}");
+		}
+		if(list.getContainedProperty() instanceof MetaEnumerationProperty){
+			EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) list.getContainedProperty()).getEnumeration());
+			appendStatement("bean.setDescription("+EnumerationGenerator.getUtilsClassName(type)+".getName(value))");
 		}
 		appendStatement("beans.add(bean)");
 		append(closeBlock()); ;		
