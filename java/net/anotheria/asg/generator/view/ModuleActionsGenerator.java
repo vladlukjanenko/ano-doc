@@ -9,6 +9,7 @@ import java.util.Set;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
@@ -75,11 +76,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		timer.startExecution(section.getModule().getName()+"-view");
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getBaseActionName(section), generateBaseAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getShowActionName(section), generateShowAction(section)));
+		files.add(new FileEntry(generateShowAction(section)));
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getMultiOpActionName(section), generateMultiOpAction(section)));
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getSearchActionName(section), generateSearchAction(section)));
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDeleteActionName(section), generateDeleteAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDuplicateActionName(section), generateDuplicateAction(section)));
+		files.add(new FileEntry(generateDuplicateAction(section)));
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getVersionInfoActionName(section), generateVersionInfoAction(section)));
 		
 		timer.stopExecution(section.getModule().getName()+"-view");
@@ -87,7 +88,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			if (section.getDialogs().size()>0){
 				//works only if the section has a dialog.
 				timer.startExecution(section.getModule().getName()+"-dialog-base");
-				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getMultiOpDialogActionName(section), generateMultiOpDialogAction(section)));
+				files.add(new FileEntry(generateMultiOpDialogAction(section)));
 				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getUpdateActionName(section), generateUpdateAction(section)));
 				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getEditActionName(section), generateEditAction(section)));
 				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getNewActionName(section), generateNewAction(section)));
@@ -251,23 +252,27 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return getCurrentJobContent().toString();
 	}
 	
-	private String generateMultiOpDialogAction(MetaModuleSection section){
-		startNewJob();
+	private GeneratedClass generateMultiOpDialogAction(MetaModuleSection section){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
 		
-	    appendStatement("package "+getPackage(section.getModule()));
-	    appendEmptyline();
-
+		clazz.setName(getMultiOpDialogActionName(section));
+		clazz.setParent(getBaseActionName(section));
+		clazz.setPackageName(getPackage(section.getModule()));
+	    
+		
 	    //write imports...
-	    appendImport("net.anotheria.util.NumberUtils");
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		appendImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
+	    clazz.addImport("net.anotheria.util.NumberUtils");
+	    addStandardActionImports(clazz);
+		
+	    clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual())
-			appendImport("net.anotheria.asg.data.MultilingualObject");
+			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
 
 	    
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
@@ -277,18 +282,16 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaFieldElement field = (MetaFieldElement)elem;
 				MetaProperty p = doc.getField(field.getName());
 				if (p.getType().equals("image")){
-					appendImport("net.anotheria.webutils.filehandling.actions.FileStorage");
-					appendImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
+					clazz.addImport("net.anotheria.webutils.filehandling.actions.FileStorage");
+					clazz.addImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
 					break;
 				}
 			}
 		}
 	    appendEmptyline();
 
-		appendString( "public class "+getMultiOpDialogActionName(section)+" extends "+getBaseActionName(section)+" {");
-	    increaseIdent();
-	    appendEmptyline();
-	    appendString( getExecuteDeclaration(null));
+	    startClassBody();
+		appendString( getExecuteDeclaration(null));
 	    increaseIdent();
 	    appendStatement("String path = stripPath(mapping.getPath())");
 	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_DELETE);
@@ -317,8 +320,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    	appendEmptyline();
 	    }
 	    
-	    append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 	
 	private void writePathResolveForMultiOpAction(MetaDocument doc,String action){
@@ -333,37 +335,30 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendIncreasedStatement("return "+path+"(mapping, af, req, res)");
 	}
 	
-	private String generateShowAction(MetaModuleSection section){
-		startNewJob();
+	private GeneratedClass generateShowAction(MetaModuleSection section){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz)
+		;
 	    MetaDocument doc = section.getDocument();
 		List<MetaViewElement> elements = section.getElements();
 	    
 	    boolean containsComparable = section.containsComparable();
-	    appendStatement("package "+getPackage(section.getModule()));
-	    appendEmptyline();
 	    
-	    //write imports...
-	    appendImport("java.util.List");
-	    appendImport("java.util.ArrayList");
-	    appendImport("net.anotheria.asg.util.decorators.IAttributeDecorator");
-	    appendImport("net.anotheria.asg.util.filter.DocumentFilter");
-	    appendImport("net.anotheria.util.NumberUtils");
-	    append(getStandardActionImports());
-	    appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    appendImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
-		appendEmptyline();
-		if (containsComparable){
-			appendImport(ModuleBeanGenerator.getListItemBeanSortTypeImport(context, doc));
-			appendImport("net.anotheria.util.sorter.Sorter");
-			appendImport("net.anotheria.util.sorter.QuickSorter");
-			appendEmptyline();
-		}
+	    clazz.setPackageName(getPackage(section.getModule()));
+
+	    clazz.addImport("java.util.List");
+	    clazz.addImport("java.util.ArrayList");
+	    clazz.addImport("net.anotheria.asg.util.decorators.IAttributeDecorator");
+	    clazz.addImport("net.anotheria.asg.util.filter.DocumentFilter");
+	    clazz.addImport("net.anotheria.util.NumberUtils");
+	    addStandardActionImports(clazz);
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    clazz.addImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
 		
-		appendImport("net.anotheria.util.slicer.Slicer");
-		appendImport("net.anotheria.util.slicer.Slice");
-		appendImport("net.anotheria.util.slicer.Segment");
-		appendImport("net.anotheria.asg.util.bean.PagingLink");
-		appendEmptyline();
+		clazz.addImport("net.anotheria.util.slicer.Slicer");
+		clazz.addImport("net.anotheria.util.slicer.Slice");
+		clazz.addImport("net.anotheria.util.slicer.Segment");
+		clazz.addImport("net.anotheria.asg.util.bean.PagingLink");
 		
 		//check if we have to property definition files.
 		//check if we have decorators
@@ -379,7 +374,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					MetaEnumerationProperty enumeration = (MetaEnumerationProperty)p;
 					if (importedEnumerations.get(enumeration.getName())==null){
 						EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(enumeration.getEnumeration());
-						appendImport(EnumerationGenerator.getUtilsImport(type));
+						clazz.addImport(EnumerationGenerator.getUtilsImport(type));
 						importedEnumerations.put(enumeration.getName(), enumeration);
 					}
 				}
@@ -392,10 +387,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 		}
 		
-	    appendString( "public class "+getShowActionName(section)+" extends "+getBaseActionName(section)+" {");
-	    increaseIdent();
-	    appendEmptyline();
-	    
+		clazz.setName(getShowActionName(section));
+		clazz.setParent(getBaseActionName(section));
+
+		startClassBody();
 	    //generate session attributes constants
 	    appendStatement("public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+", quote(doc.getName()));
 	    appendStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+", quote(doc.getName()));
@@ -404,6 +399,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    boolean containsDecorators = neededDecorators.size() >0;
 	    
 		if (containsComparable){
+			clazz.addImport(ModuleBeanGenerator.getListItemBeanSortTypeImport(context, doc));
+			clazz.addImport("net.anotheria.util.sorter.Sorter");
+			clazz.addImport("net.anotheria.util.sorter.QuickSorter");
+
 			appendStatement("private Sorter<", ModuleBeanGenerator.getListItemBeanName(doc), "> sorter");
 			appendEmptyline();
 		}
@@ -682,11 +681,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 	    appendStatement("return bean");
 	    append(closeBlock());
-	    appendEmptyline();
-	    
-	    
-	    append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 	
 	///////////////////////////////////////////////////
@@ -1546,28 +1541,25 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 	}
 
-	private String generateDuplicateAction(MetaModuleSection section){
+	private GeneratedClass generateDuplicateAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
-			return "";
-		startNewJob();
+			return null;
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		MetaDocument doc = section.getDocument();
-		appendStatement("package "+getPackage(section.getModule()));
-	    appendEmptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
 
 		//write imports...
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    
-		appendString( "public class "+getDuplicateActionName(section)+" extends "+getBaseActionName(section)+" {");
-		increaseIdent();
-	    appendEmptyline();
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		
+		clazz.setName(getDuplicateActionName(section));
+		clazz.setParent(getBaseActionName(section));
 
-	    generateDuplicateActionMethod(section, null);
-	    appendEmptyline();
-	    
-	    append(closeBlock());
-		return getCurrentJobContent().toString();
+		startClassBody();
+		generateDuplicateActionMethod(section, null);
+		return clazz;
 	    
 	}
 	
@@ -1799,8 +1791,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return ret;
 	}
 
+	/**
+	 * @deprecated use addStandardActionImports instead 
+	 */
+	@Deprecated 
 	private void appendStandardActionImports(){
 		appendStandardActionImports(getCurrentJobContent());
+	}
+
+	private void addStandardActionImports(GeneratedClass clazz){
+	    clazz.addImport("javax.servlet.http.HttpServletRequest");
+	    clazz.addImport("javax.servlet.http.HttpServletResponse");
+	    clazz.addImport("org.apache.struts.action.ActionForm");
+	    clazz.addImport("org.apache.struts.action.ActionForward");
+	    clazz.addImport("org.apache.struts.action.ActionMapping");
 	}
 	
 	private void appendStandardActionImports(StringBuilder target){

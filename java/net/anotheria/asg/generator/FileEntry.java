@@ -33,9 +33,11 @@ public class FileEntry {
 	
 	public FileEntry(GeneratedClass clazz){
 		this();
-		path = package2path(clazz.getPackageName());
-		name = clazz.getName();
-		content = clazz.createClassFileContent();
+		if (clazz!=null){
+			path = package2path(clazz.getPackageName());
+			name = clazz.getName();
+			content = clazz.createClassFileContent();
+		}
 	}
 	
 	 
