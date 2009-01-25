@@ -362,7 +362,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		//check if we have to property definition files.
 		//check if we have decorators
-		HashMap<String,MetaEnumerationProperty> importedEnumerations = new HashMap<String,MetaEnumerationProperty>();
 		List<MetaDecorator> neededDecorators = new ArrayList<MetaDecorator>();
 		
 		for (int i=0; i<elements.size(); i++){
@@ -372,11 +371,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaProperty p = doc.getField(field.getName());
 				if (p instanceof MetaEnumerationProperty){
 					MetaEnumerationProperty enumeration = (MetaEnumerationProperty)p;
-					if (importedEnumerations.get(enumeration.getName())==null){
-						EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(enumeration.getEnumeration());
-						clazz.addImport(EnumerationGenerator.getUtilsImport(type));
-						importedEnumerations.put(enumeration.getName(), enumeration);
-					}
+					EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(enumeration.getEnumeration());
+					clazz.addImport(EnumerationGenerator.getUtilsImport(type));
 				}
 				
 				MetaDecorator d = field.getDecorator();
