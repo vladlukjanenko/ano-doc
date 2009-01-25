@@ -28,36 +28,29 @@ public class AbstractDataObjectGenerator extends AbstractGenerator{
 	 * @param doc 
 	 * @return
 	 */
-	protected String generateGetFootprintMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public String getFootprint(){");
+	protected void generateGetFootprintMethod(MetaDocument doc){
+		appendString("public String getFootprint(){");
 		increaseIdent();
-		ret += writeStatement("StringBuilder footprint = new StringBuilder()");
+		appendStatement("StringBuilder footprint = new StringBuilder()");
 
-		ret += generatePropertyListFootprint(doc.getProperties());
-		ret += generatePropertyListFootprint(doc.getLinks());
+		generatePropertyListFootprint(doc.getProperties());
+		generatePropertyListFootprint(doc.getLinks());
 		
-		ret += writeStatement("return MD5Util.getMD5Hash(footprint)");
-		ret += closeBlock();
-		return ret;
-		
+		appendStatement("return MD5Util.getMD5Hash(footprint)");
+		append(closeBlock());
 	}
 	
-	protected String generatePropertyListFootprint(List<MetaProperty> properties){
-		String ret = "";
-		
+	protected void generatePropertyListFootprint(List<MetaProperty> properties){
 		Context c = GeneratorDataRegistry.getInstance().getContext();
 
 		for (MetaProperty p : properties){
 			if (c.areLanguagesSupported() && p.isMultilingual()){
 				for (String l : c.getLanguages())
-					ret += writeStatement("footprint.append(get"+p.getAccesserName(l)+"())");
+					appendStatement("footprint.append(get"+p.getAccesserName(l)+"())");
 			}else{
-				ret += writeStatement("footprint.append(get"+p.getAccesserName()+"())");
+				appendStatement("footprint.append(get"+p.getAccesserName()+"())");
 			}
 		}
-		
-		return ret;
 	}
 
 }

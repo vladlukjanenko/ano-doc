@@ -221,12 +221,13 @@ public class AbstractGenerator{
 		return ret;
 	}
 
-	protected String writeMark(int markNumber){
-		String ret = "/* ***** MARK ";
-		ret += markNumber;
-		ret += ", Generator: "+this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
-    	ret += " ***** */";
-		return emptyline()+writeString(ret)+emptyline();
+	protected void appendMark(int markNumber){
+		
+//		String ret = "/* ***** MARK ";
+//		ret += markNumber;
+//		ret += ", Generator: "+this.getClass().getName().substring(this.getClass().getName().lastIndexOf('.')+1);
+ //   	ret += " ***** */";
+//		return emptyline()+writeString(ret)+emptyline();
 	}
 
 	protected String writeCommentLine(String commentline){

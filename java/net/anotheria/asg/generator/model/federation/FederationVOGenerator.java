@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
@@ -35,8 +36,8 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentImplName(doc), generateDocument(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
+		_ret.add(new FileEntry(generateDocument(doc)));
+		_ret.add(new FileEntry(generateDocumentFactory(doc)));
 		return _ret;
 	}
 	
@@ -66,286 +67,261 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		return properties;
 	}
 	
-	private String generateDocument(MetaDocument doc){
-		String ret = "";
+	private GeneratedClass generateDocument(MetaDocument doc){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-	
-		ret += writeStatement("package "+getPackageName(doc));
-		ret += emptyline();
-
-		boolean listImported = false;
+		clazz.setPackageName(getPackageName(doc));
+		
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
-				ret += writeImport("java.util.List");
-				ret += writeImport("java.util.ArrayList");
-				listImported = true;
+				clazz.addImport("java.util.List");
+				clazz.addImport("java.util.ArrayList");
 				break;
 			}
 		}
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaTableProperty){
-				if (!listImported){
-					ret += writeImport("java.util.List");
-					ret += writeImport("java.util.ArrayList");
-				}
+				clazz.addImport("java.util.List");
+				clazz.addImport("java.util.ArrayList");
 				break;
 			}
 		}
 		
 		for (MetaProperty p : doc.getProperties()){
 			if (p.isMultilingual() && context.areLanguagesSupported()){
-				ret += writeImport("net.anotheria.anodoc.util.context.ContextManager");
+				clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 				break;
 			}
 		}
-		ret += emptyline();
-		ret += writeImport("net.anotheria.util.xml.XMLNode");
-		ret += writeImport("net.anotheria.util.crypt.MD5Util");
-		ret += writeImport("net.anotheria.asg.data.AbstractFederatedVO");
+
+		clazz.addImport("net.anotheria.util.xml.XMLNode");
+		clazz.addImport("net.anotheria.util.crypt.MD5Util");
+		clazz.addImport("net.anotheria.asg.data.AbstractFederatedVO");
 
 		
-		String interfaceDecl = "implements "+doc.getName();
-		if (doc.isComparable()){
-			ret += writeImport("net.anotheria.util.sorter.IComparable");
-			ret += writeImport("net.anotheria.util.BasicComparable");
-			ret += emptyline();
-			interfaceDecl += ", IComparable ";
-		}
-		
-		
-		ret += writeString("public class "+getDocumentImplName(doc)+" extends AbstractFederatedVO "+interfaceDecl+"{");
-		increaseIdent();
-		ret += emptyline();
-		ret += generatePropertyFields(doc);
-		ret += emptyline();
-		ret += generateDefaultConstructor(doc);
-		ret += emptyline();
-		ret += generateCloneConstructor(doc);
-		ret += emptyline();
-		ret += generatePropertyAccessMethods(doc);
-		ret += emptyline();
-		ret += generateToStringMethod(doc);
-		ret += emptyline();
-		ret += generateCloneMethod(doc);
-		ret += emptyline();
-		ret += generateCopyMethod(doc);
-		ret += emptyline();
-		ret += generateGetPropertyValueMethod(doc);
-		ret += emptyline();
-		ret += generateAdditionalMethods(doc);
+		clazz.addInterface(doc.getName());
 		
 		if (doc.isComparable()){
-			ret += emptyline();
-			ret += generateCompareMethod(doc);
+			clazz.addImport("net.anotheria.util.sorter.IComparable");
+			clazz.addImport("net.anotheria.util.BasicComparable");
+			clazz.addInterface("IComparable");
 		}
 		
-		ret +=emptyline();
-		ret += generateDefNameMethod(doc);
+		clazz.setName(getDocumentImplName(doc));
+		clazz.setParent("AbstractFederatedVO");
 		
-		ret +=emptyline();
-		ret += generateGetFootprintMethod(doc);
+		startClassBody();
+		generatePropertyFields(doc);
+		appendEmptyline();
+		generateDefaultConstructor(doc);
+		appendEmptyline();
+		generateCloneConstructor(doc);
+		appendEmptyline();
+		generatePropertyAccessMethods(doc);
+		appendEmptyline();
+		generateToStringMethod(doc);
+		appendEmptyline();
+		generateCloneMethod(doc);
+		appendEmptyline();
+		generateCopyMethod(doc);
+		appendEmptyline();
+		generateGetPropertyValueMethod(doc);
+		appendEmptyline();
+		generateAdditionalMethods(doc);
+		
+		if (doc.isComparable()){
+			appendEmptyline();
+			generateCompareMethod(doc);
+		}
+		
+		appendEmptyline();
+		generateDefNameMethod(doc);
+		
+		appendEmptyline();
+		generateGetFootprintMethod(doc);
 
-		ret += closeBlock();
-		return ret;
+		return clazz;
 	}
 	
-	private String generateDefaultConstructor(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public "+getDocumentImplName(doc)+"(String anId){");
+	private void generateDefaultConstructor(MetaDocument doc){
+		appendString("public "+getDocumentImplName(doc)+"(String anId){");
 		increaseIdent();
-		ret += writeStatement("id = anId");
-		ret += closeBlock();
-		return ret;
+		appendStatement("id = anId");
+		append(closeBlock());
 	}
 	
-	private String generateCloneConstructor(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public "+getDocumentImplName(doc)+"("+getDocumentImplName(doc)+" toClone){");
+	private void generateCloneConstructor(MetaDocument doc){
+		appendString("public "+getDocumentImplName(doc)+"("+getDocumentImplName(doc)+" toClone){");
 		increaseIdent();
 		//TODO add multilingual support 
-		ret += writeStatement("this.id = toClone.id");
-		ret += writeStatement("copyAttributesFrom(toClone)");
-		ret += closeBlock();
-		return ret;
+		appendStatement("this.id = toClone.id");
+		appendStatement("copyAttributesFrom(toClone)");
+		append(closeBlock());
 	}
 
-	private String generatePropertyFields(MetaDocument doc){
-		String ret = "";
-		ret +=_generatePropertyField(id);
-		ret += _generatePropertyFields(doc.getProperties());
-		ret += _generatePropertyFields(doc.getLinks());
-		ret += _generatePropertyField(lastUpdate);
+	private void generatePropertyFields(MetaDocument doc){
+		_generatePropertyField(id);
+		_generatePropertyFields(doc.getProperties());
+		_generatePropertyFields(doc.getLinks());
+		_generatePropertyField(lastUpdate);
 		
-		return ret;
 	}
 	
-	private String _generatePropertyFields(List<MetaProperty> propertyList){
-		String ret = "";
+	private void _generatePropertyFields(List<MetaProperty> propertyList){
 		for (int i=0; i<propertyList.size(); i++){
 			MetaProperty p = propertyList.get(i);
 			if (p instanceof MetaTableProperty){
 				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
 				for (int t=0; t<columns.size(); t++)
-					ret += _generatePropertyField(columns.get(t));
+					_generatePropertyField(columns.get(t));
 			}else{
-				ret += _generatePropertyField(p);
+				_generatePropertyField(p);
 			}
 		}
-		return ret;
 	}
 	
-	private String _generatePropertyField(MetaProperty p){
-		String ret = "";
+	private void _generatePropertyField(MetaProperty p){
 		if (context.areLanguagesSupported() && p.isMultilingual()){
-			System.err.println("Multilingual support for VOs not yet implemented!");
+			System.err.println("Multilingual support for federated VOs not yet implemented!");
 			/*
 			for (String l: context.getLanguages()){
 				String decl = PROPERTY_DECLARATION;
 				decl += p.toNameConstant(l);
 				decl += "\t= \""+p.getName()+"_"+l+"\"";
-				ret += writeStatement(decl);
+				appendStatement(decl);
 			}
 			return ret;
 			*/
-			return "";
+			return ;
 		}else{
-			ret += "private ";
-			ret += p.toJavaType();
-			ret += " "+p.getName().toLowerCase();
-			return writeStatement(ret);
+			appendStatement("private "+p.toJavaType()+" "+p.getName().toLowerCase());
 		}
 	}
 	
 	
-	private String generatePropertyAccessMethods(MetaDocument doc){
-		String ret = "";
-		
-		ret += generatePropertyGetterMethod(id);
+	private void generatePropertyAccessMethods(MetaDocument doc){
+		generatePropertyGetterMethod(id);
 		List<MetaProperty> lastUpdList = new ArrayList<MetaProperty>();
 		lastUpdList.add(lastUpdate);
-		ret += _generatePropertyAccessMethods(lastUpdList);
-		ret += _generatePropertyAccessMethods(doc.getProperties());
-		ret += _generatePropertyAccessMethods(doc.getLinks());
-
-		return ret;
+		_generatePropertyAccessMethods(lastUpdList);
+		_generatePropertyAccessMethods(doc.getProperties());
+		_generatePropertyAccessMethods(doc.getLinks());
 	}
 	
-	private String _generatePropertyAccessMethods(List<MetaProperty> properties){
-		String ret = "";
+	private void _generatePropertyAccessMethods(List<MetaProperty> properties){
 		
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
-			ret += generatePropertyGetterMethod(p);
-			ret += emptyline();
-			ret += generatePropertySetterMethod(p);
-			ret += emptyline();
+			generatePropertyGetterMethod(p);
+			appendEmptyline();
+			generatePropertySetterMethod(p);
+			appendEmptyline();
 		}
-		return ret;
 	}
 	
-	private String generatePropertyGetterMethod(MetaProperty p){
-		String ret = "";
+	private void generatePropertyGetterMethod(MetaProperty p){
+		if (p instanceof MetaTableProperty){
+			generateTablePropertyGetterMethods((MetaTableProperty)p);
+			return;
+		}
+		if (p instanceof MetaListProperty){
+			generateListPropertyGetterMethods((MetaListProperty)p);
+			return;
+		}
+		if (context.areLanguagesSupported() && p.isMultilingual()){
+			generatePropertyGetterMethodMultilingual(p);
+			return;
+		}
 		
-		if (p instanceof MetaTableProperty)
-			return generateTablePropertyGetterMethods((MetaTableProperty)p);
-		if (p instanceof MetaListProperty)
-			return generateListPropertyGetterMethods((MetaListProperty)p);
-		if (context.areLanguagesSupported() && p.isMultilingual())
-			return generatePropertyGetterMethodMultilingual(p);
-		
-		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
+		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
-		ret += writeStatement("return "+p.getName().toLowerCase());
-		ret += closeBlock();
-		return ret;
+		appendStatement("return "+p.getName().toLowerCase());
+		append(closeBlock());
 	}
 	
-	private String generatePropertyGetterMethodMultilingual(MetaProperty p){
-		String ret = "";
+	private void generatePropertyGetterMethodMultilingual(MetaProperty p){
 		for (String l : context.getLanguages()){
-			ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"(){");
+			appendString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"(){");
 			increaseIdent();
-			ret += writeStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
+			append(closeBlock());
+			appendEmptyline();
 		}
-		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
+		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
 		String v = "ContextManager.getCallContext().getCurrentLanguage()";
-		ret += writeStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
-		ret += closeBlock();
-		ret += emptyline();
-		return ret;
+		appendStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
+		append(closeBlock());
+		appendEmptyline();
 	}
 	
 	
-	private String generateListPropertyGetterMethods(MetaListProperty p){
+	private void generateListPropertyGetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaProperty(p.getName(), "list");
-		return generatePropertyGetterMethod(tmp);
+		generatePropertyGetterMethod(tmp);
 	}
 	
-	private String generateTablePropertyGetterMethods(MetaTableProperty p){
-		String ret = "";
+	private void generateTablePropertyGetterMethods(MetaTableProperty p){
 		List<MetaProperty> columns = p.getColumns();
 		for (int t=0; t<columns.size(); t++)
-			ret += generatePropertyGetterMethod(columns.get(t));
-		return ret;
+			generatePropertyGetterMethod(columns.get(t));
 	}
 	
-	private String generatePropertySetterMethod(MetaProperty p){
-		String ret = "";
+	private void generatePropertySetterMethod(MetaProperty p){
+		if (p instanceof MetaTableProperty){
+			generateTablePropertySetterMethods((MetaTableProperty)p);
+			return ;
+		}
+		if (p instanceof MetaListProperty){
+			generateListPropertySetterMethods((MetaListProperty)p);
+			return ;
+		}
+		if (context.areLanguagesSupported() && p.isMultilingual()){
+			generatePropertySetterMethodMultilingual(p);
+			return;
+		}
 
-		if (p instanceof MetaTableProperty)
-			return generateTablePropertySetterMethods((MetaTableProperty)p);
-		if (p instanceof MetaListProperty)
-			return generateListPropertySetterMethods((MetaListProperty)p);
-		if (context.areLanguagesSupported() && p.isMultilingual())
-			return generatePropertySetterMethodMultilingual(p);
-
-		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
+		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
-		ret += writeStatement(""+p.getName().toLowerCase()+" = value");
-		ret += closeBlock();	
-		return ret;
+		appendStatement(""+p.getName().toLowerCase()+" = value");
+		append(closeBlock());	
 	}
 	
 	private String generatePropertySetterMethodMultilingual(MetaProperty p){
 		String ret = "";
 		for (String l : context.getLanguages()){
-			ret += writeString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value){");
+			appendString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value){");
 			increaseIdent();
-			ret += writeStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
+			append(closeBlock());
+			appendEmptyline();
 		}
-		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
+		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
 		String v = "ContextManager.getCallContext().getCurrentLanguage()";
-		ret += writeStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
+		append(closeBlock());
+		appendEmptyline();
 		return ret;
 	}
 
-	private String generateListPropertySetterMethods(MetaListProperty p){
+	private void generateListPropertySetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaProperty(p.getName(), "list");
-		return generatePropertySetterMethod(tmp);
+		generatePropertySetterMethod(tmp);
 	}
 
-	private String generateTablePropertySetterMethods(MetaTableProperty p){
-		String ret = "";
+	private void generateTablePropertySetterMethods(MetaTableProperty p){
 		List<MetaProperty> columns = p.getColumns();
 		for (int t=0; t<columns.size(); t++)
-			ret += generatePropertySetterMethod(columns.get(t));
-		return ret;
+			generatePropertySetterMethod(columns.get(t));
 	}
 
-	private String generateToStringMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public String toString(){");
+	private void generateToStringMethod(MetaDocument doc){
+		appendString("public String toString(){");
 		increaseIdent();
-		ret += writeStatement("String ret = "+quote(doc.getName()+" "));
-		ret += writeStatement("ret += \"[\"+getId()+\"] \"");
+		appendStatement("String ret = "+quote(doc.getName()+" "));
+		appendStatement("ret += \"[\"+getId()+\"] \"");
 		List<MetaProperty> props = doc.getProperties();
 		for (int i=0; i<props.size(); i++){
 			MetaProperty p = props.get(i);
@@ -353,49 +329,41 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
 				for (int t=0; t<columns.size(); t++){
 					MetaProperty pp = columns.get(t);
-					ret += writeStatement("ret += "+quote(pp.getName()+": ")+"+get"+pp.getAccesserName()+"()");
+					appendStatement("ret += "+quote(pp.getName()+": ")+"+get"+pp.getAccesserName()+"()");
 					if (t<columns.size()-1)
-						ret += writeStatement("ret += \", \"");
+						appendStatement("ret += \", \"");
 				}
 			}else{
-				ret += writeStatement("ret += "+quote(p.getName()+": ")+"+get"+p.getAccesserName()+"()");
+				appendStatement("ret += "+quote(p.getName()+": ")+"+get"+p.getAccesserName()+"()");
 			}
 			if (i<props.size()-1)
-				ret += writeStatement("ret += \", \"");
+				appendStatement("ret += \", \"");
 		}
-		ret += writeStatement("return ret"); 
-		ret += closeBlock();
-		return ret;
+		appendStatement("return ret"); 
+		append(closeBlock());
 	}
 	
-	private String generateCloneMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public "+doc.getName()+" clone(){");
+	private void generateCloneMethod(MetaDocument doc){
+		appendString("public "+doc.getName()+" clone(){");
 		increaseIdent();
-		ret += writeStatement("return new "+getDocumentImplName(doc)+"(this)");
-		ret += closeBlock();
-		return ret;
+		appendStatement("return new "+getDocumentImplName(doc)+"(this)");
+		append(closeBlock());
 	}
 	
-	private String generateCopyMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public void copyAttributesFrom("+doc.getName()+" toCopy){");
+	private void generateCopyMethod(MetaDocument doc){
+		appendString("public void copyAttributesFrom("+doc.getName()+" toCopy){");
 		increaseIdent();
 		for (MetaProperty p : doc.getProperties()){
-			ret += writeStatement("this."+p.getName().toLowerCase() + " = toCopy."+p.toGetter()+"()");
+			appendStatement("this."+p.getName().toLowerCase() + " = toCopy."+p.toGetter()+"()");
 		}
-		ret += closeBlock();
-		return ret;
+		append(closeBlock());
 	}
 
-	private String generateGetPropertyValueMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public Object getPropertyValue(String propertyName){");
+	private void generateGetPropertyValueMethod(MetaDocument doc){
+		appendString("public Object getPropertyValue(String propertyName){");
 		increaseIdent();
-		ret += writeStatement("throw new RuntimeException("+quote("Not yet implemented.")+")");
-		ret += closeBlock();
-		
-		return ret;
+		appendStatement("throw new RuntimeException("+quote("Not yet implemented.")+")");
+		append(closeBlock());
 	}
 	
 
@@ -404,90 +372,77 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		return context.getDataPackageName(doc)+"."+getDocumentImplName(doc);
 	}
 	
-	private String generateAdditionalMethods(MetaDocument doc){
-		String ret = "";
-		
+	private void generateAdditionalMethods(MetaDocument doc){
 		List <MetaProperty>properties = doc.getProperties();
 		for (MetaProperty p : properties){
 			if (p instanceof MetaContainerProperty)
-				ret += generateContainerMethods((MetaContainerProperty)p);
+				generateContainerMethods((MetaContainerProperty)p);
 			if (p instanceof MetaTableProperty)
-				ret += generateTableMethods((MetaTableProperty)p);
+				generateTableMethods((MetaTableProperty)p);
 			if (p instanceof MetaListProperty)
-				ret += generateListMethods((MetaListProperty)p);
+				generateListMethods((MetaListProperty)p);
 		}
 		
-		ret += writeString("public XMLNode toXMLNode(){");
+		appendString("public XMLNode toXMLNode(){");
 		increaseIdent();
-		ret += writeStatement("return new XMLNode("+quote("not_imlpemented_fed_vo")+")");
-		ret += closeBlock();
-		
-		return ret;		
+		appendStatement("return new XMLNode("+quote("not_imlpemented_fed_vo")+")");
+		append(closeBlock());
 	}
 	
-	private String generateContainerMethods(MetaContainerProperty container){
-		String ret = "";
-
-		ret += writeString("public int "+getContainerSizeGetterName(container)+"(){");
+	private void generateContainerMethods(MetaContainerProperty container){
+		appendString("public int "+getContainerSizeGetterName(container)+"(){");
 		increaseIdent();
 		MetaProperty pr = container instanceof MetaTableProperty ? 
 			(MetaProperty) ((MetaTableProperty)container).getColumns().get(0) :
 			container;
-		ret += writeStatement("return getList("+pr.toNameConstant()+").size()"); 
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return getList("+pr.toNameConstant()+").size()"); 
+		append(closeBlock());
+		appendEmptyline();
 		
-		return ret;
-
 	}
 	
-	private String generateListMethods(MetaListProperty list){
-		String ret = "";
-
+	private void generateListMethods(MetaListProperty list){
 		MetaProperty c = list.getContainedProperty();
 
 		String decl = "public void "+getContainerEntryAdderName(list)+"(";
 		decl += c.toJavaType()+" "+c.getName();
 		decl += "){";
-		ret += writeString(decl);
+		appendString(decl);
 		increaseIdent();
 		
-		ret += writeStatement(c.toJavaType()+"Property p = new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+")");
-		ret += writeStatement("List tmp = get"+list.getAccesserName()+"()");
-		ret += writeStatement("tmp.add(p)");
-		ret += writeStatement("set"+list.getAccesserName()+"(tmp)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement(c.toJavaType()+"Property p = new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+")");
+		appendStatement("List tmp = get"+list.getAccesserName()+"()");
+		appendStatement("tmp.add(p)");
+		appendStatement("set"+list.getAccesserName()+"(tmp)");
+		append(closeBlock());
+		appendEmptyline();
 		
 		
-		ret += writeString("public void "+getContainerEntryDeleterName(list)+"(int index){");
+		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
-		ret += writeStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
+		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
 		increaseIdent();
-		ret += writeStatement(c.toJavaType()+" tmp1, tmp2");
-		ret += writeStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).get"+c.toJavaType()+"()");
-		ret += writeStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).get"+c.toJavaType()+"()");
-		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+c.toJavaType()+"(tmp2)");
-		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+c.toJavaType()+"(tmp1)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement(c.toJavaType()+" tmp1, tmp2");
+		appendStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).get"+c.toJavaType()+"()");
+		appendStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).get"+c.toJavaType()+"()");
+		appendStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+c.toJavaType()+"(tmp2)");
+		appendStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+c.toJavaType()+"(tmp1)");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
+		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
 		increaseIdent();
-		ret += writeStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index)");
-		ret += writeStatement("return p.get"+c.toJavaType()+"()");
-		ret += closeBlock();
-		ret += emptyline();
-
-		return ret;
+		appendStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index)");
+		appendStatement("return p.get"+c.toJavaType()+"()");
+		append(closeBlock());
+		appendEmptyline();
 	}
 	
-	private String generateTableMethods(MetaTableProperty table){
-		String ret = "";
+	private void generateTableMethods(MetaTableProperty table){
 		List<MetaProperty> columns = table.getColumns();
 		
 		String decl = "public void "+getContainerEntryAdderName(table)+"(";
@@ -498,67 +453,64 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 				decl += ", ";
 		}
 		decl += "){";
-		ret += writeString(decl);
+		appendString(decl);
 		increaseIdent();
 		
-		ret += writeStatement("List tmp");
+		appendStatement("List tmp");
 		
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty p = columns.get(i);
-			ret += writeStatement("tmp = getList("+p.toNameConstant()+")"); 
-			ret += writeStatement("tmp.add(new StringProperty(\"\", "+table.extractSubName(p)+"))");
-			ret += writeStatement("setList("+p.toNameConstant()+", tmp)");
-			ret += emptyline();
+			appendStatement("tmp = getList("+p.toNameConstant()+")"); 
+			appendStatement("tmp.add(new StringProperty(\"\", "+table.extractSubName(p)+"))");
+			appendStatement("setList("+p.toNameConstant()+", tmp)");
+			appendEmptyline();
 		}
 
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public void "+getContainerEntryDeleterName(table)+"(int index){");
+		appendString("public void "+getContainerEntryDeleterName(table)+"(int index){");
 		increaseIdent();
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty p = columns.get(i);
-			ret += writeStatement("getListProperty("+p.toNameConstant()+").remove(index)"); 
+			appendStatement("getListProperty("+p.toNameConstant()+").remove(index)"); 
 		}
 		
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public List get"+StringUtils.capitalize(table.getName())+"Row(int index){");
+		appendString("public List get"+StringUtils.capitalize(table.getName())+"Row(int index){");
 		increaseIdent();
-		ret += writeStatement("List ret = new ArrayList(1)");
+		appendStatement("List ret = new ArrayList(1)");
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty p = columns.get(i);
-			ret += writeString("try{");
-			ret += writeIncreasedStatement("ret.add(((StringProperty)getList("+p.toNameConstant()+").get(index)).getString())");
-			ret += writeString("}catch(IndexOutOfBoundsException e){ ");
-			ret += writeIncreasedStatement("ret.add(\"\")");
-			ret += writeString("}");  
+			appendString("try{");
+			appendIncreasedStatement("ret.add(((StringProperty)getList("+p.toNameConstant()+").get(index)).getString())");
+			appendString("}catch(IndexOutOfBoundsException e){ ");
+			appendIncreasedStatement("ret.add(\"\")");
+			appendString("}");  
 		}
-		ret += writeStatement("return ret");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return ret");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public List "+getTableGetterName(table)+"(){");
+		appendString("public List "+getTableGetterName(table)+"(){");
 		increaseIdent();
-		ret += writeStatement("int size = "+getContainerSizeGetterName(table)+"();");
-		ret += writeStatement("List ret = new java.util.ArrayList(size)");
-		ret += writeString("for (int i=0; i<size; i++)");
-		ret += writeIncreasedStatement("ret.add(get"+StringUtils.capitalize(table.getName())+"Row(i))");
-		ret += writeStatement("return ret");
-		ret += closeBlock();
-		ret += emptyline();
-		return ret;
+		appendStatement("int size = "+getContainerSizeGetterName(table)+"();");
+		appendStatement("List ret = new java.util.ArrayList(size)");
+		appendString("for (int i=0; i<size; i++)");
+		appendIncreasedStatement("ret.add(get"+StringUtils.capitalize(table.getName())+"Row(i))");
+		appendStatement("return ret");
+		append(closeBlock());
+		appendEmptyline();
 	}
 	
-	private String generateCompareMethod(MetaDocument doc){
-		String ret = "";
-		
-		ret += writeString("public int compareTo(IComparable anotherComparable, int method){");
+	private void generateCompareMethod(MetaDocument doc){
+		appendString("public int compareTo(IComparable anotherComparable, int method){");
 		increaseIdent();
 
-		ret += writeStatement(getDocumentImplName(doc)+" anotherDoc = ("+getDocumentImplName(doc)+") anotherComparable");
-		ret += writeString("switch(method){");
+		appendStatement(getDocumentImplName(doc)+" anotherDoc = ("+getDocumentImplName(doc)+") anotherComparable");
+		appendString("switch(method){");
 		increaseIdent();
 		List<MetaProperty> properties = extractSortableProperties(doc);
 
@@ -566,29 +518,25 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 			MetaProperty p = properties.get(i);
 
 			String caseDecl = getSortTypeName(doc)+".SORT_BY_"+p.getName().toUpperCase();
-			ret += writeString("case "+caseDecl+":");
+			appendString("case "+caseDecl+":");
 			String type2compare = null; 
 			type2compare = StringUtils.capitalize(p.toJavaType());
 			String retDecl = "return BasicComparable.compare"+type2compare;
 			retDecl += "(get"+p.getAccesserName()+"(), anotherDoc.get"+p.getAccesserName()+"())";
-			ret += writeIncreasedStatement(retDecl);
+			appendIncreasedStatement(retDecl);
 		}
-		ret += writeString("default:");
-		ret += writeIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
-		ret += closeBlock();
+		appendString("default:");
+		appendIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
+		append(closeBlock());
 
-		ret += closeBlock();
-		
-		return ret;
+		append(closeBlock());
 	}
 	
-	private String generateDefNameMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public String getDefinedName(){");
+	private void generateDefNameMethod(MetaDocument doc){
+		appendString("public String getDefinedName(){");
 		increaseIdent();
-		ret += writeStatement("return "+quote(doc.getName()));
-		ret += closeBlock();
-		return ret;
+		appendStatement("return "+quote(doc.getName()));
+		append(closeBlock());
 	}
 
 	public static String getContainerSizeGetterName(MetaContainerProperty p){
@@ -614,38 +562,34 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		return "get"+StringUtils.capitalize(list.getName())+list.getContainerEntryName();
 	}
 
-	private String generateDocumentFactory(MetaDocument doc){
-		String ret = "";
-		
+	private GeneratedClass generateDocumentFactory(MetaDocument doc){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 	
-		ret += writeStatement("package "+getPackageName(doc));
-		ret += emptyline();
-
+		clazz.setPackageName(getPackageName(doc));
+		clazz.setName(getDocumentFactoryName(doc));
 		
-		
-		ret += writeString("public class "+getDocumentFactoryName(doc)+"{");
+		startClassBody();
+		appendString("public static "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" template){");
 		increaseIdent();
-		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" template){");
+		appendStatement("return new "+getDocumentImplName(doc)+"(("+getDocumentImplName(doc)+")"+"template)");
+		append(closeBlock());
+
+		appendEmptyline();
+
+		appendString("public static "+doc.getName()+" create"+doc.getName()+"(){");
 		increaseIdent();
-		ret += writeStatement("return new "+getDocumentImplName(doc)+"(("+getDocumentImplName(doc)+")"+"template)");
-		ret += closeBlock();
+		appendStatement("return new "+getDocumentImplName(doc)+"(\"\")");
+		append(closeBlock());
 
-		ret += emptyline();
+		appendEmptyline();
 
-		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"(){");
+		appendString("public static "+doc.getName()+" create"+doc.getName()+"(String id){");
 		increaseIdent();
-		ret += writeStatement("return new "+getDocumentImplName(doc)+"(\"\")");
-		ret += closeBlock();
+		appendStatement("return new "+getDocumentImplName(doc)+"(id)");
+		append(closeBlock());
 
-		ret += emptyline();
-
-		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"(String id){");
-		increaseIdent();
-		ret += writeStatement("return new "+getDocumentImplName(doc)+"(id)");
-		ret += closeBlock();
-
-		ret += closeBlock();
-		return ret;
+		return clazz;
 	}
 	
 	private String getDocumentFactoryName(MetaDocument doc){

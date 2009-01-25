@@ -29,7 +29,8 @@ public class GeneratedClass {
 	public String createClassFileContent(){
 		StringBuilder ret = new StringBuilder(body.length()+200);
 		
-		ret.append(getTypeComment());
+		if (typeComment!=null && typeComment.length()>0)
+			ret.append(getTypeComment());
 		ret.append("package "+getPackageName()+";");
 		ret.append(CRLF).append(CRLF);
 		
@@ -45,7 +46,7 @@ public class GeneratedClass {
 		if (interfaces!=null && interfaces.size()>0){
 			nameDeclaration += " implements ";
 			for (int i=0; i<interfaces.size(); i++){
-				if (i>1)
+				if (i>0)
 					nameDeclaration += ", ";
 				nameDeclaration += interfaces.get(i);
 			}

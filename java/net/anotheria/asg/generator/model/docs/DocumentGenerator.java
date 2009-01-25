@@ -7,6 +7,7 @@ import java.util.Set;
 
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
@@ -41,8 +42,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentName(doc), generateDocument(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
+		_ret.add(new FileEntry(generateDocument(doc)));
+		_ret.add(new FileEntry(generateDocumentFactory(doc)));
 		return _ret;
 	}
 	
@@ -80,172 +81,145 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		return properties;
 	}
 	
-	private String generateDocument(MetaDocument doc){
-		String ret = "";
+	private GeneratedClass generateDocument(MetaDocument doc){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-	
-		ret += writeStatement("package "+getPackageName(doc));
-		ret += emptyline();
+		clazz.setPackageName(getPackageName(doc));
+		clazz.addImport("net.anotheria.asg.data.AbstractASGDocument");
 
-		ret += writeImport("net.anotheria.asg.data.AbstractASGDocument");
-//		boolean listImported = false;
-		Set<String> imports = new HashSet<String>();
 		for (MetaProperty p:doc.getProperties()){
 			if (p instanceof MetaContainerProperty){
-//				ret += writeImport("java.util.List");
-				imports.add("java.util.List");
+//				appendImport("java.util.List");
+				clazz.addImport("java.util.List");
 				if (p instanceof MetaTableProperty)
-					imports.add("java.util.ArrayList");
-//					ret += writeImport("java.util.ArrayList");
+					clazz.addImport("java.util.ArrayList");
+//					appendImport("java.util.ArrayList");
 				
 				if(p instanceof MetaListProperty)
-					imports.add("net.anotheria.anodoc.data." + StringUtils.capitalize(((MetaListProperty)p).getContainedProperty().toJavaType()) + "Property");
-//				ret += writeImport("net.anotheria.anodoc.data.StringProperty");
+					clazz.addImport("net.anotheria.anodoc.data." + StringUtils.capitalize(((MetaListProperty)p).getContainedProperty().toJavaType()) + "Property");
+//				appendImport("net.anotheria.anodoc.data.StringProperty");
 //				listImported = true;
 								
 //				break;
 			}
 		}
-		for(String imp: imports)
-			ret += writeImport(imp);
-//		for (int i=0; i<doc.getProperties().size(); i++){
-//			if (doc.getProperties().get(i) instanceof MetaTableProperty){
-//				if (!listImported){
-//					ret += writeImport("java.util.List");
-//					//ret += writeImport("java.util.ArrayList");
-//					ret += writeImport("net.anotheria.anodoc.data.StringProperty");
-//				}
-//				break;
-//			}
-//		}
 		
 		if (doc.isMultilingual() && context.areLanguagesSupported()){
-			ret += writeImport("net.anotheria.anodoc.util.context.ContextManager");
-			ret += writeImport("net.anotheria.anodoc.data.NoSuchPropertyException");
-			ret += writeImport("net.anotheria.anodoc.data.BooleanProperty");
+			clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
+			clazz.addImport("net.anotheria.anodoc.data.NoSuchPropertyException");
+			clazz.addImport("net.anotheria.anodoc.data.BooleanProperty");
 		}
 		
-		ret += writeImport("net.anotheria.util.crypt.MD5Util");
+		clazz.addImport("net.anotheria.util.crypt.MD5Util");
 
 		
-		ret += emptyline();
 		
-		boolean addEmptyLine = false;
-		
-		String interfaceDecl = "implements "+doc.getName();
+		clazz.addInterface(doc.getName());
 		if (doc.isComparable()){
-			ret += writeImport("net.anotheria.util.sorter.IComparable");
-			ret += writeImport("net.anotheria.util.BasicComparable");
-			interfaceDecl += ", IComparable ";
-			addEmptyLine = true;
+			clazz.addInterface("IComparable");
+			clazz.addImport("net.anotheria.util.sorter.IComparable");
+			clazz.addImport("net.anotheria.util.BasicComparable");
 		}
 		
 		if (doc.isMultilingual()){
-			ret += writeImport("net.anotheria.asg.data.MultilingualObject");
-			interfaceDecl += ", MultilingualObject ";
-			addEmptyLine = true;
+			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
+			clazz.addInterface("MultilingualObject");
 		}
 		
-		if (addEmptyLine)
-			ret += emptyline();
+		clazz.setName(getDocumentName(doc));
+		clazz.setParent("AbstractASGDocument");
 		
+		startClassBody();
 		
-		ret += writeString("public class "+getDocumentName(doc)+" extends AbstractASGDocument "+interfaceDecl+"{");
-		increaseIdent();
-		ret += emptyline();
-		ret += generateDefaultConstructor(doc);
-		ret += emptyline();
-		ret += generateCloneConstructor(doc);
-		ret += emptyline();
-		ret += generatePropertyAccessMethods(doc);
-		ret += emptyline();
-		ret += generateToStringMethod(doc);
-		ret += emptyline();
-		ret += generateAdditionalMethods(doc);
+		generateDefaultConstructor(doc);
+		appendEmptyline();
+		generateCloneConstructor(doc);
+		appendEmptyline();
+		generatePropertyAccessMethods(doc);
+		appendEmptyline();
+		generateToStringMethod(doc);
+		appendEmptyline();
+		generateAdditionalMethods(doc);
 		
 		if (doc.isComparable()){
-			ret += emptyline();
-			ret += generateCompareMethod(doc);
+			appendEmptyline();
+			generateCompareMethod(doc);
 		}
 		
-		ret +=emptyline();
-		ret += generateDefNameMethod(doc);
-		ret +=emptyline();
-		ret += generateGetFootprintMethod(doc);
+		appendEmptyline();
+		generateDefNameMethod(doc);
+		appendEmptyline();
+		generateGetFootprintMethod(doc);
 		
 		if (DataFacadeGenerator.hasLanguageCopyMethods(doc)){
-			ret += generateLanguageCopyMethods(doc);
-			ret += emptyline();
+			generateLanguageCopyMethods(doc);
+			appendEmptyline();
 		}
 		
-		ret += generateMultilingualSwitchSupport(doc);
-		ret += emptyline();
+		generateMultilingualSwitchSupport(doc);
+		appendEmptyline();
 		
-
-		
-		ret += closeBlock();
-		return ret;
+		return clazz;
 	}
 	
-	private String generateLanguageCopyMethods(MetaDocument doc){
-		String ret = "";
+	private void generateLanguageCopyMethods(MetaDocument doc){
 		
 		//first the common method lang2lang
-		ret += writeString("public void "+DataFacadeGenerator.getCopyMethodName()+"(String sourceLanguage, String destLanguage){");
+		appendString("public void "+DataFacadeGenerator.getCopyMethodName()+"(String sourceLanguage, String destLanguage){");
 		increaseIdent();
 		for (String srclang : context.getLanguages()){
 			for (String targetlang : context.getLanguages()){
 				if (!srclang.equals(targetlang)){
-					ret += writeString("if (sourceLanguage.equals("+quote(srclang)+") && destLanguage.equals("+quote(targetlang)+"))");
-					ret += writeIncreasedStatement(DataFacadeGenerator.getCopyMethodName(srclang, targetlang)+"()");
+					appendString("if (sourceLanguage.equals("+quote(srclang)+") && destLanguage.equals("+quote(targetlang)+"))");
+					appendIncreasedStatement(DataFacadeGenerator.getCopyMethodName(srclang, targetlang)+"()");
 				}
 			}
 		}
 		
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 		
 		
 		//now the concrete methods
 		for (String srclang : context.getLanguages()){
 			for (String targetlang : context.getLanguages()){
 				if (!srclang.equals(targetlang)){
-					ret += writeComment("Copies all multilingual properties from language "+srclang+" to language "+targetlang);
-					ret += writeString("public void "+DataFacadeGenerator.getCopyMethodName(srclang, targetlang)+"(){");
+					appendComment("Copies all multilingual properties from language "+srclang+" to language "+targetlang);
+					appendString("public void "+DataFacadeGenerator.getCopyMethodName(srclang, targetlang)+"(){");
 					increaseIdent();
 					for (MetaProperty p : doc.getProperties()){
 						if (p.isMultilingual()){
 							String copyCall = p.toSetter(targetlang)+"(";
 							copyCall += p.toGetter(srclang)+"()";
 							copyCall += ")";
-							ret += writeStatement(copyCall);
+							appendStatement(copyCall);
 						}
 					}
-					ret += closeBlock();
-					ret += emptyline();
+					append(closeBlock());
+					appendEmptyline();
 				}
 			}
 		}
 		
-		return ret;
 	}
 	
 	
 	private String generateDefaultConstructor(MetaDocument doc){
 		String ret = "";
-		ret += writeString("public "+getDocumentName(doc)+"(String id){");
+		appendString("public "+getDocumentName(doc)+"(String id){");
 		increaseIdent();
-		ret += writeStatement("super(id)");
-		ret += closeBlock();
+		appendStatement("super(id)");
+		append(closeBlock());
 		return ret;
 	}
 	
 	private String generateCloneConstructor(MetaDocument doc){
 		String ret = "";
-		ret += writeString("public "+getDocumentName(doc)+"("+getDocumentName(doc)+" toClone){");
+		appendString("public "+getDocumentName(doc)+"("+getDocumentName(doc)+" toClone){");
 		increaseIdent();
-		ret += writeStatement("super(toClone)");
-		ret += closeBlock();
+		appendStatement("super(toClone)");
+		append(closeBlock());
 		return ret;
 	}
 
@@ -263,9 +237,9 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
 			ret += generatePropertyGetterMethod(p);
-			ret += emptyline();
+			appendEmptyline();
 			ret += generatePropertySetterMethod(p);
-			ret += emptyline();
+			appendEmptyline();
 		}
 		return ret;
 	}
@@ -280,37 +254,37 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		if (context.areLanguagesSupported() && p.isMultilingual())
 			return generatePropertyGetterMethodMultilingual(p);
 		
-		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
+		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
 		if(p instanceof MetaGenericProperty)
-			ret += writeStatement("return "+((MetaGenericProperty)p).toPropertyGetterCall());
+			appendStatement("return "+((MetaGenericProperty)p).toPropertyGetterCall());
 		else
-			ret += writeStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant()+")");
-		ret += closeBlock();
+			appendStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant()+")");
+		append(closeBlock());
 		return ret;
 	}
 	
 	private String generatePropertyGetterMethodMultilingual(MetaProperty p){
 		String ret = "";
 		for (String l : context.getLanguages()){
-			ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"(){");
+			appendString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"(){");
 			increaseIdent();
 			if (p instanceof MetaGenericProperty)
-				ret += writeStatement("return "+((MetaGenericProperty)p).toPropertyGetterCall(l));
+				appendStatement("return "+((MetaGenericProperty)p).toPropertyGetterCall(l));
 			else
-				ret += writeStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
-			ret += closeBlock();
-			ret += emptyline();
+				appendStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
+			append(closeBlock());
+			appendEmptyline();
 		}
-		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
+		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
 		String v = "(isMultilingualDisabledInstance() ? ContextManager.getCallContext().getDefaultLanguage() : ContextManager.getCallContext().getCurrentLanguage())";
 		if(p instanceof MetaGenericProperty)
-			ret += writeStatement("return "+((MetaGenericProperty)p).toPropertyGetterCallForCurrentLanguage(v));
+			appendStatement("return "+((MetaGenericProperty)p).toPropertyGetterCallForCurrentLanguage(v));
 		else
-			ret += writeStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
-		ret += closeBlock();
-		ret += emptyline();
+			appendStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
+		append(closeBlock());
+		appendEmptyline();
 		return ret;
 	}
 	
@@ -340,37 +314,37 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		if (context.areLanguagesSupported() && p.isMultilingual())
 			return generatePropertySetterMethodMultilingual(p);
 
-		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
+		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
 		if(p instanceof MetaGenericProperty)
-			ret += writeStatement(""+((MetaGenericProperty)p).toPropertySetterCall());
+			appendStatement(""+((MetaGenericProperty)p).toPropertySetterCall());
 		else
-			ret += writeStatement(""+p.toPropertySetter()+"("+p.toNameConstant()+", value)");
-		ret += closeBlock();	
+			appendStatement(""+p.toPropertySetter()+"("+p.toNameConstant()+", value)");
+		append(closeBlock());	
 		return ret;
 	}
 	
 	private String generatePropertySetterMethodMultilingual(MetaProperty p){
 		String ret = "";
 		for (String l : context.getLanguages()){
-			ret += writeString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value){");
+			appendString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value){");
 			increaseIdent();
 			if(p instanceof MetaGenericProperty)
-				ret += writeStatement(""+((MetaGenericProperty)p).toPropertySetterCall(l));
+				appendStatement(""+((MetaGenericProperty)p).toPropertySetterCall(l));
 			else
-				ret += writeStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
-			ret += closeBlock();
-			ret += emptyline();
+				appendStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
+			append(closeBlock());
+			appendEmptyline();
 		}
-		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
+		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
 		String v = "(isMultilingualDisabledInstance() ? ContextManager.getCallContext().getDefaultLanguage() : ContextManager.getCallContext().getCurrentLanguage())";
 		if(p instanceof MetaGenericProperty)
-			ret += writeStatement(""+((MetaGenericProperty)p).toPropertySetterCallForCurrentLanguage(v));
+			appendStatement(""+((MetaGenericProperty)p).toPropertySetterCallForCurrentLanguage(v));
 		else
-			ret += writeStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
-		ret += closeBlock();
-		ret += emptyline();
+			appendStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
+		append(closeBlock());
+		appendEmptyline();
 		return ret;
 	}
 
@@ -392,10 +366,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 
 	private String generateToStringMethod(MetaDocument doc){
 		String ret = "";
-		ret += writeString("public String toString(){");
+		appendString("public String toString(){");
 		increaseIdent();
-		ret += writeStatement("String ret = "+quote(doc.getName()+" "));
-		ret += writeStatement("ret += \"[\"+getId()+\"] \"");
+		appendStatement("String ret = "+quote(doc.getName()+" "));
+		appendStatement("ret += \"[\"+getId()+\"] \"");
 		List<MetaProperty> props = doc.getProperties();
 		for (int i=0; i<props.size(); i++){
 			MetaProperty p = props.get(i);
@@ -403,18 +377,18 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
 				for (int t=0; t<columns.size(); t++){
 					MetaProperty pp = columns.get(t);
-					ret += writeStatement("ret += "+quote(pp.getName()+": ")+"+get"+pp.getAccesserName()+"()");
+					appendStatement("ret += "+quote(pp.getName()+": ")+"+get"+pp.getAccesserName()+"()");
 					if (t<columns.size()-1)
-						ret += writeStatement("ret += \", \"");
+						appendStatement("ret += \", \"");
 				}
 			}else{
-				ret += writeStatement("ret += "+quote(p.getName()+": ")+"+get"+p.getAccesserName()+"()");
+				appendStatement("ret += "+quote(p.getName()+": ")+"+get"+p.getAccesserName()+"()");
 			}
 			if (i<props.size()-1)
-				ret += writeStatement("ret += \", \"");
+				appendStatement("ret += \", \"");
 		}
-		ret += writeStatement("return ret"); 
-		ret += closeBlock();
+		appendStatement("return ret"); 
+		append(closeBlock());
 		return ret;
 	}
 	
@@ -426,72 +400,65 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data."+getSortTypeName(doc);
 	}
 	
-	private String generateAdditionalMethods(MetaDocument doc){
-		String ret = "";
-		
+	private void generateAdditionalMethods(MetaDocument doc){
 		List <MetaProperty>properties = doc.getProperties();
 		for (MetaProperty p : properties){
 			if (p instanceof MetaContainerProperty)
-				ret += generateContainerMethods((MetaContainerProperty)p);
+				generateContainerMethods((MetaContainerProperty)p);
 			if (p instanceof MetaTableProperty)
-				ret += generateTableMethods((MetaTableProperty)p);
+				generateTableMethods((MetaTableProperty)p);
 			if (p instanceof MetaListProperty)
-				ret += generateListMethods((MetaListProperty)p);
+				generateListMethods((MetaListProperty)p);
 		}
-		
-		return ret;		
 	}
 	
-	private String generateContainerMethods(MetaContainerProperty container){
+	private void generateContainerMethods(MetaContainerProperty container){
 		
-		if (container.isMultilingual())
-			return generateContainerMethodsMultilingual(container);
+		if (container.isMultilingual()){
+			generateContainerMethodsMultilingual(container);
+			return;
+		}
 		
-		String ret = "";
-
-		ret += writeString("public int "+getContainerSizeGetterName(container)+"(){");
+		appendString("public int "+getContainerSizeGetterName(container)+"(){");
 		increaseIdent();
 		MetaProperty pr = container instanceof MetaTableProperty ? 
 			(MetaProperty) ((MetaTableProperty)container).getColumns().get(0) :
 			container;
-		ret += writeStatement("return getList("+pr.toNameConstant()+").size()"); 
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return getList("+pr.toNameConstant()+").size()"); 
+		append(closeBlock());
+		appendEmptyline();
 		
-		return ret;
+		
 	}
 	
-	private String generateContainerMethodsMultilingual(MetaContainerProperty container){
-		String ret = "";
-
+	private void generateContainerMethodsMultilingual(MetaContainerProperty container){
 		for (String l : context.getLanguages()){
-			ret += writeString("public int "+getContainerSizeGetterName(container, l)+"(){");
+			appendString("public int "+getContainerSizeGetterName(container, l)+"(){");
 			increaseIdent();
 			MetaProperty pr = container instanceof MetaTableProperty ? 
 					(MetaProperty) ((MetaTableProperty)container).getColumns().get(0) :
 						container;
-					ret += writeStatement("return getList("+pr.toNameConstant(l)+").size()"); 
-					ret += closeBlock();
-					ret += emptyline();
+					appendStatement("return getList("+pr.toNameConstant(l)+").size()"); 
+					append(closeBlock());
+					appendEmptyline();
 		}
 		
-		ret += writeString("public int "+getContainerSizeGetterName(container)+"(){");
+		appendString("public int "+getContainerSizeGetterName(container)+"(){");
 		increaseIdent();
-		ret += writeStatement("return getList("+quote(container.getName()+"_")+"+"+GET_CURRENT_LANG+").size()"); 
-		ret += closeBlock();
-		ret += emptyline();
-//		ret += writeStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
+		appendStatement("return getList("+quote(container.getName()+"_")+"+"+GET_CURRENT_LANG+").size()"); 
+		append(closeBlock());
+		appendEmptyline();
+//		appendStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
 
 		
-		return ret;
-
 	}
 
-	private String generateListMethods(MetaListProperty list){
-		String ret = "";
+	private void generateListMethods(MetaListProperty list){
 		
-		if (list.isMultilingual())
-			return generateListMethodsMultilingual(list);
+		if (list.isMultilingual()){
+			generateListMethodsMultilingual(list);
+			return;
+		}
 
 		MetaProperty c = list.getContainedProperty();
 		String accesserType = StringUtils.capitalize(c.toJavaType()); 
@@ -499,50 +466,48 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		String decl = "public void "+getContainerEntryAdderName(list)+"(";
 		decl += c.toJavaType()+" "+c.getName();
 		decl += "){";
-		ret += writeString(decl);
+		appendString(decl);
 		increaseIdent();
 		
 		
-//		ret += writeStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
-		ret += writeStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
-		ret += closeBlock();
-		ret += emptyline();
+//		appendStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
+		appendStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
+		append(closeBlock());
+		appendEmptyline();
 		
 		
-		ret += writeString("public void "+getContainerEntryDeleterName(list)+"(int index){");
+		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
-		ret += writeStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
+		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
 		increaseIdent();
-		ret += writeStatement(c.toJavaType()+" tmp1, tmp2");
-//		ret += writeStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).get"+c.toJavaType()+"()");
-//		ret += writeStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).get"+c.toJavaType()+"()");
-//		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+c.toJavaType()+"(tmp2)");
-//		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+c.toJavaType()+"(tmp1)");
-		ret += writeStatement("tmp1 = (("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index1)).get"+accesserType+"()");
-		ret += writeStatement("tmp2 = (("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index2)).get"+accesserType+"()");
-		ret += writeStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+accesserType+"(tmp2)");
-		ret += writeStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+accesserType+"(tmp1)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement(c.toJavaType()+" tmp1, tmp2");
+//		appendStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).get"+c.toJavaType()+"()");
+//		appendStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).get"+c.toJavaType()+"()");
+//		appendStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+c.toJavaType()+"(tmp2)");
+//		appendStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+c.toJavaType()+"(tmp1)");
+		appendStatement("tmp1 = (("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index1)).get"+accesserType+"()");
+		appendStatement("tmp2 = (("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index2)).get"+accesserType+"()");
+		appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+accesserType+"(tmp2)");
+		appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+accesserType+"(tmp1)");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
+		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
 		increaseIdent();
-//		ret += writeStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index)");
-//		ret += writeStatement("return p.get"+c.toJavaType()+"()");
-		ret += writeStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index)");
-		ret += writeStatement("return p.get"+accesserType+"()");
-		ret += closeBlock();
-		ret += emptyline();
+//		appendStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index)");
+//		appendStatement("return p.get"+c.toJavaType()+"()");
+		appendStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index)");
+		appendStatement("return p.get"+accesserType+"()");
+		append(closeBlock());
+		appendEmptyline();
 
-		return ret;
 	}
 	
-	private String generateListMethodsMultilingual(MetaListProperty list){
-		String ret = "";
+	private void generateListMethodsMultilingual(MetaListProperty list){
 
 		MetaProperty c = list.getContainedProperty();
 		String accesserType = StringUtils.capitalize(c.toJavaType());
@@ -551,94 +516,91 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			String decl = "public void "+getContainerEntryAdderName(list, l)+"(";
 			decl += c.toJavaType()+" "+c.getName();
 			decl += "){";
-			ret += writeString(decl);
+			appendString(decl);
 			increaseIdent();
 			
-//			ret += writeStatement("getListPropertyAnyCase("+list.toNameConstant(l)+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
-			ret += writeStatement("getListPropertyAnyCase("+list.toNameConstant(l)+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
-			ret += closeBlock();
-			ret += emptyline();
+//			appendStatement("getListPropertyAnyCase("+list.toNameConstant(l)+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
+			appendStatement("getListPropertyAnyCase("+list.toNameConstant(l)+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
+			append(closeBlock());
+			appendEmptyline();
 			
 			
-			ret += writeString("public void "+getContainerEntryDeleterName(list, l)+"(int index){");
+			appendString("public void "+getContainerEntryDeleterName(list, l)+"(int index){");
 			increaseIdent();
-			ret += writeStatement("getListProperty("+list.toNameConstant(l)+").remove(index)"); 
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("getListProperty("+list.toNameConstant(l)+").remove(index)"); 
+			append(closeBlock());
+			appendEmptyline();
 			
-			ret += writeString("public void "+getContainerEntrySwapperName(list, l)+"(int index1, int index2){");
+			appendString("public void "+getContainerEntrySwapperName(list, l)+"(int index1, int index2){");
 			increaseIdent();
-			ret += writeStatement(c.toJavaType()+" tmp1, tmp2");
-//			ret += writeStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).get"+c.toJavaType()+"()");
-//			ret += writeStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).get"+c.toJavaType()+"()");
-//			ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).set"+c.toJavaType()+"(tmp2)");
-//			ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).set"+c.toJavaType()+"(tmp1)");
-			ret += writeStatement("tmp1 = (("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).get"+accesserType+"()");
-			ret += writeStatement("tmp2 = (("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).get"+accesserType+"()");
-			ret += writeStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).set"+accesserType+"(tmp2)");
-			ret += writeStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).set"+accesserType+"(tmp1)");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement(c.toJavaType()+" tmp1, tmp2");
+//			appendStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).get"+c.toJavaType()+"()");
+//			appendStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).get"+c.toJavaType()+"()");
+//			appendStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).set"+c.toJavaType()+"(tmp2)");
+//			appendStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).set"+c.toJavaType()+"(tmp1)");
+			appendStatement("tmp1 = (("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).get"+accesserType+"()");
+			appendStatement("tmp2 = (("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).get"+accesserType+"()");
+			appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).set"+accesserType+"(tmp2)");
+			appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).set"+accesserType+"(tmp1)");
+			append(closeBlock());
+			appendEmptyline();
 	
-			ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list, l)+"(int index){");
+			appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list, l)+"(int index){");
 			increaseIdent();
-//			ret += writeStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index)");
-//			ret += writeStatement("return p.get"+c.toJavaType()+"()");
-			ret += writeStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index)");
-			ret += writeStatement("return p.get"+accesserType+"()");
-			ret += closeBlock();
-			ret += emptyline();
+//			appendStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant(l)+").get(index)");
+//			appendStatement("return p.get"+c.toJavaType()+"()");
+			appendStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index)");
+			appendStatement("return p.get"+accesserType+"()");
+			append(closeBlock());
+			appendEmptyline();
 		}
 		
 //		quote(container.getName()+"_")+"+"+GET_CURRENT_LANG+
 		String decl = "public void "+getContainerEntryAdderName(list )+"(";
 		decl += c.toJavaType()+" "+c.getName();
 		decl += "){";
-		ret += writeString(decl);
+		appendString(decl);
 		increaseIdent();
 		
-//		ret += writeStatement("getListPropertyAnyCase("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
-		ret += writeStatement("getListPropertyAnyCase("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
-		ret += closeBlock();
-		ret += emptyline();
+//		appendStatement("getListPropertyAnyCase("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
+		appendStatement("getListPropertyAnyCase("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
+		append(closeBlock());
+		appendEmptyline();
 		
 		
-		ret += writeString("public void "+getContainerEntryDeleterName(list)+"(int index){");
+		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
-		ret += writeStatement("getListProperty("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").remove(index)"); 
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("getListProperty("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").remove(index)"); 
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
+		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
 		increaseIdent();
-		ret += writeStatement(c.toJavaType()+" tmp1, tmp2");
-//		ret += writeStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).get"+c.toJavaType()+"()");
-//		ret += writeStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).get"+c.toJavaType()+"()");
-//		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).set"+c.toJavaType()+"(tmp2)");
-//		ret += writeStatement("(("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).set"+c.toJavaType()+"(tmp1)");
-		ret += writeStatement("tmp1 = (("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).get"+accesserType+"()");
-		ret += writeStatement("tmp2 = (("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).get"+accesserType+"()");
-		ret += writeStatement("(("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).set"+accesserType+"(tmp2)");
-		ret += writeStatement("(("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).set"+accesserType+"(tmp1)");
+		appendStatement(c.toJavaType()+" tmp1, tmp2");
+//		appendStatement("tmp1 = (("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).get"+c.toJavaType()+"()");
+//		appendStatement("tmp2 = (("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).get"+c.toJavaType()+"()");
+//		appendStatement("(("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).set"+c.toJavaType()+"(tmp2)");
+//		appendStatement("(("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).set"+c.toJavaType()+"(tmp1)");
+		appendStatement("tmp1 = (("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).get"+accesserType+"()");
+		appendStatement("tmp2 = (("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).get"+accesserType+"()");
+		appendStatement("(("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index1)).set"+accesserType+"(tmp2)");
+		appendStatement("(("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).set"+accesserType+"(tmp1)");
 
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
+		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
 		increaseIdent();
-//		ret += writeStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index)");
-//		ret += writeStatement("return p.get"+c.toJavaType()+"()");
-		ret += writeStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index)");
-		ret += writeStatement("return p.get"+accesserType+"()");
-		ret += closeBlock();
-		ret += emptyline();
+//		appendStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index)");
+//		appendStatement("return p.get"+c.toJavaType()+"()");
+		appendStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index)");
+		appendStatement("return p.get"+accesserType+"()");
+		append(closeBlock());
+		appendEmptyline();
 
-		
-		return ret;
 	}
 
-	private String generateTableMethods(MetaTableProperty table){
-		String ret = "";
+	private void generateTableMethods(MetaTableProperty table){
 		List<MetaProperty> columns = table.getColumns();
 		
 		String decl = "public void "+getContainerEntryAdderName(table)+"(";
@@ -649,67 +611,64 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 				decl += ", ";
 		}
 		decl += "){";
-		ret += writeString(decl);
+		appendString(decl);
 		increaseIdent();
 		
-		ret += writeStatement("List tmp");
+		appendStatement("List tmp");
 		
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty p = columns.get(i);
-			ret += writeStatement("tmp = getList("+p.toNameConstant()+")"); 
-			ret += writeStatement("tmp.add(new StringProperty(\"\", "+table.extractSubName(p)+"))");
-			ret += writeStatement("setList("+p.toNameConstant()+", tmp)");
-			ret += emptyline();
+			appendStatement("tmp = getList("+p.toNameConstant()+")"); 
+			appendStatement("tmp.add(new StringProperty(\"\", "+table.extractSubName(p)+"))");
+			appendStatement("setList("+p.toNameConstant()+", tmp)");
+			appendEmptyline();
 		}
 
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public void "+getContainerEntryDeleterName(table)+"(int index){");
+		appendString("public void "+getContainerEntryDeleterName(table)+"(int index){");
 		increaseIdent();
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty p = columns.get(i);
-			ret += writeStatement("getListProperty("+p.toNameConstant()+").remove(index)"); 
+			appendStatement("getListProperty("+p.toNameConstant()+").remove(index)"); 
 		}
 		
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public List<String> get"+StringUtils.capitalize(table.getName())+"Row(int index){");
+		appendString("public List<String> get"+StringUtils.capitalize(table.getName())+"Row(int index){");
 		increaseIdent();
-		ret += writeStatement("List<String> ret = new ArrayList<String>(1)");
+		appendStatement("List<String> ret = new ArrayList<String>(1)");
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty p = columns.get(i);
-			ret += writeString("try{");
-			ret += writeIncreasedStatement("ret.add(((StringProperty)getList("+p.toNameConstant()+").get(index)).getString())");
-			ret += writeString("}catch(IndexOutOfBoundsException e){ ");
-			ret += writeIncreasedStatement("ret.add(\"\")");
-			ret += writeString("}");  
+			appendString("try{");
+			appendIncreasedStatement("ret.add(((StringProperty)getList("+p.toNameConstant()+").get(index)).getString())");
+			appendString("}catch(IndexOutOfBoundsException e){ ");
+			appendIncreasedStatement("ret.add(\"\")");
+			appendString("}");  
 		}
-		ret += writeStatement("return ret");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return ret");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public List<List<String>> "+getTableGetterName(table)+"(){");
+		appendString("public List<List<String>> "+getTableGetterName(table)+"(){");
 		increaseIdent();
-		ret += writeStatement("int size = "+getContainerSizeGetterName(table)+"();");
-		ret += writeStatement("List<List<String>> ret = new java.util.ArrayList<List<String>>(size)");
-		ret += writeString("for (int i=0; i<size; i++)");
-		ret += writeIncreasedStatement("ret.add(get"+StringUtils.capitalize(table.getName())+"Row(i))");
-		ret += writeStatement("return ret");
-		ret += closeBlock();
-		ret += emptyline();
-		return ret;
+		appendStatement("int size = "+getContainerSizeGetterName(table)+"();");
+		appendStatement("List<List<String>> ret = new java.util.ArrayList<List<String>>(size)");
+		appendString("for (int i=0; i<size; i++)");
+		appendIncreasedStatement("ret.add(get"+StringUtils.capitalize(table.getName())+"Row(i))");
+		appendStatement("return ret");
+		append(closeBlock());
+		appendEmptyline();
 	}
 	
-	private String generateCompareMethod(MetaDocument doc){
-		String ret = "";
-		
-		ret += writeString("public int compareTo(IComparable anotherComparable, int method){");
+	private void generateCompareMethod(MetaDocument doc){
+		appendString("public int compareTo(IComparable anotherComparable, int method){");
 		increaseIdent();
 
-		ret += writeStatement(getDocumentName(doc)+" anotherDoc = ("+getDocumentName(doc)+") anotherComparable");
-		ret += writeString("switch(method){");
+		appendStatement(getDocumentName(doc)+" anotherDoc = ("+getDocumentName(doc)+") anotherComparable");
+		appendString("switch(method){");
 		increaseIdent();
 		List<MetaProperty> properties = extractSortableProperties(doc);
 
@@ -717,29 +676,25 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			MetaProperty p = properties.get(i);
 
 			String caseDecl = getSortTypeName(doc)+".SORT_BY_"+p.getName().toUpperCase();
-			ret += writeString("case "+caseDecl+":");
+			appendString("case "+caseDecl+":");
 			String type2compare = null; 
 			type2compare = StringUtils.capitalize(p.toJavaType());
 			String retDecl = "return BasicComparable.compare"+type2compare;
 			retDecl += "(get"+p.getAccesserName()+"(), anotherDoc.get"+p.getAccesserName()+"())";
-			ret += writeIncreasedStatement(retDecl);
+			appendIncreasedStatement(retDecl);
 		}
-		ret += writeString("default:");
-		ret += writeIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
-		ret += closeBlock();
+		appendString("default:");
+		appendIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
+		append(closeBlock());
 
-		ret += closeBlock();
-		
-		return ret;
+		append(closeBlock());
 	}
 	
-	private String generateDefNameMethod(MetaDocument doc){
-		String ret = "";
-		ret += writeString("public String getDefinedName(){");
+	private void generateDefNameMethod(MetaDocument doc){
+		appendString("public String getDefinedName(){");
 		increaseIdent();
-		ret += writeStatement("return "+quote(doc.getName()));
-		ret += closeBlock();
-		return ret;
+		appendStatement("return "+quote(doc.getName()));
+		append(closeBlock());
 	}
 
 	public static String getContainerSizeGetterName(MetaContainerProperty p){
@@ -786,39 +741,37 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		return DataFacadeGenerator.getListElementGetterName(list, language);	    
 	}
 
-	private String generateDocumentFactory(MetaDocument doc){
-		String ret = "";
+	private GeneratedClass generateDocumentFactory(MetaDocument doc){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
 	
-		ret += writeStatement("package "+getPackageName(doc));
-		ret += emptyline();
-
+		clazz.setPackageName(getPackageName(doc));
+		clazz.setName(getDocumentFactoryName(doc));
 		
-		
-		ret += writeString("public class "+getDocumentFactoryName(doc)+"{");
+		startClassBody();
+		appendString("public static "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" template){");
 		increaseIdent();
-		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" template){");
+		appendStatement("return new "+getDocumentName(doc)+"(("+getDocumentName(doc)+")"+"template)");
+		append(closeBlock());
+
+		appendEmptyline();
+
+		appendString("public static "+doc.getName()+" create"+doc.getName()+"(){");
 		increaseIdent();
-		ret += writeStatement("return new "+getDocumentName(doc)+"(("+getDocumentName(doc)+")"+"template)");
-		ret += closeBlock();
+		appendStatement("return new "+getDocumentName(doc)+"(\"\")");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += emptyline();
-
-		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"(){");
+		appendString("public static "+doc.getName()+" create"+doc.getName()+"ForImport(String id){");
 		increaseIdent();
-		ret += writeStatement("return new "+getDocumentName(doc)+"(\"\")");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return new "+getDocumentName(doc)+"(id)");
+		append(closeBlock());
 
-		ret += writeString("public static "+doc.getName()+" create"+doc.getName()+"ForImport(String id){");
-		increaseIdent();
-		ret += writeStatement("return new "+getDocumentName(doc)+"(id)");
-		ret += closeBlock();
+		appendEmptyline();
 
-		ret += emptyline();
-
-		ret += closeBlock();
-		return ret;
+		append(closeBlock());
+		return clazz;
 	}
 	
 	
@@ -826,30 +779,27 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		return DataFacadeGenerator.getDocumentFactoryName(doc);
 	}
 
-	protected String generateMultilingualSwitchSupport(MetaDocument doc){
-		String ret = "";
+	protected void generateMultilingualSwitchSupport(MetaDocument doc){
 		if (!doc.isMultilingual())
-			return "";
+			return ;
 			
-		ret += writeString("public boolean isMultilingualDisabledInstance(){");
+		appendString("public boolean isMultilingualDisabledInstance(){");
 		increaseIdent();
-		ret += writeString("try{");
+		appendString("try{");
 		increaseIdent();
-		ret += writeStatement("return ((BooleanProperty)getInternalProperty(INT_PROPERTY_MULTILINGUAL_DISABLED)).getboolean()");
+		appendStatement("return ((BooleanProperty)getInternalProperty(INT_PROPERTY_MULTILINGUAL_DISABLED)).getboolean()");
 		decreaseIdent();
-		ret += writeString("}catch(NoSuchPropertyException e){");
-		ret += writeIncreasedString("return false;");
-		ret += writeString("}");
-		ret += closeBlock();
+		appendString("}catch(NoSuchPropertyException e){");
+		appendIncreasedString("return false;");
+		appendString("}");
+		append(closeBlock());
 
-		ret += emptyline();
+		appendEmptyline();
 		
-		ret += writeString("public void setMultilingualDisabledInstance(boolean value){");
+		appendString("public void setMultilingualDisabledInstance(boolean value){");
 		increaseIdent();
-		ret += writeStatement("setInternalProperty(new BooleanProperty(INT_PROPERTY_MULTILINGUAL_DISABLED, value))");
-		ret += closeBlock();
-
-		return ret;
+		appendStatement("setInternalProperty(new BooleanProperty(INT_PROPERTY_MULTILINGUAL_DISABLED, value))");
+		append(closeBlock());
 	}
 
 
