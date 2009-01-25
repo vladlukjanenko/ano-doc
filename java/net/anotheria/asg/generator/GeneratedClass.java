@@ -19,6 +19,8 @@ public class GeneratedClass {
 	
 	private String typeComment;
 	
+	private TypeOfClass type = TypeOfClass.getDefault();
+	
 	public GeneratedClass(){
 		body = new StringBuilder();
 		
@@ -40,7 +42,7 @@ public class GeneratedClass {
 		
 		ret.append(CRLF);
 		
-		String nameDeclaration = "public class "+getName();
+		String nameDeclaration = "public "+type.toJava()+" "+getName();
 		if (getParent()!=null && getParent().length()>0)
 			nameDeclaration += " extends "+getParent();
 		if (interfaces!=null && interfaces.size()>0){
@@ -125,6 +127,14 @@ public class GeneratedClass {
 
 	public void setTypeComment(String typeComment) {
 		this.typeComment = typeComment;
+	}
+
+	public TypeOfClass getType() {
+		return type;
+	}
+
+	public void setType(TypeOfClass type) {
+		this.type = type;
 	}
 
 }

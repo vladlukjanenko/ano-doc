@@ -36,7 +36,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
+		ret.add(new FileEntry(generateFactory(mod)));
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getImplementationName(mod), generateImplementation(mod)));
 		
 		return ret;

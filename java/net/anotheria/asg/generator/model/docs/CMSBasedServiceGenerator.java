@@ -25,7 +25,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		String packageName = context.getPackageName(mod)+".service";
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
+		ret.add(new FileEntry(generateFactory(mod)));
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getImplementationName(mod), generateImplementation(mod)));
 		ret.addAll(generateCRUDServices(mod));
 		

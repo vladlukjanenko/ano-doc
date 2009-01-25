@@ -7,10 +7,12 @@ import java.util.List;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GenerationOptions;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.TypeOfClass;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
@@ -48,7 +50,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		timer.stopExecution(module.getName()+"Factory");
 		
 
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getRemoteExceptionName(module), generateRemoteException(module)));
+		ret.add(new FileEntry(generateRemoteException(module)));
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getLookupName(module), generateLookup(module)));
 		ret.add(new FileEntry(FileEntry.package2path(packageName), getServerName(module), generateServer(module)));
 
@@ -61,7 +63,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		timer.stopExecution(module.getName()+"Skeleton");
 
 		timer.startExecution(module.getName()+"Interface");
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getInterfaceName(module), generateRemoteInterface(module)));
+		ret.add(new FileEntry(generateRemoteInterface(module)));
 		timer.stopExecution(module.getName()+"Interface");
 
 		//timer.printExecutionTimesOrderedByCreation();
@@ -86,14 +88,9 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		return getPackageName(context, module);
 	}
 	
-	protected String writeAdditionalFactoryImports(MetaModule module){
-		String ret = writeImport(context.getServicePackageName(module)+"."+getInterfaceName(module));
-		//ret += writeImport("net.anotheria.asg.service.InMemoryService");
-		return ret;
+	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
+		clazz.addImport(context.getServicePackageName(module)+"."+getInterfaceName(module));
 	}
-	
-	
-
 	
 	public static String getPackageName(Context context, MetaModule module){
 		return context.getPackageName(module)+".service.rmi";
@@ -104,71 +101,62 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		return super.getSupportedInterfacesList(module)+", InMemoryService.class";
 	}*/
 	
-	private String generateRemoteException(MetaModule module){
-		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getRemoteExceptionName(module)));
-	    appendStatement("package "+getPackageName(module));
-	    appendEmptyline();
-	    appendImport("java.rmi.RemoteException");
-	    appendImport(ServiceGenerator.getExceptionImport(context, module));
-	    appendEmptyline();
+	private GeneratedClass generateRemoteException(MetaModule module){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRemoteExceptionName(module)));
+		clazz.setPackageName(getPackageName(module));
+		clazz.addImport("java.rmi.RemoteException");
+		clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+		
+		clazz.setName("RemoteExceptionWrapper");
+		clazz.setParent(ServiceGenerator.getExceptionName(module));
 		 
-		appendString("public class RemoteExceptionWrapper extends "+ServiceGenerator.getExceptionName(module)+"{");
-		increaseIdent();
+		startClassBody();
 		appendString("public RemoteExceptionWrapper(RemoteException e){");
 		increaseIdent();
 		appendStatement("super(e)");
 		append(closeBlock());
-		append(closeBlock());
 		
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 
-	private String generateRemoteInterface(MetaModule module){
+	private GeneratedClass generateRemoteInterface(MetaModule module){
 	    
-		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
- 
-	    appendStatement("package "+getPackageName(module));
-	    appendEmptyline();
-	    appendImport("java.util.List");
-	    appendImport("net.anotheria.util.sorter.SortType");
-	    appendEmptyline();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
+		clazz.setPackageName(getPackageName(module));
+		clazz.setType(TypeOfClass.INTERFACE);
+		
+		clazz.addImport("java.util.List");
+		clazz.addImport("net.anotheria.util.sorter.SortType");
 	    
-	    List<MetaDocument> docs = module.getDocuments();
-	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = docs.get(i);
-	        appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    }
-	    appendEmptyline();
 	    
-	    appendImport("net.anotheria.util.xml.XMLNode");
-	    appendEmptyline();
-	    appendImport("net.anotheria.anodoc.query2.DocumentQuery");
+		clazz.addImport("net.anotheria.util.xml.XMLNode");
+		clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
-	    appendImport("net.anotheria.anodoc.query2.QueryResult");
-	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
-	    appendEmptyline();
-	    //appendImport("net.anotheria.asg.service.ASGService");
-	    //appendEmptyline();
-	    appendImport("java.rmi.RemoteException");
-	    appendEmptyline();
-	    appendImport(ServiceGenerator.getExceptionImport(context, module));
-	    appendEmptyline();
-	    appendImport("net.anotheria.anodoc.util.context.CallContext");
-	    appendEmptyline();
-	    appendImport("net.anotheria.asg.service.remote.RemoteService");
-	    appendEmptyline();
+		clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
+		clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
+		clazz.addImport("java.rmi.RemoteException");
+		clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
+		clazz.addImport("net.anotheria.asg.service.remote.RemoteService");
+		
+		clazz.setName(getInterfaceName(module));
+		clazz.setParent("RemoteService");
 
-	    appendString("public interface "+getInterfaceName(module)+" extends RemoteService {");
-	    increaseIdent();
+		startClassBody();
 	    
 	    boolean containsAnyMultilingualDocs = false;
 
 //	    String throwsClause = " throws "+getExceptionName(module)+", RemoteException";
 	    
+	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	        String listDecl = "List<"+doc.getName()+">";
 	        
 	        
@@ -323,8 +311,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
     			"String[] languages"
     			);
         
-        append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 	
 	public static String getInterfaceName(MetaModule mod){

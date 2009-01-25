@@ -43,7 +43,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
 		_ret.add(new FileEntry(generateDocument(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentFactoryName(doc), generateDocumentFactory(doc)));
+		_ret.add(new FileEntry(generateDocumentFactory(doc)));
 		return _ret;
 	}
 	
@@ -617,35 +617,33 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		return "get"+StringUtils.capitalize(list.getName())+list.getContainerEntryName();
 	}
 
-	private String generateDocumentFactory(MetaDocument doc){
-		String ret = "";
+	private GeneratedClass generateDocumentFactory(MetaDocument doc){
 		
-	
-		appendStatement("package "+getPackageName(doc));
-		appendEmptyline();
-
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
+		clazz.setPackageName(getPackageName(doc));
+		clazz.setName(getDocumentFactoryName(doc));
 		
-		appendString("public class "+getDocumentFactoryName(doc)+"{");
-		increaseIdent();
+		startClassBody();
 		appendString("public static "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" template){");
 		increaseIdent();
 		appendStatement("return new "+getDocumentImplName(doc)+"(("+getDocumentImplName(doc)+")"+"template)");
-		ret += closeBlock();
+		append(closeBlock());
 
 		appendEmptyline();
 
 		appendString("public static "+doc.getName()+" create"+doc.getName()+"(){");
 		increaseIdent();
 		appendStatement("return new "+getDocumentImplName(doc)+"(\"\")");
-		ret += closeBlock();
+		append(closeBlock());
 
 		appendEmptyline();
 
 		appendString("public static "+doc.getName()+" create"+doc.getName()+"ForImport(String anId){");
 		increaseIdent();
 		appendStatement("return new "+getDocumentImplName(doc)+"(anId)");
-		ret += closeBlock();
+		append(closeBlock());
 
 		appendEmptyline();
 
@@ -653,10 +651,9 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		appendString("public static "+doc.getName()+" create"+doc.getName()+"(String anId){");
 		increaseIdent();
 		appendStatement("return new "+getDocumentImplName(doc)+"(anId)");
-		ret += closeBlock();
-
-		ret += closeBlock();
-		return ret;
+		append(closeBlock());
+		
+		return clazz;
 	}
 	
 	private String getDocumentFactoryName(MetaDocument doc){

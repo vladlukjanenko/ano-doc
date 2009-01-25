@@ -3,6 +3,7 @@ package net.anotheria.asg.generator.model;
 
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 
@@ -27,31 +28,28 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 		return GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module);
 	}
 
-	protected String writeAdditionalFactoryImports(MetaModule module){
-		return "";
+	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
 	}
-	
-	protected String generateFactory(MetaModule module){
 
-		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation."));
+	protected GeneratedClass generateFactory(MetaModule module){
 
-	    appendStatement("package "+getPackageName(module));
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation."));
+		clazz.setPackageName(getPackageName(module));
+
+		clazz.addImport("java.util.concurrent.atomic.AtomicInteger");
+		clazz.addImport("net.java.dev.moskito.core.dynamic.MoskitoInvokationProxy");
+		clazz.addImport("net.java.dev.moskito.core.predefined.ServiceStatsCallHandler");
+		clazz.addImport("net.java.dev.moskito.core.predefined.ServiceStatsFactory");
+		clazz.addImport("net.anotheria.asg.service.ASGService");
+	    addAdditionalFactoryImports(clazz, module);
 	    append(emptyline());
 	    
-	    appendImport("java.util.concurrent.atomic.AtomicInteger");
-	    appendImport("net.java.dev.moskito.core.dynamic.MoskitoInvokationProxy");
-	    appendImport("net.java.dev.moskito.core.predefined.ServiceStatsCallHandler");
-	    appendImport("net.java.dev.moskito.core.predefined.ServiceStatsFactory");
-	    appendImport("net.anotheria.asg.service.ASGService");
-	    append(writeAdditionalFactoryImports(module));
-	    append(emptyline());
+	    clazz.setName(getFactoryName(module));
+	    startClassBody();
 	    
-	    
-	    
-	    appendString("public class "+getFactoryName(module)+"{");
-	    increaseIdent();
-	    append(emptyline());
 	    appendStatement("private static AtomicInteger instanceCounter = new AtomicInteger(0)");
 	    appendStatement("private static "+getInterfaceName(module)+" defaultInstance = create"+getServiceName(module)+"()");
 	    append(emptyline());
@@ -84,11 +82,7 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    increaseIdent();
 	    appendString("return defaultInstance;");
 	    append(closeBlock());
-	    append(emptyline());
-
-	    
-	    append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	} 
 	
 	//returns a comma-separated list of all interfaces supported by this impl, which the proxy must map.

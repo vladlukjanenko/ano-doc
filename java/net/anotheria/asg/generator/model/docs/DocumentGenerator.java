@@ -158,8 +158,6 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		}
 		
 		generateMultilingualSwitchSupport(doc);
-		appendEmptyline();
-		
 		return clazz;
 	}
 	
@@ -768,9 +766,6 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendStatement("return new "+getDocumentName(doc)+"(id)");
 		append(closeBlock());
 
-		appendEmptyline();
-
-		append(closeBlock());
 		return clazz;
 	}
 	

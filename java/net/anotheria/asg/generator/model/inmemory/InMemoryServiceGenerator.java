@@ -6,6 +6,7 @@ import java.util.List;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GenerationOptions;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
@@ -39,7 +40,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 		
 		ExecutionTimer timer = new ExecutionTimer("InMemory Generator");
 		timer.startExecution(mod.getName()+"Factory");
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
+		ret.add(new FileEntry(generateFactory(mod)));
 		timer.stopExecution(mod.getName()+"Factory");
 		
 		timer.startExecution(mod.getName()+"Impl");
@@ -72,10 +73,9 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 		return getPackageName(context, module);
 	}
 	
-	protected String writeAdditionalFactoryImports(MetaModule module){
-		String ret = writeImport(context.getServicePackageName(module)+"."+getInterfaceName(module));
-		ret += writeImport("net.anotheria.asg.service.InMemoryService");
-		return ret;
+	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
+		clazz.addImport(context.getServicePackageName(module)+"."+getInterfaceName(module));
+		clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	}
 	
 	private String getCacheName(MetaDocument doc){

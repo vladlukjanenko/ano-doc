@@ -28,11 +28,9 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = context.getPackageName(mod)+".service";
-		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
+		ret.add(new FileEntry(generateFactory(mod)));
 		ret.add(new FileEntry(generateImplementation(mod)));
 		
 		return ret;
