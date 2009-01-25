@@ -77,7 +77,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		timer.startExecution(section.getModule().getName()+"-view");
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getBaseActionName(section), generateBaseAction(section)));
 		files.add(new FileEntry(generateShowAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getMultiOpActionName(section), generateMultiOpAction(section)));
+		files.add(new FileEntry(generateMultiOpAction(section)));
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getSearchActionName(section), generateSearchAction(section)));
 		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDeleteActionName(section), generateDeleteAction(section)));
 		files.add(new FileEntry(generateDuplicateAction(section)));
@@ -89,7 +89,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				//works only if the section has a dialog.
 				timer.startExecution(section.getModule().getName()+"-dialog-base");
 				files.add(new FileEntry(generateMultiOpDialogAction(section)));
-				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getUpdateActionName(section), generateUpdateAction(section)));
+				files.add(new FileEntry(generateUpdateAction(section)));
 				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getEditActionName(section), generateEditAction(section)));
 				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getNewActionName(section), generateNewAction(section)));
 				timer.stopExecution(section.getModule().getName()+"-dialog-base");
@@ -216,24 +216,23 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return "Duplicate"+getActionSuffix(section);
 	}
 	
-	private String generateMultiOpAction(MetaModuleSection section){
-		startNewJob();
+	private GeneratedClass generateMultiOpAction(MetaModuleSection section){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
 		MetaDocument doc = section.getDocument();
 
-	    appendStatement("package "+getPackage(section.getModule()));
-	    appendEmptyline();
+	    clazz.setPackageName(getPackage(section.getModule()));
+	    clazz.addImport("net.anotheria.util.NumberUtils");
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
 
-	    //write imports...
-	    appendImport("net.anotheria.util.NumberUtils");
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.setName(getMultiOpActionName(section));
+		clazz.setParent(getBaseActionName(section));
 
-		appendString( "public class "+getMultiOpActionName(section)+" extends "+getBaseActionName(section)+" {");
-	    increaseIdent();
-	    appendEmptyline();
-	    appendString( getExecuteDeclaration(null));
+		startClassBody();
+		appendString( getExecuteDeclaration(null));
 	    increaseIdent();
 	    appendStatement("String path = stripPath(mapping.getPath())");
 	    //MOVE THIS TO MULTIOP WITHOUT DIALOG
@@ -245,11 +244,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 		
 	    generateVersionInfoActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_VERSIONINFO));
-	    appendEmptyline();
-
-	    
-	    append(closeBlock());
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 	
 	private GeneratedClass generateMultiOpDialogAction(MetaModuleSection section){
@@ -1005,21 +1000,18 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); 
 	}
 	
-	private String generateUpdateAction(MetaModuleSection section){
+	private GeneratedClass generateUpdateAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
-			return "";
-		startNewJob();
+			return null;
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
-		appendStatement("package "+getPackage(section.getModule()));
-		appendEmptyline();
-
-		//write imports...
-		appendStandardActionImports();
-		appendImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
-	    appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    appendImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
-	    appendEmptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
+		addStandardActionImports(clazz);
+		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	    
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
 		for (int i=0; i<elements.size(); i++){
@@ -1028,23 +1020,19 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaFieldElement field = (MetaFieldElement)elem;
 				MetaProperty p = doc.getField(field.getName());
 				if (p.getType().equals("image")){
-					appendImport("net.anotheria.webutils.filehandling.actions.FileStorage");
-					appendImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
+					clazz.addImport("net.anotheria.webutils.filehandling.actions.FileStorage");
+					clazz.addImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
 					break;
 				}
 			}
 		}
 
-	    
-		appendString( "public class "+getUpdateActionName(section)+" extends "+getBaseActionName(section)+" {");
-		increaseIdent();
-		appendEmptyline();
+		clazz.setName(getUpdateActionName(section));
+		clazz.setParent(getBaseActionName(section));
+		startClassBody();
 		generateUpdateActionMethod(section, null);
 		
-		append(closeBlock()); ;
-		return getCurrentJobContent().toString();
-
-	
+		return clazz;
 	}
 
 	private void generateUpdateActionMethod(MetaModuleSection section, String methodName){
