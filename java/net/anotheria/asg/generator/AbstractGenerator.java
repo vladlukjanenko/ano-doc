@@ -310,8 +310,16 @@ public class AbstractGenerator{
 		GenerationJobManager.startNewJob();
 	}
 	
+	public final void startNewJob(GeneratedClass clazz){
+		GenerationJobManager.startNewJob(clazz);
+	}
+
 	public static final StringBuilder getCurrentJobContent(){
 		return GenerationJobManager.getCurrentJob().getStringBuilder();
+	}
+	
+	protected void startClassBody(){
+		ident = 1;
 	}
 	
 	

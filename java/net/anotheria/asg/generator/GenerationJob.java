@@ -7,6 +7,10 @@ public class GenerationJob {
 		reset();
 	}
 	
+	public GenerationJob(StringBuilder aBuilder){
+		builder = aBuilder;
+	}
+
 	public StringBuilder getStringBuilder(){
 		return builder;
 	}

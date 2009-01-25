@@ -15,4 +15,8 @@ public class GenerationJobManager {
 	public static void startNewJob(){
 		currentJob.set(new GenerationJob());
 	}
+
+	public static void startNewJob(GeneratedClass clazz){
+		currentJob.set(new GenerationJob(clazz.getBody()));
+	}
 }
