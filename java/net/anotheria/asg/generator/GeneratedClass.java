@@ -21,6 +21,8 @@ public class GeneratedClass {
 	
 	private TypeOfClass type = TypeOfClass.getDefault();
 	
+	private boolean generateLogger = false;
+	
 	public GeneratedClass(){
 		body = new StringBuilder();
 		
@@ -57,6 +59,11 @@ public class GeneratedClass {
 		
 		ret.append(nameDeclaration).append("{");
 		ret.append(CRLF).append(CRLF);
+		
+		if (generateLogger){
+			ret.append("\tprivate static Logger log = Logger.getLogger("+getName()+".class);").append(CRLF).append(CRLF);
+		}
+		
 		
 		ret.append(getBody());
 		ret.append("}").append(CRLF);
@@ -135,6 +142,16 @@ public class GeneratedClass {
 
 	public void setType(TypeOfClass type) {
 		this.type = type;
+	}
+
+	public boolean isGenerateLogger() {
+		return generateLogger;
+	}
+
+	public void setGenerateLogger(boolean generateLogger) {
+		if (generateLogger)
+			addImport("org.apache.log4j.Logger");
+		this.generateLogger = generateLogger;
 	}
 
 }

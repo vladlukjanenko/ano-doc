@@ -40,8 +40,6 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 			return new ArrayList<FileEntry>();
 		
 		this.context = context;
-		String packageName = getPackageName(context, module);
-		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ExecutionTimer timer = new ExecutionTimer("RMI Generator");
@@ -51,15 +49,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		
 
 		ret.add(new FileEntry(generateRemoteException(module)));
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getLookupName(module), generateLookup(module)));
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getServerName(module), generateServer(module)));
+		ret.add(new FileEntry(generateLookup(module)));
+		ret.add(new FileEntry(generateServer(module)));
 
 		timer.startExecution(module.getName()+"Stub");
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getStubName(module), generateStub(module)));
+		ret.add(new FileEntry(generateStub(module)));
 		timer.stopExecution(module.getName()+"Stub");
 
 		timer.startExecution(module.getName()+"Skeleton");
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getSkeletonName(module), generateSkeleton(module)));
+		ret.add(new FileEntry(generateSkeleton(module)));
 		timer.stopExecution(module.getName()+"Skeleton");
 
 		timer.startExecution(module.getName()+"Interface");
@@ -334,24 +332,22 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		return "Remote"+getServiceName(mod)+"Skeleton";
 	}
 	
-	private String generateLookup(MetaModule module){
-		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getLookupName(module)));
- 
-	    appendStatement("package "+getPackageName(module));
-	    appendEmptyline();
-	    appendImport("org.apache.log4j.Logger");
-	    appendEmptyline();
-	    appendImport("java.rmi.registry.Registry");
-	    appendImport("java.rmi.registry.LocateRegistry");
-	    appendEmptyline();
-	    appendImport("net.anotheria.asg.util.rmi.RMIConfig");
-	    appendImport("net.anotheria.asg.util.rmi.RMIConfigFactory");
-	    appendEmptyline();
-	    
+	private GeneratedClass generateLookup(MetaModule module){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getLookupName(module)));
+		clazz.setPackageName(getPackageName(module));
 
-	    appendString("public class "+getLookupName(module)+"{");
-	    increaseIdent();
+		clazz.addImport("org.apache.log4j.Logger");
+		clazz.addImport("java.rmi.registry.Registry");
+		clazz.addImport("java.rmi.registry.LocateRegistry");
+		clazz.addImport("net.anotheria.asg.util.rmi.RMIConfig");
+		clazz.addImport("net.anotheria.asg.util.rmi.RMIConfigFactory");
+
+		clazz.setName(getLookupName(module));
+		
+		startClassBody();
+		
 	    appendStatement("private static Logger log = Logger.getLogger(", quote(getLookupName(module)), ")");
 	    appendEmptyline();
 	    appendStatement("private static Registry rmiRegistry");
@@ -375,39 +371,33 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendIncreasedStatement("return ("+getInterfaceName(module)+") rmiRegistry.lookup(getServiceId())");
 	    appendString("}");
 	    
-	    appendString(closeBlock());
-	    
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 
-	private String generateServer(MetaModule module){
-		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getServerName(module)));
- 
-	    appendStatement("package "+getPackageName(module));
-	    appendEmptyline();
-	    appendImport("org.apache.log4j.Logger");
-	    appendImport("org.apache.log4j.xml.DOMConfigurator");
-	    appendEmptyline();
-	    appendImport("java.rmi.registry.Registry");
-	    appendImport("java.rmi.registry.LocateRegistry");
-	    appendImport("java.rmi.server.UnicastRemoteObject");
+	private GeneratedClass generateServer(MetaModule module){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getServerName(module)));
+		clazz.setPackageName(getPackageName(module));
+		
+	    clazz.addImport("org.apache.log4j.xml.DOMConfigurator");
+	    clazz.addImport("java.rmi.registry.Registry");
+	    clazz.addImport("java.rmi.registry.LocateRegistry");
+	    clazz.addImport("java.rmi.server.UnicastRemoteObject");
 	    
-	    appendEmptyline();
-	    appendImport("net.anotheria.asg.util.rmi.RMIConfig");
-	    appendImport("net.anotheria.asg.util.rmi.RMIConfigFactory");
-	    appendEmptyline();
-	    appendImport(ServiceGenerator.getInterfaceImport(context, module));
-	    appendImport(ServiceGenerator.getFactoryImport(context, module));
-	    appendEmptyline();
-	    appendImport("net.anotheria.asg.service.InMemoryService");
-	    appendImport(InMemoryServiceGenerator.getInMemoryFactoryImport(context, module));
+	    clazz.addImport("net.anotheria.asg.util.rmi.RMIConfig");
+	    clazz.addImport("net.anotheria.asg.util.rmi.RMIConfigFactory");
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(context, module));
+	    clazz.addImport(ServiceGenerator.getFactoryImport(context, module));
+	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
+	    clazz.addImport(InMemoryServiceGenerator.getInMemoryFactoryImport(context, module));
 	    
-
-	    appendString("public class "+getServerName(module)+"{");
-	    increaseIdent();
-	    appendStatement("private static Logger log = Logger.getLogger(", quote(getServerName(module)), ")");
-	    appendEmptyline();
+	    clazz.setName(getServerName(module));
+	    clazz.setGenerateLogger(true);
+	    
+	    startClassBody();
 
 	    appendString("public static void main(String a[]){");
 	    increaseIdent();
@@ -467,61 +457,40 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		appendStatement("log.info(", quote(getServerName(module)+" for service "), " + serviceId + ", quote(" is up and running.")+")");
 
 	    append(closeBlock());
-	    
-	    
-	    appendString(closeBlock());
-	    
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 
-	private String generateStub(MetaModule module){
+	private GeneratedClass generateStub(MetaModule module){
 	    
-		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getStubName(module)));
- 
-	    appendStatement("package "+getPackageName(module));
-	    appendEmptyline();
-	    appendImport("java.util.List");
-	    appendImport("net.anotheria.util.sorter.SortType");
-	    appendEmptyline();
-	    
-	    List<MetaDocument> docs = module.getDocuments();
-	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = docs.get(i);
-	        appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    }
-	    appendEmptyline();
-	    
-	    appendImport("net.anotheria.util.xml.XMLNode");
-	    appendEmptyline();
-	    appendImport("net.anotheria.anodoc.query2.DocumentQuery");
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getStubName(module)));
+		clazz.setPackageName(getPackageName(module));
+
+		clazz.addImport("java.util.List");
+		clazz.addImport("net.anotheria.util.sorter.SortType");
+		clazz.addImport("net.anotheria.util.xml.XMLNode");
+	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
-	    appendImport("net.anotheria.anodoc.query2.QueryResult");
-	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
-	    appendEmptyline();
-	    appendImport("net.anotheria.asg.service.remote.BaseRemoteServiceStub");
-	    appendImport("net.anotheria.asg.util.listener.IServiceListener");
-	    appendImport("net.anotheria.anodoc.util.context.ContextManager");
-	    appendEmptyline();
-	    appendImport("java.rmi.RemoteException");
-	    appendEmptyline();
-	    appendImport(ServiceGenerator.getExceptionImport(context, module));
-	    appendImport(ServiceGenerator.getInterfaceImport(context, module));
-	    appendEmptyline();
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
+	    clazz.addImport("net.anotheria.asg.service.remote.BaseRemoteServiceStub");
+	    clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
+	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
+	    clazz.addImport("java.rmi.RemoteException");
+	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(context, module));
 	    
-
-	    appendImport("org.apache.log4j.Logger");
-	    appendEmptyline();
-
-	    appendString("public class ",getStubName(module),"  extends BaseRemoteServiceStub<",getInterfaceName(module),"> implements ",ServiceGenerator.getInterfaceName(module)," {");
-	    increaseIdent();
-	    appendEmptyline();
+	    clazz.setName(getStubName(module));
+	    clazz.setParent("BaseRemoteServiceStub<"+getInterfaceName(module)+">");
+	    clazz.addInterface(ServiceGenerator.getInterfaceName(module));
 
 	    
 	    boolean containsAnyMultilingualDocs = false;
 	    
-	    appendStatement("private static Logger log = Logger.getLogger(", quote(getStubName(module)), ")");
-	    appendEmptyline();
+	    clazz.setGenerateLogger(true);
+	    startClassBody();
+	    
 	    appendStatement("private ", getInterfaceName(module), " delegate");
 	    appendEmptyline();
 	    appendString("protected void notifyDelegateFailed(){");
@@ -552,8 +521,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         append(closeBlock());
 	    appendEmptyline();
 
+	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+
 	        String listDecl = "List<"+doc.getName()+">";
 	        
 		    writeStubFun(
@@ -764,62 +736,41 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("public boolean hasServiceListeners(){");
 	    appendIncreasedStatement("throw new RuntimeException(", quote("Method not supported"), ")");
 	    appendString("}");
-	    appendEmptyline();
-	    
-	    
-	    
-	    append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 	
 	
-	private String generateSkeleton(MetaModule module){
+	private GeneratedClass generateSkeleton(MetaModule module){
 	    
-		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getSkeletonName(module)));
- 
-	    appendStatement("package "+getPackageName(module));
-	    appendEmptyline();
-	    appendImport("java.util.List");
-	    appendImport("net.anotheria.util.sorter.SortType");
-	    appendEmptyline();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getSkeletonName(module)));
+		clazz.setPackageName(getPackageName(module));
+		
+	    clazz.addImport("java.util.List");
+	    clazz.addImport("net.anotheria.util.sorter.SortType");
 	    
-	    List<MetaDocument> docs = module.getDocuments();
-	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = docs.get(i);
-	        appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    }
-	    appendEmptyline();
 	    
-	    appendImport("net.anotheria.util.xml.XMLNode");
-	    appendEmptyline();
-	    appendImport("net.anotheria.anodoc.query2.DocumentQuery");
+	    clazz.addImport("net.anotheria.util.xml.XMLNode");
+	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
-	    appendImport("net.anotheria.anodoc.query2.QueryResult");
-	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
-	    appendImport("net.anotheria.anodoc.util.context.CallContext");
-	    appendImport("net.anotheria.anodoc.util.context.ContextManager");
-	    appendImport("net.anotheria.asg.service.remote.BaseRemoteServiceSkeleton");
-	    appendEmptyline();
-	    
-	    //appendImport("net.anotheria.asg.service.ASGService");
-	    appendEmptyline();
-	    appendImport(ServiceGenerator.getExceptionImport(context, module));
-	    appendImport(ServiceGenerator.getInterfaceImport(context, module));
-	    appendEmptyline();
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
+	    clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
+	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
+	    clazz.addImport("net.anotheria.asg.service.remote.BaseRemoteServiceSkeleton");
+	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(context, module));
 
-	    appendImport("org.apache.log4j.Logger");
-	    appendEmptyline();
-
-	    appendString("public class "+getSkeletonName(module)+" extends BaseRemoteServiceSkeleton implements "+getInterfaceName(module)+" {");
-	    increaseIdent();
-	    appendEmptyline();
-
-	    
+	    clazz.setName(getSkeletonName(module));
+	    clazz.setParent("BaseRemoteServiceSkeleton");
+	    clazz.addInterface(getInterfaceName(module));
+	    	    
 	    boolean containsAnyMultilingualDocs = false;
 	    
-	    appendStatement("private static Logger log = Logger.getLogger(", quote(getSkeletonName(module)), ")");
-	    appendEmptyline();
+	    clazz.setGenerateLogger(true);
+	    startClassBody();
+	    
 	    appendStatement("private ", ServiceGenerator.getInterfaceName(module), " service");
 	    appendEmptyline();
 	    
@@ -827,9 +778,13 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendIncreasedStatement("service = aService");
 	    appendString("}");
 	    appendEmptyline();
+	    
+	    List<MetaDocument> docs = module.getDocuments();
+
 
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	        String listDecl = "List<"+doc.getName()+">";
 	        
 		    writeSkeletonFun(
@@ -1030,8 +985,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		appendIncreasedStatement("return echoRequest");
 		appendString("}");
 	    
-	    append(closeBlock());
-	    return getCurrentJobContent().toString();
+		return clazz;
 	}
 
 	

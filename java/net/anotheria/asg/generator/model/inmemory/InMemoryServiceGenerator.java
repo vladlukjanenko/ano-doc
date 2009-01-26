@@ -44,7 +44,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 		timer.stopExecution(mod.getName()+"Factory");
 		
 		timer.startExecution(mod.getName()+"Impl");
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getImplementationName(mod), generateImplementation(mod)));
+		ret.add(new FileEntry(generateImplementation(mod)));
 		timer.stopExecution(mod.getName()+"Impl");
 		
 		//timer.printExecutionTimesOrderedByCreation();
@@ -99,55 +99,55 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	 * @param module the metamodule to generate
 	 * @return
 	 */
-	private String generateImplementation(MetaModule module){
+	private GeneratedClass generateImplementation(MetaModule module){
 
-		startNewJob();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
 	    ExecutionTimer timer = new ExecutionTimer("InMemory-generateImplementation");
 	    timer.startExecution("pre");
-		append(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The in memory implementation of the "+getInterfaceName(module)+"."));
+	    
+	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The in memory implementation of the "+getInterfaceName(module)+"."));
+	    clazz.setPackageName(getPackageName(module));
 
-	    appendStatement("package "+getPackageName(module));
-	    appendEmptyline();
-	    appendImport("java.util.List");
-	    appendImport("java.util.Map");
-	    appendImport("java.util.ArrayList");
-	    appendImport("java.util.HashMap");
-	    appendImport("java.util.concurrent.atomic.AtomicLong");
+	    clazz.addImport("java.util.List");
+	    clazz.addImport("java.util.Map");
+	    clazz.addImport("java.util.ArrayList");
+	    clazz.addImport("java.util.HashMap");
+	    clazz.addImport("java.util.concurrent.atomic.AtomicLong");
 
 
-	    appendImport("net.anotheria.util.sorter.SortType");
-	    appendImport("net.anotheria.util.sorter.StaticQuickSorter");
-	    appendImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
-	    appendEmptyline();
+	    clazz.addImport("net.anotheria.util.sorter.SortType");
+	    clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
+	    clazz.addImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
 
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        appendImport( DataFacadeGenerator.getDocumentImport(context, doc));
-	        appendImport( DataFacadeGenerator.getDocumentFactoryImport(context, doc));
-	        appendImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
+	        MetaDocument doc = docs.get(i);
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 	    }
-	    appendEmptyline();
-	    appendImport( "net.anotheria.asg.util.listener.IServiceListener");
-	    appendImport( "net.anotheria.anodoc.query2.DocumentQuery");
-	    appendImport( "net.anotheria.anodoc.query2.QueryResult");
-	    appendImport( "net.anotheria.anodoc.query2.QueryResultEntry");
-	    appendImport( "net.anotheria.anodoc.query2.QueryProperty");
+	    clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
+	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryResultEntry");
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
 	    
-	    appendEmptyline();
-	    appendImport( "net.anotheria.util.xml.XMLNode");
-	    appendImport("net.anotheria.util.xml.XMLAttribute");
-	    appendEmptyline();
-	    appendImport( "net.anotheria.asg.exception.ASGRuntimeException");
-	    appendImport( "net.anotheria.asg.service.InMemoryService");
-	    appendImport( "net.anotheria.asg.service.InMemoryObjectWrapper");
-	    appendImport( ServiceGenerator.getInterfaceImport(context, module));
-	    appendImport( ServiceGenerator.getExceptionImport(context, module));
-	    appendEmptyline();
+	    clazz.addImport("net.anotheria.util.xml.XMLNode");
+	    clazz.addImport("net.anotheria.util.xml.XMLAttribute");
+	    clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
+	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
+	    clazz.addImport("net.anotheria.asg.service.InMemoryObjectWrapper");
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(context, module));
+	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+
+	    clazz.setName(getImplementationName(module));
+	    clazz.setParent("BasicService");
+	    clazz.addInterface(getInterfaceName(module));
+	    clazz.addInterface("InMemoryService<"+getInterfaceName(module)+">");
 	    
-	    
-	    appendString("public class "+getImplementationName(module)+" extends BasicService implements "+getInterfaceName(module)+", InMemoryService<"+getInterfaceName(module)+"> {");
-	    increaseIdent();
+	    startClassBody();
 	    appendStatement("private static "+getImplementationName(module)+" instance");
 	    append(emptyline());
 	    
@@ -666,11 +666,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    append(closeBlock());
     
 
-		append(closeBlock());
 	    timer.stopExecution("foot");
-	    //timer.printExecutionTimesOrderedByCreation();
-	    
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 	
 	
