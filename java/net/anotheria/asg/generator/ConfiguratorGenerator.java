@@ -26,50 +26,48 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 	}
 	
 	private FileEntry generateConfigurator(List<MetaModule> modules, Context context){
-		String ret = "";
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		ret += writeStatement("package "+context.getServicePackageName(MetaModule.SHARED));
+		clazz.setPackageName(context.getServicePackageName(MetaModule.SHARED));
 
 
-		ret += writeImport("net.anotheria.anodoc.service.IModuleFactory");
-		ret += writeImport("net.anotheria.anodoc.service.IModuleService");
-		ret += writeImport("net.anotheria.anodoc.service.ModuleServiceFactory");
-		ret += writeImport("net.anotheria.anodoc.util.CommonHashtableModuleStorage");
-		ret += emptyline();
-		for (MetaModule m : modules){
-			ret += writeImport(context.getPackageName(m)+".data.*");
-		}
+		clazz.addImport("net.anotheria.anodoc.service.IModuleFactory");
+		clazz.addImport("net.anotheria.anodoc.service.IModuleService");
+		clazz.addImport("net.anotheria.anodoc.service.ModuleServiceFactory");
+		clazz.addImport("net.anotheria.anodoc.util.CommonHashtableModuleStorage");
 		
-		ret += emptyline();
-		ret += writeString("public class "+getConfiguratorClassName()+"{");
-		increaseIdent();
-		ret += emptyline();
+		clazz.setName(getConfiguratorClassName());
+		
+		startClassBody();
 
-		ret += writeString("private static void addCommonStorage(String moduleId, IModuleService service, IModuleFactory factory, String storageDirConfigKey){");
+		appendString("private static void addCommonStorage(String moduleId, IModuleService service, IModuleFactory factory, String storageDirConfigKey){");
 		increaseIdent();
-		ret += writeString("service.attachModuleFactory(moduleId, factory );");
-		ret += writeString("if (storageDirConfigKey==null)");
-		ret += writeIncreasedString("service.attachModuleStorage(moduleId, new CommonHashtableModuleStorage(moduleId+\".dat\", factory));");
-		ret += writeString("else");
-		ret += writeIncreasedString("service.attachModuleStorage(moduleId, new CommonHashtableModuleStorage(moduleId+\".dat\", factory, storageDirConfigKey));");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("service.attachModuleFactory(moduleId, factory );");
+		appendString("if (storageDirConfigKey==null)");
+		appendIncreasedString("service.attachModuleStorage(moduleId, new CommonHashtableModuleStorage(moduleId+\".dat\", factory));");
+		appendString("else");
+		appendIncreasedString("service.attachModuleStorage(moduleId, new CommonHashtableModuleStorage(moduleId+\".dat\", factory, storageDirConfigKey));");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeStatement("private static boolean configured");
-		ret += emptyline();
-		ret += writeString("public static void configure(){");
+		
+		appendStatement("private static boolean configured");
+		appendEmptyline();
+		appendString("public static void configure(){");
 		increaseIdent();
-		ret += writeString("if (configured)");
+		appendString("if (configured)");
 		increaseIdent();
-		ret += writeString("return;");
+		appendString("return;");
 		decreaseIdent();
-		ret += writeString("configured = true;");
-		ret += writeString("net.anotheria.anodoc.util.context.ContextManager.setFactory(new "+CallContextGenerator.getFullFactoryName(context)+"());");
+		appendString("configured = true;");
+		appendString("net.anotheria.anodoc.util.context.ContextManager.setFactory(new "+CallContextGenerator.getFullFactoryName(context)+"());");
 		
-		ret += writeStatement("IModuleService service = ModuleServiceFactory.createModuleService()");
+		appendStatement("IModuleService service = ModuleServiceFactory.createModuleService()");
 		
 		for (int i=0; i<modules.size(); i++){
 			MetaModule m = modules.get(i);
+			clazz.addImport(context.getPackageName(m)+".data.*");
 			if (m.getStorageType()==StorageType.CMS){
 				String call = "addCommonStorage(";
 				call += m.getModuleClassName()+".MODULE_ID";
@@ -82,14 +80,12 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 				else
 					call += ", null";
 				call +=")";
-				ret += writeStatement(call);
+				appendStatement(call);
 			}
 			  
 		}
-		ret += closeBlock();
-		ret += closeBlock();
-			
-		return new FileEntry(FileEntry.package2path(context.getServicePackageName(MetaModule.SHARED)), getConfiguratorClassName(),ret);
+		append(closeBlock());
+		return new FileEntry(clazz);
 		
 	}
 	
