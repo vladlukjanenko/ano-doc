@@ -91,17 +91,8 @@ public class AbstractGenerator{
 		target.append(CRLF);
 	}
 
-	/**
-	 * @deprecated use appendTry
-	 */
-	protected String openTry(){
-		String ret = writeString("try{");
-		increaseIdent();
-		return ret;
-	}
-
 	//later replace with openTry
-	protected void appendTry(){
+	protected void openTry(){
 		appendString("try{");
 		increaseIdent();
 	}
@@ -190,6 +181,10 @@ public class AbstractGenerator{
 		return CRLF;
 	}
 	
+	/**
+	 * @deprecated  
+	 * @param b
+	 */
 	protected static void emptyline(StringBuilder b){
 		b.append(CRLF);
 	}
@@ -219,6 +214,9 @@ public class AbstractGenerator{
 		appendString(target, "import ", imp, ";");
 	}
 
+	/**
+	 * @deprecated use clazz.addImport(imp) instead
+	 */
 	protected String writeImport(String packagename, String classname){
 		return writeString("import "+packagename+"."+classname+";");
 	}
@@ -243,6 +241,11 @@ public class AbstractGenerator{
 //		return emptyline()+writeString(ret)+emptyline();
 	}
 
+	/**
+	 * @deprecated 
+	 * @param commentline
+	 * @return
+	 */
 	protected String writeCommentLine(String commentline){
 		String tokens[] = StringUtils.tokenize(commentline, '\n');
 		if (tokens.length!=1)

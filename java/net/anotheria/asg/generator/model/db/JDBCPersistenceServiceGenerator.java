@@ -198,7 +198,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement(getDAOVariableName(doc) +" = new "+PersistenceServiceDAOGenerator.getDAOName(doc)+"()");
 	    }
 	    appendStatement("String currentDAO = null");
-	    append(openTry());
+        openTry();
 	    appendStatement("Connection c = getConnection()");
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
@@ -337,7 +337,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	private void generateMethodStart(String callLog){
 		appendStatement("log.debug("+callLog+")");
 		appendStatement("Connection c = null");
-		appendTry();
+		openTry();
 		appendStatement("c = getConnection()");
 	}
 	

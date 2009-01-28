@@ -432,7 +432,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("if(mode != null && mode.equals(", quote("inMemory"),")){");
 	    increaseIdent();
 	    appendStatement("log.info(", quote("Switch to InMemory mode"), ")");
-	    appendTry();
+	    openTry();
 	    appendStatement(ServiceGenerator.getInterfaceName(module), " inMemoryService = ", InMemoryServiceGenerator.getInMemoryFactoryName(module)+".create"+module.getName()+"Service()");
 	    appendStatement("log.info(", quote("Reading " + ServiceGenerator.getInterfaceName(module) + " In Memory ..."), ")");
 	    appendStatement("long startTime = System.currentTimeMillis()");
@@ -993,7 +993,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendComment(comment);
         appendString("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+", RemoteExceptionWrapper{");
         increaseIdent();
-        appendTry();
+        openTry();
         appendStatement((returnType.length()>0 ? "return " : "" ),"getDelegate().",funName, "(ContextManager.getCallContext()", (parametersStripped!=null && parametersStripped.length()>0 ? ", ":""),  parametersStripped ,")");
         decreaseIdent();
         appendString("} catch (RemoteException e){");
@@ -1021,7 +1021,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendComment(comment);
         appendString("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+"{");
         increaseIdent();
-        appendTry();
+        openTry();
         appendStatement((returnType.length()>0 ? "return " : "" ),"service.",funName, "(", parametersStripped ,")");
         decreaseIdent();
         appendString("} catch ("+ServiceGenerator.getExceptionName(module)+" e){");
@@ -1043,7 +1043,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendComment(comment);
         appendString("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "(CallContext callContext", (parametersStripped!=null && parametersStripped.length()>0 ? ", ":""), parametersFull, ")"+" throws "+getExceptionName(module)+"{");
         increaseIdent();
-        appendTry();
+        openTry();
         appendStatement("ContextManager.setCallContext(callContext)");
         appendStatement((returnType.length()>0 ? "return " : "" ),"service.",funName, "(", parametersStripped ,")");
         decreaseIdent();

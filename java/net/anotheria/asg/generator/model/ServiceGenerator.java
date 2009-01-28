@@ -25,9 +25,11 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.TypeOfClass;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
@@ -39,6 +41,7 @@ import net.anotheria.asg.generator.model.federation.FederationServiceGenerator;
 import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
 import net.anotheria.asg.generator.model.rmi.RMIServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
+import net.anotheria.util.sorter.SortType;
 
 /**
  * TODO Please remain lrosenberg to comment ServiceGenerator.java
@@ -54,18 +57,16 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = context.getServicePackageName(mod);
-		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ExecutionTimer timer = new ExecutionTimer("ServiceGenerator");
 		
 		
 		//timer.startExecution(mod.getName()+"-Interface");
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getInterfaceName(mod), generateInterface(mod)));
+		ret.add(new FileEntry(generateInterface(mod)));
 		//timer.stopExecution(mod.getName()+"-Interface");
 		//timer.startExecution(mod.getName()+"-Exception");
-		ret.add(new FileEntry(FileEntry.package2path(packageName), getExceptionName(mod), generateException(mod)));
+		ret.add(new FileEntry(generateException(mod)));
 		//timer.stopExecution(mod.getName()+"-Exception");
 		
 		//add in memory genererator
@@ -129,20 +130,23 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		return context.getPackageName(module)+".service";
 	}
 	
-	private String generateException(MetaModule module){
+	private GeneratedClass generateException(MetaModule module){
 
-		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getExceptionName(module)));
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getExceptionName(module)));
  
-	    appendStatement("package "+getPackageName(module));
-	    append(emptyline());
-	    appendImport(ASGRuntimeException.class.getName());
+	    clazz.setPackageName(getPackageName(module));
+	    clazz.addImport(ASGRuntimeException.class);
 	    
-	    appendComment("Base class for all exceptions thrown by implementations of "+getInterfaceName(module));
-	    appendString("@SuppressWarnings(" + quote("serial") + ")");
-	    appendString("public class "+getExceptionName(module)+" extends ASGRuntimeException{");
-	    increaseIdent();
+	    clazz.setClazzComment("Base class for all exceptions thrown by implementations of "+getInterfaceName(module));
+	    //TODO FIXME
+	    //appendString("@SuppressWarnings(" + quote("serial") + ")");
+	    clazz.setName(getExceptionName(module));
+	    clazz.setParent(ASGRuntimeException.class);
 	    
+	    startClassBody();
 	    appendString("public "+getExceptionName(module)+" (String message){" );
 	    appendIncreasedStatement("super(message)");
 	    appendString("}");
@@ -157,44 +161,40 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    appendIncreasedStatement("super(message, cause)");
 	    appendString("}");
 
-	    append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 
-	private String generateInterface(MetaModule module){
+	private GeneratedClass generateInterface(MetaModule module){
 	    
+		GeneratedClass clazz = new GeneratedClass();
 		startNewJob();
-		append(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
  
-	    appendStatement("package "+getPackageName(module));
-	    appendEmptyline();
-	    appendImport("java.util.List");
-	    appendImport("net.anotheria.util.sorter.SortType");
-	    appendEmptyline();
+	    clazz.setPackageName(getPackageName(module));
+	    clazz.addImport(List.class);
+	    clazz.addImport(SortType.class);
 	    
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
-	        appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    }
-	    appendEmptyline();
 	    
-	    appendImport("net.anotheria.util.xml.XMLNode");
-	    appendEmptyline();
-	    appendImport("net.anotheria.anodoc.query2.DocumentQuery");
+	    clazz.addImport("net.anotheria.util.xml.XMLNode");
+	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
-	    appendImport("net.anotheria.anodoc.query2.QueryResult");
-	    appendImport("net.anotheria.anodoc.query2.QueryProperty");
-	    appendEmptyline();
-	    appendImport("net.anotheria.asg.service.ASGService");
-	    appendEmptyline();
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
+	    clazz.addImport("net.anotheria.asg.service.ASGService");
 
-	    appendString("public interface "+getInterfaceName(module)+" extends ASGService {");
-	    increaseIdent();
+	    clazz.setType(TypeOfClass.INTERFACE);
+	    clazz.setName(getInterfaceName(module));
+	    clazz.setParent("ASGService");
 	    
 	    boolean containsAnyMultilingualDocs = false;
 
 	    String throwsClause = " throws "+getExceptionName(module);
+	    startClassBody();
 	    
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
@@ -276,10 +276,8 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    
 		appendComment("creates an xml element with all contained data but only selected languages in multilingual attributes");
 		appendStatement("public XMLNode exportToXML(String[] languages)"+throwsClause);
-		appendEmptyline();
 
-		append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 	
 	
@@ -318,16 +316,6 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    return getServiceName(m)+"Impl";
 	}
 	
-	
-	
-	/**
-	 * @deprecated
-	 * @param context
-	 * @return
-	 */
-	public static String getPackageName(Context context){
-	    return context.getPackageName()+".service";
-	}
 	public static String getPackageName(Context context, MetaModule module){
 	    return context.getServicePackageName(module);
 	}

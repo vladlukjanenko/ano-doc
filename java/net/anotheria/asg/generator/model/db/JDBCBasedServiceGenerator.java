@@ -111,7 +111,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause+"{");
 	        increaseIdent();
-	        append(openTry());
+	        openTry();
 	        appendStatement("return pService.get"+doc.getMultiple()+"()");
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
@@ -134,7 +134,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        
 	        appendString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
-	        append(openTry());
+	        openTry();
 	        appendStatement("pService.delete"+doc.getName()+"(id)");
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
@@ -153,7 +153,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendComment("Deletes multiple "+doc.getName()+" objects.");
 	        appendString("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
-	        append(openTry());
+	        openTry();
 	        appendStatement("pService.delete"+doc.getMultiple()+"(list)");
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
@@ -174,7 +174,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
-	        append(openTry());
+	        openTry();
 	        appendStatement("return pService.get"+doc.getName()+"(id)");
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
@@ -186,7 +186,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        
 	        appendString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
-	        append(openTry());
+	        openTry();
 	        appendStatement(doc.getVariableName() + " = pService.import"+doc.getName()+"("+doc.getVariableName()+")");
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
@@ -199,7 +199,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
-	        append(openTry());
+	        openTry();
 	        appendStatement(doc.getVariableName() + " = pService.create"+doc.getName()+"("+doc.getVariableName()+")");
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
@@ -220,7 +220,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(listDecl+" ret = null");
-	        append(openTry());
+	        openTry();
 	        appendStatement("ret = pService.create"+doc.getMultiple()+"(list)");
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
@@ -243,7 +243,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(listDecl+" ret = null");
-	        append(openTry());
+	        openTry();
 	        appendStatement("ret = pService.update"+doc.getMultiple()+"(list)");
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
@@ -267,7 +267,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(doc.getName()+" oldVersion = null");
-	        append(openTry());
+	        openTry();
 	        appendString("if (hasServiceListeners())");
 	        appendIncreasedStatement("oldVersion = pService.get"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        

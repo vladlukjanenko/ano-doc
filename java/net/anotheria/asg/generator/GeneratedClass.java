@@ -18,6 +18,7 @@ public class GeneratedClass {
 	private String packageName;
 	
 	private String typeComment;
+	private String clazzComment;
 	
 	private TypeOfClass type = TypeOfClass.getDefault();
 	
@@ -52,6 +53,13 @@ public class GeneratedClass {
 		}
 		
 		ret.append(CRLF);
+
+		if (clazzComment!=null && clazzComment.length()>0){
+			ret.append("/**").append(CRLF);
+			ret.append(" * ").append(clazzComment).append(CRLF);
+			ret.append(" */").append(CRLF);
+		}
+
 		
 		String nameDeclaration = "public "+(isAbstractClass()?"abstract ":"")+type.toJava()+" "+getName();
 		if (getParent()!=null && getParent().length()>0)
@@ -130,6 +138,10 @@ public class GeneratedClass {
 	public String getParent() {
 		return parent;
 	}
+	
+	public void setParent(Class<?> parentClazz){
+		setParent(parentClazz.getName().substring(parentClazz.getName().lastIndexOf('.')+1));
+	}
 
 	public void setParent(String parent) {
 		this.parent = parent;
@@ -167,6 +179,14 @@ public class GeneratedClass {
 		if (generateLogger)
 			addImport("org.apache.log4j.Logger");
 		this.generateLogger = generateLogger;
+	}
+
+	public String getClazzComment() {
+		return clazzComment;
+	}
+
+	public void setClazzComment(String clazzComment) {
+		this.clazzComment = clazzComment;
 	}
 
 }

@@ -149,7 +149,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
 		openFun("public "+doc.getName()+" map(ResultSet row) throws RowMapperException");
 
-	    appendTry();
+	    openTry();
 	    
 	    appendStatement("long id = row.getLong(1)");
 	    appendStatement(doc.getName()+" ret = new "+VOGenerator.getDocumentImplName(doc)+"(\"\"+id)");
@@ -745,7 +745,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         openFun("public List<"+doc.getName()+">"+" get"+doc.getMultiple()+"ByProperty(Connection con, List<QueryProperty> properties)"+throwsClause);
         //append(generateFunctionStart("SQL_READ_ALL_BY_PROPERTY", callLog, true));
 		appendStatement("PreparedStatement ps = null");
-		appendTry();
+		openTry();
 		//TODO Caching fuer generierte SQL Statements
         appendCommentLine("//enable caching of statements one day");
         appendStatement("String SQL = createSQL(SQL_READ_ALL_BY_PROPERTY_1, SQL_READ_ALL_BY_PROPERTY_2)");
@@ -849,7 +849,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
         openFun("private long getMaxId(Connection con, String tableName) "+throwsClause);
         appendStatement("Statement st = null");
-        appendTry();
+        openTry();
         appendStatement("con.setAutoCommit(true)");
         appendStatement("st = con.createStatement()");
     	appendStatement("st.execute(\"SELECT MAX(\"+"+getAttributeConst(id)+"+\") FROM \"+tableName)");
@@ -932,12 +932,12 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	private void generateFunctionStart(String SQL_STATEMENT, String callLog, boolean usePreparedSt){
 		if (usePreparedSt){
 			appendStatement("PreparedStatement ps = null");
-			appendTry();
+			openTry();
 			appendStatement("con.setAutoCommit(true)");
 			appendStatement("ps = con.prepareStatement(createSQL("+SQL_STATEMENT+"_1, "+SQL_STATEMENT+"_2))");
 		}else{
 			appendStatement("Statement st = null");
-			appendTry();
+			openTry();
 			appendStatement("con.setAutoCommit(true)");
 			//ret += writeStatement("ps = con.prepareStatement("+SQL_STATEMENT+")");
 		}
