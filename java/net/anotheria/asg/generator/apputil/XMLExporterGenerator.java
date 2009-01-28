@@ -8,6 +8,7 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.ConfiguratorGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
@@ -18,7 +19,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 	public List<FileEntry> generate(List<MetaModule> modules, Context context){
 		List<FileEntry> entries = new ArrayList<FileEntry>();
 		
-		entries.add(generateExporter(modules, context));
+		entries.add(new FileEntry(generateExporter(modules, context)));
 		
 		return entries;
 		
@@ -28,215 +29,207 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		return StringUtils.capitalize(context.getApplicationName())+"XMLExporter";
 	}
 	
-	private FileEntry generateExporter(List<MetaModule> modules, Context context){
-		String ret = "";
+	private GeneratedClass generateExporter(List<MetaModule> modules, Context context){
+
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		ret += writeStatement("package "+context.getServicePackageName(MetaModule.SHARED));
+		clazz.setPackageName(context.getServicePackageName(MetaModule.SHARED));
 		
-		ret += writeImport("java.util.List");
-		ret += writeImport("java.util.ArrayList");
-		ret += writeImport("java.io.File");
-		ret += writeImport("java.io.FileOutputStream");
-		ret += writeImport("java.io.OutputStream");
-		ret += writeImport("java.io.IOException");
-		ret += writeImport("java.io.OutputStreamWriter");
-		ret += writeImport("java.nio.charset.Charset");
-		ret += writeImport("java.util.concurrent.atomic.AtomicLong");
-		ret += emptyline();
-		//ret += writeImport("org.jdom.Element");
-		//ret += writeImport("org.jdom.Attribute");
-		//ret += writeImport("org.jdom.Document");
-		//ret += writeImport("org.jdom.output.XMLOutputter");
-		ret += writeImport("net.anotheria.util.xml.XMLNode");
-		ret += writeImport("net.anotheria.util.xml.XMLTree");
-		ret += writeImport("net.anotheria.util.xml.XMLAttribute");
-		ret += writeImport("net.anotheria.util.xml.XMLWriter");
-		ret += emptyline();
-		ret += writeImport("net.anotheria.util.Date");
-		ret += writeImport("net.anotheria.util.IOUtils");
-		ret += writeImport("net.anotheria.util.StringUtils");
-		ret += writeImport(ASGRuntimeException.class.getName());
-		ret += writeImport("org.apache.log4j.BasicConfigurator");
-		ret += emptyline();
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("java.io.File");
+		clazz.addImport("java.io.FileOutputStream");
+		clazz.addImport("java.io.OutputStream");
+		clazz.addImport("java.io.IOException");
+		clazz.addImport("java.io.OutputStreamWriter");
+		clazz.addImport("java.nio.charset.Charset");
+		clazz.addImport("java.util.concurrent.atomic.AtomicLong");
+
+		clazz.addImport("net.anotheria.util.xml.XMLNode");
+		clazz.addImport("net.anotheria.util.xml.XMLTree");
+		clazz.addImport("net.anotheria.util.xml.XMLAttribute");
+		clazz.addImport("net.anotheria.util.xml.XMLWriter");
+		
+		clazz.addImport("net.anotheria.util.Date");
+		clazz.addImport("net.anotheria.util.IOUtils");
+		clazz.addImport(StringUtils.class);
+		clazz.addImport(ASGRuntimeException.class);
+		clazz.addImport("org.apache.log4j.BasicConfigurator");
 		for (MetaModule m : modules){
-			ret += writeImport(ServiceGenerator.getFactoryImport(context, m));
+			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
 		}
 		
-		ret += emptyline();
-		ret += writeString("public class "+getExporterClassName(context)+"{");
-		increaseIdent();
-		ret += emptyline();
-		ret += writeStatement("private static AtomicLong exp = new AtomicLong()");
-		ret += writeStatement("private static String[] LANGUAGES = null");
+		clazz.setName(getExporterClassName(context));
+		
+		startClassBody();
+		appendStatement("private static AtomicLong exp = new AtomicLong()");
+		appendStatement("private static String[] LANGUAGES = null");
 
-		ret += writeString("static {");
+		appendString("static {");
 		increaseIdent();
-		ret += writeStatement(ConfiguratorGenerator.getConfiguratorClassName()+".configure()");
-		ret += writeStatement("String expLanguages = System.getProperty("+quote("anosite.export.languages")+")");
-		ret += writeString("if (expLanguages!=null && expLanguages.length()>0)");
-		ret += writeIncreasedStatement("LANGUAGES = StringUtils.tokenize(expLanguages, ',')");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement(ConfiguratorGenerator.getConfiguratorClassName()+".configure()");
+		appendStatement("String expLanguages = System.getProperty("+quote("anosite.export.languages")+")");
+		appendString("if (expLanguages!=null && expLanguages.length()>0)");
+		appendIncreasedStatement("LANGUAGES = StringUtils.tokenize(expLanguages, ',')");
+		append(closeBlock());
+		appendEmptyline();
 		
 		
-		ret += writeComment("Create an XML Document (ano-util) with data from all modules.");
-		ret += writeString("public static XMLTree createCompleteXMLExport() throws ASGRuntimeException{");
+		appendComment("Create an XML Document (ano-util) with data from all modules.");
+		appendString("public static XMLTree createCompleteXMLExport() throws ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>()");
+		appendStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>()");
 		for (MetaModule m : modules){
-			ret += writeStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
+			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
 		}
-		ret += writeStatement("return createExport(nodes)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return createExport(nodes)");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeComment("Write XML data from all modules into given stream.");
-		ret += writeString("public static void writeCompleteXMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
+		appendComment("Write XML data from all modules into given stream.");
+		appendString("public static void writeCompleteXMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("new XMLWriter().write(createCompleteXMLExport(), target)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("new XMLWriter().write(createCompleteXMLExport(), target)");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeComment("Write XML data from all modules into given file.");
-		ret += writeString("public static void writeCompleteXMLExportToFile(File target) throws IOException, ASGRuntimeException{");
+		appendComment("Write XML data from all modules into given file.");
+		appendString("public static void writeCompleteXMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("writeToFile(createCompleteXMLExport(), target)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("writeToFile(createCompleteXMLExport(), target)");
+		append(closeBlock());
+		appendEmptyline();
 
 		
 		
 		//create export methods for all modules.
 		for (MetaModule m : modules){
-			ret += writeComment("Create an XML Document (jdom) from "+m.getName()+" data for export.");
-			ret += writeString("public static XMLTree create"+m.getName()+"XMLExport() throws ASGRuntimeException{");
+			appendComment("Create an XML Document (jdom) from "+m.getName()+" data for export.");
+			appendString("public static XMLTree create"+m.getName()+"XMLExport() throws ASGRuntimeException{");
 			increaseIdent();
-			ret += writeStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>(1)");
-			ret += writeStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
-			ret += writeStatement("return createExport(nodes)");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>(1)");
+			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
+			appendStatement("return createExport(nodes)");
+			append(closeBlock());
+			appendEmptyline();
 
-			ret += writeComment("Write "+m.getName()+" as XML into given stream.");
-			ret += writeString("public static void write"+m.getName()+"XMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
+			appendComment("Write "+m.getName()+" as XML into given stream.");
+			appendString("public static void write"+m.getName()+"XMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
-			ret += writeStatement("new XMLWriter().write(create"+m.getName()+"XMLExport(), target)");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("new XMLWriter().write(create"+m.getName()+"XMLExport(), target)");
+			append(closeBlock());
+			appendEmptyline();
 			
-			ret += writeComment("Write "+m.getName()+" as XML into given file.");
-			ret += writeString("public static void write"+m.getName()+"XMLExportToFile(File target) throws IOException, ASGRuntimeException{");
+			appendComment("Write "+m.getName()+" as XML into given file.");
+			appendString("public static void write"+m.getName()+"XMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
-			ret += writeStatement("writeToFile(create"+m.getName()+"XMLExport(), target)");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("writeToFile(create"+m.getName()+"XMLExport(), target)");
+			append(closeBlock());
+			appendEmptyline();
 		}
 		
 		//private methods
-		ret += writeString("private static void writeToFile(XMLTree tree, File target) throws IOException{");
+		appendString("private static void writeToFile(XMLTree tree, File target) throws IOException{");
 		increaseIdent();
-		ret += writeStatement("FileOutputStream fOut = null");
-		ret += writeString("try{");
+		appendStatement("FileOutputStream fOut = null");
+		appendString("try{");
 		increaseIdent();
-		ret += writeStatement("fOut = new FileOutputStream(target)");
-		ret += writeStatement("XMLWriter writer = new XMLWriter()");
-		ret += writeStatement("OutputStreamWriter oWriter = writer.write(tree, fOut)");
-		ret += writeStatement("oWriter.close()");
+		appendStatement("fOut = new FileOutputStream(target)");
+		appendStatement("XMLWriter writer = new XMLWriter()");
+		appendStatement("OutputStreamWriter oWriter = writer.write(tree, fOut)");
+		appendStatement("oWriter.close()");
 		decreaseIdent();
-		ret += writeStatement("}catch(IOException e){");
+		appendStatement("}catch(IOException e){");
 		increaseIdent();
-		ret += writeString("if (fOut!=null){");
+		appendString("if (fOut!=null){");
 		increaseIdent();
-		ret += writeString("try{");
-		ret += writeIncreasedStatement("fOut.close()");
-		ret += writeString("}catch(IOException ignored){}");
-		ret += closeBlock();
-		ret += writeStatement("throw e");
-		ret += closeBlock();
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("try{");
+		appendIncreasedStatement("fOut.close()");
+		appendString("}catch(IOException ignored){}");
+		append(closeBlock());
+		appendStatement("throw e");
+		append(closeBlock());
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("private static XMLTree createExport(List<XMLNode> nodes){");
+		appendString("private static XMLTree createExport(List<XMLNode> nodes){");
 		increaseIdent();
-		ret += writeStatement("XMLTree tree = new XMLTree()");
-		ret += writeStatement("tree.setEncoding("+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		ret += writeStatement("XMLNode root = new XMLNode("+quote("export")+")");
-		ret += writeStatement("root.addAttribute(new XMLAttribute("+quote("timestamp")+", \"\"+System.currentTimeMillis()))");
-		ret += writeStatement("root.addAttribute(new XMLAttribute("+quote("date")+", Date.currentDate().toString()))");
-		ret += writeStatement("tree.setRoot(root)");
-		ret += writeStatement("root.setChildren(nodes)");
-		ret += writeStatement("return tree");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("XMLTree tree = new XMLTree()");
+		appendStatement("tree.setEncoding("+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
+		appendStatement("XMLNode root = new XMLNode("+quote("export")+")");
+		appendStatement("root.addAttribute(new XMLAttribute("+quote("timestamp")+", \"\"+System.currentTimeMillis()))");
+		appendStatement("root.addAttribute(new XMLAttribute("+quote("date")+", Date.currentDate().toString()))");
+		appendStatement("tree.setRoot(root)");
+		appendStatement("root.setChildren(nodes)");
+		appendStatement("return tree");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
+		appendString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("BasicConfigurator.configure()");
-		ret += writeString("if (a.length==0)");
-		ret += writeIncreasedStatement("interactiveMode(a)");
-		ret += writeString("else");
-		ret += writeIncreasedStatement("automaticMode(a)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("BasicConfigurator.configure()");
+		appendString("if (a.length==0)");
+		appendIncreasedStatement("interactiveMode(a)");
+		appendString("else");
+		appendIncreasedStatement("automaticMode(a)");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public static void interactiveMode(String a[]) throws IOException,ASGRuntimeException{");
+		appendString("public static void interactiveMode(String a[]) throws IOException,ASGRuntimeException{");
 		increaseIdent();
-		ret += writeString("while(true){");
+		appendString("while(true){");
 		increaseIdent();
-		ret += writeStatement("System.out.println("+quote("Please make your choice:")+")");
-		ret += writeStatement("System.out.println("+quote("0 - Quit")+")");
-		ret += writeStatement("System.out.println("+quote("1 - Complete export")+")");
+		appendStatement("System.out.println("+quote("Please make your choice:")+")");
+		appendStatement("System.out.println("+quote("0 - Quit")+")");
+		appendStatement("System.out.println("+quote("1 - Complete export")+")");
 		int i=2;
 		for (MetaModule m : modules){
-			ret += writeStatement("System.out.println("+quote(""+i+" - Export "+m.getName()+" ["+m.getStorageType()+"]")+")");
+			appendStatement("System.out.println("+quote(""+i+" - Export "+m.getName()+" ["+m.getStorageType()+"]")+")");
 			i++;
 		}
-		ret += writeStatement("String myInput = IOUtils.readlineFromStdIn()");
-		ret += writeStatement("XMLTree tree = createExportForInput(myInput)");
-		ret += writeString("if (tree==null)");
-		ret += writeIncreasedStatement("System.exit(0)");
-		ret += writeStatement("FileOutputStream fOut = new FileOutputStream(new File(\"export-\"+exp.incrementAndGet()+\".xml\"))");
-		ret += writeStatement("OutputStreamWriter writer = new OutputStreamWriter(fOut, Charset.forName("+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+"))");
-		ret += writeStatement("tree.write(writer)");
-		ret += writeStatement("writer.flush()");
-		ret += writeStatement("writer.close()");
-		ret += closeBlock();
+		appendStatement("String myInput = IOUtils.readlineFromStdIn()");
+		appendStatement("XMLTree tree = createExportForInput(myInput)");
+		appendString("if (tree==null)");
+		appendIncreasedStatement("System.exit(0)");
+		appendStatement("FileOutputStream fOut = new FileOutputStream(new File(\"export-\"+exp.incrementAndGet()+\".xml\"))");
+		appendStatement("OutputStreamWriter writer = new OutputStreamWriter(fOut, Charset.forName("+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+"))");
+		appendStatement("tree.write(writer)");
+		appendStatement("writer.flush()");
+		appendStatement("writer.close()");
+		append(closeBlock());
 		
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 		
 		
-		ret += writeString("public static void automaticMode(String a[]) throws IOException,ASGRuntimeException{");
+		appendString("public static void automaticMode(String a[]) throws IOException,ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("new "+getExporterClassName(context)+"().writeCompleteXMLExportToFile(new File("+quote(context.getApplicationName()+"_export.xml")+"))");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("new "+getExporterClassName(context)+"().writeCompleteXMLExportToFile(new File("+quote(context.getApplicationName()+"_export.xml")+"))");
+		append(closeBlock());
+		appendEmptyline();
 		
 		
-		ret += writeString("public static final XMLTree createExportForInput(String input) throws ASGRuntimeException{");
+		appendString("public static final XMLTree createExportForInput(String input) throws ASGRuntimeException{");
 		increaseIdent();
-		ret += writeString("if ("+quote("0")+".equals(input))");
-		ret += writeIncreasedStatement("return null");
+		appendString("if ("+quote("0")+".equals(input))");
+		appendIncreasedStatement("return null");
 		
-		ret += writeString("if ("+quote("1")+".equals(input))");
-		ret += writeIncreasedStatement("return createCompleteXMLExport()");
+		appendString("if ("+quote("1")+".equals(input))");
+		appendIncreasedStatement("return createCompleteXMLExport()");
 
 		//create"+m.getName()+"XMLExport()
 		i=2;
 		for (MetaModule m : modules){
-			ret += writeString("if ("+quote(""+i)+".equals(input))");
-			ret += writeIncreasedStatement("return create"+m.getName()+"XMLExport()");
+			appendString("if ("+quote(""+i)+".equals(input))");
+			appendIncreasedStatement("return create"+m.getName()+"XMLExport()");
 			i++;
 		}
 		
-		ret += writeStatement("throw new RuntimeException("+quote("Unrecognized input: ")+" +input)");
+		appendStatement("throw new RuntimeException("+quote("Unrecognized input: ")+" +input)");
 
-		ret += closeBlock();
-		ret += emptyline();
-		ret += closeBlock();
-		
-
-		return new FileEntry(FileEntry.package2path(context.getServicePackageName(MetaModule.SHARED)), getExporterClassName(context),ret);
+		append(closeBlock());
+		return clazz;
 		
 	}
 

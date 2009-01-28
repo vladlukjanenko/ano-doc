@@ -5,9 +5,11 @@ import java.util.List;
 
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.TypeOfClass;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaGenericProperty;
@@ -41,9 +43,9 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getDocumentName(doc), generateDocument(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getSortTypeName(doc), generateSortType(doc)));
-		_ret.add(new FileEntry(FileEntry.package2path(getPackageName(doc)), getXMLHelperName(doc), generateXMLHelper(doc)));
+		_ret.add(new FileEntry(generateDocument(doc)));
+		_ret.add(new FileEntry(generateSortType(doc)));
+		_ret.add(new FileEntry(generateXMLHelper(doc)));
 		return _ret;
 	}
 	
@@ -76,100 +78,91 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		return properties;
 	}
 	
-	private String generateSortType(MetaDocument doc){
-		String ret = "";
-
+	private GeneratedClass generateSortType(MetaDocument doc){
+		
 		List<MetaProperty> properties = extractSortableProperties(doc);
 
-		// ??? boolean containsComparable = false;
-		
 		if (properties.size()==0)
 			return null;
-			
-		ret += writeStatement("package "+getPackageName(doc));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.util.sorter.SortType");
-		ret += emptyline();
+
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+	
+		clazz.setPackageName(getPackageName(doc));
+		clazz.addImport("net.anotheria.util.sorter.SortType");
 		
-		ret += writeString("public class "+getSortTypeName(doc)+" extends SortType{");
-		increaseIdent();
-		
+		clazz.setName(getSortTypeName(doc));
+		clazz.setParent("SortType");
+
+		startClassBody();
 		
 		int lastIndex = 1;
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
-			ret += writeStatement("public static final int SORT_BY_"+p.getName().toUpperCase()+" = "+(lastIndex++));
+			appendStatement("public static final int SORT_BY_"+p.getName().toUpperCase()+" = "+(lastIndex++));
 		}
-		ret += writeStatement("public static final int SORT_BY_DEFAULT = SORT_BY_ID");
+		appendStatement("public static final int SORT_BY_DEFAULT = SORT_BY_ID");
 
-		ret += emptyline();
+		appendEmptyline();
 
-		ret += writeString("public "+getSortTypeName(doc)+"(){");
+		appendString("public "+getSortTypeName(doc)+"(){");
 		increaseIdent();
-		ret += writeString("super(SORT_BY_DEFAULT);");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("super(SORT_BY_DEFAULT);");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public "+getSortTypeName(doc)+"(int method){");
+		appendString("public "+getSortTypeName(doc)+"(int method){");
 		increaseIdent();
-		ret += writeString("super(method);");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("super(method);");
+		append(closeBlock());
+		appendEmptyline();
 				
-		ret += writeString("public "+getSortTypeName(doc)+"(int method, boolean order){");
+		appendString("public "+getSortTypeName(doc)+"(int method, boolean order){");
 		increaseIdent();
-		ret += writeString("super(method, order);");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("super(method, order);");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public static int name2method(String name){");
+		appendString("public static int name2method(String name){");
 		increaseIdent();
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
-				ret += writeString("if ("+quote(p.getName())+".equals(name))");
-				ret += writeIncreasedStatement("return SORT_BY_"+p.getName().toUpperCase());
+				appendString("if ("+quote(p.getName())+".equals(name))");
+				appendIncreasedStatement("return SORT_BY_"+p.getName().toUpperCase());
 		}
-		ret += writeStatement("throw new RuntimeException("+quote("Unknown sort type name: ")+"+name)");		
-		ret += closeBlock();
+		appendStatement("throw new RuntimeException("+quote("Unknown sort type name: ")+"+name)");		
+		append(closeBlock());
 
-		ret += closeBlock();
-		
-
-		return ret;
-		
-		
+		return clazz;
 	}
 	
-	private String generateXMLHelper(MetaDocument doc){
-		String ret = "";
+	private GeneratedClass generateXMLHelper(MetaDocument doc){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
 		
-		ret += writeStatement("package "+getPackageName(doc));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.util.xml.XMLNode");
-		ret += writeImport("net.anotheria.util.xml.XMLAttribute");
-		ret += writeImport("net.anotheria.asg.data.XMLHelper");
+		clazz.setPackageName(getPackageName(doc));
 		
-		boolean listImported = false;
+		clazz.addImport("net.anotheria.util.xml.XMLNode");
+		clazz.addImport("net.anotheria.util.xml.XMLAttribute");
+		clazz.addImport("net.anotheria.asg.data.XMLHelper");
+		
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
-				ret += writeImport("java.util.List");
-				listImported = true;
+				clazz.addImport("java.util.List");
 				break;
 			}
 		}
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaTableProperty){
-				if (!listImported){
-					ret += writeImport("java.util.List");
-				}
+				clazz.addImport("java.util.List");
 				break;
 			}
 		}
 		
-		ret += emptyline();
-		ret += writeString("public class "+getXMLHelperName(doc)+"{");
-		ret += emptyline();
+		clazz.setName(getXMLHelperName(doc));
+		
+		startClassBody();
 		increaseIdent();
 		if (context.areLanguagesSupported()){
 			String langArray = "";
@@ -178,77 +171,75 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 					langArray += ",";
 				langArray += quote(l);
 			}
-			ret += writeStatement("public static final String[] LANGUAGES = new String[]{"+langArray+"}");
+			appendStatement("public static final String[] LANGUAGES = new String[]{"+langArray+"}");
 		}
 
 		//generates generic to xml method
-		ret += writeString("private static XMLNode _toXML("+doc.getName()+" object, String[] languages){");
+		appendString("private static XMLNode _toXML("+doc.getName()+" object, String[] languages){");
 		increaseIdent();
-		ret += writeStatement("XMLNode ret = new XMLNode("+quote(doc.getName())+")");
-		ret += writeStatement("ret.addAttribute(new XMLAttribute("+quote("id")+", object.getId()))");
-		ret += emptyline();
+		appendStatement("XMLNode ret = new XMLNode("+quote(doc.getName())+")");
+		appendStatement("ret.addAttribute(new XMLAttribute("+quote("id")+", object.getId()))");
+		appendEmptyline();
 		for (MetaProperty p : doc.getProperties()){
-			ret += generatePropertyToXMLMethod(p);
+			generatePropertyToXMLMethod(p);
 		}
-		ret += emptyline();
+		appendEmptyline();
 		for (MetaProperty p : doc.getLinks()){
-			ret += generatePropertyToXMLMethod(p);
+			generatePropertyToXMLMethod(p);
 		}
-		ret += writeStatement("return ret");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return ret");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public static XMLNode toXML("+doc.getName()+" object){");
+		appendString("public static XMLNode toXML("+doc.getName()+" object){");
 		increaseIdent();
-		ret += writeStatement("return _toXML(object, LANGUAGES)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return _toXML(object, LANGUAGES)");
+		append(closeBlock());
+		appendEmptyline();
 
 		//generates toXML method for a single language
-		ret += writeString("public static XMLNode toXML("+doc.getName()+" object, String... languages){");
+		appendString("public static XMLNode toXML("+doc.getName()+" object, String... languages){");
 		increaseIdent();
 		
-		ret += writeString("if (languages==null || languages.length==0)");
-		ret += writeIncreasedStatement("return toXML(object)");
-		ret += writeStatement("return _toXML(object, languages)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("if (languages==null || languages.length==0)");
+		appendIncreasedStatement("return toXML(object)");
+		appendStatement("return _toXML(object, languages)");
+		append(closeBlock());
+		appendEmptyline();
 		
 
-		ret += writeString("public static "+doc.getName()+" fromXML(XMLNode node){");
+		appendString("public static "+doc.getName()+" fromXML(XMLNode node){");
 		increaseIdent();
-		ret += writeStatement("return null");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return null");
+		append(closeBlock());
+		appendEmptyline();
 		
 		
 		
 		//ret += generatePropertyAccessMethods(doc);
-		ret += emptyline();
 		//ret += generateAdditionalMethods(doc);
-		ret += emptyline();
-		ret += closeBlock();
-		return ret;
+		return clazz;
 	}
 	
-	private String generatePropertyToXMLMethod(MetaProperty p){
-		String ret = "";
+	private void generatePropertyToXMLMethod(MetaProperty p){
+		if (p instanceof MetaTableProperty){
+			generateTablePropertyGetterMethods((MetaTableProperty)p);
+			return;
+		}
+		if (p instanceof MetaListProperty){
+			generateListPropertyToXMLMethods((MetaListProperty)p);
+			return;
+		}
+		if (context.areLanguagesSupported() && p.isMultilingual()){
+			generatePropertyToXMLMethodMultilingual(p);
+			return;
+		}
 		
-		if (p instanceof MetaTableProperty)
-			return generateTablePropertyGetterMethods((MetaTableProperty)p);
-		if (p instanceof MetaListProperty)
-			return generateListPropertyToXMLMethods((MetaListProperty)p);
-		if (context.areLanguagesSupported() && p.isMultilingual())
-			return generatePropertyToXMLMethodMultilingual(p);
-		
-		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", null, object.get"+p.getAccesserName()+"()	))");
-		return ret;
+		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", null, object.get"+p.getAccesserName()+"()	))");
 	}
 	
 	
-	private String generatePropertyToXMLMethodMultilingual(MetaProperty p){
-		String ret = "";
-		
+	private void generatePropertyToXMLMethodMultilingual(MetaProperty p){
 		String callArr = "";
 		
 		for (String l : context.getLanguages()){
@@ -256,15 +247,14 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 				callArr += ", ";
 			callArr += "object.get"+p.getAccesserName(l)+"()";
 		}
-		ret += writeStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", languages , "+callArr+"	))");
-		return ret;
+		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", languages , "+callArr+"	))");
 	}
 	
-	private String generateListPropertyToXMLMethods(MetaListProperty p){
+	private void generateListPropertyToXMLMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
-		return generatePropertyToXMLMethod(tmp);
+		generatePropertyToXMLMethod(tmp);
 	}
 	
 	
@@ -284,10 +274,10 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
 			ret += generatePropertyGetterMethod(p);
-			ret += emptyline();
+			appendEmptyline();
 			if (!p.isReadonly()){
 				ret += generatePropertySetterMethod(p);
-				ret += emptyline();
+				appendEmptyline();
 			}
 		}
 		return ret;
@@ -295,53 +285,49 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 
 	 */
 	
-	private String generateDocument(MetaDocument doc){
-		String ret = "";
+	private GeneratedClass generateDocument(MetaDocument doc){
+
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
 	
-		ret += writeStatement("package "+getPackageName(doc));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.asg.data.DataObject");
+		clazz.setPackageName(getPackageName(doc));
+		clazz.addImport("net.anotheria.asg.data.DataObject");
 		
-		boolean listImported = false;
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
-				ret += writeImport("java.util.List");
-				listImported = true;
+				clazz.addImport("java.util.List");
 				break;
 			}
 		}
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaTableProperty){
-				if (!listImported){
-					ret += writeImport("java.util.List");
-				}
+				clazz.addImport("java.util.List");
 				break;
 			}
 		}
-		
-		String interfaceDecl = " extends DataObject";
+
+		clazz.setType(TypeOfClass.INTERFACE);
+		clazz.setName(doc.getName());
+		clazz.setParent("DataObject");
 		if (doc.isComparable()){
-			ret += writeImport("net.anotheria.util.sorter.IComparable");
-			ret += emptyline();
-			interfaceDecl += ", IComparable ";
+			clazz.addImport("net.anotheria.util.sorter.IComparable");
+			//todo hack
+			clazz.setParent(clazz.getParent()+ ", IComparable ");
 		}
-		
-		
-		ret += writeString("public interface "+doc.getName()+interfaceDecl+"{");
-		increaseIdent();
-		ret += generatePropertyConstants(doc);
-		ret += emptyline();
-		ret += generatePropertyAccessMethods(doc);
-		ret += emptyline();
-		ret += generateAdditionalMethods(doc);
-		ret += emptyline();
+
+		startClassBody();
+		generatePropertyConstants(doc);
+		appendEmptyline();
+		generatePropertyAccessMethods(doc);
+		appendEmptyline();
+		generateAdditionalMethods(doc);
+		appendEmptyline();
 		if (hasLanguageCopyMethods(doc)){
-			ret += generateLanguageCopyMethods(doc);
-			ret += emptyline();
+			generateLanguageCopyMethods(doc);
+			appendEmptyline();
 		}
-		ret += closeBlock();
-		return ret;
+		return clazz;
 	}
 	
 	public static final boolean hasLanguageCopyMethods(MetaDocument doc){
@@ -355,176 +341,159 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		return "copy"+sourceLange.toUpperCase()+"2"+targetLang.toUpperCase();
 	}
 	
-	private String generateLanguageCopyMethods(MetaDocument doc){
-		String ret = "";
-		
-		ret += writeComment("Copies all multilingual properties from source language to destination language ");
-		ret += writeString("public void "+getCopyMethodName()+"(String sourceLanguge, String destLanguage);");
-		ret += emptyline();
+	private void generateLanguageCopyMethods(MetaDocument doc){
+		appendComment("Copies all multilingual properties from source language to destination language ");
+		appendString("public void "+getCopyMethodName()+"(String sourceLanguge, String destLanguage);");
+		appendEmptyline();
 		for (String srclang : context.getLanguages()){
 			for (String targetlang : context.getLanguages()){
 				if (!srclang.equals(targetlang)){
-					ret += writeComment("Copies all multilingual properties from language "+srclang+" to language "+targetlang);
-					ret += writeString("public void "+getCopyMethodName(srclang, targetlang)+"();");
-					ret += emptyline();
+					appendComment("Copies all multilingual properties from language "+srclang+" to language "+targetlang);
+					appendString("public void "+getCopyMethodName(srclang, targetlang)+"();");
+					appendEmptyline();
 				}
 			}
 		}
-		
-		return ret;
 	}
 	
-	private String generatePropertyConstants(MetaDocument doc){
-		String ret = "";
-		ret += _generatePropertyConstants(doc.getProperties());
-		ret += _generatePropertyConstants(doc.getLinks());
-		return ret;
+	private void generatePropertyConstants(MetaDocument doc){
+		_generatePropertyConstants(doc.getProperties());
+		_generatePropertyConstants(doc.getLinks());
 	}
 	
-	private String _generatePropertyConstants(List<MetaProperty> propertyList){
-		String ret = "";
+	private void _generatePropertyConstants(List<MetaProperty> propertyList){
 		for (int i=0; i<propertyList.size(); i++){
 			MetaProperty p = propertyList.get(i);
 			if (p instanceof MetaTableProperty){
 				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
 				for (int t=0; t<columns.size(); t++)
-					ret += _generatePropertyConstant(columns.get(t));
+					_generatePropertyConstant(columns.get(t));
 			}else{
-				ret += _generatePropertyConstant(p);
+				_generatePropertyConstant(p);
 			}
 		}
-		return ret;
 	}
 	
-	private String _generatePropertyConstant(MetaProperty p){
-		String ret = "";
+	private void _generatePropertyConstant(MetaProperty p){
 		if (context.areLanguagesSupported() && p.isMultilingual()){
 			for (String l: context.getLanguages()){
 				String decl = PROPERTY_DECLARATION;
 				decl += p.toNameConstant(l);
 				decl += "\t= \""+p.getName()+"_"+l+"\"";
-				ret += writeComment("Constant property name for \""+p.getName()+"\" and domain \""+l+"\" for internal storage and queries.");
-				ret += writeStatement(decl);
+				appendComment("Constant property name for \""+p.getName()+"\" and domain \""+l+"\" for internal storage and queries.");
+				appendStatement(decl);
 			}
-			return ret;
 		}else{
 			String r = PROPERTY_DECLARATION;
 			r += p.toNameConstant();
 			r += "\t= \""+p.getName()+"\"";
-			ret += writeComment("Constant property name for \""+p.getName()+"\" for internal storage and queries.");
-			ret += writeStatement(r);
-			return ret;
+			appendComment("Constant property name for \""+p.getName()+"\" for internal storage and queries.");
+			appendStatement(r);
 		}
 	}
 	
 	
-	private String generatePropertyAccessMethods(MetaDocument doc){
-		String ret = "";
-		
-		ret += _generatePropertyAccessMethods(doc.getProperties());
-		ret += _generatePropertyAccessMethods(doc.getLinks());
-		return ret;
+	private void generatePropertyAccessMethods(MetaDocument doc){
+		_generatePropertyAccessMethods(doc.getProperties());
+		_generatePropertyAccessMethods(doc.getLinks());
 	}
 	
-	private String _generatePropertyAccessMethods(List<MetaProperty> properties){
-		String ret = "";
-		
+	private void _generatePropertyAccessMethods(List<MetaProperty> properties){
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
-			ret += generatePropertyGetterMethod(p);
-			ret += emptyline();
+			generatePropertyGetterMethod(p);
+			appendEmptyline();
 			if (!p.isReadonly()){
-				ret += generatePropertySetterMethod(p);
-				ret += emptyline();
+				generatePropertySetterMethod(p);
+				appendEmptyline();
 			}
 		}
-		return ret;
 	}
 	
-	private String generatePropertyGetterMethod(MetaProperty p){
-		String ret = "";
-		
-		if (p instanceof MetaTableProperty)
-			return generateTablePropertyGetterMethods((MetaTableProperty)p);
-		if (p instanceof MetaListProperty)
-			return generateListPropertyGetterMethods((MetaListProperty)p);
-		if (context.areLanguagesSupported() && p.isMultilingual())
-			return generatePropertyGetterMethodMultilingual(p);
-		
-		ret += writeComment("Returns the value of the "+p.getName()+" attribute.");
-		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"();");
-		return ret;
-	}
-	
-	private String generatePropertyGetterMethodMultilingual(MetaProperty p){
-		String ret = "";
-		for (String l : context.getLanguages()){
-			ret += writeComment("Returns the value of the "+p.getName()+" attribute in the \""+l+"\" domain.");
-			ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"();");
-			ret += emptyline();
+	private void generatePropertyGetterMethod(MetaProperty p){
+		if (p instanceof MetaTableProperty){
+			generateTablePropertyGetterMethods((MetaTableProperty)p);
+			return;
 		}
-		ret += writeComment("Returns the current value of the "+p.getName()+" attribute.\nCurrent means in the currently selected domain.");
-		ret += writeString("public "+p.toJavaType()+" get"+p.getAccesserName()+"();");
-		ret += emptyline();
-		return ret;
+		if (p instanceof MetaListProperty){
+			generateListPropertyGetterMethods((MetaListProperty)p);
+			return;
+		}
+		if (context.areLanguagesSupported() && p.isMultilingual()){
+			generatePropertyGetterMethodMultilingual(p);
+			return;
+		}
+		
+		appendComment("Returns the value of the "+p.getName()+" attribute.");
+		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"();");
+		
+	}
+	
+	private void generatePropertyGetterMethodMultilingual(MetaProperty p){
+		for (String l : context.getLanguages()){
+			appendComment("Returns the value of the "+p.getName()+" attribute in the \""+l+"\" domain.");
+			appendString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"();");
+			appendEmptyline();
+		}
+		appendComment("Returns the current value of the "+p.getName()+" attribute.\nCurrent means in the currently selected domain.");
+		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"();");
+		appendEmptyline();
 	}
 	
 	
-	private String generateListPropertyGetterMethods(MetaListProperty p){
+	private void generateListPropertyGetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
-		return generatePropertyGetterMethod(tmp);
+		generatePropertyGetterMethod(tmp);
 	}
 	
-	private String generateTablePropertyGetterMethods(MetaTableProperty p){
-		String ret = "";
+	private void generateTablePropertyGetterMethods(MetaTableProperty p){
 		List<MetaProperty> columns = p.getColumns();
 		for (int t=0; t<columns.size(); t++)
-			ret += generatePropertyGetterMethod(columns.get(t));
-		return ret;
+			generatePropertyGetterMethod(columns.get(t));
 	}
 	
-	private String generatePropertySetterMethod(MetaProperty p){
-		String ret = "";
-
-		if (p instanceof MetaTableProperty)
-			return generateTablePropertySetterMethods((MetaTableProperty)p);
-		if (p instanceof MetaListProperty)
-			return generateListPropertySetterMethods((MetaListProperty)p);
-		if (context.areLanguagesSupported() && p.isMultilingual())
-			return generatePropertySetterMethodMultilingual(p);
-
-		ret += writeComment("Sets the value of the "+p.getName()+" attribute.");
-		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value);");
-		return ret;
-	}
-	
-	private String generatePropertySetterMethodMultilingual(MetaProperty p){
-		String ret = "";
-		for (String l : context.getLanguages()){
-			ret += writeComment("Sets the value of the "+p.getName()+" attribute in the domain \""+l+"\"");
-			ret += writeString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value);");
-			ret += emptyline();
+	private void generatePropertySetterMethod(MetaProperty p){
+		if (p instanceof MetaTableProperty){
+			generateTablePropertySetterMethods((MetaTableProperty)p);
+			return ;
 		}
-		ret += writeComment("Sets the value of the "+p.getName()+" attribute in the current domain. Current means in the currently selected domain.");
-		ret += writeString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value);");
-		return ret;
+		if (p instanceof MetaListProperty){
+			generateListPropertySetterMethods((MetaListProperty)p);
+			return;
+		}
+		if (context.areLanguagesSupported() && p.isMultilingual()){
+			generatePropertySetterMethodMultilingual(p);
+			return;
+		}
+
+		appendComment("Sets the value of the "+p.getName()+" attribute.");
+		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value);");
+		
+	}
+	
+	private void generatePropertySetterMethodMultilingual(MetaProperty p){
+		for (String l : context.getLanguages()){
+			appendComment("Sets the value of the "+p.getName()+" attribute in the domain \""+l+"\"");
+			appendString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value);");
+			appendEmptyline();
+		}
+		appendComment("Sets the value of the "+p.getName()+" attribute in the current domain. Current means in the currently selected domain.");
+		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value);");
 	}
 
-	private String generateListPropertySetterMethods(MetaListProperty p){
+	private void generateListPropertySetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
-		return generatePropertySetterMethod(tmp);
+		generatePropertySetterMethod(tmp);
 	}
 
-	private String generateTablePropertySetterMethods(MetaTableProperty p){
-		String ret = "";
+	private void generateTablePropertySetterMethods(MetaTableProperty p){
 		List<MetaProperty> columns = p.getColumns();
 		for (int t=0; t<columns.size(); t++)
-			ret += generatePropertySetterMethod(columns.get(t));
-		return ret;
+			generatePropertySetterMethod(columns.get(t));
 	}
 
 	
@@ -543,102 +512,86 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		
 	}
 	
-	private String generateAdditionalMethods(MetaDocument doc){
-		String ret = "";
-		
+	private void generateAdditionalMethods(MetaDocument doc){
 		List <MetaProperty>properties = doc.getProperties();
 		for (MetaProperty p : properties){
 			if (p instanceof MetaContainerProperty)
-				ret += generateContainerMethods((MetaContainerProperty)p);
+				generateContainerMethods((MetaContainerProperty)p);
 			if (p instanceof MetaTableProperty)
-				ret += generateTableMethods((MetaTableProperty)p);
+				generateTableMethods((MetaTableProperty)p);
 			if (p instanceof MetaListProperty)
-				ret += generateListMethods((MetaListProperty)p);
+				generateListMethods((MetaListProperty)p);
 		}
-		
-		return ret;		
 	}
 	
-	private String generateContainerMethods(MetaContainerProperty container){
-		String ret = "";
+	private void generateContainerMethods(MetaContainerProperty container){
 		if (container.isMultilingual())
-			ret += generateContainerMethodsMultilingual(container);
-		ret += writeComment("Returns the number of elements in the \""+container.getName()+"\" container");
-		ret += writeString("public int "+getContainerSizeGetterName(container)+"();");
-		ret += emptyline();
-		return ret;
+			generateContainerMethodsMultilingual(container);
+		appendComment("Returns the number of elements in the \""+container.getName()+"\" container");
+		appendString("public int "+getContainerSizeGetterName(container)+"();");
+		appendEmptyline();
+		
 	}
 	
-	private String generateContainerMethodsMultilingual(MetaContainerProperty container){
-		String ret = "";
+	private void generateContainerMethodsMultilingual(MetaContainerProperty container){
 		for (String l : context.getLanguages()){
-			ret += writeComment("Returns the number of elements in the \""+container.getName()+"\" container");
-			ret += writeString("public int "+getContainerSizeGetterName(container, l)+"();");
-			ret += emptyline();
+			appendComment("Returns the number of elements in the \""+container.getName()+"\" container");
+			appendString("public int "+getContainerSizeGetterName(container, l)+"();");
+			appendEmptyline();
 		}
-		return ret;
 	}
 
-	private String generateListMethods(MetaListProperty list){
-		String ret = "";
-
+	private void generateListMethods(MetaListProperty list){
 		if (list.isMultilingual())
-			ret += generateListMethodsMultilingual(list);
+			generateListMethodsMultilingual(list);
 		
 		MetaProperty c = list.getContainedProperty();
-		ret += writeComment("Adds a new element to the list.");
+		appendComment("Adds a new element to the list.");
 		String decl = "public void "+getContainerEntryAdderName(list)+"(";
 		decl += c.toJavaType()+" "+c.getName();
 		decl += ");";
-		ret += writeString(decl);
-		ret += emptyline();
+		appendString(decl);
+		appendEmptyline();
 		
-		ret += writeComment("Removes the element at position index from the list.");
-		ret += writeString("public void "+getContainerEntryDeleterName(list)+"(int index);");
-		ret += emptyline();
+		appendComment("Removes the element at position index from the list.");
+		appendString("public void "+getContainerEntryDeleterName(list)+"(int index);");
+		appendEmptyline();
 		
-		ret += writeComment("Swaps elements at positions index1 and index2 in the list.");
-		ret += writeString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2);");
-		ret += emptyline();
+		appendComment("Swaps elements at positions index1 and index2 in the list.");
+		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2);");
+		appendEmptyline();
 		
-		ret += writeComment("Returns the element at the position index in the list.");
-		ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index);");
-		ret += emptyline();
-
-		return ret;
+		appendComment("Returns the element at the position index in the list.");
+		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index);");
+		appendEmptyline();
 	}
 	
-	private String generateListMethodsMultilingual(MetaListProperty list){
-		String ret = "";
-
+	private void generateListMethodsMultilingual(MetaListProperty list){
 		for (String l : context.getLanguages()){
 		
 			MetaProperty c = list.getContainedProperty();
-			ret += writeComment("Adds a new element to the list.");
+			appendComment("Adds a new element to the list.");
 			String decl = "public void "+getContainerEntryAdderName(list, l)+"(";
 			decl += c.toJavaType()+" "+c.getName();
 			decl += ");";
-			ret += writeString(decl);
-			ret += emptyline();
+			appendString(decl);
+			appendEmptyline();
 			
-			ret += writeComment("Removes the element at position index from the list.");
-			ret += writeString("public void "+getContainerEntryDeleterName(list, l)+"(int index);");
-			ret += emptyline();
+			appendComment("Removes the element at position index from the list.");
+			appendString("public void "+getContainerEntryDeleterName(list, l)+"(int index);");
+			appendEmptyline();
 			
-			ret += writeComment("Swaps elements at positions index1 and index2 in the list.");
-			ret += writeString("public void "+getContainerEntrySwapperName(list, l)+"(int index1, int index2);");
-			ret += emptyline();
+			appendComment("Swaps elements at positions index1 and index2 in the list.");
+			appendString("public void "+getContainerEntrySwapperName(list, l)+"(int index1, int index2);");
+			appendEmptyline();
 			
-			ret += writeComment("Returns the element at the position index in the list.");
-			ret += writeString("public "+c.toJavaType()+ " "+getListElementGetterName(list, l)+"(int index);");
-			ret += emptyline();
+			appendComment("Returns the element at the position index in the list.");
+			appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list, l)+"(int index);");
+			appendEmptyline();
 		}
-
-		return ret;
 	}
 
-	private String generateTableMethods(MetaTableProperty table){
-		String ret = "";
+	private void generateTableMethods(MetaTableProperty table){
 		List<MetaProperty> columns = table.getColumns();
 		
 		String decl = "public void "+getContainerEntryAdderName(table)+"(";
@@ -649,18 +602,17 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 				decl += ", ";
 		}
 		decl += ");";
-		ret += writeString(decl);
-		ret += emptyline();
+		appendString(decl);
+		appendEmptyline();
 		
-		ret += writeString("public void "+getContainerEntryDeleterName(table)+"(int index);");
-		ret += emptyline();
+		appendString("public void "+getContainerEntryDeleterName(table)+"(int index);");
+		appendEmptyline();
 		
-		ret += writeString("public List<String> get"+StringUtils.capitalize(table.getName())+"Row(int index);");
-		ret += emptyline();
+		appendString("public List<String> get"+StringUtils.capitalize(table.getName())+"Row(int index);");
+		appendEmptyline();
 
-		ret += writeString("public List<List<String>> "+getTableGetterName(table)+"();");
-		ret += emptyline();
-		return ret;
+		appendString("public List<List<String>> "+getTableGetterName(table)+"();");
+		appendEmptyline();
 	}
 	
 	public static String getContainerSizeGetterName(MetaContainerProperty p){

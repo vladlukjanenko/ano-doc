@@ -34,152 +34,131 @@ public class BasicServiceGenerator extends AbstractGenerator{
 	public List<FileEntry> generate(List<MetaModule>  modules, Context context){
 		List<FileEntry> ret = new ArrayList<FileEntry>(); 
 		
-		ret.add(new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".service"), "BasicService", generateBasicService(modules, context)));
-		ret.add(new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".service"), "BasicCMSService", generateBasicCMSService(modules, context)));
+		ret.add(new FileEntry(generateBasicService(modules, context)));
+		ret.add(new FileEntry(generateBasicCMSService(modules, context)));
 		
 		return ret;
 	}
 	
-	private String generateBasicService(List<MetaModule> modules, Context context){
+	private GeneratedClass generateBasicService(List<MetaModule> modules, Context context){
 		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		String ret = "";
+		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".service");
 		
-		ret += writeStatement("package "+context.getPackageName(MetaModule.SHARED)+".service");
-		ret += emptyline();
+		clazz.addImport("org.apache.log4j.Logger");
+		clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
 
 
-		ret += writeImport("org.apache.log4j.Logger");
-		ret += emptyline();
-		ret += writeImport("net.anotheria.asg.util.listener.IServiceListener");
-		ret += writeImport("java.util.List");
-		ret += writeImport("java.util.ArrayList");
-
-
-		//ret += emptyline();
-		//ret += writeImport(context.getPackageName()+".data.*");
+		clazz.setAbstractClass(true);
+		clazz.setName("BasicService");
 		
-		ret += emptyline();
-		ret += writeString("public abstract class BasicService{");
-		increaseIdent();
-		ret += emptyline();
+		startClassBody();
 
-		//ret += writeStatement("private Sorter sorter");
-
-		ret += writeStatement("protected Logger log");
-		ret += emptyline();
+		appendStatement("protected Logger log");
+		appendEmptyline();
 		
-		ret += writeString("//Support for listeners.");
-		ret += writeStatement("private List<IServiceListener> listeners");
+		appendString("//Support for listeners.");
+		appendStatement("private List<IServiceListener> listeners");
 
         //generate constructor
-        ret += writeString("protected BasicService(){");
+        appendString("protected BasicService(){");
         increaseIdent();
-        ret += writeStatement("log = Logger.getLogger(this.getClass())");
-        ret += writeStatement("listeners = new ArrayList<IServiceListener>()");
-        ret += closeBlock();
-        ret += emptyline();
+        appendStatement("log = Logger.getLogger(this.getClass())");
+        appendStatement("listeners = new ArrayList<IServiceListener>()");
+        append(closeBlock());
+        appendEmptyline();
         
         //support for listeners.
-        ret += writeString("public void addServiceListener(IServiceListener listener){");
+        appendString("public void addServiceListener(IServiceListener listener){");
         increaseIdent();
-        ret += writeStatement("listeners.add(listener)");
-        ret += closeBlock();
-        ret += emptyline();
+        appendStatement("listeners.add(listener)");
+        append(closeBlock());
+        appendEmptyline();
         
-        ret += writeString("public void removeServiceListener(IServiceListener listener){");
+        appendString("public void removeServiceListener(IServiceListener listener){");
         increaseIdent();
-        ret += writeStatement("listeners.remove(listener)");
-        ret += closeBlock();
-        ret += emptyline();
+        appendStatement("listeners.remove(listener)");
+        append(closeBlock());
+        appendEmptyline();
         
-        ret += writeString("public boolean hasServiceListeners(){");
+        appendString("public boolean hasServiceListeners(){");
         increaseIdent();
-        ret += writeStatement("return listeners.size() > 0");
-        ret += closeBlock();
-        ret += emptyline();
+        appendStatement("return listeners.size() > 0");
+        append(closeBlock());
+        appendEmptyline();
         
-        ret += writeString("protected List<IServiceListener> getServiceListeners(){");
+        appendString("protected List<IServiceListener> getServiceListeners(){");
         increaseIdent();
-        ret += writeStatement("return listeners");
-        ret += closeBlock();
+        appendStatement("return listeners");
+        append(closeBlock());
 
-		ret += closeBlock();
-
-			
-		return ret;
-
-		
+		return clazz;
 	}
 
-	private String generateBasicCMSService(List<MetaModule> modules, Context context){
+	private GeneratedClass generateBasicCMSService(List<MetaModule> modules, Context context){
 		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		String ret = "";
-		
-		ret += writeStatement("package "+context.getPackageName(MetaModule.SHARED)+".service");
-		ret += emptyline();
+		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".service");
 
-		ret += writeImport("net.anotheria.anodoc.data.Module");
-		ret += writeImport("net.anotheria.anodoc.service.IModuleService");
-		ret += writeImport("net.anotheria.anodoc.service.ModuleServiceFactory");
-		ret += emptyline();
+		clazz.addImport("net.anotheria.anodoc.data.Module");
+		clazz.addImport("net.anotheria.anodoc.service.IModuleService");
+		clazz.addImport("net.anotheria.anodoc.service.ModuleServiceFactory");
 
+		clazz.setName("BasicCMSService");
+		clazz.setParent("BasicService");
+		clazz.setAbstractClass(true);
 
-		//ret += emptyline();
-		//ret += writeImport(context.getPackageName()+".data.*");
+		startClassBody();
 		
-		ret += emptyline();
-		ret += writeString("public abstract class BasicCMSService extends BasicService{");
+		appendStatement("public static final String MY_OWNER_ID = "+quote(context.getOwner()));
+		appendStatement("protected IModuleService service");
+		appendEmptyline();
+
+		appendString("static{");
 		increaseIdent();
-		ret += emptyline();
-		
-		ret += writeStatement("public static final String MY_OWNER_ID = "+quote(context.getOwner()));
-		ret += writeStatement("protected IModuleService service");
-		ret += emptyline();
-
-		ret += writeString("static{");
-		increaseIdent();
-		ret += writeString("AnoDocConfigurator.configure();");
-        ret += closeBlock();
-        ret += emptyline();
+		appendString("AnoDocConfigurator.configure();");
+        append(closeBlock());
+        appendEmptyline();
         
         //generate constructor
-        ret += writeString("protected BasicCMSService(){");
+        appendString("protected BasicCMSService(){");
         increaseIdent();
-        ret += writeStatement("service = ModuleServiceFactory.createModuleService()");
-        ret += closeBlock();
-        ret += emptyline();
+        appendStatement("service = ModuleServiceFactory.createModuleService()");
+        append(closeBlock());
+        appendEmptyline();
         
         //generate update method.
-        ret += writeString("protected void updateModule(Module mod){");
+        appendString("protected void updateModule(Module mod){");
         increaseIdent();
-        ret += writeString("try{");
-        ret += writeString("service.storeModule(mod);");
-        ret += writeString("}catch(Exception e){");
+        appendString("try{");
+        appendString("service.storeModule(mod);");
+        appendString("}catch(Exception e){");
         increaseIdent();
-        ret += writeString("log.error(\"updateModule\", e);");
-        ret += closeBlock();
-        ret += closeBlock();
+        appendString("log.error(\"updateModule\", e);");
+        append(closeBlock());
+        append(closeBlock());
             
     
 
-        ret += writeString("protected Module getModule(String moduleId){");
+        appendString("protected Module getModule(String moduleId){");
         increaseIdent();
-        ret += writeString("try{");
-        ret += writeString("return service.getModule(MY_OWNER_ID, moduleId, true);");
-        ret += writeString("}catch(Exception e){");
+        appendString("try{");
+        appendString("return service.getModule(MY_OWNER_ID, moduleId, true);");
+        appendString("}catch(Exception e){");
         increaseIdent();
-        ret += writeString("log.error(\"getModule\", e);");
-        ret += closeBlock();
-        ret += writeStatement("return null");
-        ret += closeBlock();
-        ret += emptyline();
+        appendString("log.error(\"getModule\", e);");
+        append(closeBlock());
+        appendStatement("return null");
+        append(closeBlock());
+        appendEmptyline();
         
-		ret += closeBlock();
-		return ret;
-
-		
+		return clazz;
 	}
 }
 

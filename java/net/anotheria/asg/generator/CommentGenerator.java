@@ -67,7 +67,7 @@ public class CommentGenerator extends AbstractGenerator{
 			}
 		}
 		ret += COMM_END+CRLF;
-		ret += emptyline();
+		ret += CRLF;
 		
 		return ret;
 		

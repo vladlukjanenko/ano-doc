@@ -75,13 +75,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		timer.startExecution(section.getModule().getName()+"-"+section.getTitle()+"-All");
 		
 		timer.startExecution(section.getModule().getName()+"-view");
-		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getBaseActionName(section), generateBaseAction(section)));
+		files.add(new FileEntry(generateBaseAction(section)));
 		files.add(new FileEntry(generateShowAction(section)));
 		files.add(new FileEntry(generateMultiOpAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getSearchActionName(section), generateSearchAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDeleteActionName(section), generateDeleteAction(section)));
+		files.add(new FileEntry(generateSearchAction(section)));
+		files.add(new FileEntry(generateDeleteAction(section)));
 		files.add(new FileEntry(generateDuplicateAction(section)));
-		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getVersionInfoActionName(section), generateVersionInfoAction(section)));
+		files.add(new FileEntry(generateVersionInfoAction(section)));
 		
 		timer.stopExecution(section.getModule().getName()+"-view");
 		try{
@@ -90,16 +90,16 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				timer.startExecution(section.getModule().getName()+"-dialog-base");
 				files.add(new FileEntry(generateMultiOpDialogAction(section)));
 				files.add(new FileEntry(generateUpdateAction(section)));
-				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getEditActionName(section), generateEditAction(section)));
-				files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getNewActionName(section), generateNewAction(section)));
+				files.add(new FileEntry(generateEditAction(section)));
+				files.add(new FileEntry(generateNewAction(section)));
 				timer.stopExecution(section.getModule().getName()+"-dialog-base");
 
 				MetaDocument doc = section.getDocument();
 				
 				timer.startExecution(section.getModule().getName()+"-dialog-copylang");
 				if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
-					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getLanguageCopyActionName(section), generateLanguageCopyAction(section)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getSwitchMultilingualityActionName(section), generateSwitchMultilingualityAction(section)));
+					files.add(new FileEntry(generateLanguageCopyAction(section)));
+					files.add(new FileEntry(generateSwitchMultilingualityAction(section)));
 				}
 				timer.stopExecution(section.getModule().getName()+"-dialog-copylang");
 				
@@ -110,19 +110,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					if (pp instanceof MetaContainerProperty){
 						MetaContainerProperty mcp = (MetaContainerProperty)pp;
 					
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMultiOpActionName(doc, mcp), generateContainerMultiOpAction(section, mcp)));
+						files.add(new FileEntry(generateContainerMultiOpAction(section, mcp)));
 						
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerShowActionName(doc, mcp), generateContainerShowAction(section, mcp)));
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerAddEntryActionName(doc, mcp), generateContainerAddRowAction(section, mcp)));
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerQuickAddActionName(doc, mcp), generateContainerQuickAddAction(section, mcp)));
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerDeleteEntryActionName(doc, mcp), generateContainerDeleteEntryAction(section, mcp)));
-
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveEntryActionName(doc, mcp), generateContainerMoveEntryAction(section, mcp)));
-/*						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveUpEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveUpEntryAction(section, (MetaContainerProperty)pp)));
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveDownEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveDownEntryAction(section, (MetaContainerProperty)pp)));
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveTopEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveTopEntryAction(section, (MetaContainerProperty)pp)));
-						files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerMoveBottomEntryActionName(doc, (MetaContainerProperty)pp), generateContainerMoveBottomEntryAction(section, (MetaContainerProperty)pp)));
-*/
+						files.add(new FileEntry(generateContainerShowAction(section, mcp)));
+						files.add(new FileEntry(generateContainerAddRowAction(section, mcp)));
+						files.add(new FileEntry(generateContainerQuickAddAction(section, mcp)));
+						files.add(new FileEntry(generateContainerDeleteEntryAction(section, mcp)));
+						files.add(new FileEntry(generateContainerMoveEntryAction(section, mcp)));
 					}
 				}
 				timer.stopExecution(section.getModule().getName()+"-dialog-container");
@@ -137,8 +131,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		MetaDocument targetDocument = section.getDocument();
 		List<MetaProperty> links = targetDocument.getLinks();
 		if (links.size()>0){
-			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getShowQueryActionName(section), generateShowQueryAction(section)));
-			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getExecuteQueryActionName(section), generateExecuteQueryAction(section)));
+			files.add(new FileEntry(generateShowQueryAction(section)));
+			files.add(new FileEntry(generateExecuteQueryAction(section)));
 		}
 		timer.stopExecution(section.getModule().getName()+"-additional");
 		timer.stopExecution(section.getModule().getName()+"-"+section.getTitle()+"-All");
@@ -678,32 +672,26 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	///////////////////////////////////////////////////
 	////////              SEARCH             //////////
 	///////////////////////////////////////////////////
-	private String generateSearchAction(MetaModuleSection section){
-	    String ret = "";
+	private GeneratedClass generateSearchAction(MetaModuleSection section){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
 	    MetaDocument doc = section.getDocument();
 		List<MetaViewElement> elements = section.getElements();
 	    
-	    ret += writeStatement("package "+getPackage(section.getModule()));
-	    ret += emptyline();
+	    clazz.setPackageName(getPackage(section.getModule()));
 	    
 	    //write imports...
-	    ret += writeImport("java.util.List");
-	    ret += writeImport("java.util.ArrayList");
-	    ret += getStandardActionImports();
-	    //Removed 2 unneeded imports
-	    //ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    //ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.anodoc.query2.DocumentQuery");
-		ret += writeImport("net.anotheria.anodoc.query2.string.ContainsStringQuery");
-		ret += writeImport("net.anotheria.anodoc.query2.QueryResult");
-		ret += writeImport("net.anotheria.anodoc.query2.QueryResultEntry");
-		ret += writeImport("net.anotheria.anodoc.query2.ResultEntryBean");
+	    clazz.addImport("java.util.List");
+	    clazz.addImport("java.util.ArrayList");
+	    addStandardActionImports(clazz);
+	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
+	    clazz.addImport("net.anotheria.anodoc.query2.string.ContainsStringQuery");
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
+	    clazz.addImport("net.anotheria.anodoc.query2.QueryResultEntry");
+	    clazz.addImport("net.anotheria.anodoc.query2.ResultEntryBean");
 		
-
-		
-		//check if we have to property definition files.
-		HashMap<String,MetaEnumerationProperty> importedEnumerations = new HashMap<String,MetaEnumerationProperty>();
 		
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
@@ -712,28 +700,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaProperty p = doc.getField(field.getName());
 				if (p instanceof MetaEnumerationProperty){
 					MetaEnumerationProperty enumeration = (MetaEnumerationProperty)p;
-					if (importedEnumerations.get(enumeration.getName())==null){
-						EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(enumeration.getEnumeration());
-						ret += writeImport(EnumerationGenerator.getUtilsImport(type));
-						importedEnumerations.put(enumeration.getName(), enumeration);
-					}
+					EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(enumeration.getEnumeration());
+					clazz.addImport(EnumerationGenerator.getUtilsImport(type));
 				}
 				
 			}
 		}
 		
-		
-	    ret += writeString("public class "+getSearchActionName(section)+" extends "+getBaseActionName(section)+" {");
-	    increaseIdent();
-	    ret += emptyline();
-	    
-		ret += writeString("public "+getSearchActionName(section)+"(){");
-		increaseIdent();
-		ret += writeStatement("super()");
-		ret += closeBlock();
-		
 
-	    ret += writeString(getExecuteDeclaration());
+		clazz.setName(getSearchActionName(section));
+		clazz.setParent(getBaseActionName(section));
+
+		startClassBody();
+
+	    appendString(getExecuteDeclaration());
 	    increaseIdent();
 	    
 /*	    
@@ -743,68 +723,65 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		    //change this if more than one filter can be triggered at once.
 		    MetaFilter activeFilter = section.getFilters().get(0);
 		    String filterVarName = getFilterVariableName(activeFilter);
-		    ret += writeStatement("List<"+doc.getName()+"> "+unfilteredListName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
-		    ret += writeStatement("List<"+doc.getName()+"> "+listName+" = new ArrayList<"+doc.getName()+">()");
-		    ret += writeString("for (int i=0; i<"+unfilteredListName+".size(); i++)");
-		    ret += writeIncreasedString("if ("+filterVarName+".mayPass("+unfilteredListName+".get(i), "+quote(activeFilter.getFieldName())+", filterParameter))");
-		    ret += writeIncreasedStatement("\t"+listName+".add("+unfilteredListName+".get(i))");
+		    appendStatement("List<"+doc.getName()+"> "+unfilteredListName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
+		    appendStatement("List<"+doc.getName()+"> "+listName+" = new ArrayList<"+doc.getName()+">()");
+		    appendString("for (int i=0; i<"+unfilteredListName+".size(); i++)");
+		    appendIncreasedString("if ("+filterVarName+".mayPass("+unfilteredListName+".get(i), "+quote(activeFilter.getFieldName())+", filterParameter))");
+		    appendIncreasedStatement("\t"+listName+".add("+unfilteredListName+".get(i))");
 	    }else{
-		    ret += writeStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
+		    appendStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
 	    }
-		ret += writeStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
-		ret += writeString("for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){");
+		appendStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
+		appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){");
 		increaseIdent();
-		ret += writeStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
-		ret += writeStatement("beans.add(bean)");
-		ret += closeBlock();
+		appendStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
+		appendStatement("beans.add(bean)");
+	    append(closeBlock());
 	    ret += emptyline();
-	    ret += writeStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
+	    appendStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
 	
 */
 	    
-	    ret += writeStatement("String criteria = req.getParameter("+quote("criteria")+")");
-	    //ret += writeStatement("System.out.println("+quote("Criteria: ")+" + criteria)");
-	    ret += writeStatement("DocumentQuery query = new ContainsStringQuery(criteria)");
-	    ret += writeStatement("QueryResult result = "+getServiceGetterCall(section.getModule())+".executeQueryOn"+doc.getMultiple()+"(query)");
-	    //ret += writeStatement("System.out.println("+quote("Result: ")+" + result)");
-	    ret += writeString("if (result.getEntries().size()==0){");
-	    ret += writeIncreasedStatement("req.setAttribute("+quote("srMessage")+", "+quote("Nothing found.")+")");
-	    ret += writeString("}else{");
+	    appendStatement("String criteria = req.getParameter("+quote("criteria")+")");
+	    //appendStatement("System.out.println("+quote("Criteria: ")+" + criteria)");
+	    appendStatement("DocumentQuery query = new ContainsStringQuery(criteria)");
+	    appendStatement("QueryResult result = "+getServiceGetterCall(section.getModule())+".executeQueryOn"+doc.getMultiple()+"(query)");
+	    //appendStatement("System.out.println("+quote("Result: ")+" + result)");
+	    appendString("if (result.getEntries().size()==0){");
+	    appendIncreasedStatement("req.setAttribute("+quote("srMessage")+", "+quote("Nothing found.")+")");
+	    appendString("}else{");
 	    increaseIdent();
-	    ret += writeStatement("List<ResultEntryBean> beans = new ArrayList<ResultEntryBean>(result.getEntries().size())");
-	    ret += writeString("for (int i=0; i<result.getEntries().size(); i++){");
+	    appendStatement("List<ResultEntryBean> beans = new ArrayList<ResultEntryBean>(result.getEntries().size())");
+	    appendString("for (int i=0; i<result.getEntries().size(); i++){");
 	    increaseIdent();
-	    ret += writeStatement("QueryResultEntry entry = result.getEntries().get(i)");
-	    ret += writeStatement("ResultEntryBean bean = new ResultEntryBean()");
-	    ret += writeStatement("bean.setEditLink("+quote(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_EDIT)+"?pId=")+"+entry.getMatchedDocument().getId()+"+quote("&ts=")+"+System.currentTimeMillis())");
-	    ret += writeStatement("bean.setDocumentId(entry.getMatchedDocument().getId())");
-	    ret += writeStatement("bean.setPropertyName(entry.getMatchedProperty().getId())");
-	    ret += writeStatement("bean.setInfo(entry.getInfo().toHtml())");
-	    ret += writeStatement("beans.add(bean)");
-	    ret += closeBlock();
-	    ret += writeStatement("req.setAttribute("+quote("result")+", beans)");
-	    ret += closeBlock();
+	    appendStatement("QueryResultEntry entry = result.getEntries().get(i)");
+	    appendStatement("ResultEntryBean bean = new ResultEntryBean()");
+	    appendStatement("bean.setEditLink("+quote(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_EDIT)+"?pId=")+"+entry.getMatchedDocument().getId()+"+quote("&ts=")+"+System.currentTimeMillis())");
+	    appendStatement("bean.setDocumentId(entry.getMatchedDocument().getId())");
+	    appendStatement("bean.setPropertyName(entry.getMatchedProperty().getId())");
+	    appendStatement("bean.setInfo(entry.getInfo().toHtml())");
+	    appendStatement("beans.add(bean)");
+	    append(closeBlock());
+	    appendStatement("req.setAttribute("+quote("result")+", beans)");
+	    append(closeBlock());
 	    
-	    ret += writeStatement("return mapping.findForward(\"success\")");
-	    ret += closeBlock();
-	    ret += emptyline();
-	    ret += closeBlock();
-	    return ret;
+	    appendStatement("return mapping.findForward(\"success\")");
+	    append(closeBlock());
+	    return clazz;
 	}
 
-	private String generateShowQueryAction(MetaModuleSection section){
-		String ret = "";
+	private GeneratedClass generateShowQueryAction(MetaModuleSection section){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
 		MetaDocument doc = section.getDocument();
 	    
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
-		ret += getStandardActionImports();
-		ret += emptyline();
-		ret += writeImport("net.anotheria.webutils.bean.LabelValueBean");
-		ret += writeImport("java.util.List");
-		ret += writeImport("java.util.ArrayList");
-		ret += writeImport("java.util.Iterator");
-		ret += emptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
+		addStandardActionImports(clazz);
+		clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("java.util.Iterator");
 	
 		List<MetaProperty> links = doc.getLinks();
 		
@@ -822,24 +799,24 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaModule mod = GeneratorDataRegistry.getInstance().getModule(targetModuleName);
 				MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
 			
-				ret += writeImport(DataFacadeGenerator.getDocumentImport(context, targetDocument));
+				clazz.addImport(DataFacadeGenerator.getDocumentImport(context, targetDocument));
 			
 				linkTargets.add(lt);
 			}else{
 				//WARN implement relative linking.
 			}
 		}
-		ret += emptyline();
-
-		ret += writeString("public class "+getShowQueryActionName(section)+" extends "+getBaseActionName(section)+" {");
-		increaseIdent();
-		ret += emptyline();
 		
-		ret += writeString(getExecuteDeclaration());
-		increaseIdent();
-		ret += emptyline();
 		
-		//ret += writeStatement("Iterator it");
+		clazz.setName(getShowQueryActionName(section));
+		clazz.setParent(getBaseActionName(section));
+		
+		startClassBody();
+		appendString(getExecuteDeclaration());
+		increaseIdent();
+		appendEmptyline();
+		
+		//appendStatement("Iterator it");
 		
 		linkTargets = new HashSet<String>(); 
 
@@ -855,20 +832,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaModule mod = GeneratorDataRegistry.getInstance().getModule(targetModuleName);
 				MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
 			
-				ret += writeStatement("List<"+targetDocument.getName()+"> "+targetDocument.getMultiple().toLowerCase()+" = "+getServiceGetterCall(mod)+".get"+targetDocument.getMultiple()+"()");
-				ret += writeStatement("List<LabelValueBean> "+targetDocument.getMultiple().toLowerCase()+"Beans = new ArrayList<LabelValueBean>("+targetDocument.getMultiple().toLowerCase()+".size())");
-				ret += writeString("for(Iterator<"+targetDocument.getName()+"> it="+targetDocument.getMultiple().toLowerCase()+".iterator(); it.hasNext(); ){");
+				appendStatement("List<"+targetDocument.getName()+"> "+targetDocument.getMultiple().toLowerCase()+" = "+getServiceGetterCall(mod)+".get"+targetDocument.getMultiple()+"()");
+				appendStatement("List<LabelValueBean> "+targetDocument.getMultiple().toLowerCase()+"Beans = new ArrayList<LabelValueBean>("+targetDocument.getMultiple().toLowerCase()+".size())");
+				appendString("for(Iterator<"+targetDocument.getName()+"> it="+targetDocument.getMultiple().toLowerCase()+".iterator(); it.hasNext(); ){");
 				increaseIdent();
-				ret += writeStatement(targetDocument.getName()+" "+targetDocument.getVariableName()+" = ("+targetDocument.getName()+") it.next()");
+				appendStatement(targetDocument.getName()+" "+targetDocument.getVariableName()+" = ("+targetDocument.getName()+") it.next()");
 				String beanCreationCall = targetDocument.getMultiple().toLowerCase()+"Beans";
 				beanCreationCall+=".add(";
 				beanCreationCall+="new LabelValueBean(";
 				beanCreationCall+=targetDocument.getVariableName()+".getId(), ";
 				beanCreationCall+=targetDocument.getVariableName()+".getName()))";
-				ret += writeStatement(beanCreationCall);
-				ret += closeBlock();
-				ret += writeStatement("addBeanToRequest(req, "+quote(targetDocument.getMultiple().toLowerCase())+", "+targetDocument.getMultiple().toLowerCase()+"Beans)"); 
-				ret += emptyline();
+				appendStatement(beanCreationCall);
+				append(closeBlock());
+				appendStatement("addBeanToRequest(req, "+quote(targetDocument.getMultiple().toLowerCase())+", "+targetDocument.getMultiple().toLowerCase()+"Beans)"); 
+				appendEmptyline();
 				
 				linkTargets.add(lt);
 			}
@@ -876,65 +853,56 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		
 		
-		ret += writeStatement("return mapping.findForward(\"success\")");
-		ret += closeBlock();
-		
-		
-		
-		ret += closeBlock();
-		
-
-		return ret;
+		appendStatement("return mapping.findForward(\"success\")");
+		append(closeBlock());
+		return clazz;
 	}
 
-	private String generateExecuteQueryAction(MetaModuleSection section){
-		String ret = "";
+	private GeneratedClass generateExecuteQueryAction(MetaModuleSection section){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
 		MetaDocument doc = section.getDocument();
 		//List<MetaViewElement> elements = section.getElements();
 	    
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
-		ret += getStandardActionImports();
-		ret += writeImport("java.util.List");
-		ret += writeImport("java.util.ArrayList");
-		ret += emptyline();
-	    ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    ret += writeImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
-		ret += emptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
+		addStandardActionImports(clazz);
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(ModuleBeanGenerator.getListItemBeanImport(context, doc));
+		
+		clazz.setName(getExecuteQueryActionName(section));
+		clazz.setParent(getShowActionName(section));
 
-		ret += writeString("public class "+getExecuteQueryActionName(section)+" extends "+getShowActionName(section)+" {");
+		startClassBody();
+		appendString(getExecuteDeclaration());
 		increaseIdent();
-		ret += emptyline();
-
-		ret += writeString(getExecuteDeclaration());
-		increaseIdent();
-		ret += emptyline();
-		ret += writeStatement("String property = req.getParameter("+quote("property")+")");
-		ret += writeStatement("String criteria = req.getParameter("+quote("criteria")+")");
-		ret += writeString("if( criteria!=null && criteria.length()==0)");
-		ret += writeIncreasedStatement("criteria = null;");
-		//ret += writeStatement("System.out.println(property+\"=\"+criteria)");
+		appendEmptyline();
+		appendStatement("String property = req.getParameter("+quote("property")+")");
+		appendStatement("String criteria = req.getParameter("+quote("criteria")+")");
+		appendString("if( criteria!=null && criteria.length()==0)");
+		appendIncreasedStatement("criteria = null;");
+		//appendStatement("System.out.println(property+\"=\"+criteria)");
 		
 		String listName = doc.getMultiple().toLowerCase();
-		ret += writeStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"ByProperty(property, criteria)");
-		//ret += writeStatement("System.out.println(\"result: \"+"+listName+")");
+		appendStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"ByProperty(property, criteria)");
+		//appendStatement("System.out.println(\"result: \"+"+listName+")");
 
-		ret += writeStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
-		ret += writeString("for (int i=0; i<"+listName+".size(); i++){");
+		appendStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
+		appendString("for (int i=0; i<"+listName+".size(); i++){");
 		increaseIdent();
-		ret += writeStatement("beans.add("+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"(("+doc.getName()+")"+listName+".get(i)))");
-		ret += closeBlock();
-		ret += emptyline();
-		ret += writeStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
+		appendStatement("beans.add("+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"(("+doc.getName()+")"+listName+".get(i)))");
+		append(closeBlock());
+		appendEmptyline();
+		appendStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
 		
 		
-		ret += writeStatement("return mapping.findForward(\"success\")");
-		ret +=closeBlock();
+		appendStatement("return mapping.findForward(\"success\")");
+		append(closeBlock());
 
-		ret += closeBlock();
-		
-
-		return ret;
+		return clazz;
 	}
 
 
@@ -950,28 +918,28 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return "make"+StringUtils.capitalize(beanName);
 	}
 	
-	private String generateVersionInfoAction(MetaModuleSection section){
+	private GeneratedClass generateVersionInfoAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
-			return "";
-		startNewJob();
+			return null;
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
 		MetaDocument doc = section.getDocument();
-		appendStatement("package ", getPackage(section.getModule()));
-		appendEmptyline();
+		
+		clazz.setPackageName(getPackage(section.getModule()));
+		addStandardActionImports(clazz);
 
-		//write imports...
-		appendStandardActionImports();
-	    appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    appendImport("net.anotheria.util.NumberUtils");
-	    appendEmptyline();
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    clazz.addImport("net.anotheria.util.NumberUtils");
 
-		appendString( "public class ",getVersionInfoActionName(section)," extends ",getBaseActionName(section)," {");
-		increaseIdent();
-		appendEmptyline();
+	    
+		clazz.setName(getVersionInfoActionName(section));
+		clazz.setParent(getBaseActionName(section));
+		startClassBody();
 	
 		generateVersionInfoActionMethod(section, null);
 		
-		append(closeBlock()); 
-		return getCurrentJobContent().toString();
+		return clazz;
 }
 	
 	private void generateVersionInfoActionMethod(MetaModuleSection section, String methodName){
@@ -1119,29 +1087,26 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); ;
 	}
 	
-	private String generateSwitchMultilingualityAction(MetaModuleSection section){
+	private GeneratedClass generateSwitchMultilingualityAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
-			return "";
-		startNewJob();
+			return null;
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		MetaDocument doc = section.getDocument();
-		appendStatement("package "+getPackage(section.getModule()));
-		appendEmptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
 
 		//write imports...
-		appendStandardActionImports();
-	    appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    appendImport("net.anotheria.asg.data.MultilingualObject");
-	    appendEmptyline();
+		addStandardActionImports(clazz);
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    clazz.addImport("net.anotheria.asg.data.MultilingualObject");
 
-	    appendComment("This class enables or disables support for multiple languages for a particular document.");
-		appendString( "public class "+getSwitchMultilingualityActionName(section)+" extends "+getBaseActionName(section)+" {");
-		increaseIdent();
-		appendEmptyline();
-		
+	    clazz.setTypeComment("This class enables or disables support for multiple languages for a particular document.");
+		clazz.setName(getSwitchMultilingualityActionName(section));
+		clazz.setParent(getBaseActionName(section));
+
+		startClassBody();
 		generateSwitchMultilingualityActionMethod(section, null);
-	
-		append(closeBlock()); // end class
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 	
 	private void generateSwitchMultilingualityActionMethod(MetaModuleSection section, String methodName){
@@ -1164,28 +1129,26 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	
-	private String generateLanguageCopyAction(MetaModuleSection section){
+	private GeneratedClass generateLanguageCopyAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
-			return "";
-		startNewJob();
+			return null;
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		MetaDocument doc = section.getDocument();
-		appendStatement("package "+getPackage(section.getModule()));
-		appendEmptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
 
 		//write imports...
-		appendStandardActionImports();
-	    appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    appendEmptyline();
+		addStandardActionImports(clazz);
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
 	    
-	    appendComment("This class copies multilingual contents from one language to another in a given document");
-		appendString( "public class "+getLanguageCopyActionName(section)+" extends "+getBaseActionName(section)+" {");
-		increaseIdent();
-		appendEmptyline();
+	    clazz.setTypeComment("This class copies multilingual contents from one language to another in a given document");
+		clazz.setName(getLanguageCopyActionName(section));
+		clazz.setParent(getBaseActionName(section));
 
+		startClassBody();
 		generateLanguageCopyActionMethod(section, null);
 		
-		append(closeBlock()); ; // end class
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 	
 	private void generateLanguageCopyActionMethod(MetaModuleSection section, String methodName){
@@ -1214,25 +1177,21 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); ; //end doExecute
 	}
 
-	private String generateEditAction(MetaModuleSection section){
-		startNewJob();
+	private GeneratedClass generateEditAction(MetaModuleSection section){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
 		
-		appendStatement("package ", getPackage(section.getModule()));
-		appendEmptyline();
-
-		//write imports...
-		appendStandardActionImports();
-		appendImport( ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		appendImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
+		clazz.setPackageName(getPackage(section.getModule()));
+		addStandardActionImports(clazz);
+		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
 		if (doc.isMultilingual())
-			appendImport("net.anotheria.asg.data.MultilingualObject");
-		appendEmptyline();
-		
-		boolean listImported = false;
+			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
 		
 		//check if we have to import list.
 		for (int i=0; i<elements.size(); i++){
@@ -1241,16 +1200,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());
 				if (p.isLinked() || p instanceof MetaEnumerationProperty){
-					appendImport("java.util.List");
-					appendImport("java.util.ArrayList");
-					appendImport("net.anotheria.webutils.bean.LabelValueBean");
-					listImported = true;
+					clazz.addImport("java.util.List");
+					clazz.addImport("java.util.ArrayList");
+					clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
 					break;
 				}
 			}
 		}
 		
-		List<String> customImports = new ArrayList<String>();
 		//check if we have to property definition files.
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
@@ -1260,39 +1217,31 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				if (p instanceof MetaEnumerationProperty){
 					MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
 					EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-					String customImport = EnumerationGenerator.getUtilsImport(type);
-					if (customImports.indexOf(customImport)==-1){
-					    appendImport(customImport);
-					    customImports.add(customImport);
-					}
+					clazz.addImport(EnumerationGenerator.getUtilsImport(type));
 				}
 			}
 		}
 		
 	    List<DirectLink> backlinks = GeneratorDataRegistry.getInstance().findLinksToDocument(doc);
 	    if (backlinks.size()>0){
-	    	appendImport("net.anotheria.anodoc.query2.QueryProperty");
-	    	appendImport("net.anotheria.asg.util.bean.LinkToMeBean");
-	    	if (!listImported){
-	    		listImported=true;
-				appendImport("java.util.List");
-				appendImport("java.util.ArrayList");
-	    	}
+	    	clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
+	    	clazz.addImport("net.anotheria.asg.util.bean.LinkToMeBean");
+	    	clazz.addImport("java.util.List");
+	    	clazz.addImport("java.util.ArrayList");
 	    	for (DirectLink l : backlinks){
-	    		String imp = DataFacadeGenerator.getDocumentImport(context, l.getDocument());
-	    		if (customImports.indexOf(imp)==-1){
-	    			appendImport(imp);
-	    			customImports.add(imp);
-	    		}
+    			clazz.addImport(DataFacadeGenerator.getDocumentImport(context, l.getDocument()));
 	    	}
 	    }
 		
-		appendEmptyline();
+		startClassBody();
 		
+		clazz.setName(getEditActionName(section));
+		clazz.setParent(getShowActionName(section));
+
+		startClassBody();
 		generateEditActionMethod(section, "anoDocExecute");
 
-		append(closeBlock());
-		return getCurrentJobContent().toString();
+		return clazz;
 
 	}
 
@@ -1304,9 +1253,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		EnumerationPropertyGenerator enumProGenerator = new EnumerationPropertyGenerator(doc);
 	    List<DirectLink> backlinks = GeneratorDataRegistry.getInstance().findLinksToDocument(doc);
 
-		appendString( "public class "+getEditActionName(section)+" extends "+getShowActionName(section)+" {");
-		increaseIdent();
-		appendEmptyline();
 		
 		appendString( getExecuteDeclaration(methodname));
 		increaseIdent();
@@ -1490,26 +1436,22 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 	}
 
-	private String generateDeleteAction(MetaModuleSection section){
+	private GeneratedClass generateDeleteAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
-			return "";
-		startNewJob();
-	    appendStatement("package "+getPackage(section.getModule()));
-	    appendEmptyline();
+			return null;
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		clazz.setPackageName(getPackage(section.getModule()));
 
 	    //write imports...
-	    appendStandardActionImports();
-	    
-	    appendString( "public class "+getDeleteActionName(section)+" extends "+getBaseActionName(section)+" {");
-	    increaseIdent();
-	    appendEmptyline();
+	    addStandardActionImports(clazz);
+	    clazz.setName(getDeleteActionName(section));
+	    clazz.setParent(getBaseActionName(section));
 		
+	    startClassBody();
 	    generateDeleteActionMethod(section, null);
-	    appendEmptyline();
-
 	    
-	    append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 
 	private void generateDeleteActionMethod(MetaModuleSection section, String methodName){
@@ -1562,8 +1504,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    append(closeBlock());
 	}
 
-	private String generateNewAction(MetaModuleSection section){
-		startNewJob();
+	private GeneratedClass generateNewAction(MetaModuleSection section){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
 		//List<MetaViewElement> elements = dialog.getElements();
@@ -1571,13 +1517,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		EnumerationPropertyGenerator enumPropGen = new EnumerationPropertyGenerator(doc);
 		
-		appendStatement("package "+getPackage(section.getModule()));
-	    appendEmptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
 	    
 		//write imports...
-		appendStandardActionImports();
-		appendImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
-	    appendEmptyline();
+		addStandardActionImports(clazz);
+		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(context, dialog, doc));
 	    
 		//check if we have to import list.
 		for (int i=0; i<elements.size(); i++){
@@ -1586,10 +1530,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());
 				if (p.isLinked() || p instanceof MetaEnumerationProperty){
-					appendImport("java.util.List");
-					appendImport("java.util.ArrayList");
-					appendImport("net.anotheria.webutils.bean.LabelValueBean");
-					break;
+					clazz.addImport("java.util.List");
+					clazz.addImport("java.util.ArrayList");
+					clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
 				}
 			}
 		}
@@ -1604,22 +1547,18 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaProperty p = doc.getField(field.getName());
 				if (p instanceof MetaEnumerationProperty){
 					MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
-					if (importedEnumerations.get(mep.getName())==null){
-						EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-						appendImport(EnumerationGenerator.getUtilsImport(type));
-						//System.out.println("Adding enumeration import: "+mep.getType()+", "+mep+", "+mep.getName());
-						importedEnumerations.put(mep.getName(), mep);
-					}
+					EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
+					clazz.addImport(EnumerationGenerator.getUtilsImport(type));
 				}
 			}
 		}
 		
-	    appendEmptyline();
-	    
-		appendString( "public class "+getNewActionName(section)+" extends "+getShowActionName(section)+" {");
-		increaseIdent();
-	    appendEmptyline();
-	    
+
+		clazz.setName(getNewActionName(section));
+		clazz.setParent(getShowActionName(section));
+		
+		
+		startClassBody();
 		appendString( getExecuteDeclaration());
 		increaseIdent();
 	
@@ -1679,34 +1618,34 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());
-		appendEmptyline();
-	    
-		append(closeBlock());
-		return getCurrentJobContent().toString();
+
+		return clazz;
 	}
 
-	private String generateBaseAction(MetaModuleSection section){
-		startNewJob();
+	private GeneratedClass generateBaseAction(MetaModuleSection section){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 
-	    appendStatement("package "+getPackage(section.getModule()));
+	    clazz.setPackageName(getPackage(section.getModule()));
+	    clazz.setAbstractClass(true);
+	    
+	    
 	    appendEmptyline();
-	    appendImport(context.getPackageName(MetaModule.SHARED)+".action."+BaseViewActionGenerator.getViewActionName(view));
+	    clazz.addImport(context.getPackageName(MetaModule.SHARED)+".action."+BaseViewActionGenerator.getViewActionName(view));
 	    appendEmptyline();
 	    
-	    appendString( "public abstract class "+getBaseActionName(section)+" extends "+BaseViewActionGenerator.getViewActionName(view)+" {");
-	    increaseIdent();
-	    appendEmptyline();
+	    clazz.setName(getBaseActionName(section));
+	    clazz.setParent(BaseViewActionGenerator.getViewActionName(view));
 
+	    startClassBody();
 	    //generate getTitle
 	    appendString( "public String getTitle(){");
 	    increaseIdent();
 	    appendStatement("return "+quote(section.getTitle()));
 	    append(closeBlock());
-	    appendEmptyline();
 	    
-	    
-	    append(closeBlock());
-	    return getCurrentJobContent().toString();
+	    return clazz;
 	}
 	
 	/**
@@ -1849,26 +1788,27 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 	
 
-	private String generateContainerMultiOpAction(MetaModuleSection section, MetaContainerProperty containerProperty){
-		startNewJob();
+	private GeneratedClass generateContainerMultiOpAction(MetaModuleSection section, MetaContainerProperty containerProperty){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
 		MetaDocument doc = section.getDocument();
 
-	    appendStatement("package "+getPackage(section.getModule()));
-	    appendEmptyline();
+	    clazz.setPackageName(getPackage(section.getModule()));
 
 	    //write imports...
-		appendImport("java.util.List");
-		appendImport("java.util.ArrayList");
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		appendImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
 		if (containerProperty instanceof MetaListProperty){
 			MetaProperty containedProperty = ((MetaListProperty)containerProperty).getContainedProperty();
 			if(containedProperty.isLinked()){
 				MetaListProperty list = ((MetaListProperty)containerProperty);
-				appendImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, containerProperty));
+				clazz.addImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, containerProperty));
 	
 				MetaLink link = (MetaLink)list.getContainedProperty();
 				
@@ -1876,26 +1816,24 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
 						doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
 				MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
-				appendImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
-				appendImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
-				appendImport("net.anotheria.webutils.bean.LabelValueBean");
-				appendImport("net.anotheria.anodoc.data.NoSuchDocumentException");
-			    appendImport("net.anotheria.util.StringUtils");
+				clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
+				clazz.addImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
+				clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
+				clazz.addImport("net.anotheria.anodoc.data.NoSuchDocumentException");
+				clazz.addImport("net.anotheria.util.StringUtils");
 			}
 			if(containedProperty instanceof MetaEnumerationProperty){
-				appendImport("net.anotheria.webutils.bean.LabelValueBean");
+				clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
 				EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) containedProperty).getEnumeration());
-				appendImport(EnumerationGenerator.getUtilsImport(type));
+				clazz.addImport(EnumerationGenerator.getUtilsImport(type));
 			}
 		}
 		
-		appendImport("net.anotheria.asg.exception.ASGRuntimeException");
+		clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
 
-	    appendEmptyline();
-
-		appendString( "public class "+getContainerMultiOpActionName(doc, containerProperty)+" extends "+getBaseActionName(section)+" {");
-	    increaseIdent();
-	    appendEmptyline();
+		clazz.setName(getContainerMultiOpActionName(doc, containerProperty));
+		clazz.setParent(getBaseActionName(section));
+		startClassBody();
 	    appendString( getExecuteDeclaration(null));
 	    increaseIdent();
 	    appendStatement("String path = stripPath(mapping.getPath())");
@@ -1933,12 +1871,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		    }
 		}
 
-		append(closeBlock());
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 
 	
-	private String generateContainerAddRowAction(MetaModuleSection section, MetaContainerProperty container){
+	private GeneratedClass generateContainerAddRowAction(MetaModuleSection section, MetaContainerProperty container){
 		if (container instanceof MetaTableProperty)
 			return generateTableAddRowAction(section, (MetaTableProperty)container);
 
@@ -1948,36 +1885,32 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		throw new RuntimeException("Unsupported container type: "+container.getClass().getName());
 	}
 	
-	private String generateContainerQuickAddAction(MetaModuleSection section, MetaContainerProperty container){
+	private GeneratedClass generateContainerQuickAddAction(MetaModuleSection section, MetaContainerProperty container){
 		if (container instanceof MetaListProperty && ((MetaListProperty)container).getContainedProperty().isLinked())
 			return generateListQuickAddAction(section, (MetaListProperty)container);
-		return "";
+		return null;
 		//throw new RuntimeException("Unsupported container type: "+container.getClass().getName());
 	}
 
-	private String generateListAddRowAction(MetaModuleSection section, MetaListProperty list){
+	private GeneratedClass generateListAddRowAction(MetaModuleSection section, MetaListProperty list){
 		if (USE_MULTIOP_ACTIONS)
 			return null;
-		startNewJob();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 
 		MetaDocument doc = section.getDocument(); 
 
-		appendStatement("package ", getPackage(section.getModule()));
-		appendEmptyline();
-	    
-		//write imports...
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		appendImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
-		appendEmptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
 		
-		appendString( "public class "+getContainerAddEntryActionName(doc, list)+" extends "+getContainerShowActionName(doc, list)+"{");	
-		increaseIdent();
-		appendEmptyline();
+		clazz.setName(getContainerAddEntryActionName(doc, list));
+		clazz.setParent(getContainerShowActionName(doc, list));	
+
 		generateListAddRowActionMethod(section, list, null);
-		append(closeBlock());
 		
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 	
 	private void generateListAddRowActionMethod(MetaModuleSection section, MetaListProperty list, String methodName){
@@ -2002,33 +1935,28 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock());
 	}
 	
-	private String generateListQuickAddAction(MetaModuleSection section, MetaListProperty list){
+	private GeneratedClass generateListQuickAddAction(MetaModuleSection section, MetaListProperty list){
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 
-		startNewJob();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 
 		MetaDocument doc = section.getDocument();
 
-		appendStatement("package "+getPackage(section.getModule()));
-		appendEmptyline();
-	    
-		//write imports...
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		appendImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
-		appendEmptyline();
-		appendImport("net.anotheria.util.StringUtils");
+		clazz.setPackageName(getPackage(section.getModule()));
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
+		clazz.addImport("net.anotheria.util.StringUtils");
 		
-		appendString("public class "+getContainerQuickAddActionName(doc, list)+" extends "+getContainerShowActionName(doc, list)+"{");	
-		increaseIdent();
-		appendEmptyline();
-		
+		clazz.setName(getContainerQuickAddActionName(doc, list));
+		clazz.setParent(getContainerShowActionName(doc, list));	
+
+		startClassBody();
 		generateListQuickAddActionMethod(section, list, null);
 		
-		append(closeBlock());
-		
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 
 	private void generateListQuickAddActionMethod(MetaModuleSection section, MetaListProperty list, String methodName){
@@ -2068,29 +1996,29 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 	}
 
-	private String generateTableAddRowAction(MetaModuleSection section, MetaTableProperty table){
-		String ret = "";
+	private GeneratedClass generateTableAddRowAction(MetaModuleSection section, MetaTableProperty table){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
 		MetaDocument doc = section.getDocument();
-
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
 	    
 		//write imports...
-		ret += getStandardActionImports();
-		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
-		ret += emptyline();
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
 		
-		ret += writeString("public class "+getContainerAddEntryActionName(doc, table)+" extends "+getContainerShowActionName(doc, table)+"{");	
+		clazz.setName(getContainerAddEntryActionName(doc, table));
+		clazz.setParent(getContainerShowActionName(doc, table));	
+
+		startClassBody();
+		appendString(getExecuteDeclaration());
 		increaseIdent();
-		ret += emptyline();
-		ret += writeString(getExecuteDeclaration());
-		increaseIdent();
-		ret += writeStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" form = ("+ModuleBeanGenerator.getContainerEntryFormName(table)+") af");
-		ret += writeStatement("String id = form.getOwnerId()");
-		ret += writeStatement(doc.getName()+" "+doc.getVariableName());
-		ret += writeStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" form = ("+ModuleBeanGenerator.getContainerEntryFormName(table)+") af");
+		appendStatement("String id = form.getOwnerId()");
+		appendStatement(doc.getName()+" "+doc.getVariableName());
+		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 		
 		String call = "";
 		List<MetaProperty> columns = table.getColumns();
@@ -2101,39 +2029,32 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		    if (i<columns.size()-1)
 		        call += ", ";
 		}
-		ret += writeStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(table)+"("+call+")");
-		ret += writeStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
-		ret += writeStatement("return "+getSuperCall());
-		ret += closeBlock();
-		ret += closeBlock();
-		
-		return ret;
+		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(table)+"("+call+")");
+		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
+		appendStatement("return "+getSuperCall());
+		append(closeBlock());
+		return clazz;
 	}
 
-	private String generateContainerDeleteEntryAction(MetaModuleSection section, MetaContainerProperty container){
+	private GeneratedClass generateContainerDeleteEntryAction(MetaModuleSection section, MetaContainerProperty container){
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 
-		startNewJob();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		 
 		MetaDocument doc = section.getDocument();
 
-		appendStatement("package "+getPackage(section.getModule()));
-		appendEmptyline();
-	    
-		//write imports...
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		appendEmptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
 		
-		appendString("public class "+getContainerDeleteEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
-		increaseIdent();
-		appendEmptyline();
+		clazz.setName(getContainerDeleteEntryActionName(doc, container));
+		clazz.setParent(getContainerShowActionName(doc, container));	
 
+		startClassBody();
 		generateContainerDeleteEntryActionMethod(section, container, null);
-		append(closeBlock());
-		
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 
 	private void generateContainerDeleteEntryActionMethod(MetaModuleSection section, MetaContainerProperty container, String methodName){		
@@ -2155,7 +2076,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock());
 	}
 
-	private String generateContainerMoveEntryAction(MetaModuleSection section, MetaContainerProperty container){
+	private GeneratedClass generateContainerMoveEntryAction(MetaModuleSection section, MetaContainerProperty container){
 		if (!(container instanceof MetaListProperty)){
 			//TODO decomment
 			//System.out.println("WARN moveUp only supported by lists, "+container+" is not a list");
@@ -2165,31 +2086,27 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 
-		
-		startNewJob();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 			
 		MetaListProperty sourceProperty = (MetaListProperty)container;
 		MetaDocument doc = section.getDocument();
 
-		appendStatement("package "+getPackage(section.getModule()));
-		appendEmptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
 	    
 		//write imports...
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		appendImport("net.anotheria.asg.exception.ASGRuntimeException");
-		appendImport("java.util.List");
-		appendEmptyline();
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
+		clazz.addImport("java.util.List");
 		
-		appendString("public class "+getContainerMoveEntryActionName(doc, container)+" extends "+getContainerShowActionName(doc, container)+"{");	
-		increaseIdent();
-		appendEmptyline();
+		clazz.setName(getContainerMoveEntryActionName(doc, container));
+		clazz.setParent(getContainerShowActionName(doc, container));	
 
+		startClassBody();
 		generateContainerMoveEntryActionMethod(section, container, null);
 		
-		appendEmptyline();
-		append(closeBlock());
-		return getCurrentJobContent().toString();
+		return clazz;
 
 		
 	}
@@ -2267,7 +2184,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	
-	private String generateContainerShowAction(MetaModuleSection section, MetaContainerProperty container){
+	private GeneratedClass generateContainerShowAction(MetaModuleSection section, MetaContainerProperty container){
 		if (container instanceof MetaTableProperty)
 			return generateTableShowAction(section, (MetaTableProperty)container);
 
@@ -2277,45 +2194,43 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		throw new RuntimeException("Unsupported container type: "+container.getClass().getName());
 	}
 
-	private String generateListShowAction(MetaModuleSection section, MetaListProperty list){
+	private GeneratedClass generateListShowAction(MetaModuleSection section, MetaListProperty list){
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 
-		startNewJob();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 
 		MetaDocument doc = section.getDocument();
 
-		appendStatement("package "+getPackage(section.getModule()));
-		appendEmptyline();
-	    
-		//write imports...
-		appendImport("java.util.List");
-		appendImport("java.util.ArrayList");
-		appendStandardActionImports();
-		appendImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		appendImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
+		clazz.setPackageName(getPackage(section.getModule()));
+
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
 		if (list.getContainedProperty().isLinked()){
-			appendImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
+			clazz.addImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
 			MetaLink link = (MetaLink)list.getContainedProperty();
 			
 			String tDocName = link.getTargetDocumentName(); 
 			MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
 					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
 			MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
-			appendImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
-			appendImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
-			appendImport("net.anotheria.anodoc.data.NoSuchDocumentException");
+			clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
+			clazz.addImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
+			clazz.addImport("net.anotheria.anodoc.data.NoSuchDocumentException");
 
 		}
-		appendEmptyline();
 
-		appendString( "public class "+getContainerShowActionName(doc, list)+" extends "+getBaseActionName(section)+" {");
-		increaseIdent();
-		appendEmptyline();
+		clazz.setName(getContainerShowActionName(doc, list));
+		clazz.setParent(getBaseActionName(section));
+
+		startClassBody();
 		generateListShowActionMethod(section, list, null);
-		append(closeBlock()); 
 		
-		return getCurrentJobContent().toString();
+		return clazz;
 	}	
 
 	private void generateListShowActionMethod(MetaModuleSection section, MetaListProperty list, String methodName){
@@ -2430,62 +2345,60 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); 
 	}
 	
-	private String generateTableShowAction(MetaModuleSection section, MetaTableProperty table){
-		String ret = "";
+	private GeneratedClass generateTableShowAction(MetaModuleSection section, MetaTableProperty table){
 		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		MetaDocument doc = section.getDocument();
 
-		ret += writeStatement("package "+getPackage(section.getModule()));
-		ret += emptyline();
+		clazz.setPackageName(getPackage(section.getModule()));
 	    
-		//write imports...
-		ret += writeImport("java.util.List");
-		ret += writeImport("java.util.ArrayList");
-		ret += getStandardActionImports();
-		ret += writeImport(DataFacadeGenerator.getDocumentImport(context, doc));
-		ret += writeImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
-		ret += emptyline();
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
 
-		ret += writeString("public class "+getContainerShowActionName(doc, table)+" extends "+getBaseActionName(section)+" {");
-		increaseIdent();
-		ret += emptyline();
-		ret += writeString(getExecuteDeclaration());
-		increaseIdent();
-		ret += writeStatement("String id = getStringParameter(req, PARAM_ID)");
-		ret += writeStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
-		ret += emptyline();
+		clazz.setName(getContainerShowActionName(doc, table));
+		clazz.setParent(getBaseActionName(section));
 		
-		ret += writeStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(table)+"() ");
-		ret += writeStatement("form.setPosition(\"-1\")");
-		ret += writeStatement("form.setOwnerId("+doc.getVariableName()+".getId())");	
-		ret += writeStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerEntryFormName(doc, table))+", form)");
-		ret += emptyline();
-		
-		ret += writeString("// generate table...");
-		ret += writeStatement("List beans = new ArrayList()");
-		ret += writeStatement("List rows  = "+doc.getVariableName()+"."+DataFacadeGenerator.getTableGetterName(table)+"()");
-		ret += writeString("for (int i=0; i<rows.size(); i++){");
+		startClassBody();
+		appendString(getExecuteDeclaration());
 		increaseIdent();
-		ret += writeStatement("List row = (List) rows.get(i)");
-		ret += writeStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" bean = new "+ModuleBeanGenerator.getContainerEntryFormName(table)+"()");
-		ret += writeStatement("bean.setOwnerId("+doc.getVariableName()+".getId())");
-		ret += writeStatement("bean.setPosition(\"\"+i)");
+		appendStatement("String id = getStringParameter(req, PARAM_ID)");
+		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+		appendEmptyline();
+		
+		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(table)+"() ");
+		appendStatement("form.setPosition(\"-1\")");
+		appendStatement("form.setOwnerId("+doc.getVariableName()+".getId())");	
+		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerEntryFormName(doc, table))+", form)");
+		appendEmptyline();
+		
+		appendString("// generate table...");
+		appendStatement("List beans = new ArrayList()");
+		appendStatement("List rows  = "+doc.getVariableName()+"."+DataFacadeGenerator.getTableGetterName(table)+"()");
+		appendString("for (int i=0; i<rows.size(); i++){");
+		increaseIdent();
+		appendStatement("List row = (List) rows.get(i)");
+		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" bean = new "+ModuleBeanGenerator.getContainerEntryFormName(table)+"()");
+		appendStatement("bean.setOwnerId("+doc.getVariableName()+".getId())");
+		appendStatement("bean.setPosition(\"\"+i)");
 		List<MetaProperty> columns = table.getColumns();
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty p = columns.get(i);
 			String setter = "bean.set"+StringUtils.capitalize(table.extractSubName(p));
 			setter += "((String)row.get("+i+"))";
-			ret += writeStatement(setter);
+			appendStatement(setter);
 		}
-		ret += writeStatement("beans.add(bean)");
-		ret += closeBlock();		
-		ret += writeStatement("addBeanToRequest(req, "+quote("rows")+", beans)");
+		appendStatement("beans.add(bean)");
+		append(closeBlock());		
+		appendStatement("addBeanToRequest(req, "+quote("rows")+", beans)");
 		
-		ret += writeStatement("return mapping.findForward("+quote("success")+")");
-		ret += closeBlock();
-		ret += closeBlock();
+		appendStatement("return mapping.findForward("+quote("success")+")");
+		append(closeBlock());		
 		
-		return ret;
+		return clazz;
 	}
 	
 	public String getFormActionName(MetaForm form){

@@ -8,6 +8,7 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.ConfiguratorGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
@@ -28,175 +29,166 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		return StringUtils.capitalize(context.getApplicationName())+"XMLImporter";
 	}
 	
-	private String generateDocumentParser(){
-		String ret = "";
-		ret += writeString("public static Document parseDocument(String content) throws JDOMException, IOException{");
+	private void generateDocumentParser(){
+		appendString("public static Document parseDocument(String content) throws JDOMException, IOException{");
 		increaseIdent();
-		ret += writeStatement("SAXBuilder reader = new SAXBuilder();");
-		ret += writeStatement("reader.setValidation(false)");
-		ret += writeStatement("Document doc = reader.build(new StringReader(content))");
-		ret += writeStatement("return doc");
-		
-		ret += closeBlock();
-		return ret;
-
+		appendStatement("SAXBuilder reader = new SAXBuilder();");
+		appendStatement("reader.setValidation(false)");
+		appendStatement("Document doc = reader.build(new StringReader(content))");
+		appendStatement("return doc");
+		append(closeBlock());
 	}
 	
 	private FileEntry generateImporter(List<MetaModule> modules, Context context){
-		String ret = "";
 		
-		ret += writeStatement("package "+context.getServicePackageName(MetaModule.SHARED));
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		ret += writeImport("java.util.List");
-		ret += writeImport("java.util.ArrayList");
-		ret += writeImport("java.io.File");
-		ret += writeImport("java.io.FileOutputStream");
-		ret += writeImport("java.io.OutputStream");
-		ret += writeImport("java.io.IOException");
-		ret += writeImport("java.io.OutputStreamWriter");
-		ret += emptyline();
+		clazz.setPackageName(context.getServicePackageName(MetaModule.SHARED));
 		
-		ret += writeImport("org.jdom.Element");
-		ret += writeImport("org.jdom.Attribute");
-		ret += writeImport("org.jdom.Document");
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("java.io.File");
+		clazz.addImport("java.io.FileOutputStream");
+		clazz.addImport("java.io.OutputStream");
+		clazz.addImport("java.io.IOException");
+		clazz.addImport("java.io.OutputStreamWriter");
+		
+		clazz.addImport("org.jdom.Element");
+		clazz.addImport("org.jdom.Attribute");
+		clazz.addImport("org.jdom.Document");
 
 
-		ret += writeImport("java.io.StringReader");
-		ret += writeImport("org.jdom.JDOMException");
-		ret += writeImport("org.jdom.input.SAXBuilder");
+		clazz.addImport("java.io.StringReader");
+		clazz.addImport("org.jdom.JDOMException");
+		clazz.addImport("org.jdom.input.SAXBuilder");
 
-		ret += writeImport("net.anotheria.util.xml.XMLNode");
-		ret += writeImport("net.anotheria.util.xml.XMLTree");
-		ret += writeImport("net.anotheria.util.xml.XMLAttribute");
-		ret += writeImport("net.anotheria.util.xml.XMLWriter");
-		ret += emptyline();
-		ret += writeImport("net.anotheria.util.Date");
-		ret += writeImport(ASGRuntimeException.class.getName());
-		ret += writeImport("org.apache.log4j.BasicConfigurator");
-		ret += emptyline();
+		clazz.addImport("net.anotheria.util.xml.XMLNode");
+		clazz.addImport("net.anotheria.util.xml.XMLTree");
+		clazz.addImport("net.anotheria.util.xml.XMLAttribute");
+		clazz.addImport("net.anotheria.util.xml.XMLWriter");
+		clazz.addImport("net.anotheria.util.Date");
+		clazz.addImport(ASGRuntimeException.class.getName());
+		clazz.addImport("org.apache.log4j.BasicConfigurator");
+		appendEmptyline();
 		for (MetaModule m : modules){
-			ret += writeImport(ServiceGenerator.getFactoryImport(context, m));
+			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
 		}
 		
-		ret += emptyline();
-		ret += writeString("public class "+getImporterClassName(context)+"{");
+		appendEmptyline();
+		clazz.setName(getImporterClassName(context));
+
+		startClassBody();
+		appendString("public "+getImporterClassName(context)+"(){");
 		increaseIdent();
-		ret += emptyline();
-		
-		ret += writeString("public "+getImporterClassName(context)+"(){");
-		increaseIdent();
-		ret += writeStatement(ConfiguratorGenerator.getConfiguratorClassName()+".configure()");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement(ConfiguratorGenerator.getConfiguratorClassName()+".configure()");
+		append(closeBlock());
+		appendEmptyline();
 		
 		
 		//NEW
-		ret += generateDocumentParser();
-		ret += emptyline();
+		generateDocumentParser();
+		appendEmptyline();
 		
 		//OLD
 		
-		ret += writeComment("Create an XML Document (ano-util) with data from all modules.");
-		ret += writeString("public XMLTree createCompleteXMLExport() throws ASGRuntimeException{");
+		appendComment("Create an XML Document (ano-util) with data from all modules.");
+		appendString("public XMLTree createCompleteXMLExport() throws ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>()");
+		appendStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>()");
 		for (MetaModule m : modules){
-			ret += writeStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML())");
+			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML())");
 		}
-		ret += writeStatement("return createExport(nodes)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return createExport(nodes)");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeComment("Write XML data from all modules into given stream.");
-		ret += writeString("public void writeCompleteXMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
+		appendComment("Write XML data from all modules into given stream.");
+		appendString("public void writeCompleteXMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("new XMLWriter().write(createCompleteXMLExport(), target)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("new XMLWriter().write(createCompleteXMLExport(), target)");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeComment("Write XML data from all modules into given file.");
-		ret += writeString("public void writeCompleteXMLExportToFile(File target) throws IOException, ASGRuntimeException{");
+		appendComment("Write XML data from all modules into given file.");
+		appendString("public void writeCompleteXMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("writeToFile(createCompleteXMLExport(), target)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("writeToFile(createCompleteXMLExport(), target)");
+		append(closeBlock());
+		appendEmptyline();
 
 		
 		
 		//create export methods for all modules.
 		for (MetaModule m : modules){
-			ret += writeComment("Create an XML Document (jdom) from "+m.getName()+" data for export.");
-			ret += writeString("public XMLTree create"+m.getName()+"XMLExport() throws ASGRuntimeException{");
+			appendComment("Create an XML Document (jdom) from "+m.getName()+" data for export.");
+			appendString("public XMLTree create"+m.getName()+"XMLExport() throws ASGRuntimeException{");
 			increaseIdent();
-			ret += writeStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>(1)");
-			ret += writeStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML())");
-			ret += writeStatement("return createExport(nodes)");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>(1)");
+			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML())");
+			appendStatement("return createExport(nodes)");
+			append(closeBlock());
+			appendEmptyline();
 
-			ret += writeComment("Write "+m.getName()+" as XML into given stream.");
-			ret += writeString("public void write"+m.getName()+"XMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
+			appendComment("Write "+m.getName()+" as XML into given stream.");
+			appendString("public void write"+m.getName()+"XMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
-			ret += writeStatement("new XMLWriter().write(create"+m.getName()+"XMLExport(), target)");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("new XMLWriter().write(create"+m.getName()+"XMLExport(), target)");
+			append(closeBlock());
+			appendEmptyline();
 			
-			ret += writeComment("Write "+m.getName()+" as XML into given file.");
-			ret += writeString("public void write"+m.getName()+"XMLExportToFile(File target) throws IOException, ASGRuntimeException{");
+			appendComment("Write "+m.getName()+" as XML into given file.");
+			appendString("public void write"+m.getName()+"XMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
-			ret += writeStatement("writeToFile(create"+m.getName()+"XMLExport(), target)");
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("writeToFile(create"+m.getName()+"XMLExport(), target)");
+			append(closeBlock());
+			appendEmptyline();
 		}
 		
 		//private methods
-		ret += writeString("private void writeToFile(XMLTree tree, File target) throws IOException{");
+		appendString("private void writeToFile(XMLTree tree, File target) throws IOException{");
 		increaseIdent();
-		ret += writeStatement("FileOutputStream fOut = null");
-		ret += writeString("try{");
+		appendStatement("FileOutputStream fOut = null");
+		appendString("try{");
 		increaseIdent();
-		ret += writeStatement("fOut = new FileOutputStream(target)");
-		ret += writeStatement("XMLWriter writer = new XMLWriter()");
-		ret += writeStatement("OutputStreamWriter oWriter = writer.write(tree, fOut)");
-		ret += writeStatement("oWriter.close()");
+		appendStatement("fOut = new FileOutputStream(target)");
+		appendStatement("XMLWriter writer = new XMLWriter()");
+		appendStatement("OutputStreamWriter oWriter = writer.write(tree, fOut)");
+		appendStatement("oWriter.close()");
 		decreaseIdent();
-		ret += writeStatement("}catch(IOException e){");
+		appendStatement("}catch(IOException e){");
 		increaseIdent();
-		ret += writeString("if (fOut!=null){");
+		appendString("if (fOut!=null){");
 		increaseIdent();
-		ret += writeString("try{");
-		ret += writeIncreasedStatement("fOut.close()");
-		ret += writeString("}catch(IOException ignored){}");
-		ret += closeBlock();
-		ret += writeStatement("throw e");
-		ret += closeBlock();
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("try{");
+		appendIncreasedStatement("fOut.close()");
+		appendString("}catch(IOException ignored){}");
+		append(closeBlock());
+		appendStatement("throw e");
+		append(closeBlock());
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("private XMLTree createExport(List<XMLNode> nodes){");
+		appendString("private XMLTree createExport(List<XMLNode> nodes){");
 		increaseIdent();
-		ret += writeStatement("XMLTree tree = new XMLTree()");
-		ret += writeStatement("tree.setEncoding("+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		ret += writeStatement("XMLNode root = new XMLNode("+quote("export")+")");
-		ret += writeStatement("root.addAttribute(new XMLAttribute("+quote("timestamp")+", \"\"+System.currentTimeMillis()))");
-		ret += writeStatement("root.addAttribute(new XMLAttribute("+quote("date")+", Date.currentDate().toString()))");
-		ret += writeStatement("tree.setRoot(root)");
-		ret += writeStatement("root.setChildren(nodes)");
-		ret += writeStatement("return tree");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("XMLTree tree = new XMLTree()");
+		appendStatement("tree.setEncoding("+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
+		appendStatement("XMLNode root = new XMLNode("+quote("export")+")");
+		appendStatement("root.addAttribute(new XMLAttribute("+quote("timestamp")+", \"\"+System.currentTimeMillis()))");
+		appendStatement("root.addAttribute(new XMLAttribute("+quote("date")+", Date.currentDate().toString()))");
+		appendStatement("tree.setRoot(root)");
+		appendStatement("root.setChildren(nodes)");
+		appendStatement("return tree");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
+		appendString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
 		increaseIdent();
-		ret += writeStatement("BasicConfigurator.configure()");
-		ret += writeStatement("new "+getImporterClassName(context)+"().writeCompleteXMLExportToFile(new File("+quote(context.getApplicationName()+"_export.xml")+"))");
-		ret += closeBlock();
+		appendStatement("BasicConfigurator.configure()");
+		appendStatement("new "+getImporterClassName(context)+"().writeCompleteXMLExportToFile(new File("+quote(context.getApplicationName()+"_export.xml")+"))");
+		append(closeBlock());
 
-		
-		ret += closeBlock();
-		
-
-		return new FileEntry(FileEntry.package2path(context.getServicePackageName(MetaModule.SHARED)), getImporterClassName(context),ret);
+		return new FileEntry(clazz);
 		
 	}
 

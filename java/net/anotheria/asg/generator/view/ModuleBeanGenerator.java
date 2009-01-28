@@ -23,6 +23,7 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
@@ -67,10 +68,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	
 	public static final String FIELD_ML_DISABLED = "multilingualInstanceDisabled";
 
-    public ModuleBeanGenerator(MetaView aView){
-        //view = aView;
-    }
-	
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
@@ -87,22 +84,20 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		timer.startExecution("All");
 
 		timer.startExecution(section.getModule().getName()+"-"+section.getTitle()+"-ListItem");
-		files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getListItemBeanName(section.getDocument()), generateListItemBean(section)));
+		files.add(new FileEntry(generateListItemBean(section)));
 		timer.stopExecution(section.getModule().getName()+"-"+section.getTitle()+"-ListItem");
-		String sortTypeContent = generateListItemSortType(section);
-		if (sortTypeContent!=null)
-			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getListItemBeanSortTypeName(section.getDocument()), sortTypeContent));
+		files.add(new FileEntry(generateListItemSortType(section)));
 		List<MetaDialog> dialogs = section.getDialogs();
 		for (int i=0; i<dialogs.size(); i++){
 			MetaDialog dlg = dialogs.get(i);
-			files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getDialogBeanName(dlg, section.getDocument()), generateDialogForm(dlg, section.getDocument())));
+			files.add(new FileEntry(generateDialogForm(dlg, section.getDocument())));
 			
 			MetaDocument doc = section.getDocument();
 			for (int p=0; p<doc.getProperties().size(); p++){
 				MetaProperty pp = doc.getProperties().get(p);
 				if (pp instanceof MetaContainerProperty){
-					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerEntryFormName((MetaContainerProperty)pp), generateContainerEntryForm(doc, (MetaContainerProperty)pp)));
-					files.add(new FileEntry(FileEntry.package2path(getPackage(section.getModule())), getContainerQuickAddFormName((MetaContainerProperty)pp), generateContainerQuickAddForm(doc, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(generateContainerEntryForm(doc, (MetaContainerProperty)pp)));
+					files.add(new FileEntry(generateContainerQuickAddForm(doc, (MetaContainerProperty)pp)));
 				}
 			}
 
@@ -144,33 +139,34 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerQuickAddFormName(p);
 	}
 
-	private String generateContainerEntryForm(MetaDocument doc, MetaContainerProperty p){
-		if (p instanceof MetaTableProperty)
+	private GeneratedClass generateContainerEntryForm(MetaDocument doc, MetaContainerProperty p){
+		if (p instanceof MetaTableProperty){
 			return generateTableRowForm(doc, (MetaTableProperty)p);
-		if (p instanceof MetaListProperty)
+		}
+		if (p instanceof MetaListProperty){
 			return generateListElementForm(doc, (MetaListProperty)p);
+		}
 		throw new RuntimeException("Unsupported container type: "+p);
 	}
 	
-	private String generateContainerQuickAddForm(MetaDocument doc, MetaContainerProperty p){
+	private GeneratedClass generateContainerQuickAddForm(MetaDocument doc, MetaContainerProperty p){
 		if (p instanceof MetaListProperty)
 			return generateListQuickAddForm(doc, (MetaListProperty)p);
 		System.out.println("WARN Unsupported container type: "+p);
-		return "";
+		return null;
 	}
 
-	private String generateListElementForm(MetaDocument doc, MetaListProperty list){
-		String ret = "";
-		ret += writeStatement("package "+getPackage(doc));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
-		ret += writeImport("javax.servlet.http.HttpServletRequest");
-		ret += writeImport("org.apache.struts.action.ActionMapping");
-		ret += emptyline();
+	private GeneratedClass generateListElementForm(MetaDocument doc, MetaListProperty list){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		clazz.setPackageName(getPackage(doc));
+		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
+		clazz.addImport("javax.servlet.http.HttpServletRequest");
+		clazz.addImport("org.apache.struts.action.ActionMapping");
 		
 		if (list.getContainedProperty().isLinked()  || list.getContainedProperty() instanceof MetaEnumerationProperty){
-			ret += writeImport("java.util.List;");
-			ret += emptyline();
+			clazz.addImport("java.util.List");
 		}
 		
 		List<MetaProperty> elements = new ArrayList<MetaProperty>();
@@ -179,168 +175,172 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		elements.add(list.getContainedProperty());
 		elements.add(new MetaProperty("description","string"));
 
-		ret += writeString("public class "+getContainerEntryFormName(list)+" extends BaseActionForm{");
-		increaseIdent();
+		clazz.setName(getContainerEntryFormName(list));
+		clazz.setParent("BaseActionForm");
+		startClassBody();
 		
 		for (int i=0; i<elements.size(); i++){
 			MetaProperty p = elements.get(i);
-			ret += writeStatement("private "+p.toJavaType()+" "+p.getName());
+			appendStatement("private "+p.toJavaType()+" "+p.getName());
 			if (p.isLinked() || p instanceof MetaEnumerationProperty){
 				MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
-				ret += writeString("@SuppressWarnings(\"unchecked\")");
-				ret += writeStatement("private "+collection.toJavaType()+" "+collection.getName());
+				appendString("@SuppressWarnings(\"unchecked\")");
+				appendStatement("private "+collection.toJavaType()+" "+collection.getName());
 			}
 		}
 		
-		ret += emptyline();
+		appendEmptyline();
 		for (int i=0; i<elements.size(); i++){
 			MetaProperty p = elements.get(i);
-			ret += generateMethods(null, p);
+			generateMethods(null, p);
 			if (p.isLinked() || p instanceof MetaEnumerationProperty){
 				String propName = p.getName()+"Collection";
-				ret += writeString("@SuppressWarnings(\"unchecked\")");
-				ret += writeStatement("public void set"+StringUtils.capitalize(propName)+"(List l){");
+				appendString("@SuppressWarnings(\"unchecked\")");
+				appendStatement("public void set"+StringUtils.capitalize(propName)+"(List l){");
 				increaseIdent();
-				ret += writeStatement(propName+" = l");
-				ret += closeBlock();
-				ret += emptyline();
-				ret += writeString("@SuppressWarnings(\"unchecked\")");
-				ret += writeStatement("public List get"+StringUtils.capitalize(propName)+"(){");
+				appendStatement(propName+" = l");
+				append(closeBlock());
+				appendEmptyline();
+				appendString("@SuppressWarnings(\"unchecked\")");
+				appendStatement("public List get"+StringUtils.capitalize(propName)+"(){");
 				increaseIdent();
-				ret += writeStatement("return "+propName);
-				ret += closeBlock();
-				ret += emptyline();
+				appendStatement("return "+propName);
+				append(closeBlock());
+				append(emptyline());
 			}
 			
 		}
-		ret += emptyline();
+		appendEmptyline();
 		
 		
 
 		//generate encoding.
-		ret += writeString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
+		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
 		increaseIdent();
-		ret += writeString("try {");
+		appendString("try {");
 		increaseIdent();
-		ret += writeStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		ret += closeBlock();
-		ret += writeString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		ret += closeBlock();
+		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
+		append(closeBlock());
+		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
+		append(closeBlock());
 		
-		ret += closeBlock();
-
-		return ret;
+		return clazz;
 	}
 
-	private String generateListQuickAddForm(MetaDocument doc, MetaListProperty list){
-		String ret = "";
-		ret += writeStatement("package "+getPackage(doc));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
-		ret += writeImport("javax.servlet.http.HttpServletRequest");
-		ret += writeImport("org.apache.struts.action.ActionMapping");
-		ret += emptyline();
+	private GeneratedClass generateListQuickAddForm(MetaDocument doc, MetaListProperty list){
 		
-		ret += writeString("public class "+getContainerQuickAddFormName(list)+" extends BaseActionForm{");
-		increaseIdent();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		ret += writeStatement("private String quickAddIds");
-		ret += writeStatement("private String ownerId");
+		clazz.setPackageName(getPackage(doc));
 		
-		ret += emptyline();
-		ret += writeString("public void setQuickAddIds(String someIds){");
-		ret += writeIncreasedStatement("quickAddIds = someIds");
-		ret += writeString("}");
-		ret += emptyline();
-		ret += writeString("public String getQuickAddIds(){");
-		ret += writeIncreasedStatement("return quickAddIds");
-		ret += writeString("}");
+		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
+		clazz.addImport("javax.servlet.http.HttpServletRequest");
+		clazz.addImport("org.apache.struts.action.ActionMapping");
 		
-		ret += emptyline();
+		clazz.setName(getContainerQuickAddFormName(list));
+		clazz.setParent("BaseActionForm");
+
+		startClassBody();
+		appendStatement("private String quickAddIds");
+		appendStatement("private String ownerId");
 		
-		ret += emptyline();
-		ret += writeString("public void setOwnerId(String anId){");
-		ret += writeIncreasedStatement("ownerId = anId");
-		ret += writeString("}");
-		ret += emptyline();
-		ret += writeString("public String getOwnerId(){");
-		ret += writeIncreasedStatement("return ownerId");
-		ret += writeString("}");
-		ret += emptyline();
+		appendEmptyline();
+		appendString("public void setQuickAddIds(String someIds){");
+		appendIncreasedStatement("quickAddIds = someIds");
+		appendString("}");
+		appendEmptyline();
+		appendString("public String getQuickAddIds(){");
+		appendIncreasedStatement("return quickAddIds");
+		appendString("}");
+		
+		appendEmptyline();
+		
+		appendEmptyline();
+		appendString("public void setOwnerId(String anId){");
+		appendIncreasedStatement("ownerId = anId");
+		appendString("}");
+		appendEmptyline();
+		appendString("public String getOwnerId(){");
+		appendIncreasedStatement("return ownerId");
+		appendString("}");
+		appendEmptyline();
 		
 
 		//generate encoding.
-		ret += writeString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
+		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
 		increaseIdent();
-		ret += writeString("try {");
+		appendString("try {");
 		increaseIdent();
-		ret += writeStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		ret += closeBlock();
-		ret += writeString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		ret += closeBlock();
-		
-		ret += closeBlock();
+		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
+		append(closeBlock());
+		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
+		append(closeBlock());
 
-		return ret;
+		return clazz;
 	}
 
 	@SuppressWarnings("unchecked")
-	private String generateTableRowForm(MetaDocument doc, MetaTableProperty p){
-		String ret = "";
-		ret += writeStatement("package "+getPackage(doc));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
-		ret += writeImport("javax.servlet.http.HttpServletRequest");
-		ret += writeImport("org.apache.struts.action.ActionMapping");
-		ret += emptyline();
+	private GeneratedClass generateTableRowForm(MetaDocument doc, MetaTableProperty p){
 		
-		ret += writeString("public class "+getContainerEntryFormName(p)+" extends BaseActionForm{");
-		increaseIdent();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		clazz.setPackageName(getPackage(doc));
+		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
+		clazz.addImport("javax.servlet.http.HttpServletRequest");
+		clazz.addImport("org.apache.struts.action.ActionMapping");
+		
+		clazz.setName(getContainerEntryFormName(p));
+		clazz.setParent("BaseActionForm");
+
+		startClassBody();
 		List<MetaProperty> columns = (List<MetaProperty>)((ArrayList)p.getColumns()).clone();
 		columns.add(0, new MetaProperty(p.getName()+"_ownerId", "string"));
 		columns.add(0, new MetaProperty(p.getName()+"_position", "int"));
 		for (MetaProperty pr : columns)
-			ret += writeStatement("private String "+p.extractSubName(pr));
+			appendStatement("private String "+p.extractSubName(pr));
 		
-		ret += emptyline();
+		appendEmptyline();
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty pr = columns.get(i);
-			ret += writeString("public void set"+StringUtils.capitalize(p.extractSubName(pr))+"(String a"+StringUtils.capitalize(p.extractSubName(pr))+" ){");
+			appendString("public void set"+StringUtils.capitalize(p.extractSubName(pr))+"(String a"+StringUtils.capitalize(p.extractSubName(pr))+" ){");
 			increaseIdent();
-			ret += writeStatement("this."+p.extractSubName(pr)+" = a"+StringUtils.capitalize(p.extractSubName(pr)));
-			ret += closeBlock();
-			ret += writeString("public String get"+StringUtils.capitalize(p.extractSubName(pr))+"(){");
+			appendStatement("this."+p.extractSubName(pr)+" = a"+StringUtils.capitalize(p.extractSubName(pr)));
+			append(closeBlock());
+			appendString("public String get"+StringUtils.capitalize(p.extractSubName(pr))+"(){");
 			increaseIdent();
-			ret += writeStatement("return "+p.extractSubName(pr));
-			ret += closeBlock();
-			ret += emptyline();
+			appendStatement("return "+p.extractSubName(pr));
+			append(closeBlock());
+			appendEmptyline();
 		}
 
 		//generate encoding.
-		ret += writeString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
+		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
 		increaseIdent();
-		ret += writeString("try {");
+		appendString("try {");
 		increaseIdent();
-		ret += writeStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		ret += closeBlock();
-		ret += writeString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		ret += closeBlock();
+		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
+		append(closeBlock());
+		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
+		append(closeBlock());
 		
-		ret += closeBlock();
-		return ret;
+		return clazz;
 	}
 	
 	
-	String generateDialogForm(MetaDialog dialog, MetaDocument doc){
-		String ret = "";
+	GeneratedClass generateDialogForm(MetaDialog dialog, MetaDocument doc){
+
 		
-		ret += writeStatement("package "+getPackage(doc));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
-		ret += writeImport("javax.servlet.http.HttpServletRequest");
-		ret += writeImport("org.apache.struts.action.ActionMapping");
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		ret += emptyline();
+		clazz.setPackageName(getPackage(doc));
+		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
+		clazz.addImport("javax.servlet.http.HttpServletRequest");
+		clazz.addImport("org.apache.struts.action.ActionMapping");
+
+		startClassBody();
 		
 		//this is only used if the multilingual support is enabled for the project AND document.
 		MetaFieldElement multilingualInstanceDisabledElement = new MetaFieldElement(FIELD_ML_DISABLED);
@@ -352,16 +352,17 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());
 				if (p.isLinked() || p instanceof MetaEnumerationProperty){
-					ret += writeImport("java.util.List");
-					ret += writeImport("net.anotheria.webutils.bean.LabelValueBean");
-					ret += emptyline();
+					clazz.addImport("java.util.List");
+					clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
 					break;
 				}
 			}
 		}
 		
-		ret += writeString("public class "+getDialogBeanName(dialog, doc)+" extends BaseActionForm{");
-		increaseIdent();
+		clazz.setName(getDialogBeanName(dialog, doc));
+		clazz.setParent("BaseActionForm");
+		
+		startClassBody();
 	
 		for (MetaViewElement element : elements){
 			if (element instanceof MetaFieldElement){
@@ -370,54 +371,51 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				
 				MetaProperty p = doc.getField(field.getName());
 				MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
-				ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
+				appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
 				if (p.isLinked()){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),"list");
-					ret += writeStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
-					ret += writeStatement("private String "+p.getName()+"CurrentValue"+(lang==null?"":lang));
+					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
+					appendStatement("private String "+p.getName()+"CurrentValue"+(lang==null?"":lang));
 				}
 				
 				if (p instanceof MetaEnumerationProperty){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
-					ret += writeStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
-					ret += writeStatement("private String "+p.getName()+"CurrentValue");
+					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
+					appendStatement("private String "+p.getName()+"CurrentValue");
 				}
 			}
 			
 		}
 
-		ret += emptyline();
+		appendEmptyline();
 		for (MetaViewElement element : elements){
 			if (element instanceof MetaFieldElement)
-				ret += generateFieldMethodsInDialog((MetaFieldElement)element, doc);
+				generateFieldMethodsInDialog((MetaFieldElement)element, doc);
 		}
 		
 		if (doc.isMultilingual()){
 			MetaProperty mlDisProp = doc.getField(multilingualInstanceDisabledElement.getName());
-			ret += writeStatement("private "+mlDisProp.toJavaType()+" "+mlDisProp.getName());
-			ret += generateFieldMethodsInDialog(multilingualInstanceDisabledElement, doc);
+			appendStatement("private "+mlDisProp.toJavaType()+" "+mlDisProp.getName());
+			generateFieldMethodsInDialog(multilingualInstanceDisabledElement, doc);
 		}
 			
 		
-		ret += emptyline();
+		appendEmptyline();
 		
 		//generate encoding.
-		ret += writeString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
+		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
 		increaseIdent();
-		ret += writeString("try {");
+		appendString("try {");
 		increaseIdent();
-		ret += writeStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		ret += closeBlock();
-		ret += writeString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		ret += closeBlock();
+		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
+		append(closeBlock());
+		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
+		append(closeBlock());
 		  
-		
-		ret += closeBlock();		
-		
-		return ret;
+		return clazz;
 	}
 	
-	private String generateListItemSortType(MetaModuleSection section){
+	private GeneratedClass generateListItemSortType(MetaModuleSection section){
 		List<MetaViewElement> elements = section.getElements();
 		boolean containsComparable = false;
 		for (MetaViewElement element : elements){
@@ -430,15 +428,17 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		if (!containsComparable)
 			return null;
 			
-		String ret = "";
-		ret += writeStatement("package "+getPackage(section.getDocument()));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.util.sorter.SortType");
-		ret += emptyline();
 		
-		ret += writeString("public class "+getListItemBeanSortTypeName(section.getDocument())+" extends SortType{");
-		increaseIdent();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
+		clazz.setPackageName(getPackage(section.getDocument()));
+		clazz.addImport("net.anotheria.util.sorter.SortType");
+		
+		clazz.setName(getListItemBeanSortTypeName(section.getDocument()));
+		clazz.setParent("SortType");
+		
+		startClassBody();
 		
 		MetaViewElement defaultElem = section.getDefaultSortable();
 		String defaultElemName = null;
@@ -458,35 +458,35 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				}
 				if (element instanceof MultilingualFieldElement){
 					MetaProperty p = section.getDocument().getField(element.getName());
-  					ret += writeStatement("public static final int SORT_BY_"+p.getName(((MultilingualFieldElement)element).getLanguage()).toUpperCase()+" = "+(lastIndex++));
+  					appendStatement("public static final int SORT_BY_"+p.getName(((MultilingualFieldElement)element).getLanguage()).toUpperCase()+" = "+(lastIndex++));
 				}else{
-					ret += writeStatement("public static final int SORT_BY_"+element.getName().toUpperCase()+" = "+(lastIndex++));
+					appendStatement("public static final int SORT_BY_"+element.getName().toUpperCase()+" = "+(lastIndex++));
 				}
 
 			}
 		}
 		
-		ret += writeStatement("public static final int SORT_BY_DEFAULT = "+defaultElemName);
-		ret += emptyline();
-		ret += writeString("public "+getListItemBeanSortTypeName(section.getDocument())+"(){");
+		appendStatement("public static final int SORT_BY_DEFAULT = "+defaultElemName);
+		appendEmptyline();
+		appendString("public "+getListItemBeanSortTypeName(section.getDocument())+"(){");
 		increaseIdent();
-		ret += writeString("super(SORT_BY_DEFAULT);");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("super(SORT_BY_DEFAULT);");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public "+getListItemBeanSortTypeName(section.getDocument())+"(int method){");
+		appendString("public "+getListItemBeanSortTypeName(section.getDocument())+"(int method){");
 		increaseIdent();
-		ret += writeString("super(method);");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("super(method);");
+		append(closeBlock());
+		appendEmptyline();
 				
-		ret += writeString("public "+getListItemBeanSortTypeName(section.getDocument())+"(int method, boolean order){");
+		appendString("public "+getListItemBeanSortTypeName(section.getDocument())+"(int method, boolean order){");
 		increaseIdent();
-		ret += writeString("super(method, order);");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("super(method, order);");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public static int name2method(String name){");
+		appendString("public static int name2method(String name){");
 		increaseIdent();
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
@@ -494,26 +494,26 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				MetaProperty p = section.getDocument().getField(element.getName());
 				if (element instanceof MultilingualFieldElement){
 					String lang = ((MultilingualFieldElement)element).getLanguage();
-					ret += writeString("if ("+quote(p.getName(lang))+".equals(name))");
-					ret += writeIncreasedStatement("return SORT_BY_"+p.getName(lang).toUpperCase());
+					appendString("if ("+quote(p.getName(lang))+".equals(name))");
+					appendIncreasedStatement("return SORT_BY_"+p.getName(lang).toUpperCase());
 					
 				}else{
-					ret += writeString("if ("+quote(p.getName())+".equals(name))");
-					ret += writeIncreasedStatement("return SORT_BY_"+p.getName().toUpperCase());
-/*					ret += writeString("if ("+quote(element.getName())+".equals(name))");
-					ret += writeIncreasedStatement("return SORT_BY_"+element.getName().toUpperCase());*/
+					appendString("if ("+quote(p.getName())+".equals(name))");
+					appendIncreasedStatement("return SORT_BY_"+p.getName().toUpperCase());
+/*					appendString("if ("+quote(element.getName())+".equals(name))");
+					appendIncreasedStatement("return SORT_BY_"+element.getName().toUpperCase());*/
 				}
 
 			}
 		}
-		ret += writeStatement("throw new RuntimeException("+quote("Unknown sort type name: ")+"+name)");		
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("throw new RuntimeException("+quote("Unknown sort type name: ")+"+name)");		
+		append(closeBlock());
+		appendEmptyline();
 
 // 		GENERATE method2name
-		ret += writeString("public static String method2name(int method){");
+		appendString("public static String method2name(int method){");
 		increaseIdent();
-		ret += writeString("switch (method){");
+		appendString("switch (method){");
 		increaseIdent();
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
@@ -521,36 +521,38 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				MetaProperty p = section.getDocument().getField(element.getName());
 				if (element instanceof MultilingualFieldElement){
 					String lang = ((MultilingualFieldElement)element).getLanguage();
-					ret += writeString("case SORT_BY_"+p.getName(lang).toUpperCase()+":");
-					ret += writeIncreasedStatement("return "+quote(p.getName(lang)));
+					appendString("case SORT_BY_"+p.getName(lang).toUpperCase()+":");
+					appendIncreasedStatement("return "+quote(p.getName(lang)));
 					
 				}else{
-					ret += writeString("case SORT_BY_"+p.getName().toUpperCase()+":");
-					ret += writeIncreasedStatement("return "+quote(p.getName()));
-/*					ret += writeString("if ("+quote(element.getName())+".equals(name))");
-					ret += writeIncreasedStatement("return SORT_BY_"+element.getName().toUpperCase());*/
+					appendString("case SORT_BY_"+p.getName().toUpperCase()+":");
+					appendIncreasedStatement("return "+quote(p.getName()));
+/*					appendString("if ("+quote(element.getName())+".equals(name))");
+					appendIncreasedStatement("return SORT_BY_"+element.getName().toUpperCase());*/
 				}
 
 			}
 		}
-		ret += closeBlock();
-		ret += writeStatement("throw new RuntimeException("+quote("Unknown sort type method: ")+"+method)");		
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendStatement("throw new RuntimeException("+quote("Unknown sort type method: ")+"+method)");		
+		append(closeBlock());
+		appendEmptyline();
 		
 		//
-		ret += writeString("public String getMethodAndOrderCode(){");
+		appendString("public String getMethodAndOrderCode(){");
 		increaseIdent();
-		ret += writeStatement("return method2name(getSortBy())+"+quote("_")+"+(getSortOrder() ? "+quote("ASC")+":"+quote("DESC")+")");
-		ret += closeBlock();
+		appendStatement("return method2name(getSortBy())+"+quote("_")+"+(getSortOrder() ? "+quote("ASC")+":"+quote("DESC")+")");
+		append(closeBlock());
 
-		ret += closeBlock();
-		
-		return ret;
+		return clazz;
 	}
 	
 	
-	private String generateListItemBean(MetaModuleSection section){
+	private GeneratedClass generateListItemBean(MetaModuleSection section){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
 		MetaDocument doc = section.getDocument();
 		List<MetaViewElement> origElements = section.getElements();
 
@@ -569,9 +571,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		plainId.setDecorator(null);
 		elements.add(versionInfo);
 		
-		String ret = "";
-		ret += writeStatement("package "+getPackage(section.getDocument()));
-		ret += emptyline();
+		clazz.setPackageName(getPackage(section.getDocument()));
 
 		boolean containsComparable = false;
 		for (MetaViewElement element : elements){
@@ -581,11 +581,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			}
 		}
 		
-		if (containsComparable){
-			ret += writeImport("net.anotheria.util.sorter.IComparable");
-			ret += writeImport("net.anotheria.util.BasicComparable");
-			ret += emptyline();
-		}
 		
 		for(MetaViewElement element: elements){
 			if (!(element instanceof MetaFieldElement))
@@ -594,43 +589,41 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			MetaProperty p = doc.getField(field.getName());
 			if(!(p instanceof MetaListProperty))
 				continue;
-			ret += writeImport("java.util.List");
-			ret += emptyline();
+			clazz.addImport("java.util.List");
 			break;
 		}
 
-		String decl = "public class "+getListItemBeanName(section.getDocument());
-		if (containsComparable)
-			decl += " implements IComparable";
-		ret += writeString(decl+"{");
-		increaseIdent();
+		clazz.setName(getListItemBeanName(section.getDocument()));
+		
+		startClassBody();
+		
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 			if (element instanceof MetaFieldElement){
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());
 				if (p instanceof MetaEnumerationProperty)
-					ret += writeStatement("private String "+p.getName());
+					appendStatement("private String "+p.getName());
 				else{
 
 //					MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(), "int"):p;
 					MetaProperty tmp = p;
 					if (field instanceof MultilingualFieldElement){
 						if (field.getDecorator()!=null){
-							ret += writeStatement("private String "+tmp.getName(((MultilingualFieldElement)field).getLanguage()));
-							ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName("ForSorting", ((MultilingualFieldElement)field).getLanguage()));
+							appendStatement("private String "+tmp.getName(((MultilingualFieldElement)field).getLanguage()));
+							appendStatement("private "+tmp.toJavaType()+" "+tmp.getName("ForSorting", ((MultilingualFieldElement)field).getLanguage()));
 						}else{
-							ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName(((MultilingualFieldElement)field).getLanguage()));
+							appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(((MultilingualFieldElement)field).getLanguage()));
 						}
 					}else{
-						//ret += writeString("//p: "+p.getName()+", "+p.toJavaType()+", "+p.getClass());
+						//appendString("//p: "+p.getName()+", "+p.toJavaType()+", "+p.getClass());
 						if (field.getDecorator()!=null){
-							ret += writeStatement("private String "+tmp.getName());
-//							ret += writeStatement("private "+p.toJavaType()+" "+p.getName()+"ForSorting");
-							ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName()+"ForSorting");
+							appendStatement("private String "+tmp.getName());
+//							appendStatement("private "+p.toJavaType()+" "+p.getName()+"ForSorting");
+							appendStatement("private "+tmp.toJavaType()+" "+tmp.getName()+"ForSorting");
 						}else{
-//							ret += writeStatement("private "+p.toJavaType()+" "+p.getName());
-							ret += writeStatement("private "+tmp.toJavaType()+" "+tmp.getName());
+//							appendStatement("private "+p.toJavaType()+" "+p.getName());
+							appendStatement("private "+tmp.toJavaType()+" "+tmp.getName());
 						}
 					}
 				}
@@ -638,34 +631,37 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 
 			if (element instanceof MetaFunctionElement){
 				MetaFunctionElement function = (MetaFunctionElement)element;
-				ret += writeStatement("private String "+function.getPropertyName());
+				appendStatement("private String "+function.getPropertyName());
 			}
 		}
-		ret += emptyline();
+		appendEmptyline();
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 			if (element instanceof MetaFieldElement)
-				ret += generateFieldMethods((MetaFieldElement)element, doc);
+				generateFieldMethods((MetaFieldElement)element, doc);
 			if (element instanceof MetaFunctionElement)
-				ret += generateFunctionMethods((MetaFunctionElement)element);
+				generateFunctionMethods((MetaFunctionElement)element);
 			
 		}
 		
 		if (containsComparable){
-			ret += emptyline();
-			ret += generateCompareMethod(doc, elements);
+			clazz.addImport("net.anotheria.util.sorter.IComparable");
+			clazz.addImport("net.anotheria.util.BasicComparable");
+			
+			clazz.addInterface("IComparable");
+			
+			appendEmptyline();
+			generateCompareMethod(doc, elements);
 		}
 		
-		ret += closeBlock();
-		return ret;
+		return clazz;
 	}
 	
-	private String generateFunctionMethods(MetaFunctionElement function){
-		return generateMethods(function, new MetaProperty(function.getPropertyName(), "string"));
+	private void generateFunctionMethods(MetaFunctionElement function){
+		generateMethods(function, new MetaProperty(function.getPropertyName(), "string"));
 	}
 	
-	private String generateFieldMethodsInDialog(MetaFieldElement element, MetaDocument doc){
-		String ret = "";
+	private void generateFieldMethodsInDialog(MetaFieldElement element, MetaDocument doc){
 		MetaProperty p = null;
 //		String lang = getElementLanguage(element);
 		p = doc.getField(element.getName());
@@ -676,25 +672,25 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			//;
 			if (p.isMultilingual()){
 				String l = getElementLanguage(element);
-				ret += generateMethods(new MultilingualFieldElement(l, pColl), new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
-				ret += generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", "string"));
+				generateMethods(new MultilingualFieldElement(l, pColl), new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
+				generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", "string"));
 			}else{
-				ret += generateMethods(pColl, new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
-				ret += generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", "string"));
+				generateMethods(pColl, new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
+				generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", "string"));
 			}
 			
 		}
 		MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
-		ret += generateMethods(element, tmp);
-		return ret; 
+		generateMethods(element, tmp);
 	}
 
-	private String generateFieldMethods(MetaFieldElement element, MetaDocument doc){
+	private void generateFieldMethods(MetaFieldElement element, MetaDocument doc){
 		
 		MetaProperty p = doc.getField(element.getName());
 		if (p instanceof MetaEnumerationProperty){
 			MetaProperty tmp = new MetaProperty(p.getName(), "string");
-			return generateMethods(element, tmp);		
+			generateMethods(element, tmp);
+			return;
 		}
 
 //		if (p instanceof MetaListProperty && element.getDecorator()!=null){
@@ -704,72 +700,64 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 //		}
 		
 
-		String additionalMethods = "";
-
-//		if (p instanceof MetaListProperty)
-//			p = new MetaProperty(p.getName(), "int");
 		
 		if (element.getDecorator()!=null){
 			MetaProperty tmpForSorting = (MetaProperty) p.clone();//new MetaProperty(p.getName()+"ForSorting", p.getType());
 			tmpForSorting.setName(tmpForSorting.getName()+"ForSorting");
-			additionalMethods = generateMethods(element, tmpForSorting);
+			generateMethods(element, tmpForSorting);
 			//if this field has a decorator we have to generate string methods instaed of original methods.
 			p = new MetaProperty(p.getName(), "string");
 		}
 		
-		return additionalMethods + generateMethods(element, p);
+		generateMethods(element, p);
 	}
 	
-	private String generateMethods(MetaViewElement element, MetaProperty p){
+	private void generateMethods(MetaViewElement element, MetaProperty p){
 
-		if (element instanceof MultilingualFieldElement)
-			return generateMethodsMultilinguage((MultilingualFieldElement)element, p);
+		if (element instanceof MultilingualFieldElement){
+			generateMethodsMultilinguage((MultilingualFieldElement)element, p);
+			return;
+		}
 		
-		String ret = "";
-		
-		ret += writeString("public void "+p.toBeanSetter()+"("+p.toJavaType()+" "+p.getName()+" ){");
+		appendString("public void "+p.toBeanSetter()+"("+p.toJavaType()+" "+p.getName()+" ){");
 		increaseIdent();
-		ret += writeStatement("this."+p.getName()+" = "+p.getName());
-		ret += closeBlock();			
-		ret += emptyline();
+		appendStatement("this."+p.getName()+" = "+p.getName());
+		append(closeBlock());			
+		appendEmptyline();
 			
-		ret += writeString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
+		appendString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
 		increaseIdent();
-		ret += writeStatement("return "+p.getName());
-		ret += closeBlock();
-		ret += emptyline();
-		return ret;
+		appendStatement("return "+p.getName());
+		append(closeBlock());
+		appendEmptyline();
 	}
 	
-	private String generateMethodsMultilinguage(MultilingualFieldElement element, MetaProperty p){
-		String ret = "";
+	private void generateMethodsMultilinguage(MultilingualFieldElement element, MetaProperty p){
 		
 		//System.out.println("--- m "+p+", "+p.getType());
 		if (p.getType().equals("list"))
-			ret += writeString("@SuppressWarnings(\"unchecked\")");
-		ret += writeString("public void "+p.toBeanSetter(element.getLanguage())+"("+p.toJavaType()+" "+p.getName()+" ){");
+			appendString("@SuppressWarnings(\"unchecked\")");
+		appendString("public void "+p.toBeanSetter(element.getLanguage())+"("+p.toJavaType()+" "+p.getName()+" ){");
 		increaseIdent();
-		ret += writeStatement("this."+p.getName(element.getLanguage())+" = "+p.getName());
-		ret += closeBlock();			
-		ret += emptyline();
+		appendStatement("this."+p.getName(element.getLanguage())+" = "+p.getName());
+		append(closeBlock());			
+		appendEmptyline();
 			
 		if (p.getType().equals("list"))
-			ret += writeString("@SuppressWarnings(\"unchecked\")");
-		ret += writeString("public "+p.toJavaType()+" "+p.toBeanGetter(element.getLanguage())+"(){");
+			appendString("@SuppressWarnings(\"unchecked\")");
+		appendString("public "+p.toJavaType()+" "+p.toBeanGetter(element.getLanguage())+"(){");
 		increaseIdent();
-		ret += writeStatement("return "+p.getName(element.getLanguage()));
-		ret += closeBlock();
-		ret += emptyline();
-		return ret;
+		appendStatement("return "+p.getName(element.getLanguage()));
+		append(closeBlock());
+		appendEmptyline();
 		
 	}
 	
-	private String generateCompareMethod(MetaDocument doc, List<MetaViewElement> elements){
-		String ret ="";
-		ret += writeString("public int compareTo(IComparable anotherComparable, int method){");
+	private void generateCompareMethod(MetaDocument doc, List<MetaViewElement> elements){
+		appendString("public int compareTo(IComparable anotherComparable, int method){");
 		increaseIdent();
-		ret += writeStatement(getListItemBeanName(doc)+" anotherBean = ("+getListItemBeanName(doc)+") anotherComparable");
-		ret += writeString("switch(method){");
+		appendStatement(getListItemBeanName(doc)+" anotherBean = ("+getListItemBeanName(doc)+") anotherComparable");
+		appendString("switch(method){");
 		increaseIdent();
 		for (MetaViewElement element: elements){
 			if (!element.isComparable())
@@ -782,7 +770,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			String caseDecl = lang != null? getListItemBeanSortTypeName(doc)+".SORT_BY_"+p.getName(lang).toUpperCase():
 				getListItemBeanSortTypeName(doc)+".SORT_BY_"+p.getName().toUpperCase();
 			
-			ret += writeString("case "+caseDecl+":");
+			appendString("case "+caseDecl+":");
 			
 			String type2compare = p instanceof MetaEnumerationProperty? "String": StringUtils.capitalize(p.toJavaErasedType());
 
@@ -790,13 +778,12 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
 				"("+p.getName(lang)+", anotherBean."+p.getName(lang)+")";
 
-			ret += writeIncreasedStatement(retDecl);
+			appendIncreasedStatement(retDecl);
 		}
-		ret += writeString("default:");
-		ret += writeIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
-		ret += closeBlock();
-		ret += closeBlock();
-		return ret;
+		appendString("default:");
+		appendIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
+		append(closeBlock());
+		append(closeBlock());
 	}
 	
 	@Deprecated
@@ -847,39 +834,39 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	public String generateFormBean(MetaForm form){
 	    String ret = "";
 	    
-		ret += writeStatement("package "+getPackage());
-		ret += emptyline();
-		ret += writeImport("net.anotheria.webutils.bean.BaseActionForm");
-		ret += writeImport("javax.servlet.http.HttpServletRequest");
-		ret += writeImport("org.apache.struts.action.ActionMapping");
+		appendStatement("package "+getPackage());
+		appendEmptyline();
+		appendImport("net.anotheria.webutils.bean.BaseActionForm");
+		appendImport("javax.servlet.http.HttpServletRequest");
+		appendImport("org.apache.struts.action.ActionMapping");
 		
-		ret += emptyline();
+		appendEmptyline();
 
 		List<MetaFormField> elements = new ArrayList<MetaFormField>();
 		elements.addAll(form.getElements());
 		
 		
 		
-		ret += writeString("public class "+getFormBeanName(form)+" extends BaseActionForm{");
+		appendString("public class "+getFormBeanName(form)+" extends BaseActionForm{");
 		increaseIdent();
 
 		for (int i=0; i<elements.size(); i++){
 			MetaFormField element = elements.get(i);
 			if (element.isSingle())
-				ret += writeStatement("private "+((MetaFormSingleField)element).getJavaType()+" "+" "+element.getName());
+				appendStatement("private "+((MetaFormSingleField)element).getJavaType()+" "+" "+element.getName());
 			if (element.isComplex()){
 				MetaFormTableField table = (MetaFormTableField) element;
 				for (int r = 0; r<table.getRows(); r++){
 					List<MetaFormTableColumn> columns = table.getColumns();
 					for (int c = 0; c<columns.size(); c++){
 						MetaFormTableColumn col = columns.get(c);
-						ret += writeStatement("private "+col.getField().getJavaType()+" "+" "+table.getVariableName(r, c));
+						appendStatement("private "+col.getField().getJavaType()+" "+" "+table.getVariableName(r, c));
 					}
 				}
 			}
 		}
 
-		ret += emptyline();
+		appendEmptyline();
 
 		for (int i=0; i<elements.size(); i++){
 		    MetaFormField element = elements.get(i);
@@ -887,16 +874,16 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		    	MetaFormSingleField field = (MetaFormSingleField )element;
 				if (field.isSpacer())
 					continue;
-				ret += emptyline();
-				ret += writeString("public "+field.getJavaType()+" get"+StringUtils.capitalize(element.getName())+"(){");
+				appendEmptyline();
+				appendString("public "+field.getJavaType()+" get"+StringUtils.capitalize(element.getName())+"(){");
 				increaseIdent();
-				ret += writeStatement("return "+element.getName());
-				ret += closeBlock();
-				ret += emptyline();
-				ret += writeString("public void set"+StringUtils.capitalize(element.getName())+"("+field.getJavaType()+" s){");
+				appendStatement("return "+element.getName());
+				append(closeBlock());
+				appendEmptyline();
+				appendString("public void set"+StringUtils.capitalize(element.getName())+"("+field.getJavaType()+" s){");
 				increaseIdent();
-				ret += writeStatement(element.getName()+" = s");
-				ret += closeBlock();
+				appendStatement(element.getName()+" = s");
+				append(closeBlock());
 		    }
 		    
 		    if (element.isComplex()){
@@ -906,35 +893,35 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 					for (int c = 0; c<columns.size(); c++){
 						MetaFormTableColumn col = columns.get(c);
 						
-						ret += emptyline();
-						ret += writeString("public "+col.getField().getJavaType()+" get"+StringUtils.capitalize(table.getVariableName(r, c))+"(){");
+						appendEmptyline();
+						appendString("public "+col.getField().getJavaType()+" get"+StringUtils.capitalize(table.getVariableName(r, c))+"(){");
 						increaseIdent();
-						ret += writeStatement("return "+table.getVariableName(r, c));
-						ret += closeBlock();
-						ret += emptyline();
-						ret += writeString("public void set"+StringUtils.capitalize(table.getVariableName(r, c))+"("+col.getField().getJavaType()+" s){");
+						appendStatement("return "+table.getVariableName(r, c));
+						append(closeBlock());
+						appendEmptyline();
+						appendString("public void set"+StringUtils.capitalize(table.getVariableName(r, c))+"("+col.getField().getJavaType()+" s){");
 						increaseIdent();
-						ret += writeStatement(table.getVariableName(r, c)+" = s");
-						ret += closeBlock();
+						appendStatement(table.getVariableName(r, c)+" = s");
+						append(closeBlock());
 					}
 				}
 		    }
 		}
 
-		ret += emptyline();
+		appendEmptyline();
 		
 		//generate encoding.
-		ret += writeString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
+		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
 		increaseIdent();
-		ret += writeString("try {");
+		appendString("try {");
 		increaseIdent();
-		ret += writeStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		ret += closeBlock();
-		ret += writeString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		ret += closeBlock();
+		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
+		append(closeBlock());
+		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
+		append(closeBlock());
 		  
 		
-		ret += closeBlock();		
+		append(closeBlock());		
 	    
 	    
 	    return ret;

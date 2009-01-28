@@ -94,7 +94,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 	
 	private List<FileEntry> generateMetaModuleSection(String path, MetaModuleSection section, MetaView view){
 		List<FileEntry> ret = new ArrayList<FileEntry>();
-		ret.addAll(new ModuleBeanGenerator(view).generate(section, GeneratorDataRegistry.getInstance().getContext()));
+		ret.addAll(new ModuleBeanGenerator().generate(section, GeneratorDataRegistry.getInstance().getContext()));
 	    ret.addAll(new ModuleActionsGenerator(view).generate(section, GeneratorDataRegistry.getInstance().getContext()));
 	    return ret;
 	}

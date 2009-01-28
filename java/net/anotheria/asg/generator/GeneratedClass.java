@@ -22,7 +22,16 @@ public class GeneratedClass {
 	private TypeOfClass type = TypeOfClass.getDefault();
 	
 	private boolean generateLogger = false;
+	private boolean abstractClass = false;
 	
+	public boolean isAbstractClass() {
+		return abstractClass;
+	}
+
+	public void setAbstractClass(boolean abstractClass) {
+		this.abstractClass = abstractClass;
+	}
+
 	public GeneratedClass(){
 		body = new StringBuilder();
 		
@@ -44,7 +53,7 @@ public class GeneratedClass {
 		
 		ret.append(CRLF);
 		
-		String nameDeclaration = "public "+type.toJava()+" "+getName();
+		String nameDeclaration = "public "+(isAbstractClass()?"abstract ":"")+type.toJava()+" "+getName();
 		if (getParent()!=null && getParent().length()>0)
 			nameDeclaration += " extends "+getParent();
 		if (interfaces!=null && interfaces.size()>0){
@@ -73,6 +82,10 @@ public class GeneratedClass {
 
 	public void addInterface(String anInterface){
 		interfaces.add(anInterface);
+	}
+	
+	public void addImport(Class<?> clazz){
+		addImport(clazz.getName());
 	}
 	
 	public void addImport(String anImport){
@@ -109,6 +122,8 @@ public class GeneratedClass {
 	}
 
 	public void setName(String name) {
+		if (name.indexOf('{')!=-1)
+			System.err.println("Warning, illegal name: "+name);
 		this.name = name;
 	}
 

@@ -6,6 +6,7 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
@@ -29,7 +30,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		if (mod.getStorageType()==StorageType.CMS)
-			ret.add(generateModule(mod, context));
+			ret.add(new FileEntry(generateModule(mod, context)));
 		for (int i=0; i<mod.getDocuments().size();i++){
 			DataFacadeGenerator facadeGen = new DataFacadeGenerator();
 			ret.addAll(facadeGen.generate(mod.getDocuments().get(i), context));
@@ -56,73 +57,64 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		return ret;
 	}
 	
-	private FileEntry generateModule(MetaModule module, Context context){
-		String ret = "";
+	private GeneratedClass generateModule(MetaModule module, Context context){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		String packageName = context.getPackageName(module)+".data";
+		clazz.setPackageName(context.getPackageName(module)+".data");
 	
-		ret += writeStatement("package "+packageName);
-		ret += emptyline();
-		
-		ret += writeImport("net.anotheria.anodoc.data.Module");
-		ret += writeImport("net.anotheria.anodoc.data.DocumentList");
-		//ret += writeImport("net.anotheria.anodoc.data.Document");
-		ret += writeImport("net.anotheria.anodoc.data.IDHolder");
-		ret += emptyline();
-		ret += writeImport("net.anotheria.anodoc.data.NoSuchDocumentListException");
-		ret += emptyline();
-		ret += writeImport("java.util.List");
+		clazz.addImport("net.anotheria.anodoc.data.Module");
+		clazz.addImport("net.anotheria.anodoc.data.DocumentList");
+		//appendImport("net.anotheria.anodoc.data.Document");
+		clazz.addImport("net.anotheria.anodoc.data.IDHolder");
+		clazz.addImport("net.anotheria.anodoc.data.NoSuchDocumentListException");
+		clazz.addImport("java.util.List");
 						
-		ret += emptyline();
-		ret += writeString("public class Module"+module.getName()+" extends Module{");
-		increaseIdent();
-		ret += emptyline();
-		
-		ret += generateConstants(module);
-		ret += emptyline();
-		ret += generateConstructor(module);
-		ret += emptyline();
+		appendEmptyline();
+		clazz.setName("Module"+module.getName());
+		clazz.setParent("Module");
+
+		startClassBody();
+		generateConstants(module);
+		appendEmptyline();
+		generateConstructor(module);
+		appendEmptyline();
 		
 		List<MetaDocument> documents = module.getDocuments();
 		for (int i=0; i<documents.size(); i++){
 			MetaDocument doc = documents.get(i);
 			//do document type related
-			ret += generateDocumentRelatedCode(doc);
-			ret += emptyline();
+			generateDocumentRelatedCode(doc);
+			appendEmptyline();
 		}
-		
-		ret += closeBlock();
-		
-		return new FileEntry(FileEntry.package2path(packageName), module.getModuleClassName(), ret);
+		return clazz;
 	}
 	
-	private String generateConstructor(MetaModule module){
-		String ret = "";
-		ret += writeString("public "+module.getModuleClassName()+"(){");
+	private void generateConstructor(MetaModule module){
+		appendString("public "+module.getModuleClassName()+"(){");
 		increaseIdent();
-		ret += writeString("super(MODULE_ID);");
-		ret += closeBlock();
-		return ret;
+		appendString("super(MODULE_ID);");
+		append(closeBlock());
 	}
 
 	private String generateConstants(MetaModule module){
 		String ret = "";
 		
 		//first generate module id.
-		ret += writeStatement("public static final String MODULE_ID = "+quote(module.getId()));
-		ret += emptyline();
+		appendStatement("public static final String MODULE_ID = "+quote(module.getId()));
+		appendEmptyline();
 		List<MetaDocument> documents = module.getDocuments();
 		for (int i=0; i<documents.size(); i++){
 			MetaDocument d = documents.get(i);
 			String listName = "public static final String ";
 			listName += d.getListName();
 			listName += " = "+quote(d.getListConstantValue());
-			ret += writeStatement(listName);
+			appendStatement(listName);
 			
 			String idHolderName = "public static final String ";
 			idHolderName += d.getIdHolderName();
 			idHolderName += " = IDHolder.DOC_ID_HOLDER_PRE+"+quote(d.getName().toLowerCase());
-			ret += writeStatement(idHolderName);
+			appendStatement(idHolderName);
 			
 			
 		} 
@@ -130,94 +122,84 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		return ret;
 	}
 	
-	private String generateDocumentRelatedCode(MetaDocument doc){
-		String ret = "";
-		
-		ret += writeString("@SuppressWarnings(\"unchecked\")");
-		ret += writeString("private DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> _get"+doc.getMultiple()+"(){");
+	private void generateDocumentRelatedCode(MetaDocument doc){
+		appendString("@SuppressWarnings(\"unchecked\")");
+		appendString("private DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> _get"+doc.getMultiple()+"(){");
 		increaseIdent();
-		ret += writeString("try{");
+		appendString("try{");
 		increaseIdent();
-		ret += writeStatement("return getList("+doc.getListName()+")");
+		appendStatement("return getList("+doc.getListName()+")");
 		decreaseIdent();
-		ret += writeString("}catch(NoSuchDocumentListException e){");
+		appendString("}catch(NoSuchDocumentListException e){");
 		increaseIdent();
-		ret += writeStatement("return new DocumentList<"+DocumentGenerator.getDocumentName(doc)+">("+doc.getListName()+")");
-		ret += closeBlock();
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return new DocumentList<"+DocumentGenerator.getDocumentName(doc)+">("+doc.getListName()+")");
+		append(closeBlock());
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("private void _update"+doc.getMultiple()+"(DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> list){");
+		appendString("private void _update"+doc.getMultiple()+"(DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> list){");
 		increaseIdent();
-		ret += writeString("putList(list);");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("putList(list);");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public List<"+DocumentGenerator.getDocumentName(doc)+"> get"+doc.getMultiple()+"(){");
+		appendString("public List<"+DocumentGenerator.getDocumentName(doc)+"> get"+doc.getMultiple()+"(){");
 		increaseIdent();
-		ret += writeString("return _get"+doc.getMultiple()+"().getList();");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("return _get"+doc.getMultiple()+"().getList();");
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public "+DocumentGenerator.getDocumentName(doc)+" get"+doc.getName()+"(String id){");
+		appendString("public "+DocumentGenerator.getDocumentName(doc)+" get"+doc.getName()+"(String id){");
 		increaseIdent();
-		ret += writeStatement("return _get"+doc.getMultiple()+"().getDocumentById(id)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return _get"+doc.getMultiple()+"().getDocumentById(id)");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public void update"+doc.getName()+"("+DocumentGenerator.getDocumentName(doc)+" "+doc.getVariableName()+"){");
+		appendString("public void update"+doc.getName()+"("+DocumentGenerator.getDocumentName(doc)+" "+doc.getVariableName()+"){");
 		increaseIdent();
-		ret += writeString("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> "+doc.getMultiple().toLowerCase()+" = _get"+doc.getMultiple()+"();");
-		ret += writeString(doc.getMultiple().toLowerCase()+".removeDocumentById("+doc.getVariableName()+".getId());");
-		ret += writeStatement(doc.getVariableName()+".setLastUpdateNow()");
-		ret += writeString(doc.getMultiple().toLowerCase()+".addDocument("+doc.getVariableName()+");");
-		ret += writeString("_update"+doc.getMultiple()+"("+doc.getMultiple().toLowerCase()+");");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> "+doc.getMultiple().toLowerCase()+" = _get"+doc.getMultiple()+"();");
+		appendString(doc.getMultiple().toLowerCase()+".removeDocumentById("+doc.getVariableName()+".getId());");
+		appendStatement(doc.getVariableName()+".setLastUpdateNow()");
+		appendString(doc.getMultiple().toLowerCase()+".addDocument("+doc.getVariableName()+");");
+		appendString("_update"+doc.getMultiple()+"("+doc.getMultiple().toLowerCase()+");");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public void delete"+doc.getName()+"(String id){");
+		appendString("public void delete"+doc.getName()+"(String id){");
 		increaseIdent();
-		ret += writeStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
-		ret += writeStatement("entries.removeDocumentById(id)");
-		ret += writeStatement("_update"+doc.getMultiple()+"(entries)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
+		appendStatement("entries.removeDocumentById(id)");
+		appendStatement("_update"+doc.getMultiple()+"(entries)");
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("public "+DocumentGenerator.getDocumentName(doc)+" create"+doc.getName()+"("+DocumentGenerator.getDocumentName(doc)+" "+doc.getVariableName()+" ){");
+		appendString("public "+DocumentGenerator.getDocumentName(doc)+" create"+doc.getName()+"("+DocumentGenerator.getDocumentName(doc)+" "+doc.getVariableName()+" ){");
 		increaseIdent();
-		ret += writeStatement("IDHolder idh = _getIdHolder("+doc.getIdHolderName()+")");
-		ret += writeStatement("int id = idh.getNextIdInt()");
-		ret += writeStatement(doc.getVariableName()+".renameTo(\"\"+id)");
-		ret += writeStatement("putDocument(idh)");
-		ret += emptyline();
-		ret += writeStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
-		ret += writeStatement(doc.getVariableName()+".setLastUpdateNow()");
-		ret += writeStatement("entries.addDocument("+doc.getVariableName()+")");
-		ret += writeStatement("_update"+doc.getMultiple()+"(entries)");
-		ret += writeStatement("return "+doc.getVariableName());
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("IDHolder idh = _getIdHolder("+doc.getIdHolderName()+")");
+		appendStatement("int id = idh.getNextIdInt()");
+		appendStatement(doc.getVariableName()+".renameTo(\"\"+id)");
+		appendStatement("putDocument(idh)");
+		appendEmptyline();
+		appendStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
+		appendStatement(doc.getVariableName()+".setLastUpdateNow()");
+		appendStatement("entries.addDocument("+doc.getVariableName()+")");
+		appendStatement("_update"+doc.getMultiple()+"(entries)");
+		appendStatement("return "+doc.getVariableName());
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += writeString("public "+DocumentGenerator.getDocumentName(doc)+" import"+doc.getName()+"("+DocumentGenerator.getDocumentName(doc)+" "+doc.getVariableName()+" ){");
+		appendString("public "+DocumentGenerator.getDocumentName(doc)+" import"+doc.getName()+"("+DocumentGenerator.getDocumentName(doc)+" "+doc.getVariableName()+" ){");
 		increaseIdent();
-		ret += writeStatement("IDHolder idh = _getIdHolder("+doc.getIdHolderName()+")");
-		ret += writeStatement("idh.adjustTill("+doc.getVariableName()+".getId())");
-		ret += writeStatement("putDocument(idh)");
-		ret += emptyline();
-		ret += writeStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
-		ret += writeStatement(doc.getVariableName()+".setLastUpdateNow()");
-		ret += writeStatement("entries.addDocument("+doc.getVariableName()+")");
-		ret += writeStatement("_update"+doc.getMultiple()+"(entries)");
-		ret += writeStatement("return "+doc.getVariableName());
-		ret += closeBlock();
-		ret += emptyline();
-
-		return ret;
-
-			
-		
+		appendStatement("IDHolder idh = _getIdHolder("+doc.getIdHolderName()+")");
+		appendStatement("idh.adjustTill("+doc.getVariableName()+".getId())");
+		appendStatement("putDocument(idh)");
+		appendEmptyline();
+		appendStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
+		appendStatement(doc.getVariableName()+".setLastUpdateNow()");
+		appendStatement("entries.addDocument("+doc.getVariableName()+")");
+		appendStatement("_update"+doc.getMultiple()+"(entries)");
+		appendStatement("return "+doc.getVariableName());
+		append(closeBlock());
+		appendEmptyline();
 	}
-	
-	
-	
 }

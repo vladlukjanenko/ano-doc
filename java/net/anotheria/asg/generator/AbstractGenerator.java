@@ -71,6 +71,7 @@ public class AbstractGenerator{
 	 * Writes a string in a new line with ident and linefeed.
 	 * @param s string to write.
 	 * @return
+	 * @deprecated use appendString instead
 	 */
 	protected String writeString(String s){
 		String ret = getIdent();
@@ -90,6 +91,9 @@ public class AbstractGenerator{
 		target.append(CRLF);
 	}
 
+	/**
+	 * @deprecated use appendTry
+	 */
 	protected String openTry(){
 		String ret = writeString("try{");
 		increaseIdent();
@@ -102,12 +106,11 @@ public class AbstractGenerator{
 		increaseIdent();
 	}
 
-	protected String openFun(String s){
+	protected void openFun(String s){
 		if (!s.endsWith("{"))
 			s+=" {";
-		String ret = writeString(s);
+		appendString(s);
 		increaseIdent();
-		return ret;
 	}
 
 	
@@ -115,6 +118,7 @@ public class AbstractGenerator{
 	 * Writes a statement (';' at the end of the line)
 	 * @param s statement to write.
 	 * @return
+	 * @deprecated use appendStatement instead
 	 */
 	protected String writeStatement(String s){
 		String ret = getIdent();
@@ -182,7 +186,7 @@ public class AbstractGenerator{
 	/**
 	 * Returns an empty line.
 	 */
-	protected static String emptyline(){
+	protected/*private*/ static String emptyline(){
 		return CRLF;
 	}
 	
@@ -194,14 +198,23 @@ public class AbstractGenerator{
 		emptyline(getCurrentJobContent());
 	}
 
+	/**
+	 * @deprecated use clazz.addImport(imp) instead
+	 */
 	protected String writeImport(String imp){
 		return writeString("import "+imp+";");
 	}
 
+	/**
+	 * @deprecated use clazz.addImport(imp) instead
+	 */
 	protected void appendImport(String imp){
 		appendString(getCurrentJobContent(), "import ", imp, ";");
 	}
 
+	/**
+	 * @deprecated use clazz.addImport(imp) instead
+	 */
 	protected void appendImport(StringBuilder target, String imp){
 		appendString(target, "import ", imp, ";");
 	}

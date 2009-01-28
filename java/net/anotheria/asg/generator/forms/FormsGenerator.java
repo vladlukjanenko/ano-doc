@@ -38,7 +38,7 @@ public class FormsGenerator extends AbstractAnoDocGenerator{
 	public void generate(String path, List<MetaForm> forms){
 		List<FileEntry> todo = new ArrayList<FileEntry>();
 		
-		ModuleBeanGenerator beanGenerator = new ModuleBeanGenerator(null);
+		ModuleBeanGenerator beanGenerator = new ModuleBeanGenerator();
 		JspViewGenerator jspGenerator = new JspViewGenerator();
 		ModuleActionsGenerator actionsGenerator = new ModuleActionsGenerator(null);
 

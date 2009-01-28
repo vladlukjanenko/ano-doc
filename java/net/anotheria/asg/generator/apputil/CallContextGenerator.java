@@ -6,6 +6,7 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.util.StringUtils;
@@ -24,56 +25,49 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 	}
 
 	private FileEntry generateCallContext(){
-		String ret = "";
-		ret += writeStatement("package "+getPackageName());
-		ret += emptyline();
 		
-		ret += writeImport("net.anotheria.anodoc.util.context.CallContext");
-		ret += writeImport("java.io.Serializable");
-		ret += emptyline(); 
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		String className = getCallContextName(context);
-		String classDecl = "public class "+className+" extends CallContext implements Serializable{";
-		ret += writeString(classDecl);
-		ret += emptyline();
+		clazz.setPackageName(getPackageName());
+		
+		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
+		clazz.addImport("java.io.Serializable");
+		
+		clazz.setName(getCallContextName(context));
+		clazz.setParent("CallContext");
+		clazz.addInterface("Serializable");
+
+		startClassBody();
+		appendString("public String getDefaultLanguage(){");
 		increaseIdent();
+		appendStatement("return "+quote(context.getDefaultLanguage()));
+		append(closeBlock());
 		
-		ret += writeString("public String getDefaultLanguage(){");
-		increaseIdent();
-		ret += writeStatement("return "+quote(context.getDefaultLanguage()));
-		ret += closeBlock();
-		
-		ret += closeBlock();
-		
-		return new FileEntry(FileEntry.package2path(getPackageName()), className , ret);
+		return new FileEntry(clazz);
 		
 		
 	}
 	
 	private FileEntry generateCallContextFactory(){
-		String ret = "";
 		
-		ret += writeStatement("package "+getPackageName());
-		ret += emptyline();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		ret += writeImport("net.anotheria.anodoc.util.context.CallContextFactory");
-		ret += writeImport("net.anotheria.anodoc.util.context.CallContext");
-		ret += emptyline();
+		clazz.setPackageName(getPackageName());
 		
-		String className = getFactoryName(context);
-		String classDecl = "public class "+className+" implements CallContextFactory{";
-		ret += writeString(classDecl);
-		ret += emptyline();
+		clazz.addImport("net.anotheria.anodoc.util.context.CallContextFactory");
+		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
+
+		clazz.setName(getFactoryName(context));
+		clazz.addInterface("CallContextFactory");
+
+		startClassBody();
+		appendString("public CallContext createContext(){");
 		increaseIdent();
-		
-		ret += writeString("public CallContext createContext(){");
-		increaseIdent();
-		ret += writeStatement("return new "+getPreName()+"CallContext()");
-		ret += closeBlock();
-		
-		ret += closeBlock();
-		
-		return new FileEntry(FileEntry.package2path(getPackageName()), className , ret);
+		appendStatement("return new "+getPreName()+"CallContext()");
+		append(closeBlock());
+		return new FileEntry(clazz);
 	}
 	
 	private static String getPreName(Context context){

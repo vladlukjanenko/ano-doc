@@ -45,14 +45,13 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 		clazz.addImport("net.java.dev.moskito.core.predefined.ServiceStatsFactory");
 		clazz.addImport("net.anotheria.asg.service.ASGService");
 	    addAdditionalFactoryImports(clazz, module);
-	    append(emptyline());
 	    
 	    clazz.setName(getFactoryName(module));
 	    startClassBody();
 	    
 	    appendStatement("private static AtomicInteger instanceCounter = new AtomicInteger(0)");
 	    appendStatement("private static "+getInterfaceName(module)+" defaultInstance = create"+getServiceName(module)+"()");
-	    append(emptyline());
+	    appendEmptyline();
 	    
 	    appendString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");
 	    increaseIdent();
@@ -70,13 +69,13 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    appendStatement("return ("+getInterfaceName(module)+") proxy.createProxy()");
 	    
 	    append(closeBlock());
-	    append(emptyline());
+	    appendEmptyline();
 	    
 	    appendString("private static "+getInterfaceName(module)+" createInstance(){");
 	    increaseIdent();
 	    appendString("return "+getImplementationName(module)+".getInstance();");
 	    append(closeBlock());
-	    append(emptyline());
+	    appendEmptyline();
 	    
 	    appendString("static "+getInterfaceName(module)+" getDefaultInstance(){");
 	    increaseIdent();
