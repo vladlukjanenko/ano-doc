@@ -7,6 +7,7 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
@@ -28,16 +29,18 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 	public FileEntry generate(IGenerateable g, Context context) {
 		
 		MetaView view = (MetaView)g;
-		String ret = generateViewAction(view, context);
-		return new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".action"), getViewActionName(view),ret);
+		return new FileEntry(generateViewAction(view, context));
 	}
 	
 	public static String getViewActionName(MetaView view){
 		return "Base"+StringUtils.capitalize(view.getName())+"Action";
 	}
 	
-	public String generateViewAction(MetaView view, Context context){
-		String ret = "";
+	public GeneratedClass generateViewAction(MetaView view, Context context){
+
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".action");
 		
 		List<MetaSection> sections = view.getSections();
 		List<MetaModule> modules = new ArrayList<MetaModule>();
@@ -51,113 +54,96 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 			}
 		}		
 
-		
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("net.anotheria.webutils.bean.MenuItemBean");
+		clazz.addImport("javax.servlet.http.HttpServletRequest");
+		clazz.addImport("javax.servlet.http.HttpServletResponse");
+		clazz.addImport("org.apache.struts.action.ActionForm");
+		clazz.addImport("org.apache.struts.action.ActionMapping");
 
-		ret += writeStatement("package "+context.getPackageName(MetaModule.SHARED)+".action");
-		ret += emptyline();
-		
-		ret += writeImport("java.util.List");
-		ret += writeImport("java.util.ArrayList");
-		ret += emptyline();
+		clazz.setAbstractClass(true);
+		clazz.setName(getViewActionName(view));
+		clazz.setParent(BaseActionGenerator.getBaseActionName(context));
 
-		//ret += writeImport("net.anotheria.webutils.actions.*");
-		ret += writeImport("net.anotheria.webutils.bean.MenuItemBean");
-		ret += emptyline();
+		startClassBody();
 
-		ret += writeImport("javax.servlet.http.HttpServletRequest");
-		ret += writeImport("javax.servlet.http.HttpServletResponse");
-		ret += writeImport("org.apache.struts.action.ActionForm");
-		//ret += writeImport("org.apache.struts.action.ActionForward");
-		ret += writeImport("org.apache.struts.action.ActionMapping");
-		ret += emptyline();
+		appendStatement("public static final String BEAN_MENU = "+quote("menu"));
+		appendStatement("public static final String BEAN_QUERIES_MENU = "+quote("queriesMenu"));
+		appendEmptyline();
 		
+		appendString("protected abstract String getTitle();");
+		appendEmptyline();
 		
-
-		ret += writeString("public abstract class "+getViewActionName(view)+" extends "+BaseActionGenerator.getBaseActionName(context)+"{");
-		ret += emptyline();
+		appendString("protected void init(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
-		
-		
-
-		ret += writeStatement("public static final String BEAN_MENU = "+quote("menu"));
-		ret += writeStatement("public static final String BEAN_QUERIES_MENU = "+quote("queriesMenu"));
-		ret += emptyline();
-		
-		ret += writeString("protected abstract String getTitle();");
-		ret += emptyline();
-		
-		ret += writeString("protected void init(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
-		increaseIdent();
-		ret += writeStatement("super.init(mapping, af, req, res)");
+		appendStatement("super.init(mapping, af, req, res)");
 		//add check for roles
 		if (view.getRequiredRoles()!=null && view.getRequiredRoles().size()>0){
-			ret += writeCommentLine("check whether user has one of following roles: "+view.getRequiredRoles());
+			appendCommentLine("check whether user has one of following roles: "+view.getRequiredRoles());
 		}
-		ret += writeStatement("prepareMenu(req)");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("prepareMenu(req)");
+		append(closeBlock());
+		appendEmptyline();
 					
-		ret += writeString("private void prepareMenu(HttpServletRequest req){");
+		appendString("private void prepareMenu(HttpServletRequest req){");
 		increaseIdent();
-		ret += writeStatement("List<MenuItemBean> menu = new ArrayList<MenuItemBean>()");
+		appendStatement("List<MenuItemBean> menu = new ArrayList<MenuItemBean>()");
 		for (int i=0; i<sections.size(); i++){
 			MetaSection section = (MetaSection)sections.get(i);
 			if (section instanceof MetaModuleSection)
-				ret += writeStatement("menu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)section).getDocument(), StrutsConfigGenerator.ACTION_SHOW))+"))");
+				appendStatement("menu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)section).getDocument(), StrutsConfigGenerator.ACTION_SHOW))+"))");
 			if (section instanceof MetaCustomSection)
-				ret += writeStatement("menu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(((MetaCustomSection)section).getPath())+"))");
+				appendStatement("menu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(((MetaCustomSection)section).getPath())+"))");
 					
 		}
-		ret += writeStatement("addBeanToRequest(req, BEAN_MENU, menu)");
+		appendStatement("addBeanToRequest(req, BEAN_MENU, menu)");
 		
-		ret += emptyline();
-		ret += writeStatement("List<MenuItemBean> queriesMenu = new ArrayList<MenuItemBean>()");
+		appendEmptyline();
+		appendStatement("List<MenuItemBean> queriesMenu = new ArrayList<MenuItemBean>()");
 		for (int i=0; i<sections.size(); i++){
 			MetaSection section = (MetaSection)sections.get(i);
 			if (section instanceof MetaModuleSection){
 				MetaDocument doc = ((MetaModuleSection)section).getDocument();
 				if (doc.getLinks().size()>0){
-					ret += writeStatement("queriesMenu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW_QUERIES))+"))");
+					appendStatement("queriesMenu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW_QUERIES))+"))");
 				}
 			}
 		}
-		ret += writeStatement("addBeanToRequest(req, BEAN_QUERIES_MENU, queriesMenu)");
+		appendStatement("addBeanToRequest(req, BEAN_QUERIES_MENU, queriesMenu)");
 		
 		
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 		
-		ret += writeString("private MenuItemBean makeMenuItemBean(String title, String link){");
+		appendString("private MenuItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();
-		ret += writeString("MenuItemBean bean = new MenuItemBean();");
-		ret += writeString("bean.setCaption(title);");
-		ret += writeString("bean.setLink(link);");
-		ret += writeString("if (title.equals(getTitle())){");
+		appendString("MenuItemBean bean = new MenuItemBean();");
+		appendString("bean.setCaption(title);");
+		appendString("bean.setLink(link);");
+		appendString("if (title.equals(getTitle())){");
 		increaseIdent();
-		ret += writeString("bean.setActive(true);");
-		ret += writeString("bean.setStyle(\"menuTitleSelected\");");
+		appendString("bean.setActive(true);");
+		appendString("bean.setStyle(\"menuTitleSelected\");");
 		decreaseIdent();
-		ret += writeString("}else{");
+		appendString("}else{");
 		increaseIdent();
-		ret += writeString("bean.setActive(false);");
-		ret += writeString("bean.setStyle(\"menuTitle\");");
-		ret += closeBlock();		
-		ret += writeString("return bean;");
-		ret += closeBlock();
-		ret += emptyline();
+		appendString("bean.setActive(false);");
+		appendString("bean.setStyle(\"menuTitle\");");
+		append(closeBlock());		
+		appendString("return bean;");
+		append(closeBlock());
+		appendEmptyline();
 		
 		//security...
-		ret += writeString("protected boolean isAuthorizationRequired(){");
+		appendString("protected boolean isAuthorizationRequired(){");
 		increaseIdent();
 		//System.out.println("Warning authorization is off.");
-		ret+= writeStatement("return true");
+		appendStatement("return true");
 		//ret+= writeStatement("return false");
-		ret += closeBlock();
-		ret += emptyline();
+		append(closeBlock());
+		appendEmptyline();
 
-		ret += closeBlock();
-		
-		return ret;
+		return clazz;
 	}
-
 }
