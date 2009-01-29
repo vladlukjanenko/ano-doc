@@ -6,6 +6,8 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedArtefact;
+import net.anotheria.asg.generator.GeneratedXMLFile;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.util.StringUtils;
@@ -21,102 +23,103 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 	public List<FileEntry> generate(IGenerateable g, Context context) {
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		
-		String fileContent = generateContent(context);
+		GeneratedXMLFile log4Config = generateContent(context);
+		log4Config.setPath("/etc/appdata");
 		
-		FileEntry entry = new FileEntry("/etc/appdata", "log4j", fileContent);
+		FileEntry entry = new FileEntry(log4Config);
 		entry.setType(".xml");
 		files.add(entry);
 	
 		return files;
 	}
 	
-	private String generateContent(Context context){
+	private GeneratedXMLFile generateContent(Context context){
 	
-		StringBuilder ret = new StringBuilder(5000);
+		GeneratedXMLFile artefact = new GeneratedXMLFile("log4j", "UTF-8");
+		startNewJob(artefact);
 		
-		appendString(ret, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
-		appendString(ret, "<!DOCTYPE log4j:configuration SYSTEM \"log4j.dtd\">");
+		appendString("<!DOCTYPE log4j:configuration SYSTEM \"log4j.dtd\">");
 		
-		appendString(ret, "<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>");
+		appendString("<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>");
 		increaseIdent();
-		emptyline(ret);
+		appendEmptyline();
 		
-		appendString(ret , "<!-- File Appenders for generated code -->");
-		emptyline(ret);
+		appendString("<!-- File Appenders for generated code -->");
+		appendEmptyline();
 		
 		for (String cat : categories){
-		  	appendString(ret, "<!-- File Appender for ", cat, " and higher -->");
-		  	appendString(ret, "<appender name=", quote(StringUtils.capitalize(cat) + "GenAppender"), " class="+quote("org.apache.log4j.RollingFileAppender"),">");
+		  	appendString("<!-- File Appender for ", cat, " and higher -->");
+		  	appendString("<appender name=", quote(StringUtils.capitalize(cat) + "GenAppender"), " class="+quote("org.apache.log4j.RollingFileAppender"),">");
 		  	increaseIdent();
-		  	appendString(ret, "<param name=", quote("File"), " value=", quote("logs/"+context.getApplicationName()+"-gen-"+cat+".log"), " />");
-		  	appendString(ret, "<param name=", quote("Threshold"), " value=", quote(cat.toUpperCase()), " />");
-		  	appendString(ret, "<param name=", quote("MaxFileSize"), " value=",quote("100MB"), " />  ");     
-		  	appendString(ret, "<param name=", quote("MaxBackupIndex"), " value=", quote(5), " />");
-		  	appendString(ret, "<layout class=", quote("org.apache.log4j.PatternLayout"), ">");
+		  	appendString("<param name=", quote("File"), " value=", quote("logs/"+context.getApplicationName()+"-gen-"+cat+".log"), " />");
+		  	appendString("<param name=", quote("Threshold"), " value=", quote(cat.toUpperCase()), " />");
+		  	appendString("<param name=", quote("MaxFileSize"), " value=",quote("100MB"), " />  ");     
+		  	appendString("<param name=", quote("MaxBackupIndex"), " value=", quote(5), " />");
+		  	appendString("<layout class=", quote("org.apache.log4j.PatternLayout"), ">");
 		  	increaseIdent();
-		  	appendString(ret, "<param name=", quote("ConversionPattern"), " value=", quote("%r %d{ISO8601} %-5p %c - %m%n"), "/>");
+		  	appendString("<param name=", quote("ConversionPattern"), " value=", quote("%r %d{ISO8601} %-5p %c - %m%n"), "/>");
 		  	decreaseIdent();
-		  	appendString(ret, "</layout>");
+		  	appendString("</layout>");
 			decreaseIdent();
-		  	appendString(ret, "</appender>");
+		  	appendString("</appender>");
 		}
-		emptyline(ret);
+		appendEmptyline();
 		
-		appendString(ret, "<!-- File Appenders for written code -->");
-		emptyline(ret);
+		appendString("<!-- File Appenders for written code -->");
+		appendEmptyline();
 
 		for (String cat : categories){
-		  	appendString(ret, "<!-- File Appender for ", cat, " and higher -->");
-		  	appendString(ret, "<appender name=", quote(StringUtils.capitalize(cat) + "Appender"), " class="+quote("org.apache.log4j.RollingFileAppender"),">");
+		  	appendString("<!-- File Appender for ", cat, " and higher -->");
+		  	appendString("<appender name=", quote(StringUtils.capitalize(cat) + "Appender"), " class="+quote("org.apache.log4j.RollingFileAppender"),">");
 		  	increaseIdent();
-		  	appendString(ret, "<param name=", quote("File"), " value=", quote("logs/"+context.getApplicationName()+"-"+cat+".log"), " />");
-		  	appendString(ret, "<param name=", quote("Threshold"), " value=", quote(cat.toUpperCase()), " />");
-		  	appendString(ret, "<param name=", quote("MaxFileSize"), " value=",quote("100MB"), " />  ");     
-		  	appendString(ret, "<param name=", quote("MaxBackupIndex"), " value=", quote(5), " />");
-		  	appendString(ret, "<layout class=", quote("org.apache.log4j.PatternLayout"), ">");
+		  	appendString("<param name=", quote("File"), " value=", quote("logs/"+context.getApplicationName()+"-"+cat+".log"), " />");
+		  	appendString("<param name=", quote("Threshold"), " value=", quote(cat.toUpperCase()), " />");
+		  	appendString("<param name=", quote("MaxFileSize"), " value=",quote("100MB"), " />  ");     
+		  	appendString("<param name=", quote("MaxBackupIndex"), " value=", quote(5), " />");
+		  	appendString("<layout class=", quote("org.apache.log4j.PatternLayout"), ">");
 		  	increaseIdent();
-		  	appendString(ret, "<param name=", quote("ConversionPattern"), " value=", quote("%r %d{ISO8601} %-5p %c - %m%n"), "/>");
+		  	appendString("<param name=", quote("ConversionPattern"), " value=", quote("%r %d{ISO8601} %-5p %c - %m%n"), "/>");
 		  	decreaseIdent();
-		  	appendString(ret, "</layout>");
+		  	appendString("</layout>");
 			decreaseIdent();
-		  	appendString(ret, "</appender>");
+		  	appendString("</appender>");
 		}
-		emptyline(ret);
+		appendEmptyline();
 		
-		appendString(ret, "<!-- Console appender -->");
-		appendString(ret, "<appender name="+quote("ConsoleAppender"), " class=", quote("org.apache.log4j.ConsoleAppender"),">");
+		appendString("<!-- Console appender -->");
+		appendString("<appender name="+quote("ConsoleAppender"), " class=", quote("org.apache.log4j.ConsoleAppender"),">");
 		increaseIdent();
-		appendString(ret, "<param name="+quote("Threshold"), " value="+quote("WARN"), " />");
-		appendString(ret, "<layout class="+quote("org.apache.log4j.PatternLayout"), ">");
+		appendString("<param name="+quote("Threshold"), " value="+quote("WARN"), " />");
+		appendString("<layout class="+quote("org.apache.log4j.PatternLayout"), ">");
 		increaseIdent();
-		appendString(ret, "<param name="+quote("ConversionPattern")," value=", quote("%r %d{ISO8601} %-5p %c - %m%n"), "/>");
+		appendString("<param name="+quote("ConversionPattern")," value=", quote("%r %d{ISO8601} %-5p %c - %m%n"), "/>");
 		decreaseIdent();
-		appendString(ret, "</layout>");
+		appendString("</layout>");
 		decreaseIdent();
-		appendString(ret, "</appender>");
-		emptyline(ret);
+		appendString("</appender>");
+		appendEmptyline();
 
-		appendString(ret, "<logger name=", quote(context.getTopPackageName()), " additivity=", quote("false"), ">");
+		appendString("<logger name=", quote(context.getTopPackageName()), " additivity=", quote("false"), ">");
 		increaseIdent(); 
-		appendString(ret, "<level value=", quote("INFO"), "/>");
+		appendString("<level value=", quote("INFO"), "/>");
 		for (String cat : categories)
-			appendString(ret, "<appender-ref ref=",quote(StringUtils.capitalize(cat)+"GenAppender"), "/>");
+			appendString("<appender-ref ref=",quote(StringUtils.capitalize(cat)+"GenAppender"), "/>");
 		decreaseIdent();
-		appendString(ret, "</logger>");
-		emptyline(ret);
+		appendString("</logger>");
+		appendEmptyline();
 		
-		appendString(ret, "<logger name=", quote("net.anotheria."+context.getApplicationName().toLowerCase()), " additivity=", quote("false"), ">");
+		appendString("<logger name=", quote("net.anotheria."+context.getApplicationName().toLowerCase()), " additivity=", quote("false"), ">");
 		increaseIdent(); 
-		appendString(ret, "<level value=", quote("INFO"), "/>");
+		appendString("<level value=", quote("INFO"), "/>");
 		for (String cat : categories)
-			appendString(ret, "<appender-ref ref=",quote(StringUtils.capitalize(cat)+"Appender"), "/>");
+			appendString("<appender-ref ref=",quote(StringUtils.capitalize(cat)+"Appender"), "/>");
 		decreaseIdent();
-		appendString(ret, "</logger>");
-		emptyline(ret);
+		appendString("</logger>");
+		appendEmptyline();
 
 		decreaseIdent();
-		appendString(ret, "</log4j:configuration>");
-		return ret.toString();
+		appendString("</log4j:configuration>");
+		return artefact;
 	}
 
 	

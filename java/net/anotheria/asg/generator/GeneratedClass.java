@@ -3,16 +3,13 @@ package net.anotheria.asg.generator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GeneratedClass {
-	
-	public static final String CRLF = AbstractGenerator.CRLF;
+public class GeneratedClass extends GeneratedArtefact{
 	
 	private List<String> imports;
 	private List<String> interfaces;
 	
 	private StringBuilder body;
 	
-	private String name;
 	private String parent;
 	
 	private String packageName;
@@ -125,14 +122,20 @@ public class GeneratedClass {
 		this.body = body;
 	}
 
-	public String getName() {
-		return name;
+
+	@Override
+	public String createFileContent() {
+		return createClassFileContent();
 	}
 
-	public void setName(String name) {
-		if (name.indexOf('{')!=-1)
-			System.err.println("Warning, illegal name: "+name);
-		this.name = name;
+	@Override
+	public String getFileType() {
+		return ".java";
+	}
+
+	@Override
+	public String getPath() {
+		return FileEntry.package2path(getPackageName());
 	}
 
 	public String getParent() {

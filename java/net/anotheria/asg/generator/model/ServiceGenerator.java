@@ -135,7 +135,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getExceptionName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getExceptionName(module), this));
  
 	    clazz.setPackageName(getPackageName(module));
 	    clazz.addImport(ASGRuntimeException.class);
@@ -167,8 +167,8 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	private GeneratedClass generateInterface(MetaModule module){
 	    
 		GeneratedClass clazz = new GeneratedClass();
-		startNewJob();
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
+		startNewJob(clazz);
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module), this));
  
 	    clazz.setPackageName(getPackageName(module));
 	    clazz.addImport(List.class);

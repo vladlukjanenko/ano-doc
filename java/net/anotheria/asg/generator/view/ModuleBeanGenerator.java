@@ -44,7 +44,6 @@ import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
 import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
 import net.anotheria.util.ExecutionTimer;
@@ -831,25 +830,25 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	    return StringUtils.capitalize(form.getId())+"AutoForm";
 	}
 	
-	public String generateFormBean(MetaForm form){
-	    String ret = "";
+	public GeneratedClass generateFormBean(MetaForm form){
+	    GeneratedClass clazz = new GeneratedClass();
+	    startNewJob(clazz);
 	    
-		appendStatement("package "+getPackage());
-		appendEmptyline();
-		appendImport("net.anotheria.webutils.bean.BaseActionForm");
-		appendImport("javax.servlet.http.HttpServletRequest");
-		appendImport("org.apache.struts.action.ActionMapping");
+		clazz.setPackageName(getPackage());
+		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
+		clazz.addImport("javax.servlet.http.HttpServletRequest");
+		clazz.addImport("org.apache.struts.action.ActionMapping");
 		
-		appendEmptyline();
-
 		List<MetaFormField> elements = new ArrayList<MetaFormField>();
 		elements.addAll(form.getElements());
 		
 		
 		
-		appendString("public class "+getFormBeanName(form)+" extends BaseActionForm{");
-		increaseIdent();
-
+		clazz.setName(getFormBeanName(form));
+		clazz.setParent("BaseActionForm");
+		
+		startClassBody();
+		
 		for (int i=0; i<elements.size(); i++){
 			MetaFormField element = elements.get(i);
 			if (element.isSingle())
@@ -919,12 +918,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		append(closeBlock());
 		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
 		append(closeBlock());
-		  
-		
-		append(closeBlock());		
 	    
-	    
-	    return ret;
+	    return clazz;
 	}
 	
 }

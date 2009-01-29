@@ -38,7 +38,7 @@ public class JspQueriesGenerator
 		menu.setType(".jsp");
 		files.add(menu);
 
-		FileEntry footer = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(MetaModule.SHARED)), getFooterName(view), generateFooter(view, FOOTER_SELECTION_QUERIES));
+		FileEntry footer = new FileEntry(generateFooter(view, FOOTER_SELECTION_QUERIES, getFooterName(view)));
 		footer.setType(".jsp");
 		files.add(footer);
 
@@ -70,7 +70,7 @@ public class JspQueriesGenerator
 		ret += writeString("<head>");
 		increaseIdent();
 		ret += writeString("<title>"+view.getTitle()+"</title>");
-		ret += generatePragmas(view);
+		generatePragmas(view);
 		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
 		ret += writeString("</head>");
@@ -86,17 +86,17 @@ public class JspQueriesGenerator
 		
 		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
 		increaseIdent();
-		ret += openTR();
+		openTR();
 		ret += writeString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
-		ret += closeTR();
+		closeTR();
 		
-		ret += openTR();
+		openTR();
 		ret += writeString("<td>&nbsp;</td>");
-		ret += closeTR();
+		closeTR();
 		
-		ret += openTR("class="+quote("lineCaptions"));
+		openTR("class="+quote("lineCaptions"));
 		ret += writeString("<td>&nbsp;Available queries:</td>");
-		ret += closeTR();
+		closeTR();
 		
 		List<MetaProperty> links = doc.getLinks();
 		for (int i=0; i<links.size(); i++){
@@ -108,9 +108,9 @@ public class JspQueriesGenerator
 			MetaDocument targetDocument = mod.getDocumentByName(link.getTargetDocumentName());
 			
 			
-			ret += openTR("class="+quote(i%2==0 ? "lineLight" : "lineDark"));
+			openTR("class="+quote(i%2==0 ? "lineLight" : "lineDark"));
 			ret += writeString("<form name="+quote(targetDocument.getName())+" action="+quote(StrutsConfigGenerator.getExecuteQueryPath(doc))+" method="+quote("GET")+"><input type="+quote("hidden")+" name="+quote("property")+" value="+quote(link.getName()));
-			ret += openTD();
+			openTD();
 			increaseIdent();
 			ret += writeString("&nbsp;Show all "+section.getTitle()+" where "+link.getName()+" is:&nbsp;");
 			ret += writeOpeningTag("select", "name="+quote("criteria"));
@@ -123,9 +123,9 @@ public class JspQueriesGenerator
 			//ret += writeClosingTag("select");
 			ret += writeString("</select>&nbsp;<a href="+quote("#")+" onClick="+quote("document.forms."+targetDocument.getName()+".submit(); return false")+">GO</a>");
 			decreaseIdent();
-			ret += closeTD();
+			closeTD();
 			ret += writeString("</form>");
-			ret += closeTR();
+			closeTR();
 		}
 
 		decreaseIdent();
@@ -144,7 +144,7 @@ public class JspQueriesGenerator
 		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"QueriesMenu";		
 	}
 
-	private String generateMenu(MetaView view){
+	private String generateMenu(MetaView view){ 
 		
 		String ret = getBaseJSPHeader();
 		

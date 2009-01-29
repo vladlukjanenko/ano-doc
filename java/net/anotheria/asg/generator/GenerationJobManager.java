@@ -16,7 +16,7 @@ public class GenerationJobManager {
 		currentJob.set(new GenerationJob());
 	}
 
-	public static void startNewJob(GeneratedClass clazz){
-		currentJob.set(new GenerationJob(clazz.getBody()));
+	public static void startNewJob(GeneratedArtefact artefact){
+		currentJob.set(new GenerationJob(artefact.getBody()));
 	}
 }

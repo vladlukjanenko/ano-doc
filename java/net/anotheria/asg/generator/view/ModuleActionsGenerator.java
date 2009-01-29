@@ -1714,14 +1714,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return ret;
 	}
 
-	/**
-	 * @deprecated use addStandardActionImports instead 
-	 */
-	@Deprecated 
-	private void appendStandardActionImports(){
-		appendStandardActionImports(getCurrentJobContent());
-	}
-
 	private void addStandardActionImports(GeneratedClass clazz){
 	    clazz.addImport("javax.servlet.http.HttpServletRequest");
 	    clazz.addImport("javax.servlet.http.HttpServletResponse");
@@ -1730,32 +1722,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    clazz.addImport("org.apache.struts.action.ActionMapping");
 	}
 	
-	private void appendStandardActionImports(StringBuilder target){
-	    appendImport(target, "javax.servlet.http.HttpServletRequest");
-	    appendImport(target, "javax.servlet.http.HttpServletResponse");
-	    appendImport(target, "org.apache.struts.action.ActionForm");
-	    appendImport(target, "org.apache.struts.action.ActionForward");
-	    appendImport(target, "org.apache.struts.action.ActionMapping");
-		emptyline(target);
-		//TODO change this, its probably no need to store shared actions under action
-		//ret += writeImport(GeneratorDataRegistry.getInstance().getContext().getTopPackageName()+".action.*");
-		//ret += emptyline();
-	}
 
-	private String getStandardActionImports(){
-	    String ret = "";
-		ret += writeImport("javax.servlet.http.HttpServletRequest");
-		ret += writeImport("javax.servlet.http.HttpServletResponse");
-		ret += writeImport("org.apache.struts.action.ActionForm");
-		ret += writeImport("org.apache.struts.action.ActionForward");
-		ret += writeImport("org.apache.struts.action.ActionMapping");
-		ret += emptyline();
-		//TODO change this, its probably no need to store shared actions under action
-		//ret += writeImport(GeneratorDataRegistry.getInstance().getContext().getTopPackageName()+".action.*");
-		//ret += emptyline();
-		return ret;
-	}
-	
 	//////////////////////////////////////////////////////////////////////////
 	// TABLE
 	
@@ -2411,69 +2378,63 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return "Send"+StringUtils.capitalize(form.getId())+"FormAction"; 
 	}
 	
-	public String generateFormAction(MetaForm form){
+	public GeneratedClass generateFormAction(MetaForm form){
 		if (form.getAction().equals("sendMail"))
 			return generateSendMailFormAction(form);
 		throw new RuntimeException("Unsupported action type: "+form.getAction());
 	}
 	
-	private String generateSendMailFormAction(MetaForm form){
-		String ret = "";
-
-		ret += writeStatement("package "+getPackage());
+	private GeneratedClass generateSendMailFormAction(MetaForm form){
 		
-		ret += emptyline();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 
+		clazz.setPackageName(getPackage());
+		addStandardActionImports(clazz);
+		clazz.addImport(ModuleBeanGenerator.getFormBeanImport(form));
+		clazz.addImport("net.anotheria.communication.data.HtmlMailMessage");
+		clazz.addImport("net.anotheria.communication.service.IMessagingService");
+		clazz.addImport("net.anotheria.communication.service.MessagingServiceFactory");
 
+		clazz.setName(getFormActionName(form));
+		clazz.setParent(BaseActionGenerator.getBaseActionName(GeneratorDataRegistry.getInstance().getContext()));
 
-		//write imports...
-		ret += getStandardActionImports();
-		ret += writeImport(ModuleBeanGenerator.getFormBeanImport(form));
-		ret += emptyline();
-		ret += writeImport("net.anotheria.communication.data.HtmlMailMessage");
-		ret += writeImport("net.anotheria.communication.service.IMessagingService");
-		ret += writeImport("net.anotheria.communication.service.MessagingServiceFactory");
-
-		ret += emptyline();
-	    
-		ret += writeString("public class "+getFormActionName(form)+" extends "+BaseActionGenerator.getBaseActionName(GeneratorDataRegistry.getInstance().getContext())+" {");
-		increaseIdent();
-		ret += emptyline();
-		ret += writeStatement("private IMessagingService service = MessagingServiceFactory.getMessagingService()"); 
-		ret += emptyline();
+		startClassBody();
+		appendStatement("private IMessagingService service = MessagingServiceFactory.getMessagingService()"); 
+		appendEmptyline();
 		List<String> targets = form.getTargets();
-		ret += writeString("public static String[] MAIL_TARGETS = {");
+		appendString("public static String[] MAIL_TARGETS = {");
 		for (int i=0; i<targets.size(); i++){
-			ret += writeIncreasedString(quote((String)targets.get(i))+",");
+			appendIncreasedString(quote((String)targets.get(i))+",");
 		}
-		ret += writeStatement("}");
-		ret += emptyline();
+		appendStatement("}");
+		appendEmptyline();
 	    
 	    
-		ret += writeString(getExecuteDeclaration());
+		appendString(getExecuteDeclaration());
 		increaseIdent();
 	
 
-		ret += writeStatement(ModuleBeanGenerator.getFormBeanName(form)+" form = ("+ModuleBeanGenerator.getFormBeanName(form)+") af");	
+		appendStatement(ModuleBeanGenerator.getFormBeanName(form)+" form = ("+ModuleBeanGenerator.getFormBeanName(form)+") af");	
 		//create message.
-		ret += writeString("//create message");
-		ret += writeStatement("String message = "+quote(""));
-		ret += writeStatement("String htmlMessage = "+quote(""));
-		ret += emptyline();
+		appendString("//create message");
+		appendStatement("String message = "+quote(""));
+		appendStatement("String htmlMessage = "+quote(""));
+		appendEmptyline();
 
-		ret += writeStatement("String emptyHtmlLine = "+quote(""));
-		ret += writeStatement("emptyHtmlLine += "+quote("<tr>"));
-		ret += writeStatement("emptyHtmlLine += "+quote("\\t<td colspan=\\\"2\\\">"));
-		ret += writeStatement("emptyHtmlLine += "+quote("\\t\\t&nbsp;"));
-		ret += writeStatement("emptyHtmlLine  += "+quote("\\t</td>"));
-		ret += writeStatement("emptyHtmlLine  += "+quote("</tr>"));
-		ret += emptyline();
+		appendStatement("String emptyHtmlLine = "+quote(""));
+		appendStatement("emptyHtmlLine += "+quote("<tr>"));
+		appendStatement("emptyHtmlLine += "+quote("\\t<td colspan=\\\"2\\\">"));
+		appendStatement("emptyHtmlLine += "+quote("\\t\\t&nbsp;"));
+		appendStatement("emptyHtmlLine  += "+quote("\\t</td>"));
+		appendStatement("emptyHtmlLine  += "+quote("</tr>"));
+		appendEmptyline();
 		
-		ret += writeStatement("htmlMessage += "+quote("<table border=\\\"0\\\">"));
+		appendStatement("htmlMessage += "+quote("<table border=\\\"0\\\">"));
 		
 		List<MetaFormField> elements = form.getElements();
 		for (int i=0; i<elements.size(); i++){
-			ret += writeStatement("htmlMessage += "+quote("\\n"));
+			appendStatement("htmlMessage += "+quote("\\n"));
 
 			MetaFormField element = (MetaFormField)elements.get(i);
 			
@@ -2481,95 +2442,95 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				
 				MetaFormSingleField field = (MetaFormSingleField)element;
 				
-				ret += writeStatement("htmlMessage += "+quote("<tr>"));
-				ret += writeStatement("htmlMessage += "+quote("\\t<td width=\\\"1\\\">"));
-				ret += writeStatement("htmlMessage += "+quote("\\t\\t"+(field.isSpacer() ? "&nbsp;" : ""+(i+1))));
-				ret += writeStatement("htmlMessage += "+quote("\\t</td>"));
-				ret += writeStatement("htmlMessage += "+quote("\\t<td>"));
-				ret += writeStatement("htmlMessage += \"\\t\\t\"+getDefaultResources().getMessage("+quote(field.getTitle())+")");
-				ret += writeStatement("htmlMessage += "+quote("\\t</td>"));
-				ret += writeStatement("htmlMessage += "+quote("</tr>"));
-				ret += emptyline();
+				appendStatement("htmlMessage += "+quote("<tr>"));
+				appendStatement("htmlMessage += "+quote("\\t<td width=\\\"1\\\">"));
+				appendStatement("htmlMessage += "+quote("\\t\\t"+(field.isSpacer() ? "&nbsp;" : ""+(i+1))));
+				appendStatement("htmlMessage += "+quote("\\t</td>"));
+				appendStatement("htmlMessage += "+quote("\\t<td>"));
+				appendStatement("htmlMessage += \"\\t\\t\"+getDefaultResources().getMessage("+quote(field.getTitle())+")");
+				appendStatement("htmlMessage += "+quote("\\t</td>"));
+				appendStatement("htmlMessage += "+quote("</tr>"));
+				appendEmptyline();
 
 				if (field.isSpacer())
 					continue;
 				
-				ret += writeStatement("htmlMessage += "+quote("<tr>"));
-				ret += writeStatement("htmlMessage += "+quote("\\t<td colspan=\\\"2\\\">"));
+				appendStatement("htmlMessage += "+quote("<tr>"));
+				appendStatement("htmlMessage += "+quote("\\t<td colspan=\\\"2\\\">"));
 				String value = "String value"+i+" = "; 
 				if (field.getType().equals("boolean")){
 					value += "form.get"+StringUtils.capitalize(element.getName())+"() ? "+quote("Yes")+" : "+quote("No");
 				}else{
 					value += "form.get"+StringUtils.capitalize(element.getName())+"()"; 
 				}
-				ret += writeStatement(value);
-				ret += writeStatement("htmlMessage += \"\\t\\t\"+value"+i+"+"+quote("&nbsp;"));
-				ret += writeStatement("htmlMessage += "+quote("\\t</td>"));
-				ret += writeStatement("htmlMessage += "+quote("</tr>"));
-				ret += emptyline();
+				appendStatement(value);
+				appendStatement("htmlMessage += \"\\t\\t\"+value"+i+"+"+quote("&nbsp;"));
+				appendStatement("htmlMessage += "+quote("\\t</td>"));
+				appendStatement("htmlMessage += "+quote("</tr>"));
+				appendEmptyline();
 
-				ret += writeStatement("htmlMessage += emptyHtmlLine");
-				ret += emptyline();
+				appendStatement("htmlMessage += emptyHtmlLine");
+				appendEmptyline();
 
 				
 //				String title = element.getTitle();
-				ret += writeStatement("message += "+quote(element.getName()+" - "));
-				ret += writeStatement("message += getDefaultResources().getMessage("+quote(field.getTitle())+")+"+quote(":\\n"));
-				ret += writeStatement("message += value"+i+"+"+quote("\\n"));
+				appendStatement("message += "+quote(element.getName()+" - "));
+				appendStatement("message += getDefaultResources().getMessage("+quote(field.getTitle())+")+"+quote(":\\n"));
+				appendStatement("message += value"+i+"+"+quote("\\n"));
 
-				ret += emptyline();
+				appendEmptyline();
 				
 			}
 			
 			if (element.isComplex()){
 				MetaFormTableField table = (MetaFormTableField)element;
-				ret += writeStatement("htmlMessage += "+quote("<!-- including table element "+table.getName()+" -->\\n"));
-				ret += writeStatement("htmlMessage += "+quote("<tr>"));
-				ret += writeStatement("htmlMessage += "+quote("\\t<td colspan=\\\"3\\\">"));
-				ret += emptyline();
+				appendStatement("htmlMessage += "+quote("<!-- including table element "+table.getName()+" -->\\n"));
+				appendStatement("htmlMessage += "+quote("<tr>"));
+				appendStatement("htmlMessage += "+quote("\\t<td colspan=\\\"3\\\">"));
+				appendEmptyline();
 				//start subtable...
 				
-				ret += writeStatement("htmlMessage += "+quote("\\n"));
-				ret += writeString("//Writing inner table: "+table.getName());
-				ret += writeStatement("htmlMessage += "+quote("<table width=\\\"100%\\\">"));
+				appendStatement("htmlMessage += "+quote("\\n"));
+				appendString("//Writing inner table: "+table.getName());
+				appendStatement("htmlMessage += "+quote("<table width=\\\"100%\\\">"));
 				
 				//generate headers.
 				List<MetaFormTableColumn> columns = table.getColumns();
-				ret += writeStatement("htmlMessage += "+quote("\\n"));
-				ret += writeStatement("htmlMessage += "+quote("<tr>"));
+				appendStatement("htmlMessage += "+quote("\\n"));
+				appendStatement("htmlMessage += "+quote("<tr>"));
 				for (int c=0; c<columns.size(); c++){
 					MetaFormTableColumn col = columns.get(c);
 					MetaFormTableHeader header = col.getHeader();
-					ret += writeStatement("htmlMessage += "+quote("\\n"));
-					ret += writeStatement("htmlMessage += "+quote("\\t<th width=\\\""+header.getWidth()+"\\\">"));
-					ret += writeStatement("htmlMessage += getDefaultResources().getMessage("+quote(header.getKey())+")");
-					ret += writeStatement("htmlMessage += "+quote("\\t</th>"));
+					appendStatement("htmlMessage += "+quote("\\n"));
+					appendStatement("htmlMessage += "+quote("\\t<th width=\\\""+header.getWidth()+"\\\">"));
+					appendStatement("htmlMessage += getDefaultResources().getMessage("+quote(header.getKey())+")");
+					appendStatement("htmlMessage += "+quote("\\t</th>"));
 															
 				}
-				ret += writeStatement("htmlMessage += "+quote("</tr>"));
-				ret += writeStatement("htmlMessage += "+quote("\\n"));
+				appendStatement("htmlMessage += "+quote("</tr>"));
+				appendStatement("htmlMessage += "+quote("\\n"));
 
 				//generate data lines.
 				for (int r=0; r<table.getRows(); r++){
-					ret += writeStatement("htmlMessage += "+quote("<tr>"));
-					ret += writeStatement("htmlMessage += "+quote("\\n"));
+					appendStatement("htmlMessage += "+quote("<tr>"));
+					appendStatement("htmlMessage += "+quote("\\n"));
 					for (int c=0; c<columns.size(); c++){
 						MetaFormTableColumn col = (MetaFormTableColumn)columns.get(c);
 						MetaFormTableHeader header = col.getHeader();
-						ret += writeStatement("htmlMessage += "+quote("\\t<td width=\\\""+header.getWidth()+"\\\">"));
-						ret += writeStatement("htmlMessage += form.get"+StringUtils.capitalize(table.getVariableName(r,c))+"()");
-						ret += writeStatement("htmlMessage += "+quote("\\t</td>"));
+						appendStatement("htmlMessage += "+quote("\\t<td width=\\\""+header.getWidth()+"\\\">"));
+						appendStatement("htmlMessage += form.get"+StringUtils.capitalize(table.getVariableName(r,c))+"()");
+						appendStatement("htmlMessage += "+quote("\\t</td>"));
 					}
-					ret += writeStatement("htmlMessage += "+quote("</tr>\\n"));
+					appendStatement("htmlMessage += "+quote("</tr>\\n"));
 					
 				}
 				
 				
 
 				//end subtable
-				ret += writeStatement("htmlMessage += "+quote("</table>"));
-				ret += writeStatement("htmlMessage += "+quote("\\t</td>"));
-				ret += writeStatement("htmlMessage += "+quote("</tr>"));
+				appendStatement("htmlMessage += "+quote("</table>"));
+				appendStatement("htmlMessage += "+quote("\\t</td>"));
+				appendStatement("htmlMessage += "+quote("</tr>"));
 				
 				
 			}
@@ -2577,39 +2538,37 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		}
 		
-		ret += writeStatement("htmlMessage += "+quote("</table>"));
+		appendStatement("htmlMessage += "+quote("</table>"));
 
-		ret += emptyline();
-		ret += writeStatement("HtmlMailMessage mail = new HtmlMailMessage()");
-		ret += writeStatement("mail.setMessage(message)");
-		ret += writeStatement("mail.setHtmlContent(htmlMessage)");
-		ret += writeStatement("mail.setPlainTextContent(message)");
-		ret += writeStatement("mail.setSubject("+quote("WebSiteForm Submit: "+StringUtils.capitalize(form.getId()))+")");
-		ret += writeStatement("mail.setSender(\"\\\"WebForm\\\"<support@anotheria.net>\")");
+		appendEmptyline();
+		appendStatement("HtmlMailMessage mail = new HtmlMailMessage()");
+		appendStatement("mail.setMessage(message)");
+		appendStatement("mail.setHtmlContent(htmlMessage)");
+		appendStatement("mail.setPlainTextContent(message)");
+		appendStatement("mail.setSubject("+quote("WebSiteForm Submit: "+StringUtils.capitalize(form.getId()))+")");
+		appendStatement("mail.setSender(\"\\\"WebForm\\\"<support@anotheria.net>\")");
 			
-		ret += emptyline();
-		ret += writeString("//sending mail to "+targets.size()+" target(s)");
-		ret += writeString("for (int i=0; i<MAIL_TARGETS.length; i++){");
+		appendEmptyline();
+		appendString("//sending mail to "+targets.size()+" target(s)");
+		appendString("for (int i=0; i<MAIL_TARGETS.length; i++){");
 		increaseIdent();
-		ret += writeString("try{");
+		appendString("try{");
 		increaseIdent();
-		ret += writeStatement("mail.setRecipient(MAIL_TARGETS[i])");	
-		ret += writeStatement("service.sendMessage(mail)");
+		appendStatement("mail.setRecipient(MAIL_TARGETS[i])");	
+		appendStatement("service.sendMessage(mail)");
 		decreaseIdent();
-		ret += writeString("}catch(Exception e){");
+		appendString("}catch(Exception e){");
 		increaseIdent();
-		ret += writeStatement("e.printStackTrace()");
-		ret += closeBlock();
-		ret += closeBlock();
-		ret += emptyline();		
+		appendStatement("e.printStackTrace()");
+		append(closeBlock());
+		append(closeBlock());
+		appendEmptyline();		
 		
-		ret += writeStatement("return mapping.findForward(\"success\")");
-		ret += closeBlock();
-		ret += emptyline();
+		appendStatement("return mapping.findForward(\"success\")");
+		append(closeBlock());
+		appendEmptyline();
 
-//*/	    
-		ret += closeBlock();
-		return ret;
+		return clazz;
 	}
 	
 	class EnumerationPropertyGenerator{

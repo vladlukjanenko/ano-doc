@@ -25,7 +25,11 @@ public class CommentGenerator extends AbstractGenerator{
 	public static final String COMM_END   = " */";
 	
 	public static final String generateJavaTypeComment(String className){
-		return generateJavaTypeComment(className, null);
+		return generateJavaTypeComment(className, (String)null);
+	}
+
+	public static final String generateJavaTypeComment(String className, IGenerator generator){
+		return generateJavaTypeComment(className, "Generator: "+generator.getClass().getName());
 	}
 	
 	public static final String generateJavaTypeComment(String className, String additionalInfo){

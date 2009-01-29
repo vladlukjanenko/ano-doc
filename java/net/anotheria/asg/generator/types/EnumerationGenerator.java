@@ -6,9 +6,11 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.TypeOfClass;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 
@@ -28,8 +30,8 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		this.context = context;
 		
-		ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getDefinitionClassName(type), generateDefinition(type)));		
-		ret.add(new FileEntry(FileEntry.package2path(getPackageName()), getUtilsClassName(type), generateUtils(type)));		
+		ret.add(new FileEntry(generateDefinition(type)));		
+		ret.add(new FileEntry(generateUtils(type)));		
 
 		return ret;
 	}
@@ -54,101 +56,95 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 		return context.getPackageName(MetaModule.SHARED)+".data";
 	}
 	
-	private String generateDefinition(EnumerationType type){
-		String ret = "";
+	private GeneratedClass generateDefinition(EnumerationType type){
 		
-		String packageName = getPackageName();
-	
-		ret += writeStatement("package "+packageName);
-		ret += emptyline();
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		clazz.setPackageName(getPackageName());
+
+		clazz.setType(TypeOfClass.INTERFACE);
 		
-		ret += writeString("public interface "+getDefinitionClassName(type)+"{");
-		increaseIdent();
+		clazz.setName(getDefinitionClassName(type));
+		
+		startClassBody();
+		
 		List<String> values = type.getValues();
 		for (int i=0; i<values.size(); i++){
 			String v = values.get(i);
-			ret += writeStatement("public static final int "+v+" = "+(i+1));
+			appendStatement("public static final int "+v+" = "+(i+1));
 		}
-		ret += emptyline();
+		appendEmptyline();
 		
 		for (String v : values){
-			ret += writeStatement("public static final String "+v+"_NAME = "+quote(v));
+			appendStatement("public static final String "+v+"_NAME = "+quote(v));
 		}
 
-		ret += emptyline();
+		appendEmptyline();
 		
-		ret += writeString("public static final int "+type.getName().toUpperCase()+"_VALUES[] = {");
+		appendString("public static final int "+type.getName().toUpperCase()+"_VALUES[] = {");
 		for (int i=0; i<values.size(); i++){
 			String v = values.get(i);
-			ret += writeIncreasedString(v+",");
+			appendIncreasedString(v+",");
 		}
 		
-		ret += writeString("};");
-		ret += emptyline();
+		appendString("};");
+		appendEmptyline();
 		
 		
-		ret += writeString("public static final String "+type.getName().toUpperCase()+"_NAMES[] = {");
+		appendString("public static final String "+type.getName().toUpperCase()+"_NAMES[] = {");
 		for (int i=0; i<values.size(); i++){
 			String v = values.get(i);
-			ret += writeIncreasedString(v+"_NAME,");
+			appendIncreasedString(v+"_NAME,");
 		}
 		
-		ret += writeString("};");
-
-		ret += closeBlock();
-
-		
-		return ret;
+		appendString("};");
+		return clazz;
 	}
 
-	private String generateUtils(EnumerationType type){
-		String ret = "";
+	private GeneratedClass generateUtils(EnumerationType type){
 		
-		String packageName = getPackageName();
-	
-		ret += writeStatement("package "+packageName);
-		ret += emptyline();
-		ret += writeImport("java.util.Arrays");
-		ret += writeImport("java.util.List");
-		ret += emptyline();
-		
-		ret += writeString("public class "+getUtilsClassName(type)+" implements "+getDefinitionClassName(type)+" {");
-		increaseIdent();
+		GeneratedClass clazz = new GeneratedClass();
+		clazz.setPackageName(getPackageName());
+		clazz.addImport("java.util.Arrays");
+		clazz.addImport("java.util.List");
 
-		ret += writeString("public static List<String> get"+type.getName()+"List(){");
+		clazz.setName(getUtilsClassName(type));
+		clazz.addInterface(getDefinitionClassName(type));
+
+		startClassBody();
+		appendString("public static List<String> get"+type.getName()+"List(){");
 		increaseIdent();
-		ret += writeStatement("return Arrays.asList("+type.getName().toUpperCase()+"_NAMES)"); 
-		ret += closeBlock();
+		appendStatement("return Arrays.asList("+type.getName().toUpperCase()+"_NAMES)"); 
+		append(closeBlock());
 		
-		ret += writeString("public static String getName(int value){");
+		appendString("public static String getName(int value){");
 		increaseIdent();
-		ret += writeString("switch(value){");
+		appendString("switch(value){");
 		increaseIdent();
 		List<String> values = type.getValues();
 		for (int i=0; i<values.size(); i++){
 			String v = values.get(i);
-			ret += writeString("case "+v+":");
-			ret += writeIncreasedStatement("return "+v+"_NAME");
+			appendString("case "+v+":");
+			appendIncreasedStatement("return "+v+"_NAME");
 		}
-		ret += writeString("default:");
-		ret += writeIncreasedStatement("return \"Unknown: \"+value");
+		appendString("default:");
+		appendIncreasedStatement("return \"Unknown: \"+value");
 			
-		ret += closeBlock();//...switch
-		ret += closeBlock();//getName(...)
+		append(closeBlock());//...switch
+		append(closeBlock());//getName(...)
 
-		ret += writeString("public static int getValue(String name){");
+		appendString("public static int getValue(String name){");
 		increaseIdent();
 		for (int i=0; i<values.size(); i++){
 			String v = values.get(i);
-			ret += writeString("if( "+v+"_NAME.equals(name))");
-			ret += writeIncreasedStatement("return "+v);
+			appendString("if( "+v+"_NAME.equals(name))");
+			appendIncreasedStatement("return "+v);
 		}
-		ret += writeIncreasedStatement("return 0");
+		appendIncreasedStatement("return 0");
 			
-		ret += closeBlock();//getValue(...)
+		append(closeBlock());//getValue(...)
 		
-		ret += closeBlock();		
-		return ret;		
+		return clazz;		
 	}
 
 }

@@ -323,11 +323,14 @@ public class AbstractGenerator{
 	}
 	
 	///////// NEW GENERATION INTERFACE ///////////
+	/**
+	 * @deprecated use startNewJob(GeneratedArtefact) instead
+	 */
 	public static final void startNewJob(){
 		GenerationJobManager.startNewJob();
 	}
 	
-	public final void startNewJob(GeneratedClass clazz){
+	public final void startNewJob(GeneratedArtefact clazz){
 		GenerationJobManager.startNewJob(clazz);
 	}
 

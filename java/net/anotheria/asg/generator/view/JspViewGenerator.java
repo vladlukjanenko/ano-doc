@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedJSPFile;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
@@ -56,19 +57,11 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		MetaView view = (MetaView)g;
 		
-		FileEntry menu = new FileEntry(FileEntry.package2path(getContext().getPackageName(MetaModule.SHARED)+".jsp"), getMenuName(view), generateMenu(view));
-		menu.setType(".jsp");
-		files.add(menu);
-		
-		FileEntry footer = new FileEntry(FileEntry.package2path(getContext().getPackageName(MetaModule.SHARED)+".jsp"), getFooterName(view), generateFooter(view, FOOTER_SELECTION_CMS));
-		footer.setType(".jsp");
-		files.add(footer);
-		
-		FileEntry searchResultPage = new FileEntry(FileEntry.package2path(getContext().getPackageName(MetaModule.SHARED)+".jsp"), getSearchResultPageName(), generateSearchPage());
-		searchResultPage.setType(".jsp");
-		files.add(searchResultPage);
+		files.add(new FileEntry(generateMenu(view)));
+		files.add(new FileEntry(generateFooter(view, FOOTER_SELECTION_CMS, getFooterName(view))));
+		files.add(new FileEntry(generateSearchPage()));
 
-		FileEntry versionInfoPage = new FileEntry(FileEntry.package2path(getContext().getPackageName(MetaModule.SHARED)+".jsp"), getVersionInfoPageName(), generateVersionInfoPage());
+		FileEntry versionInfoPage = new FileEntry(generateVersionInfoPage());
 		versionInfoPage.setType(".jsp");
 		files.add(versionInfoPage);
 		
@@ -77,19 +70,11 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			if (!(s instanceof MetaModuleSection))
 				continue;
 			MetaModuleSection section = (MetaModuleSection)s;
-			FileEntry sectionFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getShowPageName(section.getDocument()), generateShowPage(section, view));
-			sectionFile.setType(".jsp");
-			files.add(sectionFile);
-			
-			FileEntry csvExportFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getExportAsCSVPageName(section.getDocument()), generateCSVExport(section, view));
-			csvExportFile.setType(".jsp");
-			files.add(csvExportFile);
+			files.add(new FileEntry(generateShowPage(section, view)));
+			files.add(new FileEntry(generateCSVExport(section, view)));
+			files.add(new FileEntry(generateXMLExport(section, view)));
 
-			FileEntry xmlExportFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getExportAsXMLPageName(section.getDocument()), generateXMLExport(section, view));
-			xmlExportFile.setType(".jsp");
-			files.add(xmlExportFile);
-
-			FileEntry linksToThisFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getLinksToMePageName(section.getDocument()), generateLinksToDocument(section, view));
+			FileEntry linksToThisFile = new FileEntry(generateLinksToDocument(section, view));
 			linksToThisFile.setType(".jsp");
 			files.add(linksToThisFile);
 			
@@ -97,10 +82,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			for (int d=0; d<dialogs.size(); d++){
 				MetaDialog dialog = dialogs.get(d);
 				
-				FileEntry dialogFile = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getDialogName(dialog, section.getDocument()), generateDialog(dialog, section, view));
-				dialogFile.setType(".jsp");
-				files.add(dialogFile);
-				
+				files.add(new FileEntry( generateDialog(dialog, section, view)));
 			}
 			
 			MetaDocument doc = section.getDocument();
@@ -132,35 +114,37 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	}
 
 
-	private String generateMenu(MetaView view){
+	private GeneratedJSPFile generateMenu(MetaView view){
 		
-		String ret = getBaseJSPHeader();
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
 		
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		append(getBaseJSPHeader());
+		
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
 		
-		ret += openTR();
-		ret += writeString("<logic:iterate name=\"menu\" type=\"net.anotheria.webutils.bean.MenuItemBean\" id=\"entry\">");
-		ret += writeString("<td>");
+		openTR();
+		appendString("<logic:iterate name=\"menu\" type=\"net.anotheria.webutils.bean.MenuItemBean\" id=\"entry\">");
+		appendString("<td>");
 		increaseIdent();
-		ret += writeString("<logic:equal name=\"entry\" property=\"active\" value=\"true\">");
-		ret += writeIncreasedString("<td class=\"menuTitleSelected\"><bean:write name=\"entry\" property=\"caption\"/></td>");
-		ret += writeString("</logic:equal>");
-		ret += writeString("<logic:notEqual name=\"entry\" property=\"active\" value=\"true\">");
-		ret += writeIncreasedString("<td class=\"menuTitle\"><a href=\"<ano:tslink><bean:write name=\"entry\" property=\"link\"/></ano:tslink>\"><bean:write name=\"entry\" property=\"caption\"/></a></td>");
-		ret += writeString("</logic:notEqual>");
+		appendString("<logic:equal name=\"entry\" property=\"active\" value=\"true\">");
+		appendIncreasedString("<td class=\"menuTitleSelected\"><bean:write name=\"entry\" property=\"caption\"/></td>");
+		appendString("</logic:equal>");
+		appendString("<logic:notEqual name=\"entry\" property=\"active\" value=\"true\">");
+		appendIncreasedString("<td class=\"menuTitle\"><a href=\"<ano:tslink><bean:write name=\"entry\" property=\"link\"/></ano:tslink>\"><bean:write name=\"entry\" property=\"caption\"/></a></td>");
+		appendString("</logic:notEqual>");
 		decreaseIdent();
-		ret += writeString("</td>");
+		appendString("</td>");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
-		ret += closeTR();
+		appendString("</logic:iterate>");
+		closeTR();
 
 		decreaseIdent();
-		ret += writeString("</table>");
+		appendString("</table>");
 		
-		ret += getBaseJSPFooter();
-			
-		return ret;
+		append(getBaseJSPFooter());
+		return jsp;
 	}
 	
 
@@ -181,36 +165,36 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 
 		ret += getBaseJSPHeader();
 		
-		ret += writeString("<html:html>");
+		appendString("<html:html>");
 		increaseIdent();
-		ret += writeString("<head>");
+		appendString("<head>");
 		increaseIdent();
-		ret += writeString("<title>Edit "+doc.getName()+StringUtils.capitalize(list.getName())+"</title>");
-		ret += generatePragmas();
-		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<title>Edit "+doc.getName()+StringUtils.capitalize(list.getName())+"</title>");
+		generatePragmas();
+		appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
-		ret += writeString("</head>");
-		ret += writeString("<body>");
+		appendString("</head>");
+		appendString("<body>");
 		increaseIdent();		
 
 		
-		ret += writeString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
+		appendString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 		increaseIdent();
-		ret += writeString("<tr class="+quote("lineCaptions")+">");
-		ret += writeIncreasedString("<td width=\"1%\">Pos</td>");
-		ret += writeIncreasedString("<td>"+StringUtils.capitalize(list.getName())+"</td>");
-		ret += writeIncreasedString("<td>"+"Description"+"</td>");
-		ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
-		ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
-		ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
-		ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
-		ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
-		ret += writeString("</tr>");
-		ret += writeString("<logic:iterate name="+quote("elements")+" id="+quote("element")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, list))+" indexId="+quote("ind")+">");
+		appendString("<tr class="+quote("lineCaptions")+">");
+		appendIncreasedString("<td width=\"1%\">Pos</td>");
+		appendIncreasedString("<td>"+StringUtils.capitalize(list.getName())+"</td>");
+		appendIncreasedString("<td>"+"Description"+"</td>");
+		appendIncreasedString("<td width=\"1%\">&nbsp;</td>");
+		appendIncreasedString("<td width=\"1%\">&nbsp;</td>");
+		appendIncreasedString("<td width=\"1%\">&nbsp;</td>");
+		appendIncreasedString("<td width=\"1%\">&nbsp;</td>");
+		appendIncreasedString("<td width=\"1%\">&nbsp;</td>");
+		appendString("</tr>");
+		appendString("<logic:iterate name="+quote("elements")+" id="+quote("element")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, list))+" indexId="+quote("ind")+">");
 		increaseIdent();
-		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
+		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
 		increaseIdent();
-		ret += writeString("<td width="+quote("1%")+"><bean:write name="+quote("element")+" property="+quote("position")+"/></td>");
+		appendString("<td width="+quote("1%")+"><bean:write name="+quote("element")+" property="+quote("position")+"/></td>");
 		
 		if (p.isLinked()){
 			
@@ -222,150 +206,150 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			String targetLinkAction = StrutsConfigGenerator.getPath(linkTarget, StrutsConfigGenerator.ACTION_EDIT);
 			 
 			
-			ret += writeString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></a></td>");
-			ret += writeString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote("description")+"/></a></td>");
+			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></a></td>");
+			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote("description")+"/></a></td>");
 		}else{
-			ret += writeString("<td><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></td>");
-			ret += writeString("<td><bean:write name="+quote("element")+" property="+quote("description")+"/></td>");
+			appendString("<td><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></td>");
+			appendString("<td><bean:write name="+quote("element")+" property="+quote("description")+"/></td>");
 		}
 		
 		
 		String parameter = "pId=<bean:write name="+quote("element")+" property="+quote("ownerId")+"/>";
 		parameter += "&pPosition=<bean:write name="+quote("element")+" property="+quote("position")+"/>";
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=top&"+parameter)+">"+getTopImage("move to top")+"</a></td>");
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=up&"+parameter)+">"+getUpImage("move up")+"</a></td>");
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=down&"+parameter)+">"+getDownImage("move down")+"</a></td>");
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?=bottom&"+parameter)+">"+getBottomImage("move to bottom")+"</a></td>");
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_DELETE)+"?"+parameter)+">"+getDeleteImage("delete row")+"</a></td>");
+		appendString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=top&"+parameter)+">"+getTopImage("move to top")+"</a></td>");
+		appendString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=up&"+parameter)+">"+getUpImage("move up")+"</a></td>");
+		appendString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=down&"+parameter)+">"+getDownImage("move down")+"</a></td>");
+		appendString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?=bottom&"+parameter)+">"+getBottomImage("move to bottom")+"</a></td>");
+		appendString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_DELETE)+"?"+parameter)+">"+getDeleteImage("delete row")+"</a></td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
+		appendString("</logic:iterate>");
 		decreaseIdent();
-		ret += writeString("</table>");
+		appendString("</table>");
 		
 //*/
 		
-		ret += writeString("<br>");
-		ret += writeString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
+		appendString("<br>");
+		appendString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 		increaseIdent();
-		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_ADD))+">");
-		ret += writeString("<html:hidden property="+quote("ownerId")+"/>");
-		ret += writeString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">");
+		appendString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_ADD))+">");
+		appendString("<html:hidden property="+quote("ownerId")+"/>");
+		appendString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">");
 		
-		ret += writeString("<tr class="+quote("lineCaptions")+">");
-		ret += writeIncreasedString("<td colspan="+quote("2")+">Add row:</td>");
-		ret += writeString("</tr>");
+		appendString("<tr class="+quote("lineCaptions")+">");
+		appendIncreasedString("<td colspan="+quote("2")+">Add row:</td>");
+		appendString("</tr>");
 
 
-		ret += writeString("<tr class="+quote("lineLight")+">");
+		appendString("<tr class="+quote("lineLight")+">");
 		increaseIdent();
 	        
-		ret += writeString("<td align=\"right\" width=\"35%\">");
+		appendString("<td align=\"right\" width=\"35%\">");
 		increaseIdent();
 		String name = p.getName();
 		if (name==null || name.length()==0)
 			name = "&nbsp;";
-		ret += writeString(name+":");
+		appendString(name+":");
 		decreaseIdent(); 
-		ret += writeString("</td>");
+		appendString("</td>");
 		decreaseIdent();
 	
-		ret += writeString("<td align=\"left\" width=\"65%\">&nbsp;");
+		appendString("<td align=\"left\" width=\"65%\">&nbsp;");
 		if (!p.isLinked() && !(p instanceof MetaEnumerationProperty)){
 			String field = "";
 			field += "<input type=\"text\" name="+quote(name);
 			field += " value=\"<bean:write name="+quote(StrutsConfigGenerator.getContainerEntryFormName(doc,list ))+" property="+quote(name)+"/>";
 			field += "\">";
-			ret += writeIncreasedString(field);
+			appendIncreasedString(field);
 		}else{
 			//String select = "";
-			ret += writeString("<html:select size=\"1\" property="+quote(name)+">");
-			ret += writeIncreasedString("<html:optionsCollection property="+quote(name+"Collection")+" filter=\"false\"/>");
-			ret += writeString("</html:select>");
+			appendString("<html:select size=\"1\" property="+quote(name)+">");
+			appendIncreasedString("<html:optionsCollection property="+quote(name+"Collection")+" filter=\"false\"/>");
+			appendString("</html:select>");
 		}
 			
-		ret += writeString("</td>");
+		appendString("</td>");
 
-		ret += writeString("<tr class="+quote("lineDark")+">");
-		ret += writeIncreasedString("<td colspan="+quote("2")+">&nbsp;");
-		ret += writeString("</tr>");
+		appendString("<tr class="+quote("lineDark")+">");
+		appendIncreasedString("<td colspan="+quote("2")+">&nbsp;");
+		appendString("</tr>");
 
-		ret += writeString("<tr class="+quote("lineLight")+">");
+		appendString("<tr class="+quote("lineLight")+">");
 		increaseIdent();
-		ret += writeString("<td align=\"right\" width=\"35%\">&nbsp;</td>");
-		ret += writeString("<td align=\"left\" width=\"65%\">");
-		ret += writeIncreasedString("<a href="+quote("#")+" onClick="+quote("document."+formName+".submit()")+">&nbsp;&raquo&nbsp;Add&nbsp;</a>");
-		ret += writeString("</td>");
+		appendString("<td align=\"right\" width=\"35%\">&nbsp;</td>");
+		appendString("<td align=\"left\" width=\"65%\">");
+		appendIncreasedString("<a href="+quote("#")+" onClick="+quote("document."+formName+".submit()")+">&nbsp;&raquo&nbsp;Add&nbsp;</a>");
+		appendString("</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 
-		ret += writeString("</html:form>");
+		appendString("</html:form>");
 		decreaseIdent();
-		ret += writeString("</table>");
+		appendString("</table>");
 
 		//QUICK ADD Form 
 		if (p.isLinked()){
 			formName = StrutsConfigGenerator.getContainerQuickAddFormName(doc, list);
-			ret += writeString("<br>");
-			ret += writeString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
+			appendString("<br>");
+			appendString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 			increaseIdent();
-			ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_QUICK_ADD))+">");
-			ret += writeString("<html:hidden property="+quote("ownerId")+"/>");
-			ret += writeString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">");
+			appendString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_QUICK_ADD))+">");
+			appendString("<html:hidden property="+quote("ownerId")+"/>");
+			appendString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">");
 			
-			ret += writeString("<tr class="+quote("lineCaptions")+">");
-			ret += writeIncreasedString("<td colspan="+quote("2")+">Quick add some items by id:</td>");
-			ret += writeString("</tr>");
+			appendString("<tr class="+quote("lineCaptions")+">");
+			appendIncreasedString("<td colspan="+quote("2")+">Quick add some items by id:</td>");
+			appendString("</tr>");
 	
 	
-			ret += writeString("<tr class="+quote("lineLight")+">");
+			appendString("<tr class="+quote("lineLight")+">");
 			increaseIdent();
 		        
 			p = list.getContainedProperty();
-			ret += writeString("<td align=\"right\" width=\"35%\">");
+			appendString("<td align=\"right\" width=\"35%\">");
 			increaseIdent();
 			name = p.getName();
 			if (name==null || name.length()==0)
 				name = "&nbsp;";
-			ret += writeString("ids to add :");
+			appendString("ids to add :");
 			decreaseIdent(); 
-			ret += writeString("</td>");
+			appendString("</td>");
 			decreaseIdent();
 		
-			ret += writeString("<td align=\"left\" width=\"65%\">&nbsp;");
+			appendString("<td align=\"left\" width=\"65%\">&nbsp;");
 			String field = "";
 			field += "<input type=\"text\" name="+quote("quickAddIds");
 			field += " value=\"\"/>";
-			ret += writeIncreasedString(field);
+			appendIncreasedString(field);
 				
-			ret += writeString("&nbsp;<i>comma separated list.</td>");
+			appendString("&nbsp;<i>comma separated list.</td>");
 	
-			ret += writeString("<tr class="+quote("lineDark")+">");
-			ret += writeIncreasedString("<td colspan="+quote("2")+">&nbsp;");
-			ret += writeString("</tr>");
+			appendString("<tr class="+quote("lineDark")+">");
+			appendIncreasedString("<td colspan="+quote("2")+">&nbsp;");
+			appendString("</tr>");
 	
-			ret += writeString("<tr class="+quote("lineLight")+">");
+			appendString("<tr class="+quote("lineLight")+">");
 			increaseIdent();
-			ret += writeString("<td align=\"right\" width=\"35%\">&nbsp;</td>");
-			ret += writeString("<td align=\"left\" width=\"65%\">");
-			ret += writeIncreasedString("<a href="+quote("#")+" onClick="+quote("document."+formName+".submit()")+">&nbsp;&raquo&nbsp;QuickAdd&nbsp;</a>");
-			ret += writeString("</td>");
+			appendString("<td align=\"right\" width=\"35%\">&nbsp;</td>");
+			appendString("<td align=\"left\" width=\"65%\">");
+			appendIncreasedString("<a href="+quote("#")+" onClick="+quote("document."+formName+".submit()")+">&nbsp;&raquo&nbsp;QuickAdd&nbsp;</a>");
+			appendString("</td>");
 			decreaseIdent();
-			ret += writeString("</tr>");
+			appendString("</tr>");
 	
-			ret += writeString("</html:form>");
+			appendString("</html:form>");
 			decreaseIdent();
-			ret += writeString("</table>");
+			appendString("</table>");
 		}
 		//QUICK ADD END
 		
 		decreaseIdent();
 		
 		
-		ret += writeString("</body>");
+		appendString("</body>");
 		decreaseIdent();
-		ret += writeString("</html:html>");
+		appendString("</html:html>");
 		
 		ret += getBaseJSPFooter();
 		
@@ -383,99 +367,99 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	    
 		ret += getBaseJSPHeader();
 		
-		ret += writeString("<html:html>");
+		appendString("<html:html>");
 		increaseIdent();
-		ret += writeString("<head>");
+		appendString("<head>");
 		increaseIdent();
-		ret += writeString("<title>Edit "+doc.getName()+StringUtils.capitalize(table.getName())+"</title>");
-		ret += generatePragmas();
-		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<title>Edit "+doc.getName()+StringUtils.capitalize(table.getName())+"</title>");
+		generatePragmas();
+		appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
-		ret += writeString("</head>");
-		ret += writeString("<body>");
+		appendString("</head>");
+		appendString("<body>");
 		increaseIdent();		
 		
-		ret += writeString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
+		appendString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 		increaseIdent();
-		ret += writeString("<tr class="+quote("lineCaptions")+">");
-	    ret += writeIncreasedString("<td width=\"1%\">Pos</td>");
+		appendString("<tr class="+quote("lineCaptions")+">");
+	    appendIncreasedString("<td width=\"1%\">Pos</td>");
 		for (int i=0; i<columns.size(); i++){
 		    MetaProperty p = (MetaProperty)columns.get(i);
-		    ret += writeIncreasedString("<td>"+StringUtils.capitalize(table.extractSubName(p))+"</td>");
+		    appendIncreasedString("<td>"+StringUtils.capitalize(table.extractSubName(p))+"</td>");
 		}
-	    ret += writeIncreasedString("<td width=\"1%\">&nbsp;</td>");
-		ret += writeString("</tr>");
-		ret += writeString("<logic:iterate name="+quote("rows")+" id="+quote("row")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, table))+" indexId="+quote("ind")+">");
+	    appendIncreasedString("<td width=\"1%\">&nbsp;</td>");
+		appendString("</tr>");
+		appendString("<logic:iterate name="+quote("rows")+" id="+quote("row")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, table))+" indexId="+quote("ind")+">");
 		increaseIdent();
-		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
+		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
 		increaseIdent();
-		ret += writeString("<td width="+quote("1%")+"><bean:write name="+quote("row")+" property="+quote("position")+"/></td>");
+		appendString("<td width="+quote("1%")+"><bean:write name="+quote("row")+" property="+quote("position")+"/></td>");
 		for (int i=0; i<columns.size(); i++){
 		    MetaProperty p = (MetaProperty)columns.get(i);
-		    ret += writeString("<td><bean:write name="+quote("row")+" property="+quote(table.extractSubName(p))+"/></td>");
+		    appendString("<td><bean:write name="+quote("row")+" property="+quote(table.extractSubName(p))+"/></td>");
 		}
 		String parameter = "pId=<bean:write name="+quote("row")+" property="+quote("ownerId")+"/>";
 		parameter += "&pPosition=<bean:write name="+quote("row")+" property="+quote("position")+"/>";
-		ret += writeString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, table, StrutsConfigGenerator.ACTION_DELETE)+"?"+parameter)+">"+getDeleteImage("delete row")+"</a></td>");
+		appendString("<td width="+quote("1%")+"><a href="+quote(StrutsConfigGenerator.getContainerPath(doc, table, StrutsConfigGenerator.ACTION_DELETE)+"?"+parameter)+">"+getDeleteImage("delete row")+"</a></td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
+		appendString("</logic:iterate>");
 		decreaseIdent();
-		ret += writeString("</table>");
-		ret += writeString("<br>");
+		appendString("</table>");
+		appendString("<br>");
 		decreaseIdent();
-		ret += writeString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
+		appendString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 		increaseIdent();
-		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, table, StrutsConfigGenerator.ACTION_ADD))+">");
-		ret += writeString("<html:hidden property="+quote("ownerId")+"/>"); 
-		ret += writeString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">"); 
-		ret += writeString("<tr class="+quote("lineCaptions")+">");
-	    ret += writeIncreasedString("<td colspan="+quote("2")+">Add row:</td>");
-	    ret += writeString("</tr>");
+		appendString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, table, StrutsConfigGenerator.ACTION_ADD))+">");
+		appendString("<html:hidden property="+quote("ownerId")+"/>"); 
+		appendString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">"); 
+		appendString("<tr class="+quote("lineCaptions")+">");
+	    appendIncreasedString("<td colspan="+quote("2")+">Add row:</td>");
+	    appendString("</tr>");
 	    for (int i=0; i<columns.size()+2; i++){
-	        ret += writeString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
+	        appendString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
 			increaseIdent();
 	        
 	        if (i<columns.size()){
 				MetaProperty p = (MetaProperty)columns.get(i);
-				ret += writeString("<td align=\"right\" width=\"35%\">");
+				appendString("<td align=\"right\" width=\"35%\">");
 				increaseIdent();
 				String name = table.extractSubName(p);
 				if (name==null || name.length()==0)
 					name = "&nbsp;";
-				ret += writeString(name+":");
+				appendString(name+":");
 				decreaseIdent(); 
-				ret += writeString("</td>");
+				appendString("</td>");
 				decreaseIdent();
 	
-				ret += writeString("<td align=\"left\" width=\"65%\">&nbsp;");
+				appendString("<td align=\"left\" width=\"65%\">&nbsp;");
 				String field = "";
 				field += "<input type=\"text\" name="+quote(name);
 				field += " value=\"<bean:write name="+quote(StrutsConfigGenerator.getContainerEntryFormName(doc,table ))+" property="+quote(name)+"/>";
 				field += "\">";
-				ret += writeIncreasedString(field);
-				ret += writeString("</td>");
+				appendIncreasedString(field);
+				appendString("</td>");
 	        }else{
 	            if (i==columns.size()){
-					ret += writeString("<td colspan="+quote("2")+">&nbsp;");
+					appendString("<td colspan="+quote("2")+">&nbsp;");
 	            }else{
-					ret += writeString("<td align=\"right\" width=\"35%\">&nbsp;</td>");
-					ret += writeString("<td align=\"left\" width=\"65%\">");
-					ret += writeIncreasedString("<a href="+quote("#")+" onClick="+quote("document."+formName+".submit()")+">&nbsp;&raquo&nbsp;Add&nbsp;</a>");
-					ret += writeString("</td>");
+					appendString("<td align=\"right\" width=\"35%\">&nbsp;</td>");
+					appendString("<td align=\"left\" width=\"65%\">");
+					appendIncreasedString("<a href="+quote("#")+" onClick="+quote("document."+formName+".submit()")+">&nbsp;&raquo&nbsp;Add&nbsp;</a>");
+					appendString("</td>");
 
 	            }
 	        }
 	        decreaseIdent();
-	        ret += writeString("</tr>");
+	        appendString("</tr>");
 	    }
-	    ret += writeString("</html:form>");
+	    appendString("</html:form>");
 
 	    
-	    ret += writeString("</body>");
+	    appendString("</body>");
 		decreaseIdent();
-		ret += writeString("</html:html>");
+		appendString("</html:html>");
 		
 		ret += getBaseJSPFooter();
 		
@@ -483,96 +467,100 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	    return ret;
 	}
 	
-	private String generateDialog(MetaDialog dialog, MetaModuleSection section, MetaView view){
-		String ret = "";
+	private GeneratedJSPFile generateDialog(MetaDialog dialog, MetaModuleSection section, MetaView view){
+		
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setName(getDialogName(dialog, section.getDocument()));
+		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
+		
 		resetIdent();
 		
 		currentDialog = dialog;
 		
-		ret += getBaseJSPHeader();
+		append(getBaseJSPHeader());
 		
-		ret += writeString("<html:html>");
+		appendString("<html:html>");
 		increaseIdent();
-		ret += writeString("<head>");
+		appendString("<head>");
 		increaseIdent();
-		ret += writeString("<title>"+dialog.getTitle()+"</title>");
-		ret += generatePragmas(view);
-		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<title>"+dialog.getTitle()+"</title>");
+		generatePragmas(view);
+		appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
-		ret += writeString("</head>");
-		ret += writeString("<body>");
+		appendString("</head>");
+		appendString("<body>");
 		increaseIdent();		
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
-		ret += writeString("<tr>");
-		ret += writeIncreasedString("<td class=\"menuTitleSelected\">");
-		ret += writeIncreasedString(dialog.getTitle()+"</td>");
-		ret += writeString("</tr>");
+		appendString("<tr>");
+		appendIncreasedString("<td class=\"menuTitleSelected\">");
+		appendIncreasedString(dialog.getTitle()+"</td>");
+		appendString("</tr>");
 		decreaseIdent();
-		ret += writeString("</table>");
+		appendString("</table>");
 		
 		int colspan=2;
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
+		appendString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
 		decreaseIdent(); 
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
 		// *** END MULILINGUAL COPY *** //
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()){
-			ret += writeString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
-			ret += writeString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
-			ret += writeString("<tr>");
+			appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
+			appendString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
+			appendString("<tr>");
 			increaseIdent();
-			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\"><form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG)+"\">");
-			ret += writeString("<input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>From&nbsp;");
-			ret += writeString("<select name=\"pSrcLang\">");
+			appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG)+"\">");
+			appendString("<input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>From&nbsp;");
+			appendString("<select name=\"pSrcLang\">");
 			for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-				ret += writeString("<option value=\""+sl+"\">"+sl+"</option>"); 
+				appendString("<option value=\""+sl+"\">"+sl+"</option>"); 
 			}
-			ret += writeString("</select>");
+			appendString("</select>");
 
 			
-			ret += writeString("To&nbsp;");
-			ret += writeString("<select name=\"pDestLang\">");
+			appendString("To&nbsp;");
+			appendString("<select name=\"pDestLang\">");
 			for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-				ret += writeString("<option value=\""+sl+"\">"+sl+"</option>");
+				appendString("<option value=\""+sl+"\">"+sl+"</option>");
 			}
-			ret += writeString("</select>");
+			appendString("</select>");
 			
-			ret += writeString("&nbsp;");
-			ret += writeString("<a href=\"#\" onclick=\"document.CopyLang.submit(); return false\">Copy</a>&nbsp;");
+			appendString("&nbsp;");
+			appendString("<a href=\"#\" onclick=\"document.CopyLang.submit(); return false\">Copy</a>&nbsp;");
 			
-			ret += writeString("</form></td>");
+			appendString("</form></td>");
 			decreaseIdent(); 
-			ret += writeString("</tr>");
-			ret += writeString("<tr>");
+			appendString("</tr>");
+			appendString("<tr>");
 			increaseIdent();
-			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
-			ret += writeString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
-			ret += writeString("&nbsp;Languages enabled.&nbsp;");
-			ret += writeString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Disable</a>&nbsp;");
-			ret += writeString("</form></td>");
-			ret += writeString("</tr>");
-			ret += writeString("</logic:notEqual>");
-			ret += writeString("</logic:equal>");
-			ret += writeString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
-			ret += writeString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
-			ret += writeString("<input type=\"hidden\" name=\"value\" value=\"false\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
-			ret += writeString("&nbsp;Languages disabled.&nbsp;");
-			ret += writeString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Enable</a>&nbsp;");
-			ret += writeString("</form></td>");
-			ret += writeString("</tr>");
-			ret += writeString("</logic:equal>");
+			appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+			appendString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+			appendString("&nbsp;Languages enabled.&nbsp;");
+			appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Disable</a>&nbsp;");
+			appendString("</form></td>");
+			appendString("</tr>");
+			appendString("</logic:notEqual>");
+			appendString("</logic:equal>");
+			appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
+			appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+			appendString("<input type=\"hidden\" name=\"value\" value=\"false\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+			appendString("&nbsp;Languages disabled.&nbsp;");
+			appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Enable</a>&nbsp;");
+			appendString("</form></td>");
+			appendString("</tr>");
+			appendString("</logic:equal>");
 		}
 		// *** END MULILINGUAL COPY *** //
 		
-		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
-		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
-		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
-		ret += writeIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
+		appendString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
+		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
+		appendIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
+		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
 
 		
 		List<MetaViewElement> richTextElements = new ArrayList<MetaViewElement>();
@@ -586,26 +574,26 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			//ALTERNATIVE EDITOR FOR DISABLED MODE
 			if (lang!=null && lang.equals(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage())){
 				
-				ret += writeString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
+				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
 
-				ret += writeString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
+				appendString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
 				increaseIdent();
-				ret += writeString("<td align=\"right\" width=\"35%\">");
+				appendString("<td align=\"right\" width=\"35%\">");
 				increaseIdent();
 				String name = section.getDocument().getField(element.getName()).getName()+"<b>DEF</b>";
 				if (name==null || name.length()==0)
 					name = "&nbsp;";
-				ret += writeString(name);
+				appendString(name);
 				decreaseIdent(); 
-				ret += writeString("</td>");
+				appendString("</td>");
 				decreaseIdent();
 				
-				ret += writeString("<td align=\"left\" width=\"65%\">&nbsp;");
-				ret += generateElementEditor(section.getDocument(), element);
-				ret += writeString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
-				ret += writeString("</td>");
+				appendString("<td align=\"left\" width=\"65%\">&nbsp;");
+				append(getElementEditor(section.getDocument(), element));
+				appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
+				appendString("</td>");
 				
-				ret += writeString("</tr>");
+				appendString("</tr>");
 				if(element.isRich()){
 					MetaProperty p = section.getDocument().getField(element.getName());
 					if(!p.getType().equals("text"))
@@ -614,30 +602,30 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 				}
 
 				
-				ret += writeString("</logic:equal>");
+				appendString("</logic:equal>");
 			}//END ALTERNATIVE EDITOR FOR MULTILANG DISABLED FORM
 
 			if (lang!=null)
-				ret += writeString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
+				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
 
-			ret += writeString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
+			appendString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
 			increaseIdent();
-			ret += writeString("<td align=\"right\" width=\"35%\">");
+			appendString("<td align=\"right\" width=\"35%\">");
 			increaseIdent();
 			String name = lang == null ? element.getName() : section.getDocument().getField(element.getName()).getName(lang);
 			if (name==null || name.length()==0)
 				name = "&nbsp;";
-			ret += writeString(name);
+			appendString(name);
 			decreaseIdent(); 
-			ret += writeString("</td>");
+			appendString("</td>");
 			decreaseIdent();
 			
-			ret += writeString("<td align=\"left\" width=\"65%\">&nbsp;");
-			ret += generateElementEditor(section.getDocument(), element);
-			ret += writeString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
-			ret += writeString("</td>");
+			appendString("<td align=\"left\" width=\"65%\">&nbsp;");
+			append(getElementEditor(section.getDocument(), element));
+			appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
+			appendString("</td>");
 			
-			ret += writeString("</tr>");
+			appendString("</tr>");
 			if(element.isRich()){
 				MetaProperty p = section.getDocument().getField(element.getName());
 				if(!p.getType().equals("text"))
@@ -646,173 +634,177 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			}
 			
 			if (lang!=null)
-				ret += writeString("</logic:equal>");
+				appendString("</logic:equal>");
 		}
 		
 		decreaseIdent();
-		ret += writeString("</table>");
-		ret += writeString("</html:form>");
-		ret += writeString("<br/>");
+		appendString("</table>");
+		appendString("</html:form>");
+		appendString("<br/>");
 		
 		//Link to the Links to Me page
-		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
+		appendString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
 		String linksToMePagePath = StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_LINKS_TO_ME)+"?pId=<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property=\"id\"/>";
-		ret += writeString("<a href="+quote("<ano:tslink>"+linksToMePagePath+"</ano:tslink>")+">Show direct links to  this document</a>");
-		ret += writeString("</logic:present>");
+		appendString("<a href="+quote("<ano:tslink>"+linksToMePagePath+"</ano:tslink>")+">Show direct links to  this document</a>");
+		appendString("</logic:present>");
 		
 		//HOTFIX: commentation of direct link to me section START
-		ret += writeString("<%--");
-		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		appendString("<%--");
+		appendString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td>Direct links to  this document</td>");
+		appendString("<td>Direct links to  this document</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
-		ret += writeString("<logic:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
+		appendString("</tr>");
+		appendString("<logic:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
 	
 		String docDescriptionStatement = "Type: <bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentType")+"/>";
 		docDescriptionStatement += ", Id: <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentId")+"/></a>";
 		docDescriptionStatement += "<logic:equal name="+quote("linkToMe")+" property="+quote("descriptionAvailable") +" value="+quote("true")+">, Name: <b> <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentDescription")+"/></a></b></logic:equal>";
 		docDescriptionStatement += ", in <b><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentProperty")+"/></b>.";
-		ret += writeString("<td>"+docDescriptionStatement+"</td>");
+		appendString("<td>"+docDescriptionStatement+"</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
-		ret += writeString("</table>");
+		appendString("</logic:iterate>");
+		appendString("</table>");
 		
-		ret += writeString("<br/>");
-		ret += writeString("<br/>");
-		ret += writeString("</logic:present>");
+		appendString("<br/>");
+		appendString("<br/>");
+		appendString("</logic:present>");
 		//HOTFIX: commentation of direct link to me section END
-		ret += writeString("--%>");
-		ret += writeString("<!-- ");
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		appendString("--%>");
+		appendString("<!-- ");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td>This "+section.getDocument().getName()+" can be used in following documents:</td>");
+		appendString("<td>This "+section.getDocument().getName()+" can be used in following documents:</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
 		List<DirectLink> linkee = GeneratorDataRegistry.getInstance().findLinksToDocument(section.getDocument());
 		for (DirectLink l : linkee){
-			ret += writeString("<tr>");
+			appendString("<tr>");
 			increaseIdent();
-			ret += writeString("<td>");
-			ret += writeString(l.getModule().getName()+"."+l.getDocument().getName()+", property: "+l.getProperty().getName());
-			ret += writeString("</td>");
+			appendString("<td>");
+			appendString(l.getModule().getName()+"."+l.getDocument().getName()+", property: "+l.getProperty().getName());
+			appendString("</td>");
 			decreaseIdent();
-			ret += writeString("</tr>");
+			appendString("</tr>");
 		}
 		
 		decreaseIdent();
-		ret += writeString("</table>");
-		ret += writeString("-->");
+		appendString("</table>");
+		appendString("-->");
 		
 		//object info
-		ret += writeString("<p align="+quote("right")+"><small>ObjectInfo: <bean:write name="+quote("objectInfoString")+"/></small></p>");
+		appendString("<p align="+quote("right")+"><small>ObjectInfo: <bean:write name="+quote("objectInfoString")+"/></small></p>");
 
 
 		decreaseIdent();
-		ret += writeString("</body>");
+		appendString("</body>");
 		decreaseIdent();
 		
-		ret += generateRichTextEditors(section.getDocument(), richTextElements);
+		generateRichTextEditors(section.getDocument(), richTextElements);
 		
 		decreaseIdent();
-		ret += writeString("</html:html>");
+		appendString("</html:html>");
 		
-		ret += getBaseJSPFooter();
+		append(getBaseJSPFooter());
 		
-		return ret;
+		return jsp;
 	}
 	
-	private String generateLinksToDocument(MetaModuleSection section, MetaView view){
-		String ret = "";
+	private GeneratedJSPFile generateLinksToDocument(MetaModuleSection section, MetaView view){
+
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setName(getLinksToMePageName(section.getDocument()));
+		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
+		
 		resetIdent();
 		
-		ret += getBaseJSPHeader();
+		append(getBaseJSPHeader());
 		
-		ret += writeString("<html:html>");
+		appendString("<html:html>");
 		increaseIdent();
-		ret += writeString("<head>");
+		appendString("<head>");
 		increaseIdent();
-		ret += writeString("<title>Direct links to the "+section.getDocument().getName()+"[<bean:write name=\"objectId\"/>]</title>");
-		ret += generatePragmas(view);
-		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<title>Direct links to the "+section.getDocument().getName()+"[<bean:write name=\"objectId\"/>]</title>");
+		generatePragmas(view);
+		appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
-		ret += writeString("</head>");
-		ret += writeString("<body>");
+		appendString("</head>");
+		appendString("<body>");
 		increaseIdent();		
 		
-		ret += writeString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		appendString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td>Direct links to the "+section.getDocument().getName()+"[<bean:write name=\"objectId\"/>]</td>");
+		appendString("<td>Direct links to the "+section.getDocument().getName()+"[<bean:write name=\"objectId\"/>]</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
-		ret += writeString("<logic:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
+		appendString("</tr>");
+		appendString("<logic:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
 	
 		String docDescriptionStatement = "Type: <bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentType")+"/>";
 		docDescriptionStatement += ", Id: <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentId")+"/></a>";
 		docDescriptionStatement += "<logic:equal name="+quote("linkToMe")+" property="+quote("descriptionAvailable") +" value="+quote("true")+">, Name: <b> <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentDescription")+"/></a></b></logic:equal>";
 		docDescriptionStatement += ", in <b><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentProperty")+"/></b>.";
-		ret += writeString("<td>"+docDescriptionStatement+"</td>");
+		appendString("<td>"+docDescriptionStatement+"</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
-		ret += writeString("</table>");
+		appendString("</logic:iterate>");
+		appendString("</table>");
 		
-		ret += writeString("<br/>");
-		ret += writeString("<br/>");
-		ret += writeString("</logic:present>");
-		ret += writeString("<!-- ");
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
+		appendString("<br/>");
+		appendString("<br/>");
+		appendString("</logic:present>");
+		appendString("<!-- ");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td>This "+section.getDocument().getName()+" can be used in following documents:</td>");
+		appendString("<td>This "+section.getDocument().getName()+" can be used in following documents:</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
 		List<DirectLink> linkee = GeneratorDataRegistry.getInstance().findLinksToDocument(section.getDocument());
 		for (DirectLink l : linkee){
-			ret += writeString("<tr>");
+			appendString("<tr>");
 			increaseIdent();
-			ret += writeString("<td>");
-			ret += writeString(l.getModule().getName()+"."+l.getDocument().getName()+", property: "+l.getProperty().getName());
-			ret += writeString("</td>");
+			appendString("<td>");
+			appendString(l.getModule().getName()+"."+l.getDocument().getName()+", property: "+l.getProperty().getName());
+			appendString("</td>");
 			decreaseIdent();
-			ret += writeString("</tr>");
+			appendString("</tr>");
 		}
 		
 		decreaseIdent();
-		ret += writeString("</table>");
-		ret += writeString("-->");
+		appendString("</table>");
+		appendString("-->");
 		
 
 		decreaseIdent();
-		ret += writeString("</body>");
+		appendString("</body>");
 		decreaseIdent();
 		
 		decreaseIdent();
-		ret += writeString("</html:html>");
+		appendString("</html:html>");
 		
-		ret += getBaseJSPFooter();
+		append(getBaseJSPFooter());
 		
-		return ret;
+		return jsp;
 	}	
 	
 	private String getElementName(MetaDocument doc, MetaViewElement element){
@@ -825,84 +817,83 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		 return getElementName(doc, element) + "Editor";
 	}
 	
-	private String generateRichTextEditors(MetaDocument doc, List<MetaViewElement> richTextElements){
+	private void generateRichTextEditors(MetaDocument doc, List<MetaViewElement> richTextElements){
 		
-		String ret = "";
 		if(richTextElements.size() == 0){
-			ret += writeString("<script type=\"text/javascript\">");
-			ret += writeString("function handleSubmit(){");
-			ret += writeString("	}");
-			ret += writeString("</script>");
-			return ret;
+			appendString("<script type=\"text/javascript\">");
+			appendString("function handleSubmit(){");
+			appendString("	}");
+			appendString("</script>");
+			return;
 		}
-		ret += writeString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("editor/assets/skins/sam/editor.css")) + " />");
-		ret += writeString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("editor/assets/skins/sam/container.css")) + " />");
-		ret += writeString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("utilities/utilities.js")) + "></script>");
-		ret += writeString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("container/container.js")) + "></script>");
-		ret += writeString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("editor/editor-beta-min.js")) + "></script>");
-		ret += writeString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("editor/editor-switcher.js")) + "></script>");
-		ret += writeString("<script type=\"text/javascript\">");
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("editor/assets/skins/sam/editor.css")) + " />");
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("editor/assets/skins/sam/container.css")) + " />");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("utilities/utilities.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("container/container.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("editor/editor-beta-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("editor/editor-switcher.js")) + "></script>");
+		appendString("<script type=\"text/javascript\">");
 		increaseIdent();
 		for(MetaViewElement el: richTextElements){
-			ret += writeStatement("var " + getEditorVarName(doc, el));
+			appendStatement("var " + getEditorVarName(doc, el));
 		}
-		ret += writeString("function handleSubmit(){");
+		appendString("function handleSubmit(){");
 		increaseIdent();
 		for(MetaViewElement el: richTextElements){
-			ret += writeString("if(isActiveEditor(" + getEditorVarName(doc, el) + "))");
-			ret += writeIncreasedString(getEditorVarName(doc, el) + ".saveHTML();");
+			appendString("if(isActiveEditor(" + getEditorVarName(doc, el) + "))");
+			appendIncreasedString(getEditorVarName(doc, el) + ".saveHTML();");
 		}
 		decreaseIdent();
-		ret += writeString("}");
+		appendString("}");
 
-		ret += writeString("(function() {");
+		appendString("(function() {");
 		increaseIdent();
-		ret += writeString("var Dom = YAHOO.util.Dom,");
-		ret += writeString("Event = YAHOO.util.Event,");
-		ret += writeString("status = null;"); 
-		ret += writeString("//The Editor config");
-		ret += writeString("var myConfig = {");
-		ret += writeString("width: '660px',"); 
-		ret += writeString("height: '200px',"); 
-		ret += writeString("dompath: false, ");
-		ret += writeString("animate: true ");
-		ret += writeString("}; ");
-		ret += writeString("//Now let's load the Editor.."); 
+		appendString("var Dom = YAHOO.util.Dom,");
+		appendString("Event = YAHOO.util.Event,");
+		appendString("status = null;"); 
+		appendString("//The Editor config");
+		appendString("var myConfig = {");
+		appendString("width: '660px',"); 
+		appendString("height: '200px',"); 
+		appendString("dompath: false, ");
+		appendString("animate: true ");
+		appendString("}; ");
+		appendString("//Now let's load the Editor.."); 
 		for(MetaViewElement el: richTextElements){
-			ret += writeString(getEditorVarName(doc, el) + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"', myConfig);"); 
-			ret += writeString(getEditorVarName(doc, el) + ".render(); ");
+			appendString(getEditorVarName(doc, el) + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"', myConfig);"); 
+			appendString(getEditorVarName(doc, el) + ".render(); ");
 		}
-		ret += writeString("Event.onDOMReady(function() {"); 
-		ret += writeString("status = Dom.get('status');"); 
-		ret += writeString("});");
+		appendString("Event.onDOMReady(function() {"); 
+		appendString("status = Dom.get('status');"); 
+		appendString("});");
 		decreaseIdent();
-		ret += writeString("})();"); 
+		appendString("})();"); 
 		decreaseIdent();
-		ret += writeString("</script>");
-		return ret;
+		appendString("</script>");
+		
 		
 	}
 	
-	private String generateElementEditor(MetaDocument doc, MetaViewElement element){
+	private String getElementEditor(MetaDocument doc, MetaViewElement element){
 		if (element instanceof MetaEmptyElement)
 			return "&nbsp;";
 		if (element instanceof MetaFieldElement)
-			return generateFieldEditor((MetaFieldElement)element);
+			return getFieldEditor((MetaFieldElement)element);
 		if (element instanceof MetaListElement)
-			return generateListEditor(doc, (MetaListElement)element);
+			return getListEditor(doc, (MetaListElement)element);
 		if (element instanceof MetaFunctionElement)
-			return generateFunctionEditor(doc, (MetaFunctionElement)element);
+			return getFunctionEditor(doc, (MetaFunctionElement)element);
 
 		return "";
 			
 	}
 	
-	private String generateListEditor(MetaDocument doc, MetaListElement element){
+	private String getListEditor(MetaDocument doc, MetaListElement element){
 		String ret = "";
 		
 		List<MetaViewElement> elements = element.getElements();
 		for (int i=0; i<elements.size(); i++){
-			ret += generateElementEditor(doc, elements.get(i));
+			ret += getElementEditor(doc, elements.get(i));
 			if (i<elements.size()-1)
 				ret += "&nbsp;";
 		}
@@ -911,7 +902,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 	
-	private String generateLinkEditor(MetaFieldElement element, MetaProperty p){
+	private String getLinkEditor(MetaFieldElement element, MetaProperty p){
 		//for now we have only one link...
 		String ret = "";
 		String lang = getElementLanguage(element); 
@@ -925,57 +916,57 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 	
-	private String generateFieldEditor(MetaFieldElement element){
+	private String getFieldEditor(MetaFieldElement element){
 		MetaDocument doc = ((MetaModuleSection)currentSection).getDocument();
 		MetaProperty p = doc.getField(element.getName());
 		
 		if (p.isLinked())
-			return generateLinkEditor(element, p);
+			return getLinkEditor(element, p);
 			
 		if (p instanceof MetaEnumerationProperty){
-			return generateLinkEditor(element, p);
+			return getLinkEditor(element, p);
 		}
 		
 		if (p instanceof MetaContainerProperty)
-			return generateContainerLinkEditor(element, (MetaContainerProperty)p);
+			return getContainerLinkEditor(element, (MetaContainerProperty)p);
 		
 		if (p.getType().equals("image")){
-			return generateImageEditor(element, p);
+			return getImageEditor(element, p);
 		}
 		
 		if (p.getType().equals("string")){
-			return generateStringEditor(element, p);
+			return getStringEditor(element, p);
 		}
 		
 		if (p.getType().equals("int")){
-			return generateStringEditor(element, p);
+			return getStringEditor(element, p);
 		}
 
 		if (p.getType().equals("double")){
-			return generateStringEditor(element, p);
+			return getStringEditor(element, p);
 		}
 
 		if (p.getType().equals("float")){
-			return generateStringEditor(element, p);
+			return getStringEditor(element, p);
 		}
 
 		if (p.getType().equals("long")){
-			return generateStringEditor(element, p);
+			return getStringEditor(element, p);
 		}
 
 		if (p.getType().equals("text")){
-			return generateTextEditor(element, p);
+			return getTextEditor(element, p);
 		}
 		
 		if (p.getType().equals("boolean")){
-			return generateBooleanEditor(element, p);
+			return getBooleanEditor(element, p);
 		}
 		
 		
 		return p.getType();
 	}
 	
-	private String generateContainerLinkEditor(MetaFieldElement element, MetaContainerProperty p){
+	private String getContainerLinkEditor(MetaFieldElement element, MetaContainerProperty p){
 		String ret = "";
 		String lang = getElementLanguage(element); 
 		String name = quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()));
@@ -1000,7 +991,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	
 	
 
-	private String generateImageEditor(MetaFieldElement element, MetaProperty p){
+	private String getImageEditor(MetaFieldElement element, MetaProperty p){
 		String ret ="";
 		ret += "<table height=86 width=100% cellpadding=6>";
 		ret += "<tr><td>";
@@ -1010,7 +1001,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 
-	private String generateStringEditor(MetaFieldElement element, MetaProperty p){
+	private String getStringEditor(MetaFieldElement element, MetaProperty p){
 		String ret ="";
 		String lang = getElementLanguage(element); 
 		
@@ -1028,7 +1019,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 
-	private String generateTextEditor(MetaFieldElement element, MetaProperty p){
+	private String getTextEditor(MetaFieldElement element, MetaProperty p){
 		String lang = getElementLanguage(element);
 		String ret ="";
 		ret += "<div class=\"yui-skin-sam\">";	
@@ -1042,17 +1033,21 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 
-	private String generateBooleanEditor(MetaFieldElement element, MetaProperty p){
+	private String getBooleanEditor(MetaFieldElement element, MetaProperty p){
 		String ret ="";
 		ret += "<html:checkbox property="+quote(element.getName());
 		ret += "/>";
 		return ret;
 	}
 	
-	private String generateCSVExport(MetaModuleSection section, MetaView view){
+	private GeneratedJSPFile generateCSVExport(MetaModuleSection section, MetaView view){
+		
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setName(getExportAsCSVPageName(section.getDocument()));
+		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
+		
 		ident = 0;
-		String ret = "";
-		ret += getBaseCSVHeader();
+		append(getBaseCSVHeader());
 		
 		currentSection = section;
 		MetaDocument doc = section.getDocument();
@@ -1068,9 +1063,9 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 				continue;
 			headerLine += tag+";";
 		}
-		ret += writeString(headerLine);
+		appendString(headerLine);
 
-		ret += writeString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+"><%--");
+		appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+"><%--");
 		String bodyLine = "--%>";
 
 		for (int i=0; i<elements.size(); i++){
@@ -1080,9 +1075,9 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 				continue;
 			bodyLine += "<bean:write filter=\"false\" name="+quote(entryName)+" property=\""+element.getName()+"\"/>;";
 		}
-		ret += writeString(bodyLine);
-		ret += writeString("</logic:iterate>");
-		return ret;
+		appendString(bodyLine);
+		appendString("</logic:iterate>");
+		return jsp;
 	}
 
 
@@ -1093,21 +1088,25 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 	}
 	
-	private String generateXMLExport(MetaModuleSection section, MetaView view){
+	private GeneratedJSPFile generateXMLExport(MetaModuleSection section, MetaView view){
+		
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setName(getExportAsXMLPageName(section.getDocument()));
+		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
+		
 		ident = 0;
-		String ret = "";
-		ret += getBaseXMLHeader();
+		append(getBaseXMLHeader());
 		
 		currentSection = section;
 		MetaDocument doc = section.getDocument();
 
 		String entryName = doc.getName().toLowerCase();
 
-		ret += writeString("<?xml version=\"1.0\" encoding="+quote(getContext().getEncoding())+"?>");
-		ret += writeString("<"+doc.getMultiple()+">");
-		ret += writeString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+">");
+		appendString("<?xml version=\"1.0\" encoding="+quote(getContext().getEncoding())+"?>");
+		appendString("<"+doc.getMultiple()+">");
+		appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+">");
 		increaseIdent();
-		ret += writeString("<"+doc.getName()+">");
+		appendString("<"+doc.getName()+">");
 		increaseIdent();
 		List<MetaViewElement> elements = section.getElements();
 		for (int i=0; i<elements.size(); i++){
@@ -1121,55 +1120,59 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			else
 				line += "<bean:write filter=\"false\" name="+quote(entryName)+" property=\""+element.getName()+"\"/>";
 			line += "</"+tag+">";
-			ret += writeString(line);
+			appendString(line);
 		}
 		decreaseIdent();
-		ret += writeString("</"+doc.getName()+">");
+		appendString("</"+doc.getName()+">");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
-		ret += writeString("</"+doc.getMultiple()+">");
-		return ret;
+		appendString("</logic:iterate>");
+		appendString("</"+doc.getMultiple()+">");
+		return jsp;
 	}
 
-	private String generateShowPage(MetaModuleSection section, MetaView view){
+	private GeneratedJSPFile generateShowPage(MetaModuleSection section, MetaView view){
+		
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setName(getShowPageName(section.getDocument()));
+		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
+		
 		ident = 0;
-		String ret = "";
-		ret += getBaseJSPHeader();
+		append(getBaseJSPHeader());
 		
 		currentSection = section;
 		MetaDocument doc = section.getDocument();
 
-		ret += writeString("<html>");
+		appendString("<html>");
 		increaseIdent();
-		ret += writeString("<head>");
+		appendString("<head>");
 		increaseIdent();
-		ret += writeString("<title>"+view.getTitle()+"</title>");
-		//ret += writeString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
-		ret += generatePragmas(view);
-		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
-		ret += writeString("<link href=\""+getCurrentCSSPath("menubar.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
-		ret += writeString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("menubar.js")+"\"></script>");
+		appendString("<title>"+view.getTitle()+"</title>");
+		//appendString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
+		generatePragmas(view);
+		appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<link href=\""+getCurrentCSSPath("menubar.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("menubar.js")+"\"></script>");
 		decreaseIdent();
-		ret += writeString("</head>");
-		ret += writeString("<body>");
+		appendString("</head>");
+		appendString("<body>");
 		increaseIdent();
-		ret += writeString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
-		ret += writeString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
+		appendString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
+		appendString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
 
 		List<MetaViewElement> elements = createMultilingualList(section.getElements(), doc, GeneratorDataRegistry.getInstance().getContext());
 		int colspan = elements.size();
 		
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
+		appendString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
 		decreaseIdent(); 
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td colspan=\""+(2)+"\">"+
+		appendString("<td colspan=\""+(2)+"\">"+
 		"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_XML))+">XML</a>&nbsp;"+
 		"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_CSV))+">CSV</a></td>");
 		String searchForm = "<form name="+quote("Search")+" action="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_SEARCH))+" style=\"margin:0px;padding:0px;border:0px\" target=\"_blank\">";
@@ -1177,250 +1180,259 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		searchFormContent += "&nbsp;&nbsp;";
 		searchFormContent += "<a href="+quote("#")+" onClick="+quote("document.Search.submit();return false")+">Search</a>";
 		
-		ret += writeString(searchForm+ "<td colspan=\""+(colspan-3)+"\" align=\"right\">&nbsp;"+searchFormContent+"&nbsp;&nbsp;</td></form>");
+		appendString(searchForm+ "<td colspan=\""+(colspan-3)+"\" align=\"right\">&nbsp;"+searchFormContent+"&nbsp;&nbsp;</td></form>");
 		
-		ret += writeString("<td align=\"right\">"+generateNewFunction("", new MetaFunctionElement("add"))+"</td>");
+		appendString("<td align=\"right\">"+generateNewFunction("", new MetaFunctionElement("add"))+"</td>");
 		decreaseIdent(); 
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
-		ret += writeString("<% String selectedPaging = \"\"+request.getAttribute("+quote("currentItemsOnPage")+"); %>");
-		ret += writeString("<logic:present name=\"paginglinks\" scope=\"request\">");
+		appendString("<% String selectedPaging = \"\"+request.getAttribute("+quote("currentItemsOnPage")+"); %>");
+		appendString("<logic:present name=\"paginglinks\" scope=\"request\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td align=\"right\" colspan=\""+(colspan)+"\"><div style=\"white-space:nowrap; height:2em; line-height:2em\">");
+		appendString("<td align=\"right\" colspan=\""+(colspan)+"\"><div style=\"white-space:nowrap; height:2em; line-height:2em\">");
 		increaseIdent();
-		ret += writeString("<logic:iterate name="+quote("paginglinks")+" scope="+quote("request")+" id="+quote("link")+" type="+quote("net.anotheria.asg.util.bean.PagingLink")+">");
+		appendString("<logic:iterate name="+quote("paginglinks")+" scope="+quote("request")+" id="+quote("link")+" type="+quote("net.anotheria.asg.util.bean.PagingLink")+">");
 		increaseIdent();
-		ret += writeString("&nbsp;");
-		ret += writeString("<logic:equal name="+quote("link")+" property="+quote("linked")+" value="+quote("true")+">");
-		ret += writeIncreasedString("<a href=\"?pageNumber=<bean:write name="+quote("link")+" property="+quote("link")+"/>\"><bean:write name="+quote("link")+" property="+quote("caption")+"/></a>");
-		ret += writeString("</logic:equal>");
-		ret += writeString("<logic:notEqual name="+quote("link")+" property="+quote("linked")+" value="+quote("true")+">");
-		ret += writeIncreasedString("<bean:write name="+quote("link")+" property="+quote("caption")+"/>"); 
-		ret += writeString("</logic:notEqual>");
+		appendString("&nbsp;");
+		appendString("<logic:equal name="+quote("link")+" property="+quote("linked")+" value="+quote("true")+">");
+		appendIncreasedString("<a href=\"?pageNumber=<bean:write name="+quote("link")+" property="+quote("link")+"/>\"><bean:write name="+quote("link")+" property="+quote("caption")+"/></a>");
+		appendString("</logic:equal>");
+		appendString("<logic:notEqual name="+quote("link")+" property="+quote("linked")+" value="+quote("true")+">");
+		appendIncreasedString("<bean:write name="+quote("link")+" property="+quote("caption")+"/>"); 
+		appendString("</logic:notEqual>");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
-		ret += writeString("<form style=\"display:inline\" name="+quote("ItemsOnPageForm")+" action=\"\" method=\"GET\""+">&nbsp;&nbsp;Items&nbsp;on&nbsp;page:&nbsp;");
-		ret += writeString("<select name="+quote("itemsOnPage")+" onchange="+quote("document.ItemsOnPageForm.submit();")+">");
-		ret += writeString("<logic:iterate name="+quote("PagingSelector")+" type="+quote("java.lang.String")+" id="+quote("option")+">");
-		ret += writeString("<option value="+quote("<bean:write name="+quote("option")+"/>")+" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name="+quote("option")+"/></option>"); 
-		ret += writeString("</logic:iterate>");
-		ret += writeString("</select></form>");
+		appendString("</logic:iterate>");
+		appendString("<form style=\"display:inline\" name="+quote("ItemsOnPageForm")+" action=\"\" method=\"GET\""+">&nbsp;&nbsp;Items&nbsp;on&nbsp;page:&nbsp;");
+		appendString("<select name="+quote("itemsOnPage")+" onchange="+quote("document.ItemsOnPageForm.submit();")+">");
+		appendString("<logic:iterate name="+quote("PagingSelector")+" type="+quote("java.lang.String")+" id="+quote("option")+">");
+		appendString("<option value="+quote("<bean:write name="+quote("option")+"/>")+" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name="+quote("option")+"/></option>"); 
+		appendString("</logic:iterate>");
+		appendString("</select></form>");
 		decreaseIdent();
-		ret += writeString("</div></td>");
+		appendString("</div></td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		decreaseIdent();
-		ret += writeString("</logic:present>");
+		appendString("</logic:present>");
 
 		// FILTER START ----------------------------------------
 		//filter management line
 		for (int i=0; i<section.getFilters().size(); i++){
 			MetaFilter f  = section.getFilters().get(i);
-			ret += writeString("<!-- Generating Filter: "+ModuleActionsGenerator.getFilterVariableName(f)+" -->");
-			ret += writeString("<% String filterParameter"+i+" = (String) request.getAttribute(\"currentFilterParameter"+i+"\");");
-			ret += writeString("if (filterParameter"+i+"==null)");
-			ret += writeIncreasedString("filterParameter"+i+" = \"\";%>");
-			ret += writeString("<tr class=\"lineCaptions\"><td colspan="+quote(colspan)+">Filter <strong>"+StringUtils.capitalize(f.getFieldName())+":</strong>&nbsp;");
+			appendString("<!-- Generating Filter: "+ModuleActionsGenerator.getFilterVariableName(f)+" -->");
+			appendString("<% String filterParameter"+i+" = (String) request.getAttribute(\"currentFilterParameter"+i+"\");");
+			appendString("if (filterParameter"+i+"==null)");
+			appendIncreasedString("filterParameter"+i+" = \"\";%>");
+			appendString("<tr class=\"lineCaptions\"><td colspan="+quote(colspan)+">Filter <strong>"+StringUtils.capitalize(f.getFieldName())+":</strong>&nbsp;");
 			increaseIdent();
-			ret += writeString("<logic:iterate name="+quote(ModuleActionsGenerator.getFilterVariableName(f))+" id="+quote("triggerer")+" type="+quote("net.anotheria.asg.util.filter.FilterTrigger")+">");
+			appendString("<logic:iterate name="+quote(ModuleActionsGenerator.getFilterVariableName(f))+" id="+quote("triggerer")+" type="+quote("net.anotheria.asg.util.filter.FilterTrigger")+">");
 			increaseIdent();
-			ret += writeString("<logic:equal name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
-			ret += writeIncreasedString("<strong><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></strong>");
-			ret += writeString("</logic:equal>");
-			ret += writeString("<logic:notEqual name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
-			ret += writeIncreasedString("<a href="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW)+"?pFilter"+i+"=<bean:write name="+quote("triggerer")+" property="+quote("parameter")+"/>")+"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a>");
-			ret += writeString("</logic:notEqual>");
+			appendString("<logic:equal name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
+			appendIncreasedString("<strong><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></strong>");
+			appendString("</logic:equal>");
+			appendString("<logic:notEqual name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
+			appendIncreasedString("<a href="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW)+"?pFilter"+i+"=<bean:write name="+quote("triggerer")+" property="+quote("parameter")+"/>")+"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a>");
+			appendString("</logic:notEqual>");
 			decreaseIdent();
-			ret += writeString("</logic:iterate>");
+			appendString("</logic:iterate>");
 			decreaseIdent();
-			ret += writeString("</td></tr>");
+			appendString("</td></tr>");
 		}
 		
 		// ------------------------------------------ FILTER END 
 
 		//write header
-		ret += writeString("<tr class=\"lineCaptions\">");
+		appendString("<tr class=\"lineCaptions\">");
 		increaseIdent(); 
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
-			ret += writeString(generateElementHeader(element));
+			appendString(generateElementHeader(element));
 		}
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
 		String entryName = doc.getName().toLowerCase();
-		ret += writeString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+" indexId=\"ind\">");
+		appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+" indexId=\"ind\">");
 		increaseIdent();
-		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
+		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
 
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
-			ret += writeString(generateElement(entryName, element));
+			appendString(generateElement(entryName, element));
 		}
 
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
+		appendString("</logic:iterate>");
 
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td colspan=\""+(colspan)+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
+		appendString("<td colspan=\""+(colspan)+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
 		decreaseIdent(); 
-		ret += writeString("</tr>");
-		ret += writeString("<tr class=\"lineCaptions\">");
+		appendString("</tr>");
+		appendString("<tr class=\"lineCaptions\">");
 		increaseIdent();
-		ret += writeString("<td colspan="+quote(colspan)+" align="+quote("right")+
+		appendString("<td colspan="+quote(colspan)+" align="+quote("right")+
 			"><a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_XML))+">XML</a>&nbsp;"+
 			"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_CSV))+">CSV</a></td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
 
 		decreaseIdent();
-		ret += writeString("</table>");
+		appendString("</table>");
 		decreaseIdent();
-		ret += writeString("<jsp:include page=\""+getFooterName(view)+".jsp\" flush=\"true\"/>");
-		ret += writeString("</body>");
+		appendString("<jsp:include page=\""+getFooterName(view)+".jsp\" flush=\"true\"/>");
+		appendString("</body>");
 		decreaseIdent();
-		ret += writeString("</html>");
-		ret += getBaseJSPFooter(); 
-		return ret;
+		appendString("</html>");
+		append(getBaseJSPFooter()); 
+		return jsp;
 	}
 	
-	private String generateSearchPage(){
-		ident = 0;
-		String ret = "";
-		ret += getBaseJSPHeader();
+	private GeneratedJSPFile generateSearchPage(){
 		
-
-		ret += writeString("<html>");
+		
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setName(getSearchResultPageName());
+		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
+		
+		ident = 0;
+		
+		append(getBaseJSPHeader());
+		
+		appendString("<html>");
 		increaseIdent();
-		ret += writeString("<head>");
+		appendString("<head>");
 		increaseIdent();
-		ret += writeString("<title>Search result</title>");
-		//ret += writeString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
-		ret += generatePragmas();
-		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<title>Search result</title>");
+		//appendString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
+		generatePragmas();
+		appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
-		ret += writeString("</head>");
-		ret += writeString("<body>");
+		appendString("</head>");
+		appendString("<body>");
 		increaseIdent();
-		//ret += writeString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
+		//appendString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
 
 		int colspan = 3;
 		
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
+		appendString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
 		decreaseIdent(); 
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
 		//write header
-		ret += writeString("<tr class=\"lineCaptions\">");
+		appendString("<tr class=\"lineCaptions\">");
 		increaseIdent();
-		ret += writeString("<td width=\"5%\">Id</td>");
-		ret += writeString("<td width=\"15%\">Property name</td>");
-		ret += writeString("<td width=\"80%\">Match</td>");
+		appendString("<td width=\"5%\">Id</td>");
+		appendString("<td width=\"15%\">Property name</td>");
+		appendString("<td width=\"80%\">Match</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
-		ret += writeString("<logic:iterate name="+quote("result")+" type="+quote("net.anotheria.anodoc.query2.ResultEntryBean")+" id="+quote("entry")+" indexId=\"ind\">");
+		appendString("<logic:iterate name="+quote("result")+" type="+quote("net.anotheria.anodoc.query2.ResultEntryBean")+" id="+quote("entry")+" indexId=\"ind\">");
 		increaseIdent();
-		ret += writeString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
-		ret += writeString("<td width=\"5%\"><a href="+quote("<bean:write name="+quote("entry")+" property="+quote("editLink")+"/>")+" target="+quote("_blank")+"><bean:write name="+quote("entry")+" property="+quote("documentId")+"/></td>");
-		ret += writeString("<td width=\"15%\"><bean:write name="+quote("entry")+" property="+quote("propertyName")+"/></td>");
-		ret += writeString("<td width=\"80%\"><bean:write name="+quote("entry")+" property="+quote("info")+" filter="+quote("false")+"/></td>");
-		ret += writeString("</tr>");
+		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
+		appendString("<td width=\"5%\"><a href="+quote("<bean:write name="+quote("entry")+" property="+quote("editLink")+"/>")+" target="+quote("_blank")+"><bean:write name="+quote("entry")+" property="+quote("documentId")+"/></td>");
+		appendString("<td width=\"15%\"><bean:write name="+quote("entry")+" property="+quote("propertyName")+"/></td>");
+		appendString("<td width=\"80%\"><bean:write name="+quote("entry")+" property="+quote("info")+" filter="+quote("false")+"/></td>");
+		appendString("</tr>");
 		decreaseIdent();
-		ret += writeString("</logic:iterate>");
+		appendString("</logic:iterate>");
 
 		decreaseIdent();
-		ret += writeString("</table>");
+		appendString("</table>");
 		decreaseIdent();
-		//ret += writeString("<jsp:include page=\""+getFooterName(view)+".jsp\" flush=\"true\"/>");
-		ret += writeString("</body>");
+		//appendString("<jsp:include page=\""+getFooterName(view)+".jsp\" flush=\"true\"/>");
+		appendString("</body>");
 		decreaseIdent();
-		ret += writeString("</html>");
-		ret += getBaseJSPFooter(); 
-		return ret;
+		appendString("</html>");
+		append(getBaseJSPFooter()); 
+		return jsp;
 	}
  
-	private String generateVersionInfoPage(){
+	private GeneratedJSPFile generateVersionInfoPage(){
+		
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setName(getVersionInfoPageName());
+		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
+		
 		ident = 0;
-		String ret = "";
-		ret += getBaseJSPHeader();
+		append(getBaseJSPHeader());
 		
 
-		ret += writeString("<html>");
+		appendString("<html>");
 		increaseIdent();
-		ret += writeString("<head>");
+		appendString("<head>");
 		increaseIdent();
-		ret += writeString("<title>VersionInfo for <bean:write name=\"documentName\"/></title>");
-		//ret += writeString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
-		ret += generatePragmas();
-		ret += writeString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<title>VersionInfo for <bean:write name=\"documentName\"/></title>");
+		//appendString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
+		generatePragmas();
+		appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
-		ret += writeString("</head>");
-		ret += writeString("<body>");
+		appendString("</head>");
+		appendString("<body>");
 		increaseIdent();
-		//ret += writeString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
+		//appendString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
 
 		int colspan = 2;
 		
-		ret += writeString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
 		increaseIdent();
-		ret += writeString("<tr>");
+		appendString("<tr>");
 		increaseIdent();
-		ret += writeString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
+		appendString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
 		decreaseIdent(); 
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
 		//write header
-		ret += writeString("<tr class=\"lineCaptions\">");
+		appendString("<tr class=\"lineCaptions\">");
 		increaseIdent();
-		ret += writeString("<td colspan=\"2\">VersionInfo for document</td>");
+		appendString("<td colspan=\"2\">VersionInfo for document</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 		
-		ret += writeString("<tr class=\"lineLight\">");
-		ret += writeIncreasedString("<td width=\"20%\">Document name: </td>");
-		ret += writeIncreasedString("<td width=\"80%\"><bean:write name="+quote("documentName")+"/></td>");
-		ret += writeString("</tr>");
+		appendString("<tr class=\"lineLight\">");
+		appendIncreasedString("<td width=\"20%\">Document name: </td>");
+		appendIncreasedString("<td width=\"80%\"><bean:write name="+quote("documentName")+"/></td>");
+		appendString("</tr>");
 
-		ret += writeString("<tr class=\"lineDark\">");
-		ret += writeIncreasedString("<td width=\"20%\">Document type: </td>");
-		ret += writeIncreasedString("<td width=\"80%\"><bean:write name="+quote("documentType")+"/></td>");
-		ret += writeString("</tr>");
+		appendString("<tr class=\"lineDark\">");
+		appendIncreasedString("<td width=\"20%\">Document type: </td>");
+		appendIncreasedString("<td width=\"80%\"><bean:write name="+quote("documentType")+"/></td>");
+		appendString("</tr>");
 
-		ret += writeString("<tr class=\"lineLight\">");
-		ret += writeIncreasedString("<td width=\"20%\">Last update: </td>");
-		ret += writeIncreasedString("<td width=\"80%\"><bean:write name="+quote("lastUpdate")+"/></td>");
-		ret += writeString("</tr>");
+		appendString("<tr class=\"lineLight\">");
+		appendIncreasedString("<td width=\"20%\">Last update: </td>");
+		appendIncreasedString("<td width=\"80%\"><bean:write name="+quote("lastUpdate")+"/></td>");
+		appendString("</tr>");
 
-		ret += writeString("<tr class=\"lineDark\">");
+		appendString("<tr class=\"lineDark\">");
 		increaseIdent();
-		ret += writeString("<td colspan=\"2\">&nbsp;</td>");
+		appendString("<td colspan=\"2\">&nbsp;</td>");
 		decreaseIdent();
-		ret += writeString("</tr>");
+		appendString("</tr>");
 
-		ret += writeString("<tr class=\"lineLight\">");
-		ret += writeIncreasedString("<td width=\"20%\">&nbsp;</td>");
-		ret += writeIncreasedString("<td width=\"80%\"><a href=\"javascript:history.back();\">Back</a></td>");
-		ret += writeString("</tr>");
+		appendString("<tr class=\"lineLight\">");
+		appendIncreasedString("<td width=\"20%\">&nbsp;</td>");
+		appendIncreasedString("<td width=\"80%\"><a href=\"javascript:history.back();\">Back</a></td>");
+		appendString("</tr>");
 
 		decreaseIdent();
-		ret += writeString("</table>");
+		appendString("</table>");
 		decreaseIdent();
-		//ret += writeString("<jsp:include page=\""+getFooterName(view)+".jsp\" flush=\"true\"/>");
-		ret += writeString("</body>");
+		//appendString("<jsp:include page=\""+getFooterName(view)+".jsp\" flush=\"true\"/>");
+		appendString("</body>");
 		decreaseIdent();
-		ret += writeString("</html>");
-		ret += getBaseJSPFooter(); 
-		return ret;
+		appendString("</html>");
+		append(getBaseJSPFooter()); 
+		return jsp;
 	}
 	
 	private String generateElementHeader(MetaViewElement element){
@@ -1455,16 +1467,16 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 
 	private String generateElement(String entryName, MetaViewElement element){
 		if (element instanceof MetaFieldElement)
-			return generateField(entryName, (MetaFieldElement)element);
+			return getField(entryName, (MetaFieldElement)element);
 		if (element instanceof MetaFunctionElement)
-			return generateFunction(entryName, (MetaFunctionElement)element);
+			return getFunction(entryName, (MetaFunctionElement)element);
 		if (element instanceof MetaCustomFunctionElement)
-			return generateCustomFunction(entryName, (MetaCustomFunctionElement)element);
+			return getCustomFunction(entryName, (MetaCustomFunctionElement)element);
 		
 		return "";
 	}
 	
-	private String generateField(String entryName, MetaFieldElement element){
+	private String getField(String entryName, MetaFieldElement element){
 		if (((MetaModuleSection)currentSection).getDocument().getField(element.getName()).getType().equals("image") && element.getDecorator()==null)
 			return generateImage(entryName, element);
 		String elementName = element instanceof MultilingualFieldElement ? element.getVariableName() : element.getName();
@@ -1486,93 +1498,93 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 
-	private String generateFunction(String entryName, MetaFunctionElement element){
+	private String getFunction(String entryName, MetaFunctionElement element){
 		
 		if (element.getName().equals("version")){
-			return generateVersionFunction(entryName, element);
+			return getVersionFunction(entryName, element);
 		}
 
 		if (element.getName().equals("delete")){
-			return generateDeleteFunction(entryName, element);
+			return getDeleteFunction(entryName, element);
 		}
 
 		if (element.getName().equals("deleteWithConfirmation")){
-			return generateDeleteWithConfirmationFunction(entryName, element);
+			return getDeleteWithConfirmationFunction(entryName, element);
 		}
 
 		if (element.getName().equals("edit"))
-			return generateEditFunction(entryName, element);
+			return getEditFunction(entryName, element);
 			
 		if (element.getName().equals("duplicate"))
-			return generateDuplicateFunction(entryName, element);
+			return getDuplicateFunction(entryName, element);
 
 			
 		return "";
 		//return "<td><bean:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}
 	
-	private String generateCustomFunction(String entryName, MetaCustomFunctionElement element){
+	private String getCustomFunction(String entryName, MetaCustomFunctionElement element){
 		String caption = element.getCaption();
 		String link = element.getLink();
 		link = StringUtils.replace(link, "$plainId", "<bean:write name="+quote(entryName)+" property=\"plainId\"/>");
 		return "<td><a href="+quote(generateTimestampedLinkPath(link))+">"+caption+"</a></td>";
 	}
 
-	private String generateFunctionEditor(MetaDocument doc, MetaFunctionElement element){
+	private String getFunctionEditor(MetaDocument doc, MetaFunctionElement element){
 		if (element.getName().equals("cancel")){
 			return "<a href="+quote(generateTimestampedLinkPath(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW)))+">&nbsp;&raquo&nbsp;Close&nbsp;</a>";
 		}
 		
 		if (element.getName().equals("update")){
-			return generateUpdateAndCloseFunction(doc, element);
+			return getUpdateAndCloseFunction(doc, element);
 		}
 
 		if (element.getName().equals("updateAndStay")){
-			return generateUpdateAndStayFunction(doc, element);
+			return getUpdateAndStayFunction(doc, element);
 		}
 		if (element.getName().equals("updateAndClose")){
-			return generateUpdateAndCloseFunction(doc, element);
+			return getUpdateAndCloseFunction(doc, element);
 		}
 		
 		return "";
 	}
 	
-	private String generateUpdateAndStayFunction(MetaDocument doc, MetaFunctionElement element){
+	private String getUpdateAndStayFunction(MetaDocument doc, MetaFunctionElement element){
 		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>";
 	}
-	private String generateUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
+	private String getUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
 		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a>";
 	}
 	
 	
-	private String generateDuplicateFunction(String entryName, MetaFunctionElement element){
+	private String getDuplicateFunction(String entryName, MetaFunctionElement element){
 		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_DUPLICATE);
 		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
 		return "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getDuplicateImage()+"</a></td>" ;
 	}
 
-	private String generateVersionFunction(String entryName, MetaFunctionElement element){
+	private String getVersionFunction(String entryName, MetaFunctionElement element){
 		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_VERSIONINFO);
 		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
 		return "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+" title="+quote("LastUpdate: <bean:write name="+quote(entryName)+" property="+quote("documentLastUpdateTimestamp")+"/>")+">"+getVersionImage()+"</a></td>" ;
 	}
 
-	private String generateDeleteFunction(String entryName, MetaFunctionElement element){
+	private String getDeleteFunction(String entryName, MetaFunctionElement element){
 		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_DELETE);
 		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
 		return "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getDeleteImage()+"</a></td>" ;
 	}
 
-	private String generateDeleteWithConfirmationFunction(String entryName, MetaFunctionElement element){
+	private String getDeleteWithConfirmationFunction(String entryName, MetaFunctionElement element){
 		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_DELETE);
 		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
 		return "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+" onClick="+quote("return confirm('Really delete "+((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getDeleteImage()+"</a></td>" ;
 	}
 
-	private String generateEditFunction(String entryName, MetaFunctionElement element){
+	private String getEditFunction(String entryName, MetaFunctionElement element){
 		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EDIT);
 		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
@@ -1621,92 +1633,92 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 
 		ret += getBaseJSPHeader();
-		ret += writeString("<!-- form: "+formName+" -->");
+		appendString("<!-- form: "+formName+" -->");
 		
-		ret += writeString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
+		appendString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 		increaseIdent();
-		ret += writeString("<html:form action="+quote(StrutsConfigGenerator.getFormPath(form))+">");
+		appendString("<html:form action="+quote(StrutsConfigGenerator.getFormPath(form))+">");
 		List<MetaFormField> elements = form.getElements();
 		for (int i=0; i<elements.size(); i++){
 ///*
 		    MetaFormField element = (MetaFormField)elements.get(i);
 		    if (element.isSingle()){
 		    	MetaFormSingleField field = (MetaFormSingleField )element;
-				ret += writeString("<tr class="+quote("qs_info")+">");
+				appendString("<tr class="+quote("qs_info")+">");
 				increaseIdent();
-				ret += writeString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
-				ret += writeString("<td class="+quote("qs_info")+" align="+quote("left")+">");
+				appendString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
+				appendString("<td class="+quote("qs_info")+" align="+quote("left")+">");
 	
 				String htmlFieldDeclaration = generateFormField(field, field.getType().equals("boolean") ? "qs_input" : "qs_info");
 				
 				if (field.getType().equals("boolean")){
-					ret += writeString(htmlFieldDeclaration);
-					ret += writeString("&nbsp;<bean:message key="+quote(field.getTitle())+"/>");
+					appendString(htmlFieldDeclaration);
+					appendString("&nbsp;<bean:message key="+quote(field.getTitle())+"/>");
 				}else{
-					ret += writeString("<bean:message key="+quote(field.getTitle())+"/>"+(!(field.isSpacer()) ? ":&nbsp;<br><br>" : ""));
+					appendString("<bean:message key="+quote(field.getTitle())+"/>"+(!(field.isSpacer()) ? ":&nbsp;<br><br>" : ""));
 					if (htmlFieldDeclaration.length()>0)
-						ret += writeString(htmlFieldDeclaration);
+						appendString(htmlFieldDeclaration);
 				}
 				if (!field.isSpacer())
-					ret += writeString("<br><br>");
-				ret += writeString("</td>");
-				ret += writeString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
+					appendString("<br><br>");
+				appendString("</td>");
+				appendString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
 				decreaseIdent();
-				ret += writeString("</tr>");
+				appendString("</tr>");
 		    }
 		    
 		    if (element.isComplex()){
 		    	MetaFormTableField table = (MetaFormTableField)element;
 		    	//now write inner table;
-				ret += writeString("<tr class="+quote("qs_info")+">");
+				appendString("<tr class="+quote("qs_info")+">");
 				increaseIdent();
-				ret += writeString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
-				ret += writeString("<td class="+quote("qs_info")+" >");
+				appendString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
+				appendString("<td class="+quote("qs_info")+" >");
 				increaseIdent();
-				ret += writeString("<table width="+quote("100%")+" cellpadding="+quote(0)+" cellspacing="+quote(0)+" border="+quote(0)+">");
+				appendString("<table width="+quote("100%")+" cellpadding="+quote(0)+" cellspacing="+quote(0)+" border="+quote(0)+">");
 				increaseIdent();
 				
 				//generate table headers
-				ret += writeString("<tr>");
+				appendString("<tr>");
 				List<MetaFormTableColumn> columns = table.getColumns();
 				for (MetaFormTableColumn col : columns){
 					MetaFormTableHeader header = col.getHeader();
-					ret += writeIncreasedString("<td><strong><bean:message key="+quote(header.getKey())+"/></strong></td>");
+					appendIncreasedString("<td><strong><bean:message key="+quote(header.getKey())+"/></strong></td>");
 				}
 
-				ret += writeString("</tr>");
+				appendString("</tr>");
 					
 				//generate table rows
 				for (int r=0; r<table.getRows(); r++){
-					ret += writeString("<tr>");
+					appendString("<tr>");
 					increaseIdent();
 					for (int c=0; c<columns.size(); c++){
 						MetaFormTableColumn col = (MetaFormTableColumn)columns.get(c);
 						//System.out.println("Generating column: "+col);
-						ret += writeString("<td width="+quote(col.getHeader().getWidth())+">");
-						ret += writeIncreasedString(generateFormField(table.getVariableName(r,c), col.getField(), ""));
-						ret += writeString("</td>");
+						appendString("<td width="+quote(col.getHeader().getWidth())+">");
+						appendIncreasedString(generateFormField(table.getVariableName(r,c), col.getField(), ""));
+						appendString("</td>");
 					}					
 					decreaseIdent();
-					ret += writeString("</tr>");
+					appendString("</tr>");
 				}
 				
 				
 				decreaseIdent();
-				ret += writeString("</table>");
+				appendString("</table>");
 				decreaseIdent();
-				ret += writeString("</td>");
-				ret += writeString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
-				ret += writeString("</tr>");		    	
+				appendString("</td>");
+				appendString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
+				appendString("</tr>");		    	
 		    }
 		    
 //*/		    
 		}
 
 		decreaseIdent();
-		ret += writeString("</html:form>");
+		appendString("</html:form>");
 		decreaseIdent();
-		ret += writeString("</table>");
+		appendString("</table>");
 
 		ret += getBaseJSPFooter();
 	    return ret;

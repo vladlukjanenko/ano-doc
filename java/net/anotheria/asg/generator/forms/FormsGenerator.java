@@ -46,8 +46,8 @@ public class FormsGenerator extends AbstractAnoDocGenerator{
 		
 		for (int i=0; i<forms.size(); i++){
 			MetaForm form = forms.get(i);
-			todo.add(new FileEntry(FileEntry.package2path(ModuleBeanGenerator.getPackage()), ModuleBeanGenerator.getFormBeanName(form), beanGenerator.generateFormBean(form)));
-			todo.add(new FileEntry(FileEntry.package2path(ModuleActionsGenerator.getPackage()), actionsGenerator.getFormActionName(form), actionsGenerator.generateFormAction(form)));
+			todo.add(new FileEntry(beanGenerator.generateFormBean(form)));
+			todo.add(new FileEntry(actionsGenerator.generateFormAction(form)));
 
 			FileEntry formPage = new FileEntry(FileEntry.package2path(registry.getContext().getPackageName()+".jsp"), jspGenerator.getFormIncludePageName(form), jspGenerator.generateFormInclude(form));
 			formPage.setType(".jsp");

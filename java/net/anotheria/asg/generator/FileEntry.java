@@ -31,12 +31,13 @@ public class FileEntry {
 		this.content = aContent;
 	}
 	
-	public FileEntry(GeneratedClass clazz){
+	public FileEntry(GeneratedArtefact artefact){
 		this();
-		if (clazz!=null){
-			path = package2path(clazz.getPackageName());
-			name = clazz.getName();
-			content = clazz.createClassFileContent();
+		if (artefact!=null){
+			path = artefact.getPath();
+			name = artefact.getName();
+			type = artefact.getFileType();
+			content = artefact.createFileContent();
 		}
 	}
 	
