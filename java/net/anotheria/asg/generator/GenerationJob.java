@@ -18,4 +18,8 @@ public class GenerationJob {
 	public void reset(){
 		builder = new StringBuilder(5000);
 	}
+	
+	public void setBuilder(StringBuilder target){
+		builder = target;
+	}
 }

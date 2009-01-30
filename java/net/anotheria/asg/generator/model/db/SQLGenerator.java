@@ -6,6 +6,8 @@ import java.util.List;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedSQLFile;
+import net.anotheria.asg.generator.GenerationJobManager;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
@@ -16,8 +18,6 @@ import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.StorageType;
 
 public class SQLGenerator extends AbstractGenerator implements IGenerator{
-	
-	private Context context;
 	
 	public List<FileEntry> generate(List<MetaModule>  modules, Context context){
 		ArrayList<FileEntry> ret = new ArrayList<FileEntry>();
@@ -37,34 +37,34 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 	
 	private List<FileEntry> generateAllScripts(List<MetaDocument> documents){
 		List<FileEntry> entries = new ArrayList<FileEntry>();
-
-		String allCreate = "";
-		String allDelete = "";
 		
+		GeneratedSQLFile allCreate = new GeneratedSQLFile("create_all");
+		GeneratedSQLFile allDelete = new GeneratedSQLFile("delete_all");
+
 		MetaProperty dao_created = new MetaProperty("dao_created", "long");
 	    MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
 
 		String tableNames = "";
 		for (MetaDocument doc : documents){
-			allCreate += generateSQLCreate(doc, dao_created, dao_updated);
-			allCreate += emptyline();
+			GenerationJobManager.getCurrentJob().setBuilder(allCreate.getBody());
+			generateSQLCreate(doc, dao_created, dao_updated);
+			appendEmptyline();
 			
 			if (tableNames.length()>0)
 				tableNames += ",";
 			tableNames += getSQLTableName(doc);
 		
-			allDelete += generateSQLDelete(doc);
-			allDelete += emptyline();
+			GenerationJobManager.getCurrentJob().setBuilder(allDelete.getBody());
+			generateSQLDelete(doc);
+			appendEmptyline();
 		}
 		
-		allCreate += writeString("GRANT ALL ON "+tableNames+" TO "+GeneratorDataRegistry.getInstance().getContext().getOwner()+" ; ");
 		
-		entries.add(new FileEntry("sql", "create_all", allCreate, ".sql"));
-		entries.add(new FileEntry("sql", "delete_all", allDelete, ".sql"));
+		GenerationJobManager.getCurrentJob().setBuilder(allCreate.getBody());
+		appendString("GRANT ALL ON "+tableNames+" TO "+GeneratorDataRegistry.getInstance().getContext().getOwner()+" ; ");
 		
-		
-
-		
+		entries.add(new FileEntry(allCreate));
+		entries.add(new FileEntry(allDelete));
 		return entries;
 	}
 	
@@ -72,13 +72,11 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		
 		MetaModule mod = (MetaModule)gmodule;
 		
-		this.context = context;
-		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		List<MetaDocument> documents = mod.getDocuments();
 		for (MetaDocument d: documents){
-			ret.add(new FileEntry("sql", getCreateScriptName(d), generateDocumentCreate(d), ".sql"));
+			ret.add(new FileEntry(generateDocumentCreate(d)));
 		}
 		
 		return ret;
@@ -88,36 +86,39 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		return "create_"+doc.getParentModule().getName().toLowerCase()+"_"+doc.getName().toLowerCase();
 	}
 	
-	private String generateDocumentCreate(MetaDocument doc){
+	private GeneratedSQLFile generateDocumentCreate(MetaDocument doc){
+		GeneratedSQLFile file = new GeneratedSQLFile(getCreateScriptName(doc));
+		startNewJob(file);
+		
+		
 	    MetaProperty dao_created = new MetaProperty("dao_created", "long");
 	    MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
 
-		return generateSQLCreate(doc, dao_created, dao_updated);
+		generateSQLCreate(doc, dao_created, dao_updated);
+		
+		return file;
 	}
 	
-	private String generateSQLDelete(MetaDocument doc){
-		return writeString("DROP TABLE "+getSQLTableName(doc)+";");
+	private void generateSQLDelete(MetaDocument doc){
+		appendString("DROP TABLE "+getSQLTableName(doc)+";");
 	}
 	
-	private String generateSQLCreate(MetaDocument doc, MetaProperty... additionalProps){
-		String ret = "";
-		ret += writeString("CREATE TABLE "+getSQLTableName(doc)+"(");
+	private void generateSQLCreate(MetaDocument doc, MetaProperty... additionalProps){
+		appendString("CREATE TABLE "+getSQLTableName(doc)+"(");
 		increaseIdent();
-		ret += writeString("id int8 PRIMARY KEY,");
+		appendString("id int8 PRIMARY KEY,");
 		for (int i=0; i<doc.getProperties().size(); i++){
-			ret += writeString(getSQLPropertyDefinition(doc.getProperties().get(i))+",");
+			appendString(getSQLPropertyDefinition(doc.getProperties().get(i))+",");
 		}
 		for (int i=0; i<doc.getLinks().size(); i++){
-			ret += writeString(getSQLPropertyDefinition(doc.getLinks().get(i))+",");
+			appendString(getSQLPropertyDefinition(doc.getLinks().get(i))+",");
 		}
 		for (int i=0; i<additionalProps.length-1; i++)
-			ret += writeString(getSQLPropertyDefinition(additionalProps[i])+",");
-		ret += writeString(getSQLPropertyDefinition(additionalProps[additionalProps.length-1]));
+			appendString(getSQLPropertyDefinition(additionalProps[i])+",");
+		appendString(getSQLPropertyDefinition(additionalProps[additionalProps.length-1]));
 		
 		decreaseIdent();
-		ret += writeString(");");
-		return ret;
-
+		appendString(");");
 	}
 	
 	private String getSQLPropertyDefinition(MetaProperty p){

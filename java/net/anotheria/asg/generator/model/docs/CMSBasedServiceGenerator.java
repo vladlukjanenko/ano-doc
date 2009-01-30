@@ -35,10 +35,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	private List<FileEntry> generateCRUDServices(MetaModule module){
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
-		String packageName = GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module);
-
 		for (MetaDocument doc : module.getDocuments())
-			ret.add(new FileEntry(FileEntry.package2path(packageName), getCRUDServiceName(doc), generateCRUDService(module, doc)));
+			ret.add(new FileEntry(generateCRUDService(module, doc)));
 
 		return ret;
 	}
@@ -47,24 +45,21 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		return doc.getName()+"CRUDServiceImpl";
 	}
 	
-	private String generateCRUDService(MetaModule module, MetaDocument doc){
-		startNewJob();
+	private GeneratedClass generateCRUDService(MetaModule module, MetaDocument doc){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
 		
-		append(CommentGenerator.generateJavaTypeComment(getCRUDServiceName(doc),"The implementation of the "+getCRUDServiceName(doc)+"."));
-		append(writeStatement("package "+getPackageName(module))); 
-	    append(emptyline());
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getCRUDServiceName(doc),"The implementation of the "+getCRUDServiceName(doc)+"."));
+		clazz.setPackageName(getPackageName(module)); 
+
+		clazz.addImport("net.anotheria.asg.service.CRUDService");
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
 	    
+		clazz.setName(getCRUDServiceName(doc));
+		clazz.addInterface("CRUDService<"+doc.getName()+">");
 	    
-	    append(writeImport("net.anotheria.asg.service.CRUDService"));
-	    append(writeImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc)));
-	    append(writeImport("net.anotheria.asg.exception.ASGRuntimeException"));
-	    append(emptyline());
-	    
-	    append(writeString("public class "+getCRUDServiceName(doc)+ " implements CRUDService<"+doc.getName()+">{"));
-	    increaseIdent();
-	    
-	    append(emptyline());
-	    
+		startClassBody();
 	    appendStatement(getInterfaceName(module)+" service");
 	    append(emptyline());
 	    appendString("public ", getCRUDServiceName(doc), "(){");
@@ -104,10 +99,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    append(emptyline());
 
 	    
-	    append(closeBlock());
-		
-		
-		return getCurrentJobContent().toString();
+		return clazz;
 	}
 	
 	private GeneratedClass generateImplementation(MetaModule module){

@@ -1344,7 +1344,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				}
 				
 				if (p instanceof MetaEnumerationProperty){
-				    append(enumProGenerator.generateEnumerationPropertyHandling((MetaEnumerationProperty)p, true));
+				    enumProGenerator.generateEnumerationPropertyHandling((MetaEnumerationProperty)p, true);
 				}
 			}
 		}
@@ -1604,7 +1604,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				}//...end if (p.isLinked())
 
 				if (p instanceof MetaEnumerationProperty){
-					append(enumPropGen.generateEnumerationPropertyHandling((MetaEnumerationProperty)p, false));
+					enumPropGen.generateEnumerationPropertyHandling((MetaEnumerationProperty)p, false);
 				}
 				
 			}
@@ -2580,30 +2580,28 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	        this.doc = doc;
 	    }
 	    
-	    public String generateEnumerationPropertyHandling(MetaEnumerationProperty mep, boolean editMode){
-	        String ret = "";
+	    public void generateEnumerationPropertyHandling(MetaEnumerationProperty mep, boolean editMode){
 	        EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-			ret += emptyline();
+			append(emptyline());
 			String arrName = type.getName()+"_values";
 		    String listName = arrName+"List";
 			if (generatedProperties.indexOf(arrName)==-1){
-			    ret += writeString("//enumeration "+type.getName());
-			    ret += writeStatement("int[] "+arrName+" = " +EnumerationGenerator.getUtilsClassName(type)+"."+type.getName().toUpperCase()+"_VALUES");
-			    ret += writeStatement("List<LabelValueBean> "+listName+" = new ArrayList<LabelValueBean>("+arrName+".length)");
-			    ret += writeString("for (int i=0; i<"+arrName+".length; i++){");
+			    appendString("//enumeration "+type.getName());
+			    appendStatement("int[] "+arrName+" = " +EnumerationGenerator.getUtilsClassName(type)+"."+type.getName().toUpperCase()+"_VALUES");
+			    appendStatement("List<LabelValueBean> "+listName+" = new ArrayList<LabelValueBean>("+arrName+".length)");
+			    appendString("for (int i=0; i<"+arrName+".length; i++){");
 			    increaseIdent();
 			
-			    ret += writeStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+EnumerationGenerator.getUtilsClassName(type)+".getName("+arrName+"[i]))");
-			    ret += writeStatement(listName+".add(bean)");
-			    ret += closeBlock();
+			    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+EnumerationGenerator.getUtilsClassName(type)+".getName("+arrName+"[i]))");
+			    appendStatement(listName+".add(bean)");
+			    append(closeBlock());
 			    generatedProperties.add(arrName);
 			}else{
-			    ret += writeString("//enumeration "+type.getName()+" already prepared.");
+				appendString("//enumeration "+type.getName()+" already prepared.");
 			}
-			ret += writeStatement("form."+mep.toBeanSetter()+"Collection("+listName+")");
+			appendStatement("form."+mep.toBeanSetter()+"Collection("+listName+")");
 			if (editMode)
-			    ret += writeStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumerationGenerator.getUtilsClassName(type)+".getName("+doc.getVariableName()+"."+mep.toGetter()+"()))");
-	        return ret;
+				appendStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumerationGenerator.getUtilsClassName(type)+".getName("+doc.getVariableName()+"."+mep.toGetter()+"()))");
 	    }
 	}
 	

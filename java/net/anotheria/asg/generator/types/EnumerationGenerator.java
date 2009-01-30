@@ -104,6 +104,8 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 	private GeneratedClass generateUtils(EnumerationType type){
 		
 		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
 		clazz.setPackageName(getPackageName());
 		clazz.addImport("java.util.Arrays");
 		clazz.addImport("java.util.List");

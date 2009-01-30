@@ -89,8 +89,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			for (int p=0; p<doc.getProperties().size(); p++){
 				MetaProperty pp = doc.getProperties().get(p);
 				if (pp instanceof MetaContainerProperty){
-				    FileEntry entry = new FileEntry(FileEntry.package2path(getContext().getJspPackageName(section.getModule())), getContainerPageName(doc, (MetaContainerProperty)pp), generateContainerPage(doc, (MetaContainerProperty)pp)); 
-					entry.setType(".jsp");
+				    FileEntry entry = new FileEntry(generateContainerPage((MetaModuleSection)section, doc, (MetaContainerProperty)pp)); 
 				    files.add(entry);
 				}
 			}
@@ -117,7 +116,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private GeneratedJSPFile generateMenu(MetaView view){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
+		
 		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
+		jsp.setName(getMenuName(view));
 		
 		append(getBaseJSPHeader());
 		
@@ -148,22 +150,28 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	}
 	
 
-	private String generateContainerPage(MetaDocument doc, MetaContainerProperty p){
+	private GeneratedJSPFile generateContainerPage(MetaModuleSection section, MetaDocument doc, MetaContainerProperty p){
 		if (p instanceof MetaListProperty)
-			return generateListPage(doc, (MetaListProperty)p);
+			return generateListPage(section, doc, (MetaListProperty)p);
 		if (p instanceof MetaTableProperty)
-			return generateTablePage(doc, (MetaTableProperty)p);
+			return generateTablePage(section, doc, (MetaTableProperty)p);
 		throw new RuntimeException("Unsupported container: "+p);
 	}
 	
-	private String generateListPage(MetaDocument doc, MetaListProperty list){
-		String ret = "";
+	private GeneratedJSPFile generateListPage(MetaModuleSection section, MetaDocument doc, MetaListProperty list){
+		
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
+		
+		jsp.setName(getContainerPageName(doc, list));
+		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
+		
 		resetIdent();
 
 		String formName = StrutsConfigGenerator.getContainerEntryFormName(doc, list);
 		MetaProperty p = list.getContainedProperty();
 
-		ret += getBaseJSPHeader();
+		append(getBaseJSPHeader());
 		
 		appendString("<html:html>");
 		increaseIdent();
@@ -351,21 +359,24 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		decreaseIdent();
 		appendString("</html:html>");
 		
-		ret += getBaseJSPFooter();
+		append(getBaseJSPFooter());
 		
 	    
-		return ret;
+		return jsp;
 
 	}
 	
-	private String generateTablePage(MetaDocument doc, MetaTableProperty table){
-	    String ret = "";
+	private GeneratedJSPFile generateTablePage(MetaModuleSection section, MetaDocument doc, MetaTableProperty table){
+		
+		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		jsp.setName(getContainerPageName(doc, table));
+		
 	    resetIdent();
 	    
 	    List<MetaProperty> columns = table.getColumns();
 	    String formName = StrutsConfigGenerator.getContainerEntryFormName(doc, table);
 	    
-		ret += getBaseJSPHeader();
+		append(getBaseJSPHeader());
 		
 		appendString("<html:html>");
 		increaseIdent();
@@ -461,15 +472,16 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		decreaseIdent();
 		appendString("</html:html>");
 		
-		ret += getBaseJSPFooter();
+		append(getBaseJSPFooter());
 		
 	    
-	    return ret;
+		return jsp;
 	}
 	
 	private GeneratedJSPFile generateDialog(MetaDialog dialog, MetaModuleSection section, MetaView view){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
 		jsp.setName(getDialogName(dialog, section.getDocument()));
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
 		
@@ -1133,6 +1145,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private GeneratedJSPFile generateShowPage(MetaModuleSection section, MetaView view){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
 		jsp.setName(getShowPageName(section.getDocument()));
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
 		
