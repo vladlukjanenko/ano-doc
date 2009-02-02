@@ -1,17 +1,16 @@
 package net.anotheria.asg.generator.view;
 
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
 
@@ -39,20 +38,21 @@ public class BaseActionGenerator extends AbstractGenerator {
 		
 		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".action");
 
-		List<MetaModule> modules = new ArrayList<MetaModule>();
-		for (MetaView view:views){
-			List<MetaSection> sections = view.getSections();
-			
-			for (int i=0; i<sections.size(); i++){
-				MetaSection section = sections.get(i);
-				if (section instanceof MetaModuleSection){
-					if (modules.indexOf(((MetaModuleSection)section).getModule())==-1){
-						modules.add(((MetaModuleSection)section).getModule());
-					}
-				}
-			}		
-		}
+//		List<MetaModule> modules = new ArrayList<MetaModule>();
+//		for (MetaView view:views){
+//			List<MetaSection> sections = view.getSections();
+//			
+//			for (int i=0; i<sections.size(); i++){
+//				MetaSection section = sections.get(i);
+//				if (section instanceof MetaModuleSection){
+//					if (modules.indexOf(((MetaModuleSection)section).getModule())==-1){
+//						modules.add(((MetaModuleSection)section).getModule());
+//					}
+//				}
+//			}		
+//		}
 
+		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
 		
 		clazz.addImport("net.anotheria.webutils.actions.*");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
@@ -61,8 +61,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		clazz.addImport("org.apache.struts.action.ActionForward");
 		clazz.addImport("org.apache.struts.action.ActionMapping");
 
-		for (int i=0; i<modules.size(); i++){
-			MetaModule m = modules.get(i);
+		for (MetaModule m:modules){
 			clazz.addImport(ServiceGenerator.getInterfaceImport(context, m));
 			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
 		}
@@ -85,18 +84,13 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendStatement("public static final String SA_FILTER_PREFIX = SA_PREFIX+"+quote(ViewConstants.SA_FILTER_PREFIX));
 		appendEmptyline();
 		
-		for (int i=0; i<modules.size(); i++){
-			MetaModule m = modules.get(i);
+		for (MetaModule m:modules)
 			appendStatement("private static "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceInstanceName(m));
-		}
 
 		appendString("static{");
 		increaseIdent();
-		for (int i=0; i<modules.size(); i++){
-			MetaModule m = (MetaModule)modules.get(i);
+		for (MetaModule m:modules)
 			appendStatement(ModuleActionsGenerator.getServiceInstanceName(m)+" = "+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"()");
-			
-		}
 
 		append(closeBlock());
 		appendEmptyline();
@@ -141,8 +135,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		append(closeBlock());
 
 		//generate service getter
-		for (int i=0; i<modules.size(); i++){
-			MetaModule m = (MetaModule)modules.get(i);
+		for (MetaModule m:modules){
 			appendString("protected "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceGetterCall(m)+"{");
 			increaseIdent();
 			appendStatement("return "+ModuleActionsGenerator.getServiceInstanceName(m));

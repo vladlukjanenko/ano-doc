@@ -1,7 +1,6 @@
 package net.anotheria.asg.generator.view;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -1252,7 +1251,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
 		EnumerationPropertyGenerator enumProGenerator = new EnumerationPropertyGenerator(doc);
 	    List<DirectLink> backlinks = GeneratorDataRegistry.getInstance().findLinksToDocument(doc);
-
 		
 		appendString( getExecuteDeclaration(methodname));
 		increaseIdent();
@@ -1538,7 +1536,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 
 		//check if we have to property definition files.
-		HashMap<String, MetaEnumerationProperty> importedEnumerations = new HashMap<String, MetaEnumerationProperty>();
+//		HashMap<String, MetaEnumerationProperty> importedEnumerations = new HashMap<String, MetaEnumerationProperty>();
 		
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = (MetaViewElement)elements.get(i);

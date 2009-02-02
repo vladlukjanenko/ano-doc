@@ -117,6 +117,7 @@ public class Generator {
 		if(viewContent!=null){
 			XMLViewParser viewParser = new XMLViewParser(viewContent);
 			List<MetaView> views = viewParser.parseViews();
+			GeneratorDataRegistry.getInstance().addViews(views);
 		//	System.out.println("Parsed views: "+views);
 			ViewGenerator v = new ViewGenerator();
 			v.generate("java", views);

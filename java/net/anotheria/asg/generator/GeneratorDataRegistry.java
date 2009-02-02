@@ -1,6 +1,7 @@
 package net.anotheria.asg.generator;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +13,9 @@ import net.anotheria.asg.generator.types.meta.DataType;
 import net.anotheria.asg.generator.util.DirectLink;
 import net.anotheria.asg.generator.view.meta.MetaDecorator;
 import net.anotheria.asg.generator.view.meta.MetaFilter;
+import net.anotheria.asg.generator.view.meta.MetaModuleSection;
+import net.anotheria.asg.generator.view.meta.MetaSection;
+import net.anotheria.asg.generator.view.meta.MetaView;
 
 /**
  * TODO please remined another to comment this class
@@ -21,6 +25,7 @@ public class GeneratorDataRegistry {
 	private static GeneratorDataRegistry instance;
 	
 	private Hashtable<String,MetaModule> modules;
+	private Hashtable<String,MetaView> views;
 	private Context context;
 	private Hashtable<String,DataType> types;
 	private Hashtable<String,MetaDecorator> decorators;
@@ -31,6 +36,7 @@ public class GeneratorDataRegistry {
 	
 	private GeneratorDataRegistry(){
 		modules = new Hashtable<String,MetaModule>();
+		views = new Hashtable<String, MetaView>();
 		types   = new Hashtable<String,DataType>();
 		decorators = new Hashtable<String,MetaDecorator>();
 		filters = new Hashtable<String, MetaFilter>();
@@ -48,8 +54,16 @@ public class GeneratorDataRegistry {
 	}
 	
 	public void addModules(List<MetaModule> modules){
-		for (int i=0; i<modules.size(); i++)
-			addModule((MetaModule)modules.get(i));
+		for (MetaModule m: modules)
+			addModule(m);
+	}
+	public void addView(MetaView v){
+		views.put(v.getName(), v);
+	}
+	
+	public void addViews(List<MetaView> views){
+		for (MetaView v: views)
+			addView(v);
 	}
 	
 	public MetaDocument resolveLink(String link){
@@ -73,9 +87,34 @@ public class GeneratorDataRegistry {
 		}
 		return ret;
 	}
+//	
+//	public List<DirectLink> findLinksWithViewToDocument(MetaDocument target){
+//		List<DirectLink> ret = new ArrayList<DirectLink>();
+//	    for(DirectLink l: findLinksToDocument(target))
+//	    	if(findViewSection(l.getDocument()) != null)
+//	    		ret.add(l);
+//	    return ret;
+//	}
 	
+	public MetaSection findViewSection(MetaDocument document){
+		for (MetaView module : views.values()){
+			for (MetaSection section : module.getSections())
+				if(section instanceof MetaModuleSection && document.equals(((MetaModuleSection)section).getDocument()))
+					return section;
+		}
+		return null;
+	}
+		
 	public MetaModule getModule(String name){
-		return (MetaModule) modules.get(name);
+		return modules.get(name);
+	}
+	
+	public Collection<MetaModule> getModules(){
+		return modules.values();
+	}
+	
+	public MetaView getView(String name){
+		return views.get(name);
 	}
 	/**
 	 * @return
