@@ -191,6 +191,32 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			append(closeBlock());
 			appendEmptyline();
+			
+			appendComment("Returns the "+doc.getName()+" objects with the specified ids.");
+	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids){");
+	        increaseIdent();
+	        appendString("if (ids==null || ids.size()==0)");
+	        appendIncreasedStatement("return new ArrayList<"+doc.getName()+">(0)");
+	        appendStatement(listDecl, " all = get",doc.getMultiple(), "()");
+	        appendStatement(listDecl, " ret = new ArrayList<"+doc.getName()+">", "()");
+	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : all){");
+	        increaseIdent();
+	        appendString("if(ids.contains("+doc.getVariableName()+".getId())){");
+	        increaseIdent();
+	        appendStatement("ret.add("+doc.getVariableName()+")");
+	        append(closeBlock());
+	        append(closeBlock());
+	        appendStatement("return ret");
+			append(closeBlock());
+			appendEmptyline();
+
+	        appendComment("Returns the "+doc.getName()+" objects with the specified ids, sorted by given sorttype.");
+	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids, SortType sortType){");
+	        increaseIdent();
+			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(ids), sortType)");
+			append(closeBlock());
+	        appendEmptyline();
+
 
 	        appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	        increaseIdent();
