@@ -126,7 +126,19 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			append(closeBlock());
 			append(emptyline());
 
-	        appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
+			//appendString("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids)"+throwsClause+"{");
+			//increaseIdent();
+			//appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
+			//append(closeBlock());
+			//append(emptyline());
+
+			//appendString("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids, SortType sortType)"+throwsClause+"{");
+			//increaseIdent();
+			//appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(ids), sortType)");
+			//append(closeBlock());
+			//append(emptyline());
+
+			appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        append(closeBlock());
