@@ -19,26 +19,25 @@ public class MetaFactory {
 	
 	
 	public static <T extends ASGService> T create(Class<T> pattern, Extension extension)throws MetaFactoryException{
-		return create(extension.toName(pattern));
+		return pattern.cast(create(extension.toName(pattern)));
 	}
 
 	public static <T extends ASGService> T create(Class<T> pattern)throws MetaFactoryException{
-		return create(pattern, Extension.NONE);
+		return pattern.cast(create(pattern, Extension.NONE));
 	}
-
-	@SuppressWarnings("unchecked")
-	private static <T extends ASGService,F extends ServiceFactory<T>> T create(String name) throws MetaFactoryException{
+///*
+	private static <T extends ASGService> T create(String name) throws MetaFactoryException{
 		
-		F factory = (F)factories.get(name);
+		ServiceFactory<T> factory = (ServiceFactory<T>)factories.get(name);
 		if (factory!=null)
 			return factory.create();
 		
-		Class<F> clazz = (Class<F>)factoryClasses.get(name);
+		Class<? extends ServiceFactory<T>> clazz = (Class<? extends ServiceFactory<T>>)factoryClasses.get(name);
 		if (clazz==null)
-			throw new FactoryNotFoundException(name);
+			throw new FactoryNotFoundException(name); 
 		
 		synchronized (factories) {
-			factory = (F) factories.get(name);
+			factory = (ServiceFactory<T>) factories.get(name);
 			if (factory==null){
 				try{
 					factory = clazz.newInstance();
@@ -53,12 +52,12 @@ public class MetaFactory {
 		}
 		return factory.create();
 	}
-
+	//*/
+	
 	public static <T extends ASGService> T get(Class<T> pattern) throws MetaFactoryException{
 		return get(pattern, Extension.NONE);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static <T extends ASGService> T get(Class<T> pattern, Extension extension) throws MetaFactoryException{
 		
 		out("get called, pattern: "+pattern+", extension: "+extension);
@@ -71,7 +70,7 @@ public class MetaFactory {
 		name = resolveAlias(name);
 		out("resolved to "+name);
 		
-		T instance = (T) instances.get(name);
+		T instance = pattern.cast(instances.get(name));
 		
 		out("lookup "+name + " is: "+instance);
 		
@@ -81,9 +80,9 @@ public class MetaFactory {
 		synchronized (instances) {
 			//double check
 			//@SuppressWarnings("unchecked")
-			instance = (T) instances.get(name);
+			instance = pattern.cast(instances.get(name));
 			if (instance==null){
-				instance = create(name); 
+				instance = pattern.cast(create(name)); 
 				instances.put(name, instance);
 			}
 			
@@ -117,7 +116,7 @@ public class MetaFactory {
 		addAlias(nameExt.toName(pattern), aliasExtension.toName(pattern));
 	}
 	
-	public static <T extends ASGService, F extends ServiceFactory<T>> void addFactoryClass(Class<T> service, Extension extension, Class<F> factoryClass){
+	public static <T extends ASGService> void addFactoryClass(Class<T> service, Extension extension, Class<? extends ServiceFactory<T>> factoryClass){
 		addFactoryClass(extension.toName(service), factoryClass);
 	}
 	
@@ -125,7 +124,7 @@ public class MetaFactory {
 //		addFactoryClass(extension.toName(serviceClassName), factoryClass);
 //	}
 
-	public static <T extends ASGService, F extends ServiceFactory<T>>  void addFactoryClass(String name, Class<F> factoryClass){
+	public static <T extends ASGService>  void addFactoryClass(String name, Class<? extends ServiceFactory<T>> factoryClass){
 		factoryClasses.put(name, factoryClass);
 	}
 	
