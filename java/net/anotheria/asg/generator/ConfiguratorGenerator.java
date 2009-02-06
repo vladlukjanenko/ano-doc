@@ -6,6 +6,10 @@ import java.util.List;
 import net.anotheria.asg.generator.apputil.CallContextGenerator;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.model.ServiceGenerator;
+import net.anotheria.asg.generator.model.docs.CMSBasedServiceGenerator;
+import net.anotheria.asg.metafactory.Extension;
+import net.anotheria.asg.metafactory.MetaFactory;
 
 /**
  * TODO please remined another to comment this class
@@ -17,12 +21,66 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 		return "AnoDocConfigurator";
 	}
 
+	public static String getMetaFactoryConfiguratorClassName(){
+		return "MetaFactoryConfigurator";
+	}
+
 	public List<FileEntry> generate(List<MetaModule> modules, Context context){
 		List<FileEntry> entries = new ArrayList<FileEntry>();
 		
 		entries.add(generateConfigurator(modules, context));
+		entries.add(generateMetaFactoryConfigurator(modules, context));
 		return entries;
 		
+	}
+	
+	private FileEntry generateMetaFactoryConfigurator(List<MetaModule> modules, Context context){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		clazz.setPackageName(context.getServicePackageName(MetaModule.SHARED));
+		
+		clazz.setName(getMetaFactoryConfiguratorClassName());
+		clazz.addImport(Extension.class);
+		clazz.addImport(MetaFactory.class);
+		
+		startClassBody();
+
+		appendStatement("private static volatile boolean configured");
+		appendEmptyline();
+		appendString("public static void configure(){");
+		increaseIdent();
+		appendString("if (configured)");
+		increaseIdent();
+		appendString("return;");
+		decreaseIdent();
+		appendString("configured = true;");
+		for (int i=0; i<modules.size(); i++){
+			MetaModule m = modules.get(i);
+			
+			clazz.addImport(ServiceGenerator.getInterfaceImport(context, m));
+			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
+			appendCommentLine("//aliases for "+ServiceGenerator.getInterfaceName(m));
+			appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.LOCAL)");
+			appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.DOMAIN, Extension.LOCAL)");
+			
+			if (m.getStorageType()==StorageType.CMS){
+				appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.CMS, Extension.DOMAIN)");
+				appendStatement("MetaFactory.addFactoryClass("+ServiceGenerator.getInterfaceName(m)+".class, Extension.CMS, "+ServiceGenerator.getFactoryName(m)+".class)");
+			}
+			
+			if (m.getStorageType()==StorageType.DB){
+				appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.DB, Extension.DOMAIN)");
+			}
+
+			if (m.getStorageType()==StorageType.FEDERATION){
+				appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.FEDERATION, Extension.DOMAIN)");
+			}
+			
+		}
+		append(closeBlock());
+		return new FileEntry(clazz);
+			
 	}
 	
 	private FileEntry generateConfigurator(List<MetaModule> modules, Context context){
@@ -52,7 +110,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 		appendEmptyline();
 		
 		
-		appendStatement("private static boolean configured");
+		appendStatement("private static volatile boolean configured");
 		appendEmptyline();
 		appendString("public static void configure(){");
 		increaseIdent();
@@ -84,6 +142,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 			}
 			  
 		}
+		appendStatement(getMetaFactoryConfiguratorClassName()+".configure()");
 		append(closeBlock());
 		return new FileEntry(clazz);
 		
