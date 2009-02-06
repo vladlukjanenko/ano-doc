@@ -18,15 +18,16 @@ public class MetaFactory {
 	
 	
 	
-	public static <T extends ASGService> T create(Class<T> pattern, Extension extension){
-		return null;
+	public static <T extends ASGService> T create(Class<T> pattern, Extension extension)throws MetaFactoryException{
+		return create(extension.toName(pattern));
 	}
 
-	public static <T extends ASGService> T create(Class<T> pattern){
+	public static <T extends ASGService> T create(Class<T> pattern)throws MetaFactoryException{
 		return create(pattern, Extension.NONE);
 	}
 
-	private static <T extends ASGService,F extends ServiceFactory<T>> T create(String name){
+	@SuppressWarnings("unchecked")
+	private static <T extends ASGService,F extends ServiceFactory<T>> T create(String name) throws MetaFactoryException{
 		
 		F factory = (F)factories.get(name);
 		if (factory!=null)
@@ -34,7 +35,7 @@ public class MetaFactory {
 		
 		Class<F> clazz = (Class<F>)factoryClasses.get(name);
 		if (clazz==null)
-			throw new IllegalArgumentException("FactoryClass for "+name+" not found.");
+			throw new FactoryNotFoundException(name);
 		
 		synchronized (factories) {
 			factory = (F) factories.get(name);
@@ -42,10 +43,10 @@ public class MetaFactory {
 				try{
 					factory = clazz.newInstance();
 					factories.put(name, factory);
-				}catch(IllegalAccessException e1){
-					throw new IllegalArgumentException("Can't instantiate factory "+name);
-				}catch(InstantiationException e2){
-					throw new IllegalArgumentException();
+				}catch(IllegalAccessException e){
+					throw new FactoryInstantiationError(clazz, name, e.getMessage());
+				}catch(InstantiationException e){
+					throw new FactoryInstantiationError(clazz, name, e.getMessage());
 				}
 			}
 			
@@ -53,11 +54,12 @@ public class MetaFactory {
 		return factory.create();
 	}
 
-	public static <T extends ASGService> T get(Class<T> pattern){
+	public static <T extends ASGService> T get(Class<T> pattern) throws MetaFactoryException{
 		return get(pattern, Extension.NONE);
 	}
 
-	public static <T extends ASGService> T get(Class<T> pattern, Extension extension){
+	@SuppressWarnings("unchecked")
+	public static <T extends ASGService> T get(Class<T> pattern, Extension extension) throws MetaFactoryException{
 		
 		out("get called, pattern: "+pattern+", extension: "+extension);
 		
@@ -69,7 +71,6 @@ public class MetaFactory {
 		name = resolveAlias(name);
 		out("resolved to "+name);
 		
-		@SuppressWarnings("unchecked")
 		T instance = (T) instances.get(name);
 		
 		out("lookup "+name + " is: "+instance);

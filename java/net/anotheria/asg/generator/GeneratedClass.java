@@ -22,6 +22,8 @@ public class GeneratedClass extends GeneratedArtefact{
 	private boolean generateLogger = false;
 	private boolean abstractClass = false;
 	
+	private IGenerator generator;
+	
 	public boolean isAbstractClass() {
 		return abstractClass;
 	}
@@ -40,8 +42,14 @@ public class GeneratedClass extends GeneratedArtefact{
 	public String createClassFileContent(){
 		StringBuilder ret = new StringBuilder(body.length()+200);
 		
-		if (typeComment!=null && typeComment.length()>0)
-			ret.append(getTypeComment());
+		if (typeComment==null || typeComment.length()==0){
+			if (generator==null)
+				typeComment = CommentGenerator.generateJavaTypeComment(getName());
+			else
+				typeComment = CommentGenerator.generateJavaTypeComment(getName(), generator);
+		}
+		
+		ret.append(getTypeComment());
 		ret.append("package "+getPackageName()+";");
 		ret.append(CRLF).append(CRLF);
 		
@@ -190,6 +198,14 @@ public class GeneratedClass extends GeneratedArtefact{
 
 	public void setClazzComment(String clazzComment) {
 		this.clazzComment = clazzComment;
+	}
+
+	public IGenerator getGenerator() {
+		return generator;
+	}
+
+	public void setGenerator(IGenerator generator) {
+		this.generator = generator;
 	}
 
 }

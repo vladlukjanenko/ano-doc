@@ -15,8 +15,14 @@ import net.anotheria.asg.metafactory.MetaFactory;
  * TODO please remined another to comment this class
  * @author another
  */
-public class ConfiguratorGenerator extends AbstractGenerator{
+public class ConfiguratorGenerator extends AbstractGenerator implements IGenerator{
 	
+	@Override
+	public List<FileEntry> generate(IGenerateable g, Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public static String getConfiguratorClassName(){
 		return "AnoDocConfigurator";
 	}
@@ -38,6 +44,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
+		clazz.setGenerator(this);
 		clazz.setPackageName(context.getServicePackageName(MetaModule.SHARED));
 		
 		clazz.setName(getMetaFactoryConfiguratorClassName());
@@ -63,6 +70,7 @@ public class ConfiguratorGenerator extends AbstractGenerator{
 			appendCommentLine("//aliases for "+ServiceGenerator.getInterfaceName(m));
 			appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.LOCAL)");
 			appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.DOMAIN, Extension.LOCAL)");
+			appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.DOMAIN, Extension.EDITORINTERFACE)");
 			
 			if (m.getStorageType()==StorageType.CMS){
 				appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.CMS, Extension.DOMAIN)");

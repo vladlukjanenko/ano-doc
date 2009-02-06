@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.anotheria.asg.generator.AbstractGenerator;
+import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
@@ -12,6 +13,9 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.asg.metafactory.Extension;
+import net.anotheria.asg.metafactory.MetaFactory;
+import net.anotheria.asg.metafactory.MetaFactoryException;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -61,11 +65,6 @@ public class BaseActionGenerator extends AbstractGenerator {
 		clazz.addImport("org.apache.struts.action.ActionForward");
 		clazz.addImport("org.apache.struts.action.ActionMapping");
 
-		for (MetaModule m:modules){
-			clazz.addImport(ServiceGenerator.getInterfaceImport(context, m));
-			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
-		}
-
 		clazz.setAbstractClass(true);
 		clazz.setParent("BaseAction");
 		clazz.setName(getBaseActionName(context));
@@ -89,8 +88,23 @@ public class BaseActionGenerator extends AbstractGenerator {
 
 		appendString("static{");
 		increaseIdent();
-		for (MetaModule m:modules)
-			appendStatement(ModuleActionsGenerator.getServiceInstanceName(m)+" = "+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"()");
+		
+		clazz.addImport("org.apache.log4j.Logger");
+		appendStatement("Logger staticlogger = Logger.getLogger("+getBaseActionName(context)+".class)");
+		
+		clazz.addImport(MetaFactory.class);
+		clazz.addImport(Extension.class);
+		clazz.addImport(MetaFactoryException.class);
+		
+		for (MetaModule m:modules){
+			clazz.addImport(ServiceGenerator.getInterfaceImport(context, m));
+			appendCommentLine(ModuleActionsGenerator.getServiceInstanceName(m)+" = "+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"()");
+			appendString("try{");
+			appendIncreasedStatement(ModuleActionsGenerator.getServiceInstanceName(m)+" = MetaFactory.get("+ServiceGenerator.getInterfaceName(m)+".class, Extension.EDITORINTERFACE)");
+			appendString("}catch(MetaFactoryException e){");
+			appendIncreasedStatement("staticlogger.fatal("+quote("Can't load editor instance of module service "+m.getName())+", e)");
+			appendString("}");
+		}
 
 		append(closeBlock());
 		appendEmptyline();

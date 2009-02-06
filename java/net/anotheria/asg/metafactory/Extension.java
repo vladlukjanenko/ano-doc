@@ -12,7 +12,12 @@ public enum Extension {
 	DB,
 	
 	PERSISTENCE,
-	JDBC;
+	JDBC,
+	
+	EDITORINTERFACE,
+	;
+	
+	
 	
 	public String toExt(){
 		return toString().toLowerCase();
