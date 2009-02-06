@@ -6,6 +6,7 @@ import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.metafactory.ServiceFactory;
 
 public class AbstractServiceGenerator extends AbstractGenerator{
 	public static String getInterfaceName(MetaModule m){
@@ -47,10 +48,18 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    addAdditionalFactoryImports(clazz, module);
 	    
 	    clazz.setName(getFactoryName(module));
+	    clazz.addImport(ServiceFactory.class);
+	    clazz.addInterface("ServiceFactory<"+ServiceGenerator.getInterfaceName(module)+">");
 	    startClassBody();
 	    
 	    appendStatement("private static AtomicInteger instanceCounter = new AtomicInteger(0)");
 	    appendStatement("private static "+getInterfaceName(module)+" defaultInstance = create"+getServiceName(module)+"()");
+	    appendEmptyline();
+	    
+	    appendString("public "+getInterfaceName(module)+" create(){");
+	    increaseIdent();
+	    appendStatement("return create"+getServiceName(module)+"()");
+	    append(closeBlock());
 	    appendEmptyline();
 	    
 	    appendString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");

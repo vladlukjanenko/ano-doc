@@ -205,6 +205,16 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 			appendComment("Returns all "+doc.getMultiple()+" objects sorted by given sortType.");
 			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause);
 			appendEmptyline();
+
+			//get multiple by id
+//			appendComment("Returns the "+doc.getName()+" objects with the specified ids.");
+//	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids)"+throwsClause);
+//	        appendEmptyline();
+
+//	        appendComment("Returns the "+doc.getName()+" objects with the specified ids, sorted by given sorttype.");
+//	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids, SortType sortType)"+throwsClause);
+//	        appendEmptyline();
+
 	        appendComment("Deletes a "+doc.getName()+" object by id.");
 	        appendStatement("public void delete"+doc.getName()+"(String id)"+throwsClause);
 	        appendEmptyline();
@@ -217,6 +227,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
 	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
 	        appendEmptyline();
+
 
 	        appendComment("Imports a new "+doc.getName()+" object.\nReturns the created version.");
 	        appendStatement("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
