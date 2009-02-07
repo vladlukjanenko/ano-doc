@@ -79,10 +79,12 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 			
 			if (m.getStorageType()==StorageType.DB){
 				appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.DB, Extension.DOMAIN)");
+				appendStatement("MetaFactory.addFactoryClass("+ServiceGenerator.getInterfaceName(m)+".class, Extension.DB, "+ServiceGenerator.getFactoryName(m)+".class)");
 			}
 
 			if (m.getStorageType()==StorageType.FEDERATION){
 				appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.FEDERATION, Extension.DOMAIN)");
+				appendStatement("MetaFactory.addFactoryClass("+ServiceGenerator.getInterfaceName(m)+".class, Extension.FEDERATION, "+ServiceGenerator.getFactoryName(m)+".class)");
 			}
 			
 		}
