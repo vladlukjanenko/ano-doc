@@ -65,14 +65,14 @@ public class MetaFactory {
 		if (extension==null)
 			extension = Extension.NONE;
 		String name = extension.toName(pattern);
-		out("lookup "+name);
+		out("name is "+name);
 		
 		name = resolveAlias(name);
-		out("resolved to "+name);
+		out("resolved alias to "+name);
 		
 		T instance = pattern.cast(instances.get(name));
 		
-		out("lookup "+name + " is: "+instance);
+		out("instance of "+name + " is: "+instance);
 		
 		if (instance!=null)
 			return instance;
@@ -82,7 +82,13 @@ public class MetaFactory {
 			//@SuppressWarnings("unchecked")
 			instance = pattern.cast(instances.get(name));
 			if (instance==null){
-				instance = pattern.cast(create(name)); 
+				
+				out("creating new instance of "+name);
+				
+				instance = pattern.cast(create(name));
+				
+				out("created new instance of "+name+" ---> "+instance);
+				
 				instances.put(name, instance);
 			}
 			
@@ -129,7 +135,8 @@ public class MetaFactory {
 	}
 	
 	private static void out(Object o){
-		System.out.println("[MetaFactory]Ê"+o);
+		
+		//System.out.println("[MetaFactory] "+o);
 	}
 	
 	public static void debugDumpAliasMap(){
