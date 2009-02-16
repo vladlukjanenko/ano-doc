@@ -1,6 +1,8 @@
 package net.anotheria.asg.metafactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,6 +17,13 @@ public class MetaFactory {
 	private static Map<String, Class<? extends ServiceFactory<? extends ASGService>>> factoryClasses = new HashMap<String, Class<? extends ServiceFactory<? extends ASGService>>>();
 	private static Map<String, ServiceFactory<? extends ASGService>> factories = new HashMap<String, ServiceFactory<? extends ASGService>>();
 	
+	
+	private static final List<AliasResolver> resolverList;
+	
+	static{
+		resolverList = new ArrayList<AliasResolver>();
+		resolverList.add(new SystemPropertyResolver());
+	}
 	
 	
 	
@@ -82,22 +91,27 @@ public class MetaFactory {
 			//@SuppressWarnings("unchecked")
 			instance = pattern.cast(instances.get(name));
 			if (instance==null){
-				
 				out("creating new instance of "+name);
-				
 				instance = pattern.cast(create(name));
-				
 				out("created new instance of "+name+" ---> "+instance);
-				
 				instances.put(name, instance);
 			}
-			
 		}
 		
 		return instance;
 	}
 	
 	public static final String resolveAlias(String name){
+		
+		//first check resolvers
+		synchronized(resolverList){
+			for (AliasResolver resolver : resolverList){
+				String resolved = resolver.resolveAlias(name);
+				if (resolved!=null)
+					return resolveAlias(resolved);
+			}
+		}
+		
 		String alias = aliases.get(name);
 		return alias == null ? name : resolveAlias(alias);
 	}
@@ -145,4 +159,27 @@ public class MetaFactory {
 			System.out.println(key + " = "+aliases.get(key));
 		}
 	}
+	
+	
+	public static void addAliasResolver(AliasResolver resolver){
+		synchronized(resolverList){
+			for (int i=0; i<resolverList.size(); i++){
+				AliasResolver someResolver = resolverList.get(i);
+				if (resolver.getPriority()<someResolver.getPriority()){
+					resolverList.add(i, resolver);
+					return;
+				}
+			}
+			resolverList.add(resolver);
+		}
+	}
+	
+	public static List<AliasResolver> getAliasResolverList(){
+		synchronized(resolverList){
+			ArrayList<AliasResolver> ret = new ArrayList<AliasResolver>();
+			ret.addAll(resolverList);
+			return ret;
+		}
+	}
+	
 }
