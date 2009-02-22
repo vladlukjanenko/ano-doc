@@ -35,6 +35,7 @@ public class MetaFactory {
 		return pattern.cast(create(pattern, Extension.NONE));
 	}
 ///*
+	@SuppressWarnings("unchecked")
 	private static <T extends ASGService> T create(String name) throws MetaFactoryException{
 		
 		ServiceFactory<T> factory = (ServiceFactory<T>)factories.get(name);

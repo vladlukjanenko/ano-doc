@@ -11,6 +11,10 @@ public class ConfigurableResolver implements IConfigurable, AliasResolver{
 	private Map<String,String> aliasMap;
 	private int priority;
 	
+	public ConfigurableResolver(){
+		this("factories", 50);
+	}
+	
 	public ConfigurableResolver(String aConfigurationName, int aPriority){
 		configurationName = aConfigurationName;
 		priority = aPriority;
