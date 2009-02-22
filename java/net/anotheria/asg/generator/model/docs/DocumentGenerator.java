@@ -143,8 +143,12 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			generateLanguageCopyMethods(doc);
 			appendEmptyline();
 		}
-		
+
 		generateMultilingualSwitchSupport(doc);
+
+		appendEmptyline();
+		generateEqualsMethod(doc);
+		
 		return clazz;
 	}
 	

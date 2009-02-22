@@ -14,7 +14,6 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
-import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -125,6 +124,9 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		
 		appendEmptyline();
 		generateGetFootprintMethod(doc);
+
+		appendEmptyline();
+		generateEqualsMethod(doc);
 
 		return clazz;
 	}

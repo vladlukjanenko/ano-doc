@@ -176,6 +176,13 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 	private String getDocumentFactoryName(MetaDocument doc){
 		return DataFacadeGenerator.getDocumentFactoryName(doc);
 	}
+	
+	protected void generateEqualsMethod(MetaDocument doc){
+		appendString("public boolean equals(Object o){");
+		increaseIdent();
+		appendStatement("return o == this || ((o instanceof "+getDataObjectImplName(doc)+") && (("+getDataObjectImplName(doc)+")o).getId().equals(getId()))");
+		append(closeBlock());
+	}
 
 
 

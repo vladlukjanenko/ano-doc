@@ -142,6 +142,9 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		appendEmptyline();
 		generateGetFootprintMethod(doc);
 		
+		appendEmptyline();
+		generateEqualsMethod(doc);
+
 		return clazz;
 	}
 	
