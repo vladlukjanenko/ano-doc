@@ -11,8 +11,7 @@ public abstract class AbstractVO implements DataObject{
 	
 	public abstract long  getDaoCreated();
 	public abstract long  getDaoUpdated();
-	public abstract Object clone() throws CloneNotSupportedException;
-
+	
 	public XMLNode toXMLNode(){
 		return new XMLNode("NotImplemented "+getId());
 	}
@@ -22,5 +21,16 @@ public abstract class AbstractVO implements DataObject{
 		ret.setAuthor("none");
 		return ret;
 	}
-	
+
+	public AbstractVO clone(){
+		try{
+			return (AbstractVO)super.clone();
+		}catch(CloneNotSupportedException e){
+			throw new AssertionError("Can not happen");
+		}
+	}
+
+	public int hashCode(){
+		return getId().hashCode();
+	}
 }
