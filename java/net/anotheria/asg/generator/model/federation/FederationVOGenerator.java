@@ -101,6 +101,8 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		appendEmptyline();
 		generateCloneConstructor(doc);
 		appendEmptyline();
+		generateBuilderConstructor(doc);
+		appendEmptyline();
 		generatePropertyAccessMethods(doc);
 		appendEmptyline();
 		generateToStringMethod(doc);
@@ -142,6 +144,23 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		appendStatement("copyAttributesFrom(toClone)");
 		append(closeBlock());
 	}
+	
+	private void generateBuilderConstructor(MetaDocument doc){
+		appendString(getDocumentImplName(doc)+"("+getDocumentBuilderName(doc)+" builder){");
+		increaseIdent();
+		//TODO add multilingual support 
+		appendStatement("id = "+quote(""));
+		for (MetaProperty p : doc.getProperties()){
+			appendStatement(p.getName().toLowerCase()," = ", "builder.", p.getName());
+		}
+		
+		for (MetaProperty p : doc.getLinks()){
+			appendStatement(p.getName().toLowerCase()," = ", "builder.", p.getName());
+		}
+
+		append(closeBlock());
+	}
+
 
 	private void generatePropertyFields(MetaDocument doc){
 		_generatePropertyField(id);
