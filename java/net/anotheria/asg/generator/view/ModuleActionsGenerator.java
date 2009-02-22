@@ -28,6 +28,7 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.types.EnumerationGenerator;
@@ -1782,7 +1783,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
 				MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
 				clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
-				clazz.addImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
+				clazz.addImport(AbstractDataObjectGenerator.getSortTypeImport(targetDocument));
 				clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
 				clazz.addImport("net.anotheria.anodoc.data.NoSuchDocumentException");
 				clazz.addImport("net.anotheria.util.StringUtils");
