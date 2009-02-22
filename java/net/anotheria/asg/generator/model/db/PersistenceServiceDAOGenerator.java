@@ -1,9 +1,7 @@
 package net.anotheria.asg.generator.model.db;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
