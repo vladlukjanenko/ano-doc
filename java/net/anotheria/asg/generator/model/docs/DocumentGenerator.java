@@ -49,6 +49,10 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		return doc.getName()+"Document";
 	}
 
+	public String getDataObjectImplName(MetaDocument doc){
+		return getDocumentImplName(doc);
+	}
+
 	public static String getDocumentImplName(MetaDocument doc){
 		return doc.getName()+"Document";
 	}
@@ -60,23 +64,6 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 
 	public static String getSortTypeName(MetaDocument doc){
 		return doc.getName()+"SortType";
-	}
-	
-	private List<MetaProperty> extractSortableProperties(MetaDocument doc){
-		List<MetaProperty> properties = new ArrayList<MetaProperty>();
-		properties.add(new MetaProperty("id","string"));
-		properties.addAll(doc.getProperties());
-		properties.addAll(doc.getLinks());
-
-		for (int i=0; i<properties.size(); i++){
-			MetaProperty p = properties.get(i);
-			if (p instanceof MetaContainerProperty){
-				properties.remove(p);
-				i--;
-			}
-		}
-
-		return properties;
 	}
 	
 	private GeneratedClass generateDocument(MetaDocument doc){
@@ -133,6 +120,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		generateDefaultConstructor(doc);
 		appendEmptyline();
 		generateCloneConstructor(doc);
+		appendEmptyline();
+		generateBuilderConstructor(doc);
 		appendEmptyline();
 		generatePropertyAccessMethods(doc);
 		appendEmptyline();
@@ -217,6 +206,21 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendStatement("super(toClone)");
 		append(closeBlock());
 		return ret;
+	}
+
+	private void generateBuilderConstructor(MetaDocument doc){
+		appendString(getDocumentImplName(doc)+"("+getDocumentBuilderName(doc)+" builder){");
+		increaseIdent();
+		appendStatement("super("+quote("")+")");
+		for (MetaProperty p : doc.getProperties()){
+			appendStatement("set", p.getAccesserName(), "(builder.", p.getName(), ")");
+		}
+		
+		for (MetaProperty p : doc.getLinks()){
+			appendStatement("set", p.getAccesserName(), "(builder.", p.getName(), ")");
+		}
+
+		append(closeBlock());
 	}
 
 	private String generatePropertyAccessMethods(MetaDocument doc){
@@ -390,10 +394,6 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 	
 	public static final String getDocumentImport(Context context, MetaDocument doc){
 		return context.getDataPackageName(doc)+"."+getDocumentImplName(doc);
-	}
-	
-	public static final String getSortTypeImport(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data."+getSortTypeName(doc);
 	}
 	
 	private void generateAdditionalMethods(MetaDocument doc){
@@ -659,6 +659,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendEmptyline();
 	}
 	
+/*	
 	private void generateCompareMethod(MetaDocument doc){
 		appendString("public int compareTo(IComparable anotherComparable, int method){");
 		increaseIdent();
@@ -685,13 +686,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 
 		append(closeBlock());
 	}
-	
-	private void generateDefNameMethod(MetaDocument doc){
-		appendString("public String getDefinedName(){");
-		increaseIdent();
-		appendStatement("return "+quote(doc.getName()));
-		append(closeBlock());
-	}
+	*/
 
 	public static String getContainerSizeGetterName(MetaContainerProperty p){
 		return "get"+StringUtils.capitalize(p.getName())+"Size"; 
@@ -735,41 +730,6 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 
 	public static String getListElementGetterName(MetaListProperty list, String language){
 		return DataFacadeGenerator.getListElementGetterName(list, language);	    
-	}
-
-	private GeneratedClass generateDocumentFactory(MetaDocument doc){
-		GeneratedClass clazz = new GeneratedClass();
-		startNewJob(clazz);
-		
-	
-		clazz.setPackageName(getPackageName(doc));
-		clazz.setName(getDocumentFactoryName(doc));
-		
-		startClassBody();
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" template){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentName(doc)+"(("+getDocumentName(doc)+")"+"template)");
-		append(closeBlock());
-
-		appendEmptyline();
-
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"(){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentName(doc)+"(\"\")");
-		append(closeBlock());
-		appendEmptyline();
-
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"ForImport(String id){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentName(doc)+"(id)");
-		append(closeBlock());
-
-		return clazz;
-	}
-	
-	
-	private String getDocumentFactoryName(MetaDocument doc){
-		return DataFacadeGenerator.getDocumentFactoryName(doc);
 	}
 
 	protected void generateMultilingualSwitchSupport(MetaDocument doc){

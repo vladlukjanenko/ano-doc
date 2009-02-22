@@ -19,15 +19,8 @@ import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.util.StringUtils;
 
 /**
- * This generator genera
- * 
- * 
- * 
- * 
- * 
- * 
- *  tes the data facade - the interface which defines the behaviour of the document and its attributes. It also generates the 
- * sort type. 
+ * This generator generates the data facade - the interface which defines the behaviour of the document and its attributes. It also generates the 
+ * sort type and the builder. 
  * @author another
  *
  */
@@ -46,6 +39,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		_ret.add(new FileEntry(generateDocument(doc)));
 		_ret.add(new FileEntry(generateSortType(doc)));
 		_ret.add(new FileEntry(generateXMLHelper(doc)));
+		_ret.add(new FileEntry(generateBuilder(doc)));
 		return _ret;
 	}
 	
@@ -61,21 +55,44 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		return doc.getName()+"XMLHelper";
 	}
 	
-	private List<MetaProperty> extractSortableProperties(MetaDocument doc){
-		List<MetaProperty> properties = new ArrayList<MetaProperty>();
-		properties.add(new MetaProperty("id","string"));
-		properties.addAll(doc.getProperties());
-		properties.addAll(doc.getLinks());
-
-		for (int i=0; i<properties.size(); i++){
-			MetaProperty p = properties.get(i);
-			if (p instanceof MetaContainerProperty){
-				properties.remove(p);
-				i--;
+	private GeneratedClass generateBuilder(MetaDocument doc){
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+	
+		clazz.setPackageName(getPackageName(doc));
+		clazz.setName(getDocumentBuilderName(doc));
+		
+		clazz.addInterface("Builder<"+doc.getName()+">");
+		clazz.addImport(net.anotheria.asg.data.Builder.class);
+		
+		startClassBody();
+		
+		for (int i=0; i<doc.getProperties().size(); i++){
+			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
+				clazz.addImport("java.util.List");
+				break;
 			}
 		}
 
-		return properties;
+		for (MetaProperty p : doc.getProperties()){
+			appendStatement("protected "+p.toJavaType()+" "+p.getName());
+		}
+		for (MetaProperty p : doc.getLinks()){
+			appendStatement("protected "+p.toJavaType()+" "+p.getName());
+		}
+		appendEmptyline();
+		
+		generateBuilderPropertyAccessMethods(doc);
+		appendEmptyline();
+		//generateAdditionalMethods(doc);
+		//appendEmptyline();
+		
+		appendString("public "+doc.getName()+" build(){");
+		increaseIdent();
+		appendStatement("return "+doc.getName()+"Factory.create"+doc.getName()+"(this)");
+		append(closeBlock());
+		
+		return clazz;
 	}
 	
 	private GeneratedClass generateSortType(MetaDocument doc){
@@ -410,6 +427,23 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		}
 	}
 	
+	private void generateBuilderPropertyAccessMethods(MetaDocument doc){
+		_generateBuilderPropertyAccessMethods(doc, doc.getProperties());
+		_generateBuilderPropertyAccessMethods(doc, doc.getLinks());
+	}
+	
+	private void _generateBuilderPropertyAccessMethods(MetaDocument doc, List<MetaProperty> properties){
+		for (int i=0; i<properties.size(); i++){
+			MetaProperty p = properties.get(i);
+			//generateBuilderPropertyGetterMethod(p);
+			//appendEmptyline();
+			if (!p.isReadonly()){
+				generateBuilderPropertySetterMethod(doc, p);
+				appendEmptyline();
+			}
+		}
+	}
+
 	private void generatePropertyGetterMethod(MetaProperty p){
 		if (p instanceof MetaTableProperty){
 			generateTablePropertyGetterMethods((MetaTableProperty)p);
@@ -429,6 +463,23 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		
 	}
 	
+	private void generateBuilderPropertyGetterMethod(MetaProperty p){
+		if (p instanceof MetaTableProperty){
+			generateBuilderTablePropertyGetterMethods((MetaTableProperty)p);
+			return;
+		}
+		if (p instanceof MetaListProperty){
+			generateBuilderListPropertyGetterMethods((MetaListProperty)p);
+			return;
+		}
+		
+		appendComment("Returns the value of the "+p.getName()+" attribute.");
+		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
+		appendIncreasedStatement("return "+p.getName());
+		appendString("}");
+		
+	}
+
 	private void generatePropertyGetterMethodMultilingual(MetaProperty p){
 		for (String l : context.getLanguages()){
 			appendComment("Returns the value of the "+p.getName()+" attribute in the \""+l+"\" domain.");
@@ -441,11 +492,22 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 	
 	
+	private void generateBuilderListPropertyGetterMethods(MetaListProperty p){
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		generateBuilderPropertyGetterMethod(tmp);
+	}
+	
 	private void generateListPropertyGetterMethods(MetaListProperty p){
 		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
 		generatePropertyGetterMethod(tmp);
+	}
+
+	private void generateBuilderTablePropertyGetterMethods(MetaTableProperty p){
+		List<MetaProperty> columns = p.getColumns();
+		for (int t=0; t<columns.size(); t++)
+			generateBuilderPropertyGetterMethod(columns.get(t));
 	}
 	
 	private void generateTablePropertyGetterMethods(MetaTableProperty p){
@@ -453,7 +515,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		for (int t=0; t<columns.size(); t++)
 			generatePropertyGetterMethod(columns.get(t));
 	}
-	
+
 	private void generatePropertySetterMethod(MetaProperty p){
 		if (p instanceof MetaTableProperty){
 			generateTablePropertySetterMethods((MetaTableProperty)p);
@@ -473,6 +535,25 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		
 	}
 	
+	private void generateBuilderPropertySetterMethod(MetaDocument doc, MetaProperty p){
+		if (p instanceof MetaTableProperty){
+			generateBuilderTablePropertySetterMethods(doc, (MetaTableProperty)p);
+			return ;
+		}
+		if (p instanceof MetaListProperty){
+			generateBuilderListPropertySetterMethods(doc, (MetaListProperty)p);
+			return;
+		}
+
+		appendComment("Sets the value of the "+p.getName()+" attribute.");
+		appendString("public "+getDocumentBuilderName(doc)+" "+p.getName()+"("+p.toJavaType()+" value){");
+		increaseIdent();
+		appendStatement(p.getName(), " = ", "value");
+		appendStatement("return this");
+		append(closeBlock());
+		
+	}
+
 	private void generatePropertySetterMethodMultilingual(MetaProperty p){
 		for (String l : context.getLanguages()){
 			appendComment("Sets the value of the "+p.getName()+" attribute in the domain \""+l+"\"");
@@ -490,12 +571,22 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		generatePropertySetterMethod(tmp);
 	}
 
+	private void generateBuilderListPropertySetterMethods(MetaDocument doc, MetaListProperty p){
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		generateBuilderPropertySetterMethod(doc, tmp);
+	} 
+
 	private void generateTablePropertySetterMethods(MetaTableProperty p){
 		List<MetaProperty> columns = p.getColumns();
 		for (int t=0; t<columns.size(); t++)
 			generatePropertySetterMethod(columns.get(t));
 	}
 
+	private void generateBuilderTablePropertySetterMethods(MetaDocument doc, MetaTableProperty p){
+		List<MetaProperty> columns = p.getColumns();
+		for (int t=0; t<columns.size(); t++)
+			generateBuilderPropertySetterMethod(doc, columns.get(t));
+	}
 	
 	public static final String getDocumentImport(Context context, MetaDocument doc){
 		return context.getDataPackageName(doc)+"."+doc.getName();
@@ -505,13 +596,6 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		return context.getDataPackageName(doc)+"."+getXMLHelperName(doc);
 	}
 
-	
-	
-	public static final String getSortTypeImport(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc)+"."+getSortTypeName(doc);
-		
-	}
-	
 	private void generateAdditionalMethods(MetaDocument doc){
 		List <MetaProperty>properties = doc.getProperties();
 		for (MetaProperty p : properties){
@@ -666,6 +750,12 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	public static final String getDocumentFactoryImport(Context context, MetaDocument doc){
 		return context.getDataPackageName(doc)+"."+getDocumentFactoryName(doc);
 	}
+	
+	public String getDataObjectImplName(MetaDocument doc){
+		throw new AssertionError("Shouln't be called, since the facade has no impl");
+	}
+
+
 
 
 }

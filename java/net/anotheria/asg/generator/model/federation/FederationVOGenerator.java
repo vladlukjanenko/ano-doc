@@ -41,32 +41,15 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		return _ret;
 	}
 	
+	public String getDataObjectImplName(MetaDocument doc){
+		return getDocumentImplName(doc);
+	}
+	
 	public static String getDocumentImplName(MetaDocument doc){
 		return doc.getName()+"VO";
 	}
 	
 
-	public static String getSortTypeName(MetaDocument doc){
-		return doc.getName()+"SortType";
-	}
-	
-	private List<MetaProperty> extractSortableProperties(MetaDocument doc){
-		List<MetaProperty> properties = new ArrayList<MetaProperty>();
-		properties.add(new MetaProperty("id","string"));
-		properties.addAll(doc.getProperties());
-		properties.addAll(doc.getLinks());
-
-		for (int i=0; i<properties.size(); i++){
-			MetaProperty p = properties.get(i);
-			if (p instanceof MetaContainerProperty){
-				properties.remove(p);
-				i--;
-			}
-		}
-
-		return properties;
-	}
-	
 	private GeneratedClass generateDocument(MetaDocument doc){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
@@ -505,40 +488,6 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		appendEmptyline();
 	}
 	
-	private void generateCompareMethod(MetaDocument doc){
-		appendString("public int compareTo(IComparable anotherComparable, int method){");
-		increaseIdent();
-
-		appendStatement(getDocumentImplName(doc)+" anotherDoc = ("+getDocumentImplName(doc)+") anotherComparable");
-		appendString("switch(method){");
-		increaseIdent();
-		List<MetaProperty> properties = extractSortableProperties(doc);
-
-		for (int i=0; i<properties.size(); i++){
-			MetaProperty p = properties.get(i);
-
-			String caseDecl = getSortTypeName(doc)+".SORT_BY_"+p.getName().toUpperCase();
-			appendString("case "+caseDecl+":");
-			String type2compare = null; 
-			type2compare = StringUtils.capitalize(p.toJavaType());
-			String retDecl = "return BasicComparable.compare"+type2compare;
-			retDecl += "(get"+p.getAccesserName()+"(), anotherDoc.get"+p.getAccesserName()+"())";
-			appendIncreasedStatement(retDecl);
-		}
-		appendString("default:");
-		appendIncreasedStatement("throw new RuntimeException(\"Sort method \"+method+\" is not supported.\")");
-		append(closeBlock());
-
-		append(closeBlock());
-	}
-	
-	private void generateDefNameMethod(MetaDocument doc){
-		appendString("public String getDefinedName(){");
-		increaseIdent();
-		appendStatement("return "+quote(doc.getName()));
-		append(closeBlock());
-	}
-
 	public static String getContainerSizeGetterName(MetaContainerProperty p){
 		return "get"+StringUtils.capitalize(p.getName())+"Size"; 
 	}
@@ -560,40 +509,6 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 	
 	public static String getListElementGetterName(MetaListProperty list){
 		return "get"+StringUtils.capitalize(list.getName())+list.getContainerEntryName();
-	}
-
-	private GeneratedClass generateDocumentFactory(MetaDocument doc){
-		GeneratedClass clazz = new GeneratedClass();
-		startNewJob(clazz);
-	
-		clazz.setPackageName(getPackageName(doc));
-		clazz.setName(getDocumentFactoryName(doc));
-		
-		startClassBody();
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" template){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentImplName(doc)+"(("+getDocumentImplName(doc)+")"+"template)");
-		append(closeBlock());
-
-		appendEmptyline();
-
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"(){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentImplName(doc)+"(\"\")");
-		append(closeBlock());
-
-		appendEmptyline();
-
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"(String id){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentImplName(doc)+"(id)");
-		append(closeBlock());
-
-		return clazz;
-	}
-	
-	private String getDocumentFactoryName(MetaDocument doc){
-		return DataFacadeGenerator.getDocumentFactoryName(doc);
 	}
 
 }

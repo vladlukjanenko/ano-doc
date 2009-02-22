@@ -3,10 +3,10 @@ package net.anotheria.asg.generator.model.db;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
@@ -16,15 +16,13 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
-import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
 
 /**
  * Generates value objects for db bound document implementation.
  * @author another
  */
-public class VOGenerator extends AbstractDataObjectGenerator
-	implements IGenerator{
+public class VOGenerator extends AbstractDataObjectGenerator implements IGenerator{
 
 	public static final String DAO_CREATED = "daoCreated";
 	public static final String DAO_UPDATED = "daoUpdated";
@@ -47,6 +45,9 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		return _ret;
 	}
 	
+	public String getDataObjectImplName(MetaDocument doc){
+		return getDocumentImplName(doc);
+	}
 	
 	public static String getDocumentImplName(MetaDocument doc){
 		return doc.getName()+"VO";
@@ -56,34 +57,15 @@ public class VOGenerator extends AbstractDataObjectGenerator
 	public static String getClassImplName(MetaDocument doc){
 		return doc.getName()+"Document";
 	}
-
-	public static String getSortTypeName(MetaDocument doc){
-		return doc.getName()+"SortType";
-	}
-	
-	private List<MetaProperty> extractSortableProperties(MetaDocument doc){
-		List<MetaProperty> properties = new ArrayList<MetaProperty>();
-		properties.add(new MetaProperty("id","string"));
-		properties.addAll(doc.getProperties());
-		properties.addAll(doc.getLinks());
-
-		for (int i=0; i<properties.size(); i++){
-			MetaProperty p = properties.get(i);
-			if (p instanceof MetaContainerProperty){
-				properties.remove(p);
-				i--;
-			}
-		}
-
-		return properties;
-	}
 	
 	private GeneratedClass generateDocument(MetaDocument doc){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
 		clazz.setPackageName(getPackageName(doc));
-	
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment("The implementation of the "+(doc.getName())+".", this));
+
+	 
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
 				clazz.addImport("java.util.List");
@@ -116,6 +98,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 			clazz.addImport("net.anotheria.util.sorter.IComparable");
 			clazz.addImport("net.anotheria.util.BasicComparable");
 			clazz.addInterface("IComparable");
+			clazz.addInterface("Comparable<"+doc.getName()+">");
 		}
 		
 
@@ -133,6 +116,8 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		appendEmptyline();
 		appendMark(4);
 		generateCloneConstructor(doc);
+		appendEmptyline();
+		generateBuilderConstructor(doc);
 		appendEmptyline();
 		generatePropertyAccessMethods(doc);
 		appendEmptyline();
@@ -176,6 +161,22 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		append(closeBlock());
 	}
 
+	private void generateBuilderConstructor(MetaDocument doc){
+		appendString(getDocumentImplName(doc)+"("+getDocumentBuilderName(doc)+" builder){");
+		increaseIdent();
+		//TODO add multilingual support 
+		appendStatement("id = "+quote(""));
+		for (MetaProperty p : doc.getProperties()){
+			appendStatement(p.getName().toLowerCase()," = ", "builder.", p.getName());
+		}
+		
+		for (MetaProperty p : doc.getLinks()){
+			appendStatement(p.getName().toLowerCase()," = ", "builder.", p.getName());
+		}
+
+		append(closeBlock());
+	}
+
 	private void generatePropertyFields(MetaDocument doc){
 		_generatePropertyField(id);
 		_generatePropertyFields(doc.getProperties());
@@ -211,7 +212,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 	
 	private void _generatePropertyField(MetaProperty p){
 		if (context.areLanguagesSupported() && p.isMultilingual()){
-			System.out.println("Multilingual support for VOs not yet implemented!");
+			throw new AssertionError("Multilingual support for VOs not yet implemented!");
 			/*
 			for (String l: context.getLanguages()){
 				String decl = PROPERTY_DECLARATION;
@@ -375,9 +376,9 @@ public class VOGenerator extends AbstractDataObjectGenerator
 	}
 	
 	private void generateCloneMethod(MetaDocument doc){
-		appendString("public "+doc.getName()+" clone(){");
+		appendString("public "+getDocumentImplName(doc)+" clone(){");
 		increaseIdent();
-		appendStatement("return new "+getDocumentImplName(doc)+"(this)");
+		appendStatement("return ("+getDocumentImplName(doc)+") super.clone()");
 		append(closeBlock());
 	}
 	
@@ -414,11 +415,6 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		return context.getPackageName(doc)+".data."+getDocumentImplName(doc);
 	}
 	
-
-	public static final String getSortTypeImport(MetaDocument doc){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".data."+getSortTypeName(doc);
-	}
-	
 	private void generateAdditionalMethods(MetaDocument doc){
 		
 		List <MetaProperty>properties = doc.getProperties();
@@ -437,9 +433,9 @@ public class VOGenerator extends AbstractDataObjectGenerator
 
 		appendString("public int "+getContainerSizeGetterName(container)+"(){");
 		increaseIdent();
-		MetaProperty pr = container instanceof MetaTableProperty ? 
-			(MetaProperty) ((MetaTableProperty)container).getColumns().get(0) :
-			container;
+//		MetaProperty pr = container instanceof MetaTableProperty ? 
+//			((MetaTableProperty)container).getColumns().get(0) :
+//			container;
 //		appendStatement("return getList("+pr.toNameConstant()+").size()"); 
 		appendStatement("return get"+container.getAccesserName()+"().size()");
 		append(closeBlock());
@@ -559,7 +555,12 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		appendEmptyline();
 	}
 	
-	private void generateCompareMethod(MetaDocument doc){
+/*	private void generateCompareMethod(MetaDocument doc){
+		appendString("public int compareTo("+doc.getName()+" comparable){");
+		appendIncreasedStatement("return compareTo(comparable, "+getSortTypeName(doc)+".SORT_BY_DEFAULT)");
+		appendString("}");
+		append(emptyline());
+
 		appendString("public int compareTo(IComparable anotherComparable, int method){");
 		increaseIdent();
 
@@ -584,14 +585,7 @@ public class VOGenerator extends AbstractDataObjectGenerator
 		append(closeBlock());
 		append(closeBlock());
 	}
-	
-	private void generateDefNameMethod(MetaDocument doc){
-		appendString("public String getDefinedName(){");
-		increaseIdent();
-		appendStatement("return "+quote(doc.getName()));
-		append(closeBlock());
-	}
-	
+	*/
 	
 
 	public static String getContainerSizeGetterName(MetaContainerProperty p){
@@ -615,49 +609,6 @@ public class VOGenerator extends AbstractDataObjectGenerator
 	
 	public static String getListElementGetterName(MetaListProperty list){
 		return "get"+StringUtils.capitalize(list.getName())+list.getContainerEntryName();
-	}
-
-	private GeneratedClass generateDocumentFactory(MetaDocument doc){
-		
-		GeneratedClass clazz = new GeneratedClass();
-		startNewJob(clazz);
-		
-		clazz.setPackageName(getPackageName(doc));
-		clazz.setName(getDocumentFactoryName(doc));
-		
-		startClassBody();
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" template){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentImplName(doc)+"(("+getDocumentImplName(doc)+")"+"template)");
-		append(closeBlock());
-
-		appendEmptyline();
-
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"(){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentImplName(doc)+"(\"\")");
-		append(closeBlock());
-
-		appendEmptyline();
-
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"ForImport(String anId){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentImplName(doc)+"(anId)");
-		append(closeBlock());
-
-		appendEmptyline();
-
-		appendComment("For internal use only!");
-		appendString("public static "+doc.getName()+" create"+doc.getName()+"(String anId){");
-		increaseIdent();
-		appendStatement("return new "+getDocumentImplName(doc)+"(anId)");
-		append(closeBlock());
-		
-		return clazz;
-	}
-	
-	private String getDocumentFactoryName(MetaDocument doc){
-		return DataFacadeGenerator.getDocumentFactoryName(doc);
 	}
 
 }
