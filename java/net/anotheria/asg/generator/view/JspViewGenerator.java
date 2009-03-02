@@ -568,7 +568,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			appendString("</logic:equal>");
 		}
 		// *** END MULILINGUAL COPY *** //
-		
+		appendString("</table>");
 		appendString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
@@ -578,9 +578,16 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		List<MetaViewElement> richTextElements = new ArrayList<MetaViewElement>();
 		
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument(), GeneratorDataRegistry.getInstance().getContext()); 
+		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 
+			if(element.isRich()){
+				MetaProperty p = section.getDocument().getField(element.getName());
+				if(p.getType().equals("text"))
+						richTextElements.add(element);
+			}
+			
 			String lang = getElementLanguage(element);
 
 			//ALTERNATIVE EDITOR FOR DISABLED MODE
@@ -606,13 +613,6 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 				appendString("</td>");
 				
 				appendString("</tr>");
-				if(element.isRich()){
-					MetaProperty p = section.getDocument().getField(element.getName());
-					if(!p.getType().equals("text"))
-						break;
-					richTextElements.add(element);
-				}
-
 				
 				appendString("</logic:equal>");
 			}//END ALTERNATIVE EDITOR FOR MULTILANG DISABLED FORM
@@ -638,12 +638,6 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			appendString("</td>");
 			
 			appendString("</tr>");
-			if(element.isRich()){
-				MetaProperty p = section.getDocument().getField(element.getName());
-				if(!p.getType().equals("text"))
-					break;
-				richTextElements.add(element);
-			}
 			
 			if (lang!=null)
 				appendString("</logic:equal>");
@@ -838,12 +832,16 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			appendString("</script>");
 			return;
 		}
-		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("editor/assets/skins/sam/editor.css")) + " />");
-		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("editor/assets/skins/sam/container.css")) + " />");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("utilities/utilities.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("container/container.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("editor/editor-beta-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("editor/editor-switcher.js")) + "></script>");
+		
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/assets/skins/sam/skin.css")) + " />");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/element/element-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container_core-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/button/button-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");
+		
+		
 		appendString("<script type=\"text/javascript\">");
 		increaseIdent();
 		for(MetaViewElement el: richTextElements){
@@ -852,7 +850,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("function handleSubmit(){");
 		increaseIdent();
 		for(MetaViewElement el: richTextElements){
-			appendString("if(isActiveEditor(" + getEditorVarName(doc, el) + "))");
+//			appendString("if(isActiveEditor(" + getEditorVarName(doc, el) + "))");
 			appendIncreasedString(getEditorVarName(doc, el) + ".saveHTML();");
 		}
 		decreaseIdent();
@@ -868,11 +866,12 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("width: '660px',"); 
 		appendString("height: '200px',"); 
 		appendString("dompath: false, ");
-		appendString("animate: true ");
+		appendString("animate: true, ");
+		appendString("handleSubmit: true ");
 		appendString("}; ");
 		appendString("//Now let's load the Editor.."); 
 		for(MetaViewElement el: richTextElements){
-			appendString(getEditorVarName(doc, el) + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"', myConfig);"); 
+			appendString(getEditorVarName(doc, el) + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"_ID', myConfig);"); 
 			appendString(getEditorVarName(doc, el) + ".render(); ");
 		}
 		appendString("Event.onDOMReady(function() {"); 
@@ -1035,9 +1034,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		String lang = getElementLanguage(element);
 		String ret ="";
 		ret += "<div class=\"yui-skin-sam\">";	
-		if(element.isRich())
-			ret += "<button onclick=\"toggleRichEditor(this,"+ getEditorVarName(((MetaModuleSection)currentSection).getDocument(), element) +");\" type=\"button\">Hide Editor</button>";
-		ret += "<textarea cols=\"80\" rows=\"15\" id="+quote(p.getName(lang))+" name="+quote(p.getName(lang));
+		//FIXME: Editor hiding doesn't work in new yui library. Additional JS has to be written.
+//		if(element.isRich())
+//			ret += "<button id="+quote(p.getName(lang) + "Button")+" type=\"button\">Hide Editor</button>";
+		ret += "<textarea cols=\"80\" rows=\"15\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
 		ret += ">";
 		ret += "<bean:write filter=\"false\" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
 		ret += "</textarea>";
