@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.service.IModuleFactory;
@@ -83,7 +84,7 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 	/**
 	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#executeQueryOnDocuments(BasicPredicate)
 	 */
-	public List executeQueryOnDocuments(Predicate p) throws StorageFailureException{
+	public List<Document> executeQueryOnDocuments(Predicate p) throws StorageFailureException{
 		try{
 			return delegate.executeQueryOnDocuments(p, factory);
 		}catch(Exception e){

@@ -34,7 +34,6 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 			return new ArrayList<FileEntry>();
 
 		this.context = context;
-		String packageName = getPackageName(context, mod);
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		

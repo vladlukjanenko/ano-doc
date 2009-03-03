@@ -33,8 +33,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 		MetaModule mod = (MetaModule)gmodule;
 		
 		this.context = context;
-		String packageName = getPackageName(mod);
-		
+
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ret.add(new FileEntry(generateFactory(mod)));

@@ -88,7 +88,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		//appendEmptyline();
 		
 		appendString("public "+doc.getName()+" build(){");
-		increaseIdent();
+		increaseIdent(); 
 		appendStatement("return "+doc.getName()+"Factory.create"+doc.getName()+"(this)");
 		append(closeBlock());
 		
