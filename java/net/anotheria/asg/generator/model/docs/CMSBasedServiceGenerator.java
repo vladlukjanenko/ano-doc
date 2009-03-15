@@ -432,18 +432,46 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendEmptyline();
 			
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
-	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
-	        increaseIdent();
-	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
-	        append(closeBlock());
-	        appendEmptyline();
+//	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
+//	        increaseIdent();
+//	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+//	        append(closeBlock());
+//	        appendEmptyline();
+//	        
+//			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
+//			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
+//	        increaseIdent();
+//	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+//	        append(closeBlock());
+//			appendEmptyline();
+			
+			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
+			increaseIdent();
+			appendString("//first the slow version, the fast version is a todo.");
+			appendStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
+			appendStatement(listDecl+" src = get"+doc.getMultiple()+"()");
+			appendStatement("for ( "+doc.getName()+" "+doc.getVariableName() +" : src){");
+			increaseIdent();
+			appendStatement("boolean mayPass = true");
+			appendStatement("for (QueryProperty qp : property){");
+			increaseIdent();
+			appendStatement("mayPass = mayPass && qp.doesMatch("+doc.getVariableName()+".getPropertyValue(qp.getName()))");
+			append(closeBlock());
+			
+			appendString("if (mayPass)");
+			appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
+			append(closeBlock());
+			
+			appendStatement("return ret");
+			append(closeBlock());
+	        append(emptyline());
 	        
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
 	        increaseIdent();
-	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
 	        append(closeBlock());
-			appendEmptyline();
+			append(emptyline());
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 				containsAnyMultilingualDocs = true;
