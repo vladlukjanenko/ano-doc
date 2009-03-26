@@ -23,7 +23,6 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 		if (log==null){
 			log = Logger.getLogger(this.getClass());
 		}
-		BROKE BUILD
 		return log;
 	}
 	/**
