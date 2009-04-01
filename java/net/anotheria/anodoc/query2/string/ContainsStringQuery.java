@@ -31,6 +31,8 @@ public class ContainsStringQuery implements DocumentQuery{
 			Property p = properties.get(i);
 			if (p instanceof StringProperty){
 				String value = ((StringProperty)p).getString();
+				if(value == null)
+					continue;
 				int index = value.toLowerCase().indexOf(criteria.toLowerCase());
 				if (index!=-1){
 					QueryResultEntry e = new QueryResultEntry();

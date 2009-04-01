@@ -369,6 +369,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private GeneratedJSPFile generateTablePage(MetaModuleSection section, MetaDocument doc, MetaTableProperty table){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
 		jsp.setName(getContainerPageName(doc, table));
 		
 	    resetIdent();
@@ -730,6 +731,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private GeneratedJSPFile generateLinksToDocument(MetaModuleSection section, MetaView view){
 
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
 		jsp.setName(getLinksToMePageName(section.getDocument()));
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
 		
@@ -1055,6 +1057,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private GeneratedJSPFile generateCSVExport(MetaModuleSection section, MetaView view){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
 		jsp.setName(getExportAsCSVPageName(section.getDocument()));
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
 		
@@ -1103,6 +1106,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private GeneratedJSPFile generateXMLExport(MetaModuleSection section, MetaView view){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
 		jsp.setName(getExportAsXMLPageName(section.getDocument()));
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
 		
@@ -1309,6 +1313,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
 		jsp.setName(getSearchResultPageName());
 		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
 		
@@ -1348,7 +1353,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<td width=\"80%\">Match</td>");
 		decreaseIdent();
 		appendString("</tr>");
-		
+		appendString("<logic:present name="+quote("result")+" >");
 		appendString("<logic:iterate name="+quote("result")+" type="+quote("net.anotheria.anodoc.query2.ResultEntryBean")+" id="+quote("entry")+" indexId=\"ind\">");
 		increaseIdent();
 		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
@@ -1358,6 +1363,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("</tr>");
 		decreaseIdent();
 		appendString("</logic:iterate>");
+		appendString("</logic:present>");
 
 		decreaseIdent();
 		appendString("</table>");
@@ -1373,6 +1379,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private GeneratedJSPFile generateVersionInfoPage(){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
+		startNewJob(jsp);
 		jsp.setName(getVersionInfoPageName());
 		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
 		
