@@ -10,9 +10,11 @@ import net.anotheria.anodoc.query2.QueryProperty;
  * @author denis
  *
  */
-public class QueryLessThenProperty extends QueryProperty{
+public class QueryLessThenProperty<P extends Comparable<P>> extends QueryProperty{
 	
-	public QueryLessThenProperty(String name, Object value) {
+	private static final long serialVersionUID = -4870076734697577172L;
+
+	public QueryLessThenProperty(String name, P value) {
 		super(name, value);
 	}
 
@@ -24,7 +26,15 @@ public class QueryLessThenProperty extends QueryProperty{
 		return " < ";
 	}
 	
+	@Override
 	public boolean doesMatch(Object o){
-		throw new RuntimeException("Not Implemented");
+		if(getValue() == null || o == null)
+			return false;
+		P value = (P)getValue();
+		if(!(o instanceof Comparable))
+			throw new RuntimeException("Matched object must implement interface Comprable!");
+		P anotherValue = (P) o;
+		return value.compareTo(anotherValue) > 0;
 	}
+	
 }

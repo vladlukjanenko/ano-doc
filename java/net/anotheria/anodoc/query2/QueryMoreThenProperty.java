@@ -1,6 +1,5 @@
 package net.anotheria.anodoc.query2;
 
-import net.anotheria.anodoc.query2.QueryProperty;
 
 /**
  * Difference with QueryProperty is property value of queried object must be more then specified in this query.
@@ -10,14 +9,14 @@ import net.anotheria.anodoc.query2.QueryProperty;
  * @author denis
  *
  */
-public class QueryMoreThenProperty extends QueryProperty{
+public class QueryMoreThenProperty <P extends Comparable<P>> extends QueryProperty{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1772130142649741117L;
 
-	public QueryMoreThenProperty(String name, Object value) {
+	public QueryMoreThenProperty(String name, P value) {
 		super(name, value);
 	}
 
@@ -29,9 +28,14 @@ public class QueryMoreThenProperty extends QueryProperty{
 		return " > ";
 	}
 	
+	@Override
 	public boolean doesMatch(Object o){
-		if(o instanceof Long && getValue() instanceof Long)
-			return (Long)o > (Long)getValue();
-		throw new RuntimeException("Not Implemented");
+		if(getValue() == null || o == null)
+			return false;
+		P value = (P)getValue();
+		if(!(o instanceof Comparable))
+			throw new RuntimeException("Matched object must implement interface Comprable!");
+		P anotherValue = (P) o;
+		return value.compareTo(anotherValue) < 0;
 	}
 }
