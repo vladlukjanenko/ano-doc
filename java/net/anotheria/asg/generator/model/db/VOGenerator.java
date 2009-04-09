@@ -321,7 +321,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 
 		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
-		appendStatement(""+p.getName().toLowerCase()+" = value");
+		appendStatement("this."+p.getName().toLowerCase()+" = value");
 		append(closeBlock());	
 	}
 	
