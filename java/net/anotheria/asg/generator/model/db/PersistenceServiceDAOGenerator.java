@@ -783,7 +783,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         appendStatement("return");
     	append(closeBlock());
         for (MetaProperty p : properties){
-        	appendString("if ("+getAttributeConst(p)+".equals(property.getName())){");
+        	appendString("if ("+getAttributeConst(p)+".equals(property.getName().toLowerCase())){");
         	increaseIdent();
         	appendStatement(getDB2PropertyCallMapping("property.getValue()", p, "position"));
         	appendStatement("return");
