@@ -4,6 +4,9 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.configureme.ConfigurationManager;
+import org.configureme.annotations.AfterConfiguration;
+import org.configureme.annotations.ConfigureMe;
 
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.query.Predicate;
@@ -11,15 +14,14 @@ import net.anotheria.anodoc.stats.IStatisticsConstants;
 import net.anotheria.anodoc.stats.ModuleStatistics;
 import net.anotheria.anodoc.stats.StatisticsFactory;
 import net.anotheria.anodoc.util.CommonHashtableModuleStorage;
-import net.java.dev.moskito.core.configuration.ConfigurationServiceFactory;
-import net.java.dev.moskito.core.configuration.IConfigurable;
 
 
 /**
  * An implementation of IModuleService for local usage, 
  * which supports local cache and synchronization over network.
  */
-public class ModuleServiceImpl implements IModuleService,IConfigurable/*, EventPushConsumerIFC*/{
+@ConfigureMe (name="anodoc.storage")
+public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC*/{
 	
 	/**
 	 * The name of the channel used for internal communication.
@@ -89,7 +91,7 @@ public class ModuleServiceImpl implements IModuleService,IConfigurable/*, EventP
 //		log.info("receiveChannelClass: "+receiveChannel.getClass());
 //		log.info("sendChannelClass: "+sendChannel.getClass());
 		
-		ConfigurationServiceFactory.getConfigurationService().addConfigurable(this);
+		ConfigurationManager.INSTANCE.configure(this);
 	}
 	
 	
@@ -392,20 +394,8 @@ public class ModuleServiceImpl implements IModuleService,IConfigurable/*, EventP
 		}
 	}
 
-	public String getConfigurationName() {
-		return "anodoc.storage";
-	}
-
-	public void notifyConfigurationFinished() {
+	@AfterConfiguration public void notifyConfigurationFinished() {
 		log.info("Cleaning cache.");
 		cache.clear();
-		//System.out.println("CONFIG FINISHED!");
 	}
-
-	public void notifyConfigurationStarted() {
-	}
-
-	public void setProperty(String arg0, String arg1) {
-	}
-
 }

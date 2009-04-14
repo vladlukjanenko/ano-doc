@@ -2,19 +2,11 @@ package net.anotheria.asg.util.rmi;
 
 import java.rmi.registry.Registry;
 
-import net.java.dev.moskito.core.configuration.ConfigurationServiceFactory;
-import net.java.dev.moskito.core.configuration.IConfigurable;
+import org.configureme.annotations.ConfigureMe;
 
-public class RMIConfig implements IConfigurable{
+@ConfigureMe 
+public class RMIConfig {
 
-	/**
-	 * The name of the config key for registry host.
-	 */
-	private static final String KEY_REGISTRY_HOST = "registry.host";
-	/**
-	 * The name of the config key for registry port.
-	 */
-	private static final String KEY_REGISTRY_PORT = "registry.port";
 
 	/**
 	 * The host where the RMIRegistry is running.
@@ -23,7 +15,7 @@ public class RMIConfig implements IConfigurable{
 	/**
 	 * The port where the RMIRegistry is running.
 	 */
-	private int    registryPort;
+	private int  registryPort;
 	
 	/**
 	 * Default registry host value if nothing is explicitely configured.
@@ -37,27 +29,8 @@ public class RMIConfig implements IConfigurable{
 	RMIConfig(){
 		registryHost = DEF_REGISTRY_HOST;
 		registryPort = DEF_REGISTRY_PORT;
-		ConfigurationServiceFactory.getConfigurationService().addConfigurable(this);
 	}
 		
-
-	public String getConfigurationName() {
-		return "rmi";
-	}
-
-	public void notifyConfigurationFinished() {
-	}
-
-	public void notifyConfigurationStarted() {
-	}
-
-	public void setProperty(String key, String value) {
-		if (KEY_REGISTRY_PORT.equals(key))
-			registryPort = Integer.parseInt(value);
-		if (KEY_REGISTRY_HOST.equals(key))
-			registryHost = value;
-	}
-	
 	public String getRegistryHost(){
 		return registryHost;
 	}

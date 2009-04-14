@@ -12,6 +12,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
+import org.configureme.ConfigurationManager;
+import org.configureme.annotations.AfterConfiguration;
+import org.configureme.annotations.Configure;
+import org.configureme.annotations.ConfigureMe;
 
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
@@ -22,8 +26,6 @@ import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.service.IModuleFactory;
 import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;
-import net.java.dev.moskito.core.configuration.AbstractConfigurable;
-import net.java.dev.moskito.core.configuration.ConfigurationServiceFactory;
 
 /**
  * This storage stores everything in a hashtable and stores this 
@@ -31,7 +33,8 @@ import net.java.dev.moskito.core.configuration.ConfigurationServiceFactory;
  * in ONE file.
  * 
  */
-public class CommonHashtableModuleStorage extends AbstractConfigurable implements IModuleStorage{
+@ConfigureMe (name="anodoc.storage")
+public class CommonHashtableModuleStorage implements IModuleStorage{
 
 
 	public static final String DEF_KEY_CFG_STORAGE_DIRECTORY = "storage.dir";
@@ -42,7 +45,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 	public String cfgKeyStorageDir;
 	
 	public static final String DEF_STORAGE_DIR = ".";
-	private String storageDir = DEF_STORAGE_DIR;
+	@Configure private String storageDir = DEF_STORAGE_DIR;
 	
 	private static Logger log;
 	static {
@@ -59,7 +62,7 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		this.factory = aFactory;
 		cfgKeyStorageDir = aCfgKeyStorageDir;
 		
-		ConfigurationServiceFactory.getConfigurationService().addConfigurable(this);
+		ConfigurationManager.INSTANCE.configure(this);
 	}
 
 	/**
@@ -260,26 +263,15 @@ public class CommonHashtableModuleStorage extends AbstractConfigurable implement
 		throw new RuntimeException("Not implemented");
 	}
 
-	/* (non-Javadoc)
-	 * @see de.friendscout.vincent.services.config.IConfigurable#getConfigurationName()
-	 */
-	public String getConfigurationName() {
-		return "anodoc.storage";
-	}
 
 	/* (non-Javadoc)
 	 * @see de.friendscout.vincent.services.config.IConfigurable#setProperty(java.lang.String, java.lang.String)
 	 */
-	public void setProperty(String name, String value) {
-		if (cfgKeyStorageDir.equals(name)){
-			log.info("Setting storage dir to: "+value);
-			storageDir = value;			
-		}
-
+	public void setStorageDir(String value){
+		storageDir = value;			
 	}
 
-	@Override
-	public void notifyConfigurationFinished() {
+	@AfterConfiguration public void notifyConfigurationFinished() {
 		load();
 	}
 }
