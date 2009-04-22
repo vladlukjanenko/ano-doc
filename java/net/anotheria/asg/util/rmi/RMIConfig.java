@@ -4,7 +4,7 @@ import java.rmi.registry.Registry;
 
 import org.configureme.annotations.ConfigureMe;
 
-@ConfigureMe 
+@ConfigureMe (allfields=true)
 public class RMIConfig {
 
 
@@ -12,6 +12,7 @@ public class RMIConfig {
 	 * The host where the RMIRegistry is running.
 	 */
 	private String registryHost;
+
 	/**
 	 * The port where the RMIRegistry is running.
 	 */
@@ -41,5 +42,13 @@ public class RMIConfig {
 	
 	public String toString(){
 		return "RMIConfig "+getRegistryHost()+":"+getRegistryPort();
+	}
+
+	public void setRegistryHost(String registryHost) {
+		this.registryHost = registryHost;
+	}
+
+	public void setRegistryPort(int registryPort) {
+		this.registryPort = registryPort;
 	}
 }
