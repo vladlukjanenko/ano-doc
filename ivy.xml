@@ -1,0 +1,19 @@
+<ivy-module version="2.0">
+    <info organisation="anotheria.net" module="ano-doc"/>
+	<configurations >
+		<conf name="jar" />
+	</configurations>	
+	<publications>
+		<artifact name="ano-doc" type="jar" ext="jar" conf="jar"/>
+    </publications>
+    <dependencies>
+        <dependency org="org.apache" name="log4j" rev="stable" transitive="false"/>
+        <dependency org="org.apache" name="xalan" rev="stable" transitive="false"/>
+
+        <dependency org="org.jdom" name="jdom" rev="stable" transitive="false"/>
+
+        <dependency org="java.net" name="configureme" rev="latest" transitive="true" changing="true"/>
+
+        <dependency org="anotheria.net" name="ano-util" rev="latest" transitive="true" changing="true"/>
+    </dependencies>
+</ivy-module>
