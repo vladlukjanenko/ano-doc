@@ -9,6 +9,7 @@
     <dependencies>
         <dependency org="org.apache" name="log4j" rev="stable" transitive="false"/>
         <dependency org="org.apache" name="xalan" rev="stable" transitive="false"/>
+        <dependency org="org.apache" name="ant" rev="stable" transitive="false"/>
 
         <dependency org="org.jdom" name="jdom" rev="stable" transitive="false"/>
 
