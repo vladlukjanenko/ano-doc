@@ -484,8 +484,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 				appendString("for ("+doc.getName()+" document : allDocuments){");
 				increaseIdent();
 				appendStatement("document.copyLANG2LANG(sourceLanguage, targetLanguage)");
-				appendStatement("update"+doc.getName()+"(document)");
+//				appendStatement("update"+doc.getName()+"(document)");
 				append(closeBlock());
+				appendStatement("update"+doc.getMultiple()+"(allDocuments)");
 				append(closeBlock());
 				appendEmptyline();
 			
