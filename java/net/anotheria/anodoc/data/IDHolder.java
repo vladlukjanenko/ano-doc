@@ -2,9 +2,8 @@ package net.anotheria.anodoc.data;
 
 
 /**
- * @author another
- * $Repository : 
- *
+ * Utility class to for unique document ids.
+ * @author lrosenberg
  */
 public class IDHolder extends Document{
 	public static final String DOC_ID_HOLDER_PRE = "anodoc.id.holder.";

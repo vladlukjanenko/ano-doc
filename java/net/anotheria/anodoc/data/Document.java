@@ -14,6 +14,7 @@ import net.anotheria.util.xml.XMLNode;
  * This class represents a basic document, which is a container for properties and therefore a 
  * corresponding modell object to a simple class (with attributes). 
  * @since 1.0
+ * @author lrosenberg
  */
 public class Document extends DataHolder 
 		implements ICompositeDataObject, Cloneable{
@@ -43,6 +44,10 @@ public class Document extends DataHolder
 		putProperty(new StringProperty(IHelperConstants.IDENTIFIER_KEY, IHelperConstants.IDENTIFIER_DOCUMENT));
 	}
 	
+	/**
+	 * Creates a new document as a copy of another document
+	 * @param anotherDocument the document to be copied
+	 */
 	public Document(Document anotherDocument){
 		super("");
 		dataStorage = new Hashtable<String,DataHolder>();
@@ -53,8 +58,6 @@ public class Document extends DataHolder
 			try{
 				putProperty((Property)p.clone());
 			}catch(CloneNotSupportedException e){
-				//sdhouldn't happen
-				e.printStackTrace();
 				throw new RuntimeException("Clone failed: "+e.getMessage());
 			}
 		}

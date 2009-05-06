@@ -5,8 +5,8 @@ package net.anotheria.anodoc.data;
  * storeable object, which means, that it doesn't contain futher storeable objects. <br>
  * Therefore it's suitable for properties and other simple things, but not for whole 
  * documents.
- * @see biz.beaglesoft.bgldoc.data.ICompositeDataObject
- * @see biz.beaglesoft.bgldoc.data.IPlainDataObject
+ * @see net.anotheria.anodoc.data.ICompositeDataObject
+ * @see net.anotheria.anodoc.data.IPlainDataObject
  * @since 1.0  
  */
 public interface IBasicStoreableObject {

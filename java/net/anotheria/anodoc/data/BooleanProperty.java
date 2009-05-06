@@ -54,7 +54,7 @@ public class BooleanProperty extends Property{
 	/**
 	 * Sets the value of this property to the given value, which can be a Boolean or a String.
 	 */
-	public void setValue(Object o){
+	@Override public void setValue(Object o){
 		if (o instanceof Boolean){
 			super.setValue(o);
 			return;
@@ -72,7 +72,7 @@ public class BooleanProperty extends Property{
 	/**
 	 * Returns the string representation of this property <code>(B <value>)</code>
 	 */
-	public String toString(){
+	@Override public String toString(){
 		return "B "+super.toString();
 	}
 	
@@ -80,18 +80,15 @@ public class BooleanProperty extends Property{
 	 * Returns the size of this property in bytes (one byte).
 	 * @see net.anotheria.anodoc.data.Property#getSizeInBytes()
 	 */
-	public long getSizeInBytes() {
+	@Override public long getSizeInBytes() {
 		return 1;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.anotheria.anodoc.data.Property#cloneValue()
-	 */
-	protected Object cloneValue() {
+	@Override protected Object cloneValue() {
 		return getboolean() ? Boolean.TRUE : Boolean.FALSE;
 	}
 	
-	public PropertyType getPropertyType(){
+	@Override public PropertyType getPropertyType(){
 		return PropertyType.BOOLEAN;
 	}
 
