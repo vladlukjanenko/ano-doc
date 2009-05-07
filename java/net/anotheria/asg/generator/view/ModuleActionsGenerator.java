@@ -579,7 +579,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		
 		appendStatement("pagingLinks.add(new PagingLink(slice.hasNextSlice() ?  \"\"+(slice.getCurrentSlice()+1) : null, \">>\"))");
-		appendStatement("pagingLinks.add(new PagingLink(slice.isLastPage() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))");
+		appendStatement("pagingLinks.add(new PagingLink(slice.isLastSlice() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))");
 	    appendCommentLine(" paging links end");
 	    
 	    appendStatement("req.setAttribute("+quote("paginglinks")+", pagingLinks)");
