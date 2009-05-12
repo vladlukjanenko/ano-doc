@@ -9,7 +9,7 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 
 /**
- * TODO please remined another to comment this class
+ * The Context is available at the generation time and contains contents of the context.xml.
  * @author another
  */
 public class Context {

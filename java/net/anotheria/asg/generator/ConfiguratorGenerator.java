@@ -7,7 +7,6 @@ import net.anotheria.asg.generator.apputil.CallContextGenerator;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.model.ServiceGenerator;
-import net.anotheria.asg.generator.model.docs.CMSBasedServiceGenerator;
 import net.anotheria.asg.metafactory.Extension;
 import net.anotheria.asg.metafactory.MetaFactory;
 

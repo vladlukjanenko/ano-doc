@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO please remined another to comment this class
+ * Helper class that generates comments.
  * @author another
  */
 public class CommentGenerator extends AbstractGenerator{
@@ -24,14 +24,32 @@ public class CommentGenerator extends AbstractGenerator{
 	public static final String COMM_START = "/**";
 	public static final String COMM_END   = " */";
 	
+	/**
+	 * Returns a java file comment for given class.
+	 * @param className the name of the commented class.
+	 * @return return the content of a comment.
+	 * @deprecated use generateJavaTypeComment(String className, IGenerator generator) instead
+	 */
 	public static final String generateJavaTypeComment(String className){
 		return generateJavaTypeComment(className, (String)null);
 	}
 
+	/**
+	 * Returns a java file comment for given class and a generator.
+	 * @param className the name of the commented class.
+	 * @param generator the name/class of the generator which generated the code.
+	 * @return return the content of a comment.
+	 */
 	public static final String generateJavaTypeComment(String className, IGenerator generator){
 		return generateJavaTypeComment(className, "Generator: "+generator.getClass().getName());
 	}
 	
+	/**
+	 * Generates and returns java file comment for given class. Includes additional line(s) supplied by the user.
+	 * @param className the class to comment
+	 * @param additionalInfo an info string to add to the content
+	 * @return the comment for the class.
+	 */
 	public static final String generateJavaTypeComment(String className, String additionalInfo){
 		
 		List<String> lines = new ArrayList<String>();		
@@ -77,6 +95,11 @@ public class CommentGenerator extends AbstractGenerator{
 		
 	}
 	
+	/**
+	 * Returns the length of the longest comment line for beautifuying.
+	 * @param lines a list of string objects
+	 * @return the length of the longest line
+	 */
 	private static int findLongestLineLength(List<String> lines){
 		int length = 0;
 		for (int i=0; i<lines.size(); i++){
