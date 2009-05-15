@@ -61,7 +61,7 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		
 		startClassBody();
 		//create supported language list;
-		appendString("private static List<String> supportedLanguages = Arrays.asList(new String[]{");
+		appendString("private static final List<String> supportedLanguages = Arrays.asList(new String[]{");
 		increaseIdent();
 		List<String> languages = context.getLanguages();
 		for (String l : languages)
@@ -70,10 +70,16 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		appendString("});");
 		appendEmptyline();
 		
-
+		appendString("public static List<String> getSupportedLanguages(){");
+		increaseIdent();
+		appendStatement("return supportedLanguages");
+		append(closeBlock());
+		appendEmptyline();
+		
 		appendString("public static void copyAttributesFromLanguage2Language(String sourceLang, String targetLanguage){");
 		increaseIdent();
 		append(closeBlock());
+		appendEmptyline();
 		
 		appendString("public static void main(String[] a) throws Exception{");
 		increaseIdent();

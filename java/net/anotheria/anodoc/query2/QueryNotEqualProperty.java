@@ -26,6 +26,6 @@ public class QueryNotEqualProperty extends QueryProperty{
 	}
 	
 	public boolean doesMatch(Object o){
-		throw new RuntimeException("Not Implemented");
+		return !super.doesMatch(o);
 	}
 }
