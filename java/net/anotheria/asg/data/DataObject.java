@@ -4,36 +4,60 @@ import net.anotheria.util.xml.XMLNode;
 
 /**
  * Basic interface which all objects managed by the generated code will implement and which provides basic access methods.
- * @author another
+ * @author lrosenberg
  *
  */
 public interface DataObject extends Cloneable{
-	public String getId();
+	/**
+	 * Returns a document id. Each document regardless if it comes from db or filesystem has a unique id.
+	 * @return
+	 */
+	String getId();
 
-	public Object clone() throws CloneNotSupportedException;
+	/**
+	 * DataObjects are cloneable
+	 * @return
+	 * @throws CloneNotSupportedException
+	 */
+	Object clone() throws CloneNotSupportedException;
 
 	/**
 	 * Returns the value of a property in an underlying type.
 	 * @param propertyName
 	 * @return
 	 */
-	public Object getPropertyValue(String propertyName);
+	Object getPropertyValue(String propertyName);
 	
 	/**
 	 * Returns the name under which the object was defined in xml originally.
 	 * @return
 	 */
-	public String getDefinedName();
+	String getDefinedName();
 
-	public long getLastUpdateTimestamp();
+	/**
+	 * Returns the timestamp (time in ms since 1970) of the last change.
+	 * @return
+	 */
+	long getLastUpdateTimestamp();
 
-	public XMLNode toXMLNode();
+	/**
+	 * Creates an XMLNode for this document for XML export.
+	 * @return
+	 */
+	XMLNode toXMLNode();
 	
 	//public void copyAttributesFrom(DataObject object);
 	
-	public String getFootprint();
-	
-	public ObjectInfo getObjectInfo();
+	/**
+	 * Returns the footprint of the document. The footprint is the unique code which identifies a document state. The footprint is calculates from the values of 
+	 * all attributes.
+	 */
+	String getFootprint();
+	/**
+	 * Returns the object info about this data object.
+	 * @return
+	 */
+	ObjectInfo getObjectInfo();
 
 }
  
