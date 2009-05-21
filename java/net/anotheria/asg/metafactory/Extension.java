@@ -15,6 +15,8 @@ public enum Extension {
 	JDBC,
 	
 	EDITORINTERFACE,
+	
+	FIXTURE
 	;
 	
 	
