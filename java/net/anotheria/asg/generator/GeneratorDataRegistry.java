@@ -2,9 +2,10 @@ package net.anotheria.asg.generator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaLink;
@@ -18,54 +19,104 @@ import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Used by the generator to store the parsed xml data during the generation.
+ * @author lrosenberg
  */
-public class GeneratorDataRegistry {
-	private static GeneratorDataRegistry instance;
+public final class GeneratorDataRegistry {
 	
-	private Hashtable<String,MetaModule> modules;
-	private Hashtable<String,MetaView> views;
+	private static GeneratorDataRegistry instance  = new GeneratorDataRegistry();
+	
+	/**
+	 * The storage for the parsed modules.
+	 */
+	private Map<String,MetaModule> modules;
+	/**
+	 * The storage for views.
+	 */
+	private Map<String,MetaView> views;
+	/**
+	 * The context.
+	 */
 	private Context context;
-	private Hashtable<String,DataType> types;
-	private Hashtable<String,MetaDecorator> decorators;
-	private Hashtable<String, MetaFilter> filters;
+	/**
+	 * Parsed data types.
+	 */
+	private Map<String,DataType> types;
+	/**
+	 * Parsed decorators.
+	 */
+	private Map<String,MetaDecorator> decorators;
+	/**
+	 * Parsed filters.
+	 */
+	private Map<String, MetaFilter> filters;
 	
+	/**
+	 * Default generation options. Used if no other options are specified.
+	 */
 	private GenerationOptions defaultOptions = createDefaultGenerationOptions();
+	/**
+	 * Current generation options.
+	 */
 	private GenerationOptions options;
-	
+	/**
+	 * Creates a new GeneratorDataRegistry.
+	 */
 	private GeneratorDataRegistry(){
-		modules = new Hashtable<String,MetaModule>();
-		views = new Hashtable<String, MetaView>();
-		types   = new Hashtable<String,DataType>();
-		decorators = new Hashtable<String,MetaDecorator>();
-		filters = new Hashtable<String, MetaFilter>();
+		modules = new HashMap<String,MetaModule>();
+		views = new HashMap<String, MetaView>();
+		types   = new HashMap<String,DataType>();
+		decorators = new HashMap<String,MetaDecorator>();
+		filters = new HashMap<String, MetaFilter>();
 		options = defaultOptions;
 	}
 	
-	public static synchronized  GeneratorDataRegistry getInstance(){
-		if (instance == null)
-			instance = new GeneratorDataRegistry();
+	/**
+	 * Returns the singleton instance of the GeneratorDataRegistry.
+	 * @return 
+	 */
+	public static GeneratorDataRegistry getInstance(){
 		return instance;
 	}
 	
+	/**
+	 * Adds a new parsed module to the storage.
+	 * @param m the module to add.
+	 */
 	public void addModule(MetaModule m){
 		modules.put(m.getName(), m);
 	}
 	
+	/**
+	 * Adds some modules to the storage.
+	 * @param modules a list of modules to add.
+	 */
 	public void addModules(List<MetaModule> modules){
 		for (MetaModule m: modules)
 			addModule(m);
 	}
+	/**
+	 * Adds a view to the storage.
+	 * @param v the view to add.
+	 */
 	public void addView(MetaView v){
 		views.put(v.getName(), v);
 	}
 	
+	/**
+	 * Adds some view to the storage.
+	 * @param views the views to add.
+	 */
 	public void addViews(List<MetaView> views){
 		for (MetaView v: views)
 			addView(v);
 	}
 	
+	/**
+	 * 
+	 * @param link
+	 * @return
+	 */
 	public MetaDocument resolveLink(String link){
 		int dotIndex = link.indexOf('.');
 		String targetModuleName = link.substring(0,dotIndex);
@@ -87,14 +138,6 @@ public class GeneratorDataRegistry {
 		}
 		return ret;
 	}
-//	
-//	public List<DirectLink> findLinksWithViewToDocument(MetaDocument target){
-//		List<DirectLink> ret = new ArrayList<DirectLink>();
-//	    for(DirectLink l: findLinksToDocument(target))
-//	    	if(findViewSection(l.getDocument()) != null)
-//	    		ret.add(l);
-//	    return ret;
-//	}
 	
 	public MetaSection findViewSection(MetaDocument document){
 		for (MetaView module : views.values()){
@@ -104,7 +147,12 @@ public class GeneratorDataRegistry {
 		}
 		return null;
 	}
-		
+
+	/**
+	 * Returns the module from the storage.
+	 * @param name the name of the module.
+	 * @return
+	 */
 	public MetaModule getModule(String name){
 		return modules.get(name);
 	}
@@ -155,18 +203,26 @@ public class GeneratorDataRegistry {
 		return ret;
 	}
 	
+	/**
+	 * Adds the decorator to the storage.
+	 * @param decorator the decorator to add.
+	 */
 	public void addDecorator(MetaDecorator decorator){
 		decorators.put(decorator.getName(), decorator);
 	}
 	
+	/**
+	 * Adds some decorators to the storage.
+	 * @param decorators a list with decorators to add.
+	 */
 	public void addDecorators(List<MetaDecorator> decorators){
 		for (int i=0; i<decorators.size();i++){
-			addDecorator((MetaDecorator)decorators.get(i));
+			addDecorator(decorators.get(i));
 		}
 	}
 	
 	public MetaDecorator getDecorator(String name){
-		return (MetaDecorator)decorators.get(name);
+		return decorators.get(name);
 	}
 
 	public MetaDecorator createDecorator(String name, String rule){
@@ -184,12 +240,12 @@ public class GeneratorDataRegistry {
 
 	public void addFilters(List<MetaFilter> filters){
 		for (int i=0; i<filters.size();i++){
-			addFilter((MetaFilter)filters.get(i));
+			addFilter(filters.get(i));
 		}
 	}
 	
 	public MetaFilter getFilter(String name){
-		return (MetaFilter)filters.get(name);
+		return filters.get(name);
 	}
 
 	public MetaFilter createFilter(String name, String fieldName){
@@ -201,6 +257,11 @@ public class GeneratorDataRegistry {
 		return ret;
 	}
 	
+	/**
+	 * Returns true if the document should have methods for language copying.
+	 * @param doc the document to check.
+	 * @return true if support for languages is enabled and the document has multilingual attributes.
+	 */
 	public static final boolean hasLanguageCopyMethods(MetaDocument doc){
 		if (!getInstance().getContext().areLanguagesSupported())
 			return false;
