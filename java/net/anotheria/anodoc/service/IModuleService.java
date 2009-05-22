@@ -27,20 +27,20 @@ public interface IModuleService {
 	 * @throws NoStoredModuleEntityException
 	 * @throws StorageFailureException
 	 */
-	public Module getModule(String ownerId, String moduleId, String copyId, boolean create) 
+	Module getModule(String ownerId, String moduleId, String copyId, boolean create) 
 		throws NoStorageForModuleException, NoFactoryForModuleException, NoStoredModuleEntityException, StorageFailureException;
 
-	public Module getModule(String ownerId, String moduleId, boolean create) 
+	Module getModule(String ownerId, String moduleId, boolean create) 
 		throws NoStorageForModuleException, NoFactoryForModuleException, NoStoredModuleEntityException, StorageFailureException;
 
-	public Module getModule(String ownerId, String moduleId) 
+	Module getModule(String ownerId, String moduleId) 
 		throws NoStorageForModuleException, NoFactoryForModuleException, NoStoredModuleEntityException, StorageFailureException;
 
 	/**
 	 * Same as return getModule(ownerId, moduleId, copyId, false); in current implementation.
 	 * @see biz.beaglesoft.bgldoc.service.getModule(String, String, String, boolean)
 	 */
-	public Module getModule(String ownerId, String moduleId, String copyId) 
+	Module getModule(String ownerId, String moduleId, String copyId) 
 		throws NoStorageForModuleException, NoFactoryForModuleException, NoStoredModuleEntityException, StorageFailureException;
 
 
@@ -51,44 +51,44 @@ public interface IModuleService {
 	 * @throws StorageFailureException thrown if the storage failed.
 	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage.saveModule(BGLModule)  
 	 */
-	public void storeModule(Module module) throws NoStorageForModuleException, StorageFailureException;
+	void storeModule(Module module) throws NoStorageForModuleException, StorageFailureException;
 
 	/**
 	 * Attaches a factory for a given moduleId.
 	 * @param moduleId
 	 * @param storage
 	 */
-	public void attachModuleFactory(String moduleId, IModuleFactory factory);	
+	void attachModuleFactory(String moduleId, IModuleFactory factory);	
 
 	/**
 	 * Attaches a storage for a given moduleId.
 	 * @param moduleId
 	 * @param storage
 	 */
-	public void attachModuleStorage(String moduleId, IModuleStorage storage);
+	void attachModuleStorage(String moduleId, IModuleStorage storage);
 	
 	/**
 	 * Deletes the given module from the appropriate storage.   
 	 */
-	public void deleteModule(Module module) throws NoStorageForModuleException, StorageFailureException;
+	void deleteModule(Module module) throws NoStorageForModuleException, StorageFailureException;
 	
 	/**
 	 * Deletes the module identified by the tuple (ownerId | moduleId | copyId) from the appropriate storage.   
 	 */
-	public void deleteModule(String ownerId, String moduleId, String copyId) throws NoStorageForModuleException, StorageFailureException;
+	void deleteModule(String ownerId, String moduleId, String copyId) throws NoStorageForModuleException, StorageFailureException;
 	
 	/**
 	 * Deletes the module identified by the tuple (ownerId | moduleId) from the appropriate storage. The copy id
 	 * is assumed to be the standart copyId.   
 	 */
-	public void deleteModule(String ownerId, String moduleId) throws NoStorageForModuleException, StorageFailureException;
+	void deleteModule(String ownerId, String moduleId) throws NoStorageForModuleException, StorageFailureException;
 
 	/**
 	 * Executes the given query on the module storage for given moduleId if this query 
 	 * is supported by the storage.<br>
 	 * In current implementation queries are supported for POET but not for file storage.
 	 */
-	public List<Document> executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException;
+	List<Document> executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException;
 	
 	
 	
