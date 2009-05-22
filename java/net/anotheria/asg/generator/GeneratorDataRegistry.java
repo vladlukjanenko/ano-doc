@@ -215,9 +215,9 @@ public final class GeneratorDataRegistry {
 	 * Adds some decorators to the storage.
 	 * @param decorators a list with decorators to add.
 	 */
-	public void addDecorators(List<MetaDecorator> decorators){
-		for (int i=0; i<decorators.size();i++){
-			addDecorator(decorators.get(i));
+	public void addDecorators(List<MetaDecorator> someDecorators){
+		for (int i=0; i<someDecorators.size();i++){
+			addDecorator(someDecorators.get(i));
 		}
 	}
 	
