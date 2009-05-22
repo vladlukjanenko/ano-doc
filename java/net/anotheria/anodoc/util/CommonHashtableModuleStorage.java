@@ -47,10 +47,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	public static final String DEF_STORAGE_DIR = ".";
 	@Configure private String storageDir = DEF_STORAGE_DIR;
 	
-	private static Logger log;
-	static {
-		log = Logger.getLogger(CommonHashtableModuleStorage.class);
-	}
+	private static Logger log = Logger.getLogger(CommonHashtableModuleStorage.class);
 	
 	public CommonHashtableModuleStorage(String aFilename, IModuleFactory aFactory){
 		this(aFilename, aFactory, DEF_KEY_CFG_STORAGE_DIRECTORY);
@@ -65,10 +62,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		ConfigurationManager.INSTANCE.configure(this);
 	}
 
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#loadModule(String, String)
-	 */
-	public Module loadModule(String ownerId, String copyId)
+	@Override public Module loadModule(String ownerId, String copyId)
 		throws NoStoredModuleEntityException {
 		String key = makeKey(ownerId, copyId);
 		if (!storage.containsKey(key))
@@ -76,15 +70,12 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		return (Module)storage.get(key);
 	} 
 	
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#saveModule(BGLModule)
-	 */
-	public void saveModule(Module module) {
+	@Override public void saveModule(Module module) {
 		storage.put(makeKey(module), module);
 		save();
 	}
 	
-	public void deleteModule(String ownerId, String copyId){
+	@Override public void deleteModule(String ownerId, String copyId){
 		String key = makeKey(ownerId, copyId);
 		storage.remove(key);
 		save();
@@ -256,9 +247,6 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		}
 	}
 
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#executeQueryOnDocuments(BasicPredicate)
-	 */
 	public List<Document> executeQueryOnDocuments(Predicate q) {
 		throw new RuntimeException("Not implemented");
 	}
