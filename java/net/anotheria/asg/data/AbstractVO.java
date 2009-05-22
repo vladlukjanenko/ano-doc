@@ -2,9 +2,13 @@ package net.anotheria.asg.data;
 
 import net.anotheria.util.xml.XMLNode;
 
+/**
+ * The base class for Value Objects which are DataObjects stored in Databases.
+ * @author lrosenberg
+ */
 public abstract class AbstractVO implements DataObject{
 
-	public long getLastUpdateTimestamp() {
+	@Override public long getLastUpdateTimestamp() {
 		return getDaoUpdated() == 0 ? 
 				getDaoCreated() : getDaoUpdated();
 	}
@@ -12,17 +16,17 @@ public abstract class AbstractVO implements DataObject{
 	public abstract long  getDaoCreated();
 	public abstract long  getDaoUpdated();
 	
-	public XMLNode toXMLNode(){
+	@Override public XMLNode toXMLNode(){
 		return new XMLNode("NotImplemented "+getId());
 	}
 	
-	public ObjectInfo getObjectInfo(){
+	@Override public ObjectInfo getObjectInfo(){
 		ObjectInfo ret = new ObjectInfo(this);
 		ret.setAuthor("none");
 		return ret;
 	}
 
-	public AbstractVO clone(){
+	@Override public AbstractVO clone(){
 		try{
 			return (AbstractVO)super.clone();
 		}catch(CloneNotSupportedException e){
@@ -30,7 +34,7 @@ public abstract class AbstractVO implements DataObject{
 		}
 	}
 
-	public int hashCode(){
+	@Override public int hashCode(){
 		return getId().hashCode();
 	}
 }
