@@ -2,12 +2,15 @@ package net.anotheria.anodoc.service;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.configureme.ConfigurationManager;
 import org.configureme.annotations.AfterConfiguration;
 import org.configureme.annotations.ConfigureMe;
 
+import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.stats.IStatisticsConstants;
@@ -21,51 +24,42 @@ import net.anotheria.anodoc.util.CommonHashtableModuleStorage;
  * which supports local cache and synchronization over network.
  */
 @ConfigureMe (name="anodoc.storage")
-public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC*/{
+public class ModuleServiceImpl implements IModuleService{
 	
-	/**
-	 * The name of the channel used for internal communication.
-	 */
-	//private static final String MY_CHANNEL_NAME = "anodoc.IModuleServiceChannel";
 	
 	private static final String DELIMITER = "#";
-	
+
+	/**
+	 * Constant used for 'copy' if none is specified.
+	 */
 	public static final String DEFAULT_COPY_ID = "singlecopy";
 
-//	private EventChannel receiveChannel, sendChannel;
-
-	private static Logger log;
-	static {
-		log = Logger.getLogger(ModuleServiceImpl.class);
-	}	 
+	private static Logger log = Logger.getLogger(ModuleServiceImpl.class);
 	 
 	/** 
 	 * The factories.
 	 */
-	private Hashtable<String, IModuleFactory> factories;
+	private Map<String, IModuleFactory> factories;
 
 	/**
 	 * The module storages.
 	 */
-	private Hashtable<String, IModuleStorage> storages;
+	private Map<String, IModuleStorage> storages;
 
 	/**
 	 * The local cache - loaded modules.
 	 */
-	private Hashtable<String,Module> cache;
+	private Map<String,Module> cache;
 
 	/**
 	 * The current instance. ModuleServiceImpl is a Singleton.
 	 */
-	private static ModuleServiceImpl instance;
+	private static ModuleServiceImpl instance = new ModuleServiceImpl() ;
 	
 	/**
 	 * Returns the current (singleton) instance of this implementation. 
 	 */
 	protected static ModuleServiceImpl getInstance(){
-		if (instance==null){
-			instance = new ModuleServiceImpl();
-		}
 		return instance;
 	}
 
@@ -74,9 +68,9 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 	 */
 	private ModuleServiceImpl(){
 		//initialize local data.
-		factories = new Hashtable<String, IModuleFactory>();
-		storages  = new Hashtable<String, IModuleStorage>();
-		cache = new Hashtable<String, Module>();		
+		factories = new ConcurrentHashMap<String, IModuleFactory>();
+		storages  = new ConcurrentHashMap<String, IModuleStorage>();
+		cache = new ConcurrentHashMap<String, Module>();		
 		if (log.isDebugEnabled()) {
 			log.debug("Created new ModuleServiceImplementation");
 		}
@@ -84,13 +78,6 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 		//attach statistic module
 		attachStatistics();
 
-		//initialize event channels
-//		receiveChannel = LocalEventService.getInstance().obtainEventChannel(MY_CHANNEL_NAME,ESConstants.MODE_PUSH_CONSUMER);
-//		receiveChannel.addConsumer(this);
-//		sendChannel = LocalEventService.getInstance().obtainEventChannel(MY_CHANNEL_NAME,ESConstants.MODE_PUSH_SUPPLIER);
-//		log.info("receiveChannelClass: "+receiveChannel.getClass());
-//		log.info("sendChannelClass: "+sendChannel.getClass());
-		
 		ConfigurationManager.INSTANCE.configure(this);
 	}
 	
@@ -99,7 +86,6 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 
 	/**
 	 * Attaches a factory for given module id.
-	 * @see biz.beaglesoft.bgldoc.service.IModuleService#attachModuleFactory(String, IModuleFactory)
 	 */
 	public void attachModuleFactory(String moduleId, IModuleFactory factory) {
 		factories.put(moduleId, factory);
@@ -110,7 +96,6 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 	
 	/**
 	 * Attaches a storage for given module id.
-	 * @see biz.beaglesoft.bgldoc.service.IModuleService#attachModuleStorage(String, IModuleStorage)
 	 */
 	public void attachModuleStorage(String moduleId, IModuleStorage storage){
 		storages.put(moduleId, storage);
@@ -146,37 +131,8 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 			throw new NoStorageForModuleException(module.getId());
 		}
 		storage.saveModule(module);
-		//sendEvent(module);
 	}
 	
-	/**
-     * Send an event concerning module change.
-	 */
-/*	private void sendEvent(BGLModule module) {
-		BGLDocStoreEvent e = new BGLDocStoreEvent();
-		//!!! TODO remove cip dependency
-		e.setInstanceId(CIPEngine.getInstance().getCIPId());
-		e.setCopyId(module.getCopyId());
-		e.setModuleId(module.getId());
-		e.setOwnerId(module.getOwnerId());
-		Event event = new Event(e);
-		sendChannel.push(event);
-	}
-*/
-	/**
-	 * Called by event service.
-	 */
-/*	public void push(Event event) {
-		log.info("received event");
-		BGLDocStoreEvent e = (BGLDocStoreEvent)event.data;
-		//!!! TODO remove cip dependency
-		if(e.getInstanceId() == CIPEngine.getInstance().getCIPId()){
-			//ignore: it from my self
-			return;
-		}
-		removeFromCache(e.getModuleId(),e.getOwnerId(),e.getCopyId());
-	}
-*/
 	/**
 	 * Removes the given module tuple from cache AND storage. 
 	 */
@@ -192,10 +148,7 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 	/**
 	 * Same as getModule(ownerId, moduleId, copyId, false)
 	 */
-	public Module getModule(
-		String ownerId,
-		String moduleId,
-		String copyId) 
+	public Module getModule(String ownerId, String moduleId, String copyId) 
 			throws NoStorageForModuleException, NoFactoryForModuleException, NoStoredModuleEntityException, StorageFailureException{
 		return getModule(ownerId, moduleId, copyId, false);
 	}
@@ -203,9 +156,7 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 	/**
 	 * Same as getModule(ownerId, moduleId, default_copy_id, false)
 	 */
-	public Module getModule(
-		String ownerId,
-		String moduleId) 
+	public Module getModule(String ownerId, String moduleId) 
 			throws NoStorageForModuleException, NoFactoryForModuleException, NoStoredModuleEntityException, StorageFailureException{
 		return getModule(ownerId, moduleId, DEFAULT_COPY_ID, false);
 	}
@@ -222,10 +173,7 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 	}
 	
 
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleService#getModule(String, String, String, boolean)
-	 */
-	public Module getModule(
+	@Override public Module getModule(
 		String ownerId,
 		String moduleId,
 		String copyId,
@@ -236,17 +184,10 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 		String key = getKey(moduleId, copyId, ownerId);
 		//System.out.println("getModule() "+key+" called");
 
-//		if (log.isDebugEnabled()) {
-//			log.debug("Requested module:"+moduleId+", user:"+ownerId+", copy:"+copyId);
-//			log.debug("Key: "+key);
-//		}
 		
 		//first we check if we have this module in cache.
-		Module module = (Module)cache.get(key);
+		Module module = cache.get(key);
 		
-		//TODO n�chste zeile reinkommentieren um die bremse wieder einzubauen.
-		//log.debug("cache: " + cache);
-		//System.out.println("getModule() in cache: "+module);
 		if (module!=null){
 			log.debug("Module "+key+" was in cache");
 			return module;
@@ -353,7 +294,7 @@ public class ModuleServiceImpl implements IModuleService/*, EventPushConsumerIFC
 	/**
 	 * @see biz.beaglesoft.bgldoc.service.IModuleService#executeQueryOnDocuments(BasicPredicate)
 	 */
-	public List executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException{
+	public List<Document> executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException{
 		IModuleStorage storage = (IModuleStorage)storages.get(moduleId);
 		if (storage==null){
 			log.warn("No storage for "+moduleId);
