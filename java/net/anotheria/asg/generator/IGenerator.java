@@ -7,5 +7,5 @@ import java.util.List;
  * @author another
  */
 public interface IGenerator {
-	public List<FileEntry> generate(IGenerateable g, Context context);	
+	List<FileEntry> generate(IGenerateable g, Context context);	
 }
