@@ -19,7 +19,7 @@ public abstract class AbstractASGDocument extends Document implements DataObject
 		super(toClone);
 	}
 
-	public ObjectInfo getObjectInfo(){
+	@Override public ObjectInfo getObjectInfo(){
 		ObjectInfo ret = new ObjectInfo(this);
 		ret.setAuthor("rfu");
 		return ret;
