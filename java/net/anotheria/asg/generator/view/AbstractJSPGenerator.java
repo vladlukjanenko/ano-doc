@@ -17,8 +17,8 @@ import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Generator for the JSP files used for generations of the view jsps. 
+ * @author lrosenberg
  */
 public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	
@@ -27,6 +27,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	
 	private Context context;
 	
+	/**
+	 * Generates the header for all jsp files. 
+	 * @return
+	 */
 	protected String getBaseJSPHeader(){
 		String ret = "";
 		ret += "<%@ page"+CRLF;
@@ -40,6 +44,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return ret;
 	}
 	
+	/**
+	 * Generates the header for jsp files that generate xml exports.
+	 * @return
+	 */
 	protected String getBaseXMLHeader(){
 		String ret = "";
 		ret += "<%@ page"+CRLF;
@@ -53,6 +61,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return ret;
 	}
 
+	/**
+	 * Generates the header for jsp files that generate csv exports.
+	 * @return
+	 */
 	protected String getBaseCSVHeader(){
 		String ret = "";
 		ret += "<%@ page"+CRLF;
@@ -74,6 +86,13 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 
 	}
 
+	/**
+	 * Generates a footer file which is included by other jsps.
+	 * @param view the vie to generate the footer for.
+	 * @param selection ?
+	 * @param name the name of the file.
+	 * @return
+	 */
 	protected GeneratedJSPFile generateFooter(MetaView view, String selection, String name){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
@@ -291,6 +310,12 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return getImage("edit",alt);
 	}
 	
+	/**
+	 * Returns the img tag to embed an image into the jsp.
+	 * @param name name of the gif file containing the image.
+	 * @param alt alternative description (alt tag).
+	 * @return
+	 */
 	protected String getImage(String name, String alt){
 		return "<img src=\""+context.getApplicationURLPath()+"/img/"+name+".gif"+"\" border=\"0\" alt="+quote(alt)+" title="+quote(alt)+">";
 	}
@@ -303,10 +328,18 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		this.context = context;
 	}
 
+	/**
+	 * Generates pragmas for a given view.
+	 * @param view the view to generate pragmas for.
+	 */
 	protected void generatePragmas(MetaView view){
 	    generatePragmas();
 	}
 	
+	/**
+	 * Generates generic pragmas.
+	 * Adds the generated content to the current job.
+	 */
 	protected void generatePragmas(){
 		appendString("<META http-equiv=\"pragma\" content=\"no-cache\">");
 		appendString("<META http-equiv=\"Cache-Control\" content=\"no-cache, must-revalidate\">");
@@ -340,6 +373,9 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		closeTR("");
 	}
 	
+	/**
+	 * Opens a table cell.
+	 */
 	protected void openTD(){
 		openTD("");
 	}
@@ -348,6 +384,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		closeTD("");
 	}
 	
+	/**
+	 * Opens a table cell.
+	 * @param additionalParams additional parameters.
+	 */
 	protected void openTD(String additionalParams){
 		openTag("td", additionalParams);
 	}
