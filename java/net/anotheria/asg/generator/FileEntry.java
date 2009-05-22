@@ -3,13 +3,25 @@ package net.anotheria.asg.generator;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Generation result.
+ * @author lrosenberg
  */
 public class FileEntry {
+	/**
+	 * The path to store the file into.
+	 */
 	private String path;
+	/**
+	 * The name of the file.
+	 */
 	private String name;
+	/**
+	 * The content of the file.
+	 */
 	private String content;
+	/**
+	 * The type of the file. The type of the file is the extension.
+	 */
 	private String type;
 	
 	public FileEntry(){
@@ -41,69 +53,50 @@ public class FileEntry {
 		}
 	}
 	
-	 
-	/**
-	 * @return
-	 */
 	public String getContent() {
 		return content;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getPath() {
 		return path;
 	}
 
-	/**
-	 * @param string
-	 */
 	public void setContent(String string) {
 		content = string;
 	}
 
-	/**
-	 * @param string
-	 */
 	public void setName(String string) {
 		name = string;
 	}
 
-	/**
-	 * @param string
-	 */
 	public void setPath(String string) {
 		path = string;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return path+"/"+name;
 	}
 	
+	/**
+	 * Resolves a package name to a path.
+	 * @param packageName 
+	 * @return
+	 */
 	public static String package2path(String packageName){
 		String ret = StringUtils.replace(packageName, '.', '/');
 		ret = "java/"+ret;
 		return ret; 
 	}
 
-	/**
-	 * @return
-	 */
 	public String getType() {
 		return type;
 	}
 
-	/**
-	 * @param string
-	 */
+	
 	public void setType(String string) {
 		type = string;
 	}
