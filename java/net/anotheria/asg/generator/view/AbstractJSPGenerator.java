@@ -24,7 +24,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	
 	public static final String FOOTER_SELECTION_QUERIES = "Queries";
 	public static final String FOOTER_SELECTION_CMS     = "CMS";
-	
+
+	/*
+	 * The context for the generation.
+	 */
 	private Context context;
 	
 	/**
@@ -158,6 +161,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return ret;
 	}
 	
+	/**
+	 * Returns image tag for the duplicate entry image.
+	 * @return
+	 */
 	protected String getDuplicateImage(){
 		return getDuplicateImage("duplicate");
 	}
@@ -180,6 +187,11 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return ret;
 	}
 	
+	/**
+	 * Returns the name of the jsp file for the show page for the document.
+	 * @param doc
+	 * @return
+	 */
 	public static String getShowPageName(MetaDocument doc){
 		return "Show"+doc.getMultiple();
 	}
@@ -196,18 +208,31 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return getVersionInfoPageName();
 	}
 
+	
 	public static String getShowQueriesPageName(MetaDocument doc){
 		return "Show"+doc.getMultiple()+"Queries";
 	}
 	
+	/**
+	 * Returns the name of the jsp file for the csv page export for the document.
+	 * @return
+	 */
 	public static String getExportAsCSVPageName(MetaDocument doc){
 		return "Show"+doc.getMultiple()+"AsCSV";
 	}
 
+	/**
+	 * Returns the name of the jsp file for the xml page export for the document.
+	 * @return
+	 */
 	public static String getExportAsXMLPageName(MetaDocument doc){
 		return "Show"+doc.getMultiple()+"AsXML";
 	}
 
+	/**
+	 * Returns the name of the edit page for this document.
+	 * @return
+	 */
 	public static String getEditPageName(MetaDocument doc){
 		return "Edit"+doc.getName()+"Dialog";
 	}
@@ -270,38 +295,74 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return context.getJspPackageName(doc);
 	}
 
+	/**
+	 * Returns the tag for the delete image in the overview. 
+	 * @return
+	 */
 	protected String getDeleteImage(){
 		return getDeleteImage("delete");
 	}
 
+	/**
+	 * Returns the tag for the version info image in the overview. Note: for now it returns a 'V' text.
+	 * @return
+	 */
 	protected String getVersionImage(){
 		return "V";//getDeleteImage("delete");
 	}
 
+	/**
+	 * Returns the tag for the edit image in the overview.
+	 * @return
+	 */
 	protected String getEditImage(){
 		return getEditImage("edit");
 	}
 
+	/**
+	 * Returns the tag for the delete image in the overview with the given alt tag. 
+	 * @return
+	 */
 	protected String getDeleteImage(String alt){
 		return getImage("del",alt);
 	}
 
+	/**
+	 * Returns the tag for the move to the top image in the list view with the given alt tag. 
+	 * @return
+	 */
 	protected String getTopImage(String alt){
 		return getImage("top",alt);
 	}
 
+	/**
+	 * Returns the tag for the move to the bottom image in the list view with the given alt tag. 
+	 * @return
+	 */
 	protected String getBottomImage(String alt){
 		return getImage("bottom",alt);
 	}
 
+	/**
+	 * Returns the tag for the move up image in the list view with the given alt tag. 
+	 * @return
+	 */
 	protected String getUpImage(String alt){
 		return getImage("up",alt);
 	}
 
+	/**
+	 * Returns the tag for the move down image in the list view with the given alt tag. 
+	 * @return
+	 */
 	protected String getDownImage(String alt){
 		return getImage("down",alt);
 	}
 
+	/**
+	 * Returns the tag for the duplicate image in the overview with the given alt tag. 
+	 * @return
+	 */
 	protected String getDuplicateImage(String alt){
 		return getImage("duplicate",alt);
 	}
@@ -324,8 +385,8 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return context;
 	}
 
-	public void setContext(Context context) {
-		this.context = context;
+	public void setContext(final Context aContext) {
+		context = aContext;
 	}
 
 	/**
