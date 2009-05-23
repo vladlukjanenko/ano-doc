@@ -1,29 +1,44 @@
 package net.anotheria.asg.generator.view.meta;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Definition of a decorator.
+ * @author lrosenberg
  */
 public class MetaDecorator implements Cloneable{
+	/**
+	 * The name of a decorator.
+	 */
 	private String name;
+	/**
+	 * The class name of the decorator.
+	 */
 	private String className;
 	
+	/**
+	 * The rule for this decorator instance.
+	 */
 	private String rule;
-	
+	/**
+	 * Creates a new metadecorator.
+	 */
 	public MetaDecorator(){
 		
 	}
-	
+	/**
+	 * Creates a new meta decorator.
+	 * @param aName
+	 * @param aClassName
+	 */
 	public MetaDecorator(String aName, String aClassName){
 		name = aName;
 		className = aClassName;
 	}
 	
-	public Object clone(){
+	@Override public Object clone(){
 		try{
 			return super.clone();
 		}catch(Exception e){
-			return null;
+			throw new AssertionError("Can't happen.");
 		}
 		
 	}
@@ -69,20 +84,22 @@ public class MetaDecorator implements Cloneable{
 		rule = string;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return name+" = "+className+" ("+rule+")";
 	}
 	
-	public boolean equals(Object o){
+	@Override public boolean equals(Object o){
 		return o instanceof MetaDecorator ?
 			((MetaDecorator)o).getName().equals(name) : false; 
 	}
 	
+	/**
+	 * Returns the name of the class of the decorator without a package.
+	 * @return
+	 */
 	public String getClassNameOnly(){
 		if (className.lastIndexOf('.')==-1)
 			return className;
 		return className.substring(className.lastIndexOf('.')+1);
 	}
-	
-
 }
