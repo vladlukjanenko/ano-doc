@@ -5,6 +5,11 @@ import java.util.List;
 import net.anotheria.util.xml.XMLAttribute;
 import net.anotheria.util.xml.XMLNode;
 
+/**
+ * A helper class for creation of xml trees.
+ * @author lrosenberg
+ *
+ */
 public class XMLHelper {
 	public static <T> XMLNode createXMLNodeForListValue(String name, String[] language, List<T>... value){
 		return createXMLNodeWithContent(name, language, "list", "not_yet_implemented");
@@ -137,5 +142,12 @@ public class XMLHelper {
 		for (int i=0; i<in.length; i++)
 			out[i]=in[i];
 		return out;
+	}
+	
+	/**
+	 * Prevent instantiation.
+	 */
+	private XMLHelper(){
+		
 	}
 }
