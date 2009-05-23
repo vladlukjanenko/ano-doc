@@ -4,21 +4,26 @@ import net.anotheria.util.NumberUtils;
 import net.anotheria.util.xml.XMLAttribute;
 import net.anotheria.util.xml.XMLNode;
 
+/**
+ * An object which contains the meta information about an object.
+ * @author lrosenberg
+ *
+ */
 public class ObjectInfo {
 	
 	
 	/**
-	 * The id of the document
+	 * The id of the object. It can be a VO or a Document.
 	 */
 	private String id;
 	
 	/**
-	 * The author of the document
+	 * The author of the document or vo.
 	 */
 	private String author;
 	
 	/**
-	 * The last change timestamp of the document
+	 * The last change timestamp of the document or vo.
 	 */
 	private long lastChangeTimestamp;
 
@@ -27,12 +32,20 @@ public class ObjectInfo {
 	 */
 	private String footprint;
 
+	/**
+	 * The type of the document or vo.
+	 */
 	private String type;
-	
+
+	/**
+	 * Creates a new ObjectInfo.
+	 */
 	public ObjectInfo(){
-		
 	}
-	
+	/**
+	 * Creates a new ObjectInfo for a DataObject.
+	 * @param object the data object to create the info for.
+	 */
 	public ObjectInfo(DataObject object){
 		setId(object.getId());
 		setLastChangeTimestamp(object.getLastUpdateTimestamp());
@@ -65,7 +78,7 @@ public class ObjectInfo {
 		this.footprint = footprint;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "Id: "+getId()+", Ts: "+getLastChangeTimestamp()+", Footprint: "+getFootprint()+", Author: "+getAuthor()+", IsoTs: "+NumberUtils.makeISO8601TimestampString(getLastChangeTimestamp());
 	}
 
@@ -77,6 +90,10 @@ public class ObjectInfo {
 		this.id = id;
 	}
 	
+	/**
+	 * Creates the XMLNode for xml representation of this object info.
+	 * @return
+	 */
 	public XMLNode toXML(){
 		XMLNode ret = new XMLNode("objectinfo");
 		ret.addAttribute(new XMLAttribute("id",getId()));
