@@ -63,7 +63,7 @@ public class StringProperty extends Property{
 	/**
 	 * Returns true if the given obj is a StringProperty and the name, value tuples are equal.  
 	 */
-	public boolean equals(Object obj) {
+	@Override public boolean equals(Object obj) {
 		if(obj instanceof StringProperty){
 			StringProperty p = (StringProperty)obj;
 			return p.getName().equals(getName()) && p.getValue().equals(getValue());
@@ -80,14 +80,11 @@ public class StringProperty extends Property{
 		return s==null ? 0 : s.length()*2;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.anotheria.anodoc.data.Property#cloneValue()
-	 */
-	protected Object cloneValue() {
+	@Override protected Object cloneValue() {
 		return new String(getString());
 	}
 	
-	public PropertyType getPropertyType(){
+	@Override public PropertyType getPropertyType(){
 		return PropertyType.STRING;
 	}
 

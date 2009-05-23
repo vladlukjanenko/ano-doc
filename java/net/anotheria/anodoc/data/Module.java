@@ -66,7 +66,10 @@ public class Module implements ICompositeDataObject, Serializable{
 	 */
 	private IModuleFactory moduleFactory;
 	
-	private char DELIMITER = '$';
+	/**
+	 * Delimiter used to separate parts of the key.
+	 */
+	private static final char DELIMITER = '$';
 	
 	/**
 	 * Creates a new Module with given moduleId.
