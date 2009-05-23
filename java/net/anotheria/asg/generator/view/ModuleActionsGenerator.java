@@ -2079,7 +2079,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		
 	}
-	
+	/**
+	 * Generates the action which moves an entry in a container up, down, top or bottom.
+	 * @param section
+	 * @param container
+	 * @param methodName
+	 */
 	private void generateContainerMoveEntryActionMethod(MetaModuleSection section, MetaContainerProperty container, String methodName){
 		MetaDocument doc = section.getDocument();
 		MetaListProperty sourceProperty = (MetaListProperty)container;
@@ -2152,7 +2157,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock());
 	}
 
-	
+	/**
+	 * Generates the show action for a container. This would be a list or table.
+	 * @param section
+	 * @param container
+	 * @return
+	 */
 	private GeneratedClass generateContainerShowAction(MetaModuleSection section, MetaContainerProperty container){
 		if (container instanceof MetaTableProperty)
 			return generateTableShowAction(section, (MetaTableProperty)container);
@@ -2314,6 +2324,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); 
 	}
 	
+	/**
+	 * Generates show table action.
+	 * @param section
+	 * @param table
+	 * @return
+	 */
 	private GeneratedClass generateTableShowAction(MetaModuleSection section, MetaTableProperty table){
 		
 		GeneratedClass clazz = new GeneratedClass();
@@ -2481,7 +2497,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				appendStatement("message += value"+i+"+"+quote("\\n"));
 
 				appendEmptyline();
-				
 			}
 			
 			if (element.isComplex()){
@@ -2526,18 +2541,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					appendStatement("htmlMessage += "+quote("</tr>\\n"));
 					
 				}
-				
-				
-
 				//end subtable
 				appendStatement("htmlMessage += "+quote("</table>"));
 				appendStatement("htmlMessage += "+quote("\\t</td>"));
 				appendStatement("htmlMessage += "+quote("</tr>"));
-				
-				
 			}
-
-
 		}
 		
 		appendStatement("htmlMessage += "+quote("</table>"));
@@ -2572,14 +2580,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		return clazz;
 	}
-	
+
 	class EnumerationPropertyGenerator{
 	    private List<String> generatedProperties;
 	    MetaDocument doc;
 	    
-	    EnumerationPropertyGenerator(MetaDocument doc){
+	    EnumerationPropertyGenerator(MetaDocument aDoc){
 	        generatedProperties = new ArrayList<String>();
-	        this.doc = doc;
+	        doc = aDoc;
 	    }
 	    
 	    public void generateEnumerationPropertyHandling(MetaEnumerationProperty mep, boolean editMode){
@@ -2613,5 +2621,4 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	private String getEditActionRedirect(MetaDocument doc){
 	    return quote(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_EDIT)+"?ts=")+"+System.currentTimeMillis()";
 	}
-	
 }
