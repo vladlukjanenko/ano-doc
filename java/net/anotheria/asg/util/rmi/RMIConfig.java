@@ -4,6 +4,11 @@ import java.rmi.registry.Registry;
 
 import org.configureme.annotations.ConfigureMe;
 
+/**
+ * Configuration for rmi services in ano-doc. This config file is configured by the configureme framework.
+ * @author lrosenberg
+ *
+ */
 @ConfigureMe (allfields=true)
 public class RMIConfig {
 
@@ -27,6 +32,9 @@ public class RMIConfig {
 	 */
 	public static final int DEF_REGISTRY_PORT = Registry.REGISTRY_PORT;
 	
+	/**
+	 * Creates a new config.
+	 */
 	RMIConfig(){
 		registryHost = DEF_REGISTRY_HOST;
 		registryPort = DEF_REGISTRY_PORT;
@@ -40,15 +48,15 @@ public class RMIConfig {
 		return registryPort;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "RMIConfig "+getRegistryHost()+":"+getRegistryPort();
 	}
 
-	public void setRegistryHost(String registryHost) {
-		this.registryHost = registryHost;
+	public void setRegistryHost(final String aRegistryHost) {
+		registryHost = aRegistryHost;
 	}
 
-	public void setRegistryPort(int registryPort) {
-		this.registryPort = registryPort;
+	public void setRegistryPort(final int aRegistryPort) {
+		registryPort = aRegistryPort;
 	}
 }
