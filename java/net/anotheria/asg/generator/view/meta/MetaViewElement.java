@@ -1,17 +1,36 @@
 package net.anotheria.asg.generator.view.meta;
 
 /**
- * TODO please remined another to comment this class
+ * Represents an element of the view.
  * @author another
  */
 public class MetaViewElement {
+	/**
+	 * True if the element is readonly.
+	 */
 	private boolean readonly;
+	/**
+	 * The name of the element.
+	 */
 	private String name;
+	/**
+	 * If true the element is comparable.
+	 */
 	private boolean comparable;
+	/**
+	 * If true the element is rich element.
+	 */
 	private boolean rich;
 	
+	/**
+	 * The decorator for the element.
+	 */
 	private MetaDecorator decorator;
 	
+	/**
+	 * Creates a new meta view element.
+	 * @param aName
+	 */
 	public MetaViewElement(String aName){
 		this.name = aName;
 	}
@@ -46,7 +65,7 @@ public class MetaViewElement {
 
 	
 	/**
-	 * @return
+	 * Returns true if the element is comparable.
 	 */
 	public boolean isComparable() {
 		return comparable;
@@ -74,7 +93,7 @@ public class MetaViewElement {
 		this.decorator = decorator;
 	}
 
-	public boolean equals(Object o){
+	@Override public boolean equals(Object o){
 		return (o instanceof MetaViewElement) && ((MetaViewElement)o).getName().equals(getName());
 	}
 

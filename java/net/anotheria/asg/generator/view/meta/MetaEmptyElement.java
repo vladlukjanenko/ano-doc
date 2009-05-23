@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.view.meta;
 
 /**
- * TODO please remined another to comment this class
+ * An empty element in a view.
  * @author another
  */
 public class MetaEmptyElement extends MetaViewElement{
@@ -9,11 +9,11 @@ public class MetaEmptyElement extends MetaViewElement{
 		super(null);
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "empty";
 	}
 	
-	public boolean isComparable(){
+	@Override public boolean isComparable(){
 		return false;
 	}
 }

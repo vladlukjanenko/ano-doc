@@ -3,10 +3,13 @@ package net.anotheria.asg.generator.view.meta;
 import net.anotheria.asg.generator.IGenerateable;
 
 /**
- * TODO please remined another to comment this class
+ * A section in the overview.
  * @author another
  */
 public class MetaSection implements IGenerateable{
+	/**
+	 * The title of the section.
+	 */
 	private String title;
 	
 	public MetaSection(String aTitle){
@@ -19,11 +22,11 @@ public class MetaSection implements IGenerateable{
 		return title;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "section "+title;
 	}
 	
-	public boolean equals(Object o){
+	@Override public boolean equals(Object o){
 		return (o instanceof MetaSection) && ((MetaSection)o).title.equals(title);
 	}
 
