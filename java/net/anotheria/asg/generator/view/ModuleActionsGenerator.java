@@ -1657,7 +1657,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	public static String getPackage(){
 	    return getPackage(GeneratorDataRegistry.getInstance().getContext());
 	}
-	
+
 	public static String getPackage(MetaModule module){
 	    return getPackage(GeneratorDataRegistry.getInstance().getContext(), module);
 	}
@@ -1716,6 +1716,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return ret;
 	}
 
+	/**
+	 * Adds standard imports for an action to the clazz. 
+	 * @param clazz
+	 */
 	private void addStandardActionImports(GeneratedClass clazz){
 	    clazz.addImport("javax.servlet.http.HttpServletRequest");
 	    clazz.addImport("javax.servlet.http.HttpServletResponse");
