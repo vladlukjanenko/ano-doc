@@ -26,7 +26,7 @@ import net.anotheria.util.IOUtils;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
+ * Generator for the 'struts-config.xml' files.
  * @author another
  */
 public class StrutsConfigGenerator extends AbstractGenerator implements IGenerator {
@@ -50,14 +50,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	public static final String ACTION_EXECUTE_QUERY = "execQuery";
 	public static final String ACTION_LINKS_TO_ME = "LinksToMe";
 	
+	
 	public static final String ACTION_MOVE = "move";
-	/*
-	 
-	public static final String ACTION_MOVE_UP = "moveUp";
-	public static final String ACTION_MOVE_DOWN = "moveDown";
-	public static final String ACTION_MOVE_TOP = "moveTop";
-	public static final String ACTION_MOVE_BOTTOM = "moveBottom";
-	*/
 	
 	public static final String ACTION_SEARCH = "search";
 	public static final String ACTION_COPY_LANG ="copyLang";
@@ -66,19 +60,24 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	public static final String SUFFIX_CSV = ".csv";
 	public static final String SUFFIX_XML = ".xml";
 	
-	
-	private MetaView view;    
+	/**
+	 * The view which is being generated.
+	 */
+	private MetaView view;
+	/**
+	 * The current context.
+	 */
 	private Context context;
 
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
-	public List<FileEntry> generate(IGenerateable g, Context context) {
+	public List<FileEntry> generate(IGenerateable g, Context aContext) {
 		List<FileEntry> files = new ArrayList<FileEntry>();
 	
-		this.context = context;
-		this.view = (MetaView)g;
+		context = aContext;
+		view = (MetaView)g;
 		
 		String mappings = generateMappings(view, context);
 		String file = "";
@@ -97,15 +96,24 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		entry.setType(".xml");
 		files.add(entry);
 		
-		//System.out.println("Generated "+entry);
-	
 		return files;
 	}
 	
+	/**
+	 * Returns the name of the config file name for the given view.
+	 * @param view
+	 * @return
+	 */
 	public static final String getConfigFileName(MetaView view){
 		return "struts-config-"+view.getName().toLowerCase();
 	}
 	
+	/**
+	 * Generates forms for the given view.
+	 * @param view
+	 * @param context
+	 * @return
+	 */
 	private String generateForms(MetaView view, Context context){
 		increaseIdent();
 		increaseIdent();
@@ -139,6 +147,12 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return dialog.getName()+document.getName()+"Form"; 
 	}
 	
+	/**
+	 * Generates forms for the containers.
+	 * @param doc
+	 * @param container
+	 * @return
+	 */
 	private String generateContainerForms(MetaDocument doc, MetaContainerProperty container){
 	    String ret = "";
 	    ret += writeString("<form-bean name="+quote(getContainerEntryFormName(doc, container)));
@@ -457,6 +471,16 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return ret;
 	}
 	
+	/**
+	 * Creates an action mapping.
+	 * @param path the path 
+	 * @param type type of the redirect.
+	 * @param forwardName
+	 * @param forwardPath
+	 * @param input
+	 * @param form
+	 * @return
+	 */
 	private String generateActionMapping(String path, String type, String forwardName, String forwardPath, String input, String form){
 		return generateActionMapping(path, type, "request", forwardName, forwardPath, input, form);
 	}
@@ -489,11 +513,6 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return ret;
 	}
 
-	/*
-	private String getBaseActionName(MetaModuleSection section){
-		return "Base"+getActionSuffix(section);
-	}
-*/
 	public static String getActionSuffix(MetaModuleSection section){
 		return section.getDocument().getName()+"Action";
 	}
