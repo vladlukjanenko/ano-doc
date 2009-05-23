@@ -53,17 +53,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
     
     private MetaView view;
     private Context context;
-    
+
+    /**
+     * If true multiop actions are generated instead of one-action for each link.
+     */
     static final boolean USE_MULTIOP_ACTIONS = true;
     
     public ModuleActionsGenerator(MetaView aView){
         view = aView;
     }
 	
-	/* (non-Javadoc)
-	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
-	 */
-	public List<FileEntry> generate(IGenerateable g, Context context) {
+    /**
+     * Generates all artefacts.
+     */
+	@Override public List<FileEntry> generate(IGenerateable g, Context context) {
 		 List<FileEntry> files = new ArrayList<FileEntry>();
 		
 		this.context = context;
