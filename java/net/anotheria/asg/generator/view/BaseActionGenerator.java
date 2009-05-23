@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
@@ -19,42 +18,42 @@ import net.anotheria.asg.metafactory.MetaFactoryException;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Generator class for the base action for a generator.
+ * @author lrosenberg
  */
 public class BaseActionGenerator extends AbstractGenerator {
 
-	/* (non-Javadoc)
-	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
+	/**
+	 * Generates all artefacts for this action.
+	 * @param views
+	 * @param context
+	 * @return
 	 */
 	public FileEntry generate(List<MetaView> views , Context context) {
 		return new FileEntry(generateBaseAction(context, views));
 	}
 	
+	/**
+	 * Returns the base action name for the application.
+	 * @param context
+	 * @return
+	 */
 	public static String getBaseActionName(Context context){
 		return "Base"+StringUtils.capitalize(context.getApplicationName())+"Action";
 	}
 	
+	/**
+	 * Generates the base action.
+	 * @param context
+	 * @param views
+	 * @return
+	 */
 	public GeneratedClass generateBaseAction(Context context, List<MetaView> views){
 
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
 		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".action");
-
-//		List<MetaModule> modules = new ArrayList<MetaModule>();
-//		for (MetaView view:views){
-//			List<MetaSection> sections = view.getSections();
-//			
-//			for (int i=0; i<sections.size(); i++){
-//				MetaSection section = sections.get(i);
-//				if (section instanceof MetaModuleSection){
-//					if (modules.indexOf(((MetaModuleSection)section).getModule())==-1){
-//						modules.add(((MetaModuleSection)section).getModule());
-//					}
-//				}
-//			}		
-//		}
 
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
 		
