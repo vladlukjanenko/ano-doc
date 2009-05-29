@@ -105,7 +105,7 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 		clazz.addImport("net.anotheria.anodoc.util.CommonHashtableModuleStorage");
 		
 		clazz.setName(getConfiguratorClassName());
-		
+		clazz.setGenerator(this);
 		startClassBody();
 		
 		appendString("public static String CONTENT_ENCODING = "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding()));
