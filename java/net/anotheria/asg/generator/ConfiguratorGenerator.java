@@ -108,7 +108,8 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 		clazz.setGenerator(this);
 		startClassBody();
 		
-		appendStatement("public static String CONTENT_ENCODING = "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding()));
+		appendComment("Returns the selected encoding. Using method instead of constant to prevent compilation dependencies");
+		appendString("public static final String getEncoding(){ return "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+"; }");
 		appendEmptyline();
 
 		appendString("private static void addCommonStorage(String moduleId, IModuleService service, IModuleFactory factory, String storageDirConfigKey){");
