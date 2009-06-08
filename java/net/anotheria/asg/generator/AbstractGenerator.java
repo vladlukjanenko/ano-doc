@@ -103,6 +103,13 @@ public class AbstractGenerator{
 		appendString(s);
 		increaseIdent();
 	}
+	
+	protected void appendNullCheck(String aArgName, String aExceptionMessage){
+		appendString("if(" + aArgName + " == null)");
+		increaseIdent();
+		appendString("throw new IllegalArgumentException(\"" + aExceptionMessage + "\");");
+		decreaseIdent();		
+	}
 
 	
 	/**

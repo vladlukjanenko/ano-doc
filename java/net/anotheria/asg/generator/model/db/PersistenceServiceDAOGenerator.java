@@ -309,9 +309,10 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
 	    boolean moduleDbContextSensitive = doc.getParentModule().isParameterEqual(ModuleParameter.MODULE_DB_CONTEXT_SENSITIVE, "true");
 	    
+	    clazz.addImport("java.lang.IllegalArgumentException");
 	    clazz.addImport("java.util.List");
 	    clazz.addImport("java.util.ArrayList");
-	    clazz.addImport("java.util.concurrent.atomic.AtomicLong");
+	    clazz.addImport("java.util.concurrent.atomic.AtomicLong");	    
 	    if (moduleDbContextSensitive){
 	    	clazz.addImport("java.util.Map");
 	    	clazz.addImport("java.util.HashMap");
@@ -561,6 +562,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         callLog = quote("get"+doc.getName()+"(")+"+con+"+quote(", ")+"+id+"+quote(")");
         appendComment("Returns the "+doc.getName()+" object with the specified id.");
         openFun("public "+doc.getName()+" get"+doc.getName()+"(Connection con, String id)"+throwsClause);
+        appendNullCheck("con", "Null arg: con");
+        appendNullCheck("id", "Null arg: id");        
         generateFunctionStart("SQL_READ_ONE", callLog, true);
         appendStatement("ps.setLong(1, Long.parseLong(id))");
         appendStatement("ResultSet result = ps.executeQuery()");
