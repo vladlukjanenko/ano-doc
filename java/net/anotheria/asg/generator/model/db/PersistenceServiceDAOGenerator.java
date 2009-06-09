@@ -309,7 +309,6 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
 	    boolean moduleDbContextSensitive = doc.getParentModule().isParameterEqual(ModuleParameter.MODULE_DB_CONTEXT_SENSITIVE, "true");
 	    
-	    clazz.addImport("java.lang.IllegalArgumentException");
 	    clazz.addImport("java.util.List");
 	    clazz.addImport("java.util.ArrayList");
 	    clazz.addImport("java.util.concurrent.atomic.AtomicLong");	    
