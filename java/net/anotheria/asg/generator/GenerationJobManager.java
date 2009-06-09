@@ -17,6 +17,6 @@ public class GenerationJobManager {
 	}
 
 	public static void startNewJob(GeneratedArtefact artefact){
-		currentJob.set(new GenerationJob(artefact.getBody()));
+		currentJob.set(new GenerationJob(artefact));
 	}
 }

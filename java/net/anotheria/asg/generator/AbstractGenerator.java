@@ -105,6 +105,7 @@ public class AbstractGenerator{
 	}
 	
 	protected void appendNullCheck(String aArgName, String aExceptionMessage){
+		((GeneratedClass)getCurrentJob()).addImport(IllegalArgumentException.class);
 		appendString("if(" + aArgName + " == null)");
 		increaseIdent();
 		appendString("throw new IllegalArgumentException(\"" + aExceptionMessage + "\");");
@@ -345,6 +346,10 @@ public class AbstractGenerator{
 		return GenerationJobManager.getCurrentJob().getStringBuilder();
 	}
 	
+	public static final GeneratedArtefact getCurrentJob(){
+		return GenerationJobManager.getCurrentJob().getArtefact();
+	}
+
 	protected void startClassBody(){
 		ident = 1;
 	}
