@@ -49,6 +49,11 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 	}
 	
 
+	/**
+	 * Generates the federated VO.
+	 * @param doc
+	 * @return
+	 */
 	private GeneratedClass generateDocument(MetaDocument doc){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
