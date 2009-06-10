@@ -22,12 +22,20 @@ import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 
+/**
+ * Generator for the FederationService.
+ * @author lrosenberg
+ *
+ */
 public class FederationServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
 	private Context context;
 	MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
 
 	
+	/**
+	 * Generates all artefacts.
+	 */
 	public List<FileEntry> generate(IGenerateable gmodule, Context context){
 		
 		MetaModule mod = (MetaModule)gmodule;
@@ -45,6 +53,11 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	
 	public static final String FEDERATION_VARIABLE_PREFIX = "federated";
 	
+	/**
+	 * Generates the service implementation for the module.
+	 * @param moduleX
+	 * @return
+	 */
 	private GeneratedClass generateImplementation(MetaModule moduleX){
 		
 		GeneratedClass clazz = new GeneratedClass();
