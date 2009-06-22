@@ -59,7 +59,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		startClassBody();
 
 		appendStatement("protected Logger log");
-		appendEmptyline();
+		emptyline();
 		
 		appendString("//Support for listeners.");
 		appendStatement("private List<IServiceListener> listeners");
@@ -70,26 +70,26 @@ public class BasicServiceGenerator extends AbstractGenerator{
         appendStatement("log = Logger.getLogger(this.getClass())");
         appendStatement("listeners = new ArrayList<IServiceListener>()");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         //support for listeners.
         appendString("public void addServiceListener(IServiceListener listener){");
         increaseIdent();
         appendStatement("listeners.add(listener)");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         appendString("public void removeServiceListener(IServiceListener listener){");
         increaseIdent();
         appendStatement("listeners.remove(listener)");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         appendString("public boolean hasServiceListeners(){");
         increaseIdent();
         appendStatement("return listeners.size() > 0");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         appendString("protected List<IServiceListener> getServiceListeners(){");
         increaseIdent();
@@ -118,20 +118,20 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		
 		appendStatement("public static final String MY_OWNER_ID = "+quote(context.getOwner()));
 		appendStatement("protected IModuleService service");
-		appendEmptyline();
+		emptyline();
 
 		appendString("static{");
 		increaseIdent();
 		appendString("AnoDocConfigurator.configure();");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         //generate constructor
         appendString("protected BasicCMSService(){");
         increaseIdent();
         appendStatement("service = ModuleServiceFactory.createModuleService()");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         //generate update method.
         appendString("protected void updateModule(Module mod){");
@@ -156,7 +156,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
         append(closeBlock());
         appendStatement("return null");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
 		return clazz;
 	}

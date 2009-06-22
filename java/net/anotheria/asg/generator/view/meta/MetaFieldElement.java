@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.view.meta;
 
 /**
- * TODO please remined another to comment this class
+ * A view element which is tied to a document attribute and presented as edit-field.
  * @author another
  */
 public class MetaFieldElement extends MetaViewElement{

@@ -148,11 +148,11 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    
 	    startClassBody();
 	    appendStatement("private static "+getImplementationName(module)+" instance");
-	    append(emptyline());
+	    emptyline();
 	    
 	    appendStatement("private boolean paired");
 	    appendStatement(getInterfaceName(module)," pairedInstance = null");
-	    appendEmptyline();
+	    emptyline();
 
 	    //generate storage
 	    for (MetaDocument doc : docs){
@@ -162,14 +162,14 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("private Object "+doc.getName()+"Lock = new Object()");
 
 	    }
-	    appendEmptyline();
+	    emptyline();
 	    
 	    
 	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
 	    appendStatement("reset()");
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("static final "+getImplementationName(module)+" getInstance(){");
 	    increaseIdent();
@@ -179,7 +179,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    append(closeBlock());
 	    appendStatement("return instance");
 	    append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 	    
 	    String throwsClause = " throws "+getExceptionName(module)+" ";
 	    boolean containsAnyMultilingualDocs = false;
@@ -211,26 +211,26 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("return "+getCachedListName(doc));
 	        append(closeBlock());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("return _getCached"+doc.getMultiple()+"()");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 	        
 	        appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 	        appendString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
@@ -245,7 +245,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement(getCacheName(doc)+".remove(id)");
 	        append(closeBlock());
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 	        appendComment("Deletes multiple "+doc.getName()+" objects.");
 	        appendString("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
@@ -269,7 +269,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        decreaseIdent();
 	        append(closeBlock());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 //*/	        
 
@@ -280,7 +280,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"No such "+doc.getName()+" with id: \"+id)");
 	        appendStatement("return w.get()");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 	        appendString("private "+doc.getName()+" createNewObject(String anId, "+doc.getName()+" template){");
 	        increaseIdent();
@@ -292,7 +292,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	//appendStatement(ret, "return ret");
 	        
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 
 	        appendString("if (template instanceof net.anotheria.anodoc.data.Document){");
 	        increaseIdent();
@@ -311,7 +311,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement(getCachedListName(doc), " = null");
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 ///*	        
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -330,7 +330,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 ///*	        
 	        
@@ -360,7 +360,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        appendStatement("return ret");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 
 	        //*/
 	        
@@ -389,7 +389,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        appendStatement("return list");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 //*/
 	        
 	        appendString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -413,7 +413,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 ///*	        
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
 	        increaseIdent();
@@ -426,14 +426,14 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 			appendString("}");
 */			
       		append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 //*/
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
 			append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 
 	        // /*			
 			appendComment("Executes a query on "+doc.getMultiple());
@@ -449,7 +449,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 			
 			appendStatement("return result");
 			append(closeBlock());
-			append(emptyline());
+			emptyline();
 
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause+"{");
@@ -471,7 +471,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 			
 			appendStatement("return ret");
 			append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 /*
 	        increaseIdent();
 			appendString("try{");
@@ -487,7 +487,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
 	        append(closeBlock());
-			append(emptyline());
+			emptyline();
 		//	*/
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
@@ -496,7 +496,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 				increaseIdent();
 		        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 				append(closeBlock());
-				append(emptyline());
+				emptyline();
 				containsAnyMultilingualDocs = true;
 			}
 	    
@@ -513,12 +513,12 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 			increaseIdent();
 	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 			append(closeBlock());
-			append(emptyline());
+			emptyline();
 			
 	    }
 
 	  //generate export function
-	    append(emptyline());
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(){");
 	    	increaseIdent();
@@ -537,7 +537,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
 	    	append(closeBlock());
 	    	append(closeBlock());
-	    	append(emptyline());
+	    	emptyline();
 
 	    
 	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages){");
@@ -557,30 +557,30 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
 	    	append(closeBlock());
 	    	append(closeBlock());
-	    	append(emptyline());
+	    	emptyline();
 }
 	    
 
 	    appendString("public XMLNode exportToXML(){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
-	    append(emptyline());
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML())");
 	    }
-	    append(emptyline());
+	    emptyline();
 	    appendStatement("return ret");
 	    append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 	    
 	    appendString("public XMLNode exportToXML(String[] languages){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
-	    append(emptyline());
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML(languages))");
 	    }
-	    append(emptyline());
+	    emptyline();
 	    appendStatement("return ret");
 	    append(closeBlock());
 	    
@@ -597,13 +597,13 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    appendStatement( "reset()");
 	    
 		append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("public synchronized void unpair("+getInterfaceName(module)+" instance){");
 	    increaseIdent();
 	    appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 	    append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 
 	    appendString("public synchronized void synchBack()throws ASGRuntimeException{");
 	    increaseIdent();
@@ -612,7 +612,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    
 	    appendStatement( "throw new RuntimeException(\"Not yet implemented\")");
 		append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 
 	    
 	    for (MetaDocument doc : docs){
@@ -630,7 +630,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 		    appendStatement(getLastIdName(doc)+" = new AtomicLong(maxId)");
 		    appendStatement(getCachedListName(doc)+" = null");
 			append(closeBlock());
-		    append(emptyline());
+		    emptyline();
 	    }
 
 	    appendString("public void readFrom("+getInterfaceName(module)+" instance) throws ASGRuntimeException {");
@@ -639,13 +639,13 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	appendStatement("read"+doc.getName()+"From(instance)");
 	    }
 	    append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 		
 	    appendString("public void synchTo("+getInterfaceName(module)+" instance)throws ASGRuntimeException{");
 	    increaseIdent();
 	    appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 	    append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 	    
 	    appendString("public void clear(){");
 	    increaseIdent();
@@ -660,7 +660,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement(getCacheName(doc)+" = new HashMap<String, InMemoryObjectWrapper<"+doc.getName()+">>()");
 		    appendStatement(getLastIdName(doc)+" = new AtomicLong(0)");
 		    appendStatement(getCachedListName(doc)+" = null");
-		    appendEmptyline();
+		    emptyline();
 	    }
 	    append(closeBlock());
     

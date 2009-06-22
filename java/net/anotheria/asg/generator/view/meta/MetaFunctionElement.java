@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.view.meta;
 
 /**
- * TODO please remined another to comment this class
+ * A view element which represents an action.
  * @author another
  */
 public class MetaFunctionElement extends MetaViewElement{
@@ -30,11 +30,11 @@ public class MetaFunctionElement extends MetaViewElement{
 		caption = string;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "Fun: "+getName();
 	}
 
-	public boolean isComparable(){
+	@Override public boolean isComparable(){
 		return false;
 	}
 

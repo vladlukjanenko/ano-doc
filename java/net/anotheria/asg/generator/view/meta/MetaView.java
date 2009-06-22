@@ -6,36 +6,47 @@ import java.util.List;
 import net.anotheria.asg.generator.IGenerateable;
 
 /**
- * TODO please remined another to comment this class
+ * Meta description of the view.
  * @author another
  */
 public class MetaView implements IGenerateable{
+	/**
+	 * Name of the view.
+	 */
 	private String name;
-	private boolean passwordProtected;
+	//not used?
+	//private boolean passwordProtected;
+	/**
+	 * Sections of the view.
+	 */
 	private List<MetaSection> sections;
 	private String title;
 	private List<String> requiredRoles;
-	
+	/**
+	 * Creates a new MetaView.
+	 * @param aName
+	 */
 	public MetaView(String aName){
 		name = aName;
 		sections = new ArrayList<MetaSection>();
 		requiredRoles = new ArrayList<String>();
 	}
 	
-	
+// --- SOFAR NOT USED, HENCE OUTCOMMENTED 	
 	/**
 	 * @return
 	 */
-	public boolean isPasswordProtected() {
-		return passwordProtected;
-	}
+//	public boolean isPasswordProtected() {
+	//	return passwordProtected;
+	//}
 
 	/**
 	 * @param b
 	 */
-	public void setPasswordProtected(boolean b) {
-		passwordProtected = b;
-	}
+//	public void setPasswordProtected(boolean b) {
+	//	passwordProtected = b;
+	//}
+//--- // END OUTCOMMENTED	
 	
 	public void addSection(MetaSection section){
 		sections.add(section);	
@@ -55,8 +66,8 @@ public class MetaView implements IGenerateable{
 		sections = list;
 	}
 
-	public String toString(){
-		return "view "+name+" "+sections+" T: "+title;
+	@Override public String toString(){
+		return "view "+name+", Roles: "+requiredRoles+", Sections: "+sections+" T: "+title;
 	}
 	/**
 	 * @return

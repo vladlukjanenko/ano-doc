@@ -43,12 +43,3 @@ public class MetaCustomFunctionElement extends MetaViewElement{
 	}
 }
 
-/* ------------------------------------------------------------------------- *
- * $Log$
- * Revision 1.2  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.1  2006/03/07 16:04:44  lrosenberg
- * *** empty log message ***
- *
- */

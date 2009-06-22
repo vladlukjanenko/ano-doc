@@ -87,7 +87,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("super(message)");
 		appendString("}");
 		
-		appendEmptyline();
+		emptyline();
 		appendString("public "+getExceptionName(doc)+"(){");
 		appendIncreasedStatement("super()");
 		appendString("}");
@@ -348,7 +348,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    //first define constants.
 	    String constDecl = "public static final String ";
 	    appendStatement(constDecl+"TABNAME = "+quote(getSQLTableName(doc)));
-	    appendEmptyline();
+	    emptyline();
 	    MetaProperty id = new MetaProperty("id", "string");
 	    MetaProperty dao_created = new MetaProperty("dao_created", "long");
 	    MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
@@ -358,7 +358,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		    appendStatement(constDecl+getAttributeConst(p)+" \t = "+quote(getAttributeName(p)));
 	    }
 	    
-	    appendEmptyline();
+	    emptyline();
 	    //create sql staments
 	    //SQL-CREATE
 	    String sqlCreate1 = quote("INSERT INTO ");
@@ -426,10 +426,10 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    appendStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_1 \t= "+sqlReadAllByProperty1);
 	    appendStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_2 \t= "+sqlReadAllByProperty2);
 
-	    appendEmptyline();
+	    emptyline();
 	    appendStatement("private RowMapper<"+doc.getName()+"> rowMapper = new "+doc.getName()+"RowMapper()");
 	    
-	    appendEmptyline();
+	    emptyline();
 	    //create impl
 
 
@@ -439,7 +439,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		    appendStatement("private AtomicLong lastId = new AtomicLong()");
 	    }
 	    appendStatement("private static final long START_ID = 0");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    //get last id method
 	    appendString("private AtomicLong getLastId(Connection con) throws DAOException {");
@@ -469,7 +469,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    	
 	    }
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    //get last id method
 	    appendString("private void adjustLastId(Connection con, long lastIdValue) throws DAOException {");
@@ -481,7 +481,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    	appendIncreasedStatement("lastId.set(lastIdValue)");
 	    }
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 
 	    
 	    //createSQL Method
@@ -498,7 +498,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		    appendStatement("return sql.toString()");
 	    }
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    String throwsClause = " throws DAOException";
 	    String callLog = "";
@@ -515,7 +515,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("return  ret");
         generateFunctionEnd(callLog, true);
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         appendComment("Deletes a "+doc.getName()+" object by id.");
         callLog = quote("delete"+doc.getName()+"(")+"+con+"+quote(", ")+"+id+"+quote(")");
@@ -530,7 +530,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		append(closeBlock());
 		generateFunctionEnd(callLog, true);
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         //deleteListXYZ method
         String listDecl = "List<"+doc.getName()+">";
@@ -555,7 +555,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("con.commit()");
 		generateFunctionEnd(callLog, true);
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         //getXYZ method
         callLog = quote("get"+doc.getName()+"(")+"+con+"+quote(", ")+"+id+"+quote(")");
@@ -571,7 +571,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("return rowMapper.map(result)");
         generateFunctionEnd(callLog, true);
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         int ii = 0;
         
@@ -604,7 +604,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         generateFunctionEnd(callLog, true);
         
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         ii = 0;
         
         //createXYZ method
@@ -635,7 +635,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         generateFunctionEnd(callLog, true);
         
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
 
 
         //createListXYZ method
@@ -678,7 +678,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         generateFunctionEnd(callLog, true);
         
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
 
         //updateXYZ method
         callLog = quote("update"+doc.getName()+"(")+"+con+"+quote(", ")+"+"+doc.getVariableName()+"+"+quote(")");
@@ -702,7 +702,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         appendStatement("return "+doc.getVariableName());
         generateFunctionEnd(callLog, true);
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         
         //updateListXYZ method
@@ -736,7 +736,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         generateFunctionEnd(callLog, true);
         
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         //end updateListXYZ
         
         //get all XYZ byProperty method
@@ -776,7 +776,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("return  ret");
         generateFunctionEnd(callLog, true);
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         //setProperty
         openFun("private void setProperty(int position, PreparedStatement ps, QueryProperty property) throws SQLException");
@@ -813,18 +813,18 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
        //special functions
 //	        appendComment("Returns all "+doc.getName()+" objects, where property with given name equals object."));
 //	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"));
-//	        appendEmptyline();
+//	        emptyline();
 //			appendComment("Returns all "+doc.getName()+" objects, where property with given name equals object, sorted"));
 //			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"));
-//			appendEmptyline();
+//			emptyline();
 //			appendComment("Executes a query"));
 //			appendStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"));
-//			appendEmptyline();
+//			emptyline();
 	    
 	    
 //		appendComment("creates an xml element with all contained data."));
 //		appendStatement("public Element exportToXML()"));
-//		appendEmptyline();
+//		emptyline();
         
         appendString("/* ---------- SQL --------- ");
         generateSQLCreate(doc, dao_created, dao_updated);
@@ -833,7 +833,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         openFun("public void createStructure(Connection connection) "+throwsClause);
         appendCommentLine("not implemented");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         		
         appendString("/* ---------- SQL --------- ");
         generateSQLDelete(doc);
@@ -841,11 +841,11 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         openFun("public void deleteStructure(Connection connection) "+throwsClause);
         appendCommentLine("not implemented");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         openFun("protected void finish(Statement st)");
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
 
         openFun("private long getMaxId(Connection con, String tableName) "+throwsClause);
         appendStatement("Statement st = null");
@@ -864,7 +864,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
     	
     	generateFunctionEnd(quote("getMaxId(")+"+con+"+quote(", ")+"+tableName+"+quote(")"), false);
         append(closeBlock());
-        appendEmptyline();
+        emptyline();
         
         //init() method
         openFun("public void init(Connection con) "+throwsClause);

@@ -70,12 +70,12 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		clazz.addImport("net.anotheria.util.Date");
 		clazz.addImport(ASGRuntimeException.class.getName());
 		clazz.addImport("org.apache.log4j.BasicConfigurator");
-		appendEmptyline();
+		emptyline();
 		for (MetaModule m : modules){
 			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
 		}
 		
-		appendEmptyline();
+		emptyline();
 		clazz.setName(getImporterClassName(context));
 
 		startClassBody();
@@ -83,12 +83,12 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		increaseIdent();
 		appendStatement(ConfiguratorGenerator.getConfiguratorClassName()+".configure()");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		//NEW
 		generateDocumentParser();
-		appendEmptyline();
+		emptyline();
 		
 		//OLD
 		
@@ -101,21 +101,21 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		}
 		appendStatement("return createExport(nodes)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendComment("Write XML data from all modules into given stream.");
 		appendString("public void writeCompleteXMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
 		appendStatement("new XMLWriter().write(createCompleteXMLExport(), target)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendComment("Write XML data from all modules into given file.");
 		appendString("public void writeCompleteXMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
 		appendStatement("writeToFile(createCompleteXMLExport(), target)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		
 		
@@ -128,21 +128,21 @@ public class XMLImporterGenerator extends AbstractGenerator{
 			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML())");
 			appendStatement("return createExport(nodes)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 
 			appendComment("Write "+m.getName()+" as XML into given stream.");
 			appendString("public void write"+m.getName()+"XMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
 			appendStatement("new XMLWriter().write(create"+m.getName()+"XMLExport(), target)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 			
 			appendComment("Write "+m.getName()+" as XML into given file.");
 			appendString("public void write"+m.getName()+"XMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
 			appendStatement("writeToFile(create"+m.getName()+"XMLExport(), target)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		
 		//private methods
@@ -167,7 +167,7 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		appendStatement("throw e");
 		append(closeBlock());
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("private XMLTree createExport(List<XMLNode> nodes){");
 		increaseIdent();
@@ -180,7 +180,7 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		appendStatement("root.setChildren(nodes)");
 		appendStatement("return tree");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
 		increaseIdent();

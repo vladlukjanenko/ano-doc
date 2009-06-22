@@ -110,39 +110,39 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		startClassBody();
 		appendMark(2);
 		generatePropertyFields(doc);
-		appendEmptyline();
+		emptyline();
 		appendMark(3);
 		generateDefaultConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		appendMark(4);
 		generateCloneConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		generateBuilderConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		generatePropertyAccessMethods(doc);
-		appendEmptyline();
+		emptyline();
 		generateToStringMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateCloneMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateCopyMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateGetPropertyValueMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateAdditionalMethods(doc);
 		
 		if (doc.isComparable()){
-			appendEmptyline();
+			emptyline();
 			generateCompareMethod(doc);
 		}
 		
-		appendEmptyline();
+		emptyline();
 		generateDefNameMethod(doc);
 
-		appendEmptyline();
+		emptyline();
 		generateGetFootprintMethod(doc);
 		
-		appendEmptyline();
+		emptyline();
 		generateEqualsMethod(doc);
 
 		return clazz;
@@ -249,9 +249,9 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
 			generatePropertyGetterMethod(p);
-			appendEmptyline();
+			emptyline();
 			generatePropertySetterMethod(p);
-			appendEmptyline();
+			emptyline();
 		}
 	}
 	
@@ -281,14 +281,14 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 			increaseIdent();
 			appendStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
 		String v = "ContextManager.getCallContext().getCurrentLanguage()";
 		appendStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 	}
 	
@@ -331,14 +331,14 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 			increaseIdent();
 			appendStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
 		String v = "ContextManager.getCallContext().getCurrentLanguage()";
 		appendStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 
 	private void generateListPropertySetterMethods(MetaListProperty p){
@@ -442,7 +442,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 //		appendStatement("return getList("+pr.toNameConstant()+").size()"); 
 		appendStatement("return get"+container.getAccesserName()+"().size()");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 	
 	private void generateListMethods(MetaListProperty list){
@@ -460,7 +460,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		appendStatement("tmp.add(p)");
 //		appendStatement("set"+list.getAccesserName()+"(tmp)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
@@ -468,7 +468,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 //		appendStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
 		appendStatement("get"+list.getAccesserName()+"().remove(index)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
 		increaseIdent();
@@ -483,7 +483,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		appendStatement("tmpList.set(index1, tmp2)");
 		appendStatement("tmpList.set(index2, tmp1)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
 		increaseIdent();
@@ -492,7 +492,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		appendStatement(c.toJavaType()+" p = ("+c.toJavaObjectType()+""+")get"+list.getAccesserName()+"().get(index)");
 		appendStatement("return p");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 	
 	private void generateTableMethods(MetaTableProperty table){
@@ -516,11 +516,11 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 			appendStatement("tmp = getList("+p.toNameConstant()+")"); 
 			appendStatement("tmp.add(new StringProperty(\"\", "+table.extractSubName(p)+"))");
 			appendStatement("setList("+p.toNameConstant()+", tmp)");
-			appendEmptyline();
+			emptyline();
 		}
 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public void "+getContainerEntryDeleterName(table)+"(int index){");
 		increaseIdent();
@@ -530,7 +530,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		}
 		
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public List get"+StringUtils.capitalize(table.getName())+"Row(int index){");
 		increaseIdent();
@@ -545,7 +545,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		}
 		appendStatement("return ret");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("public List "+getTableGetterName(table)+"(){");
 		increaseIdent();
@@ -555,7 +555,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		appendIncreasedStatement("ret.add(get"+StringUtils.capitalize(table.getName())+"Row(i))");
 		appendStatement("return ret");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 	
 /*	private void generateCompareMethod(MetaDocument doc){

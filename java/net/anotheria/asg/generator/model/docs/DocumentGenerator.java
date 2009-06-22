@@ -118,35 +118,35 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		startClassBody();
 		
 		generateDefaultConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		generateCloneConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		generateBuilderConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		generatePropertyAccessMethods(doc);
-		appendEmptyline();
+		emptyline();
 		generateToStringMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateAdditionalMethods(doc);
 		
 		if (doc.isComparable()){
-			appendEmptyline();
+			emptyline();
 			generateCompareMethod(doc);
 		}
 		
-		appendEmptyline();
+		emptyline();
 		generateDefNameMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateGetFootprintMethod(doc);
 		
 		if (DataFacadeGenerator.hasLanguageCopyMethods(doc)){
 			generateLanguageCopyMethods(doc);
-			appendEmptyline();
+			emptyline();
 		}
 
 		generateMultilingualSwitchSupport(doc);
 
-		appendEmptyline();
+		emptyline();
 		generateEqualsMethod(doc);
 		
 		return clazz;
@@ -167,7 +167,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		}
 		
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		//now the concrete methods
@@ -186,7 +186,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 						}
 					}
 					append(closeBlock());
-					appendEmptyline();
+					emptyline();
 				}
 			}
 		}
@@ -241,9 +241,9 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
 			ret += generatePropertyGetterMethod(p);
-			appendEmptyline();
+			emptyline();
 			ret += generatePropertySetterMethod(p);
-			appendEmptyline();
+			emptyline();
 		}
 		return ret;
 	}
@@ -278,7 +278,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			else
 				appendStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
@@ -288,7 +288,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		else
 			appendStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		return ret;
 	}
 	
@@ -338,7 +338,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			else
 				appendStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
@@ -348,7 +348,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		else
 			appendStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		return ret;
 	}
 
@@ -426,7 +426,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			container;
 		appendStatement("return getList("+pr.toNameConstant()+").size()"); 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 	}
@@ -440,14 +440,14 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 						container;
 					appendStatement("return getList("+pr.toNameConstant(l)+").size()"); 
 					append(closeBlock());
-					appendEmptyline();
+					emptyline();
 		}
 		
 		appendString("public int "+getContainerSizeGetterName(container)+"(){");
 		increaseIdent();
 		appendStatement("return getList("+quote(container.getName()+"_")+"+"+GET_CURRENT_LANG+").size()"); 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 //		appendStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
 
 		
@@ -473,14 +473,14 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 //		appendStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
 		appendStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
 		appendStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
 		increaseIdent();
@@ -494,7 +494,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+accesserType+"(tmp2)");
 		appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+accesserType+"(tmp1)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
 		increaseIdent();
@@ -503,7 +503,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index)");
 		appendStatement("return p.get"+accesserType+"()");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 	}
 	
@@ -522,14 +522,14 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 //			appendStatement("getListPropertyAnyCase("+list.toNameConstant(l)+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
 			appendStatement("getListPropertyAnyCase("+list.toNameConstant(l)+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 			
 			
 			appendString("public void "+getContainerEntryDeleterName(list, l)+"(int index){");
 			increaseIdent();
 			appendStatement("getListProperty("+list.toNameConstant(l)+").remove(index)"); 
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 			
 			appendString("public void "+getContainerEntrySwapperName(list, l)+"(int index1, int index2){");
 			increaseIdent();
@@ -543,7 +543,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index1)).set"+accesserType+"(tmp2)");
 			appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index2)).set"+accesserType+"(tmp1)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 	
 			appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list, l)+"(int index){");
 			increaseIdent();
@@ -552,7 +552,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			appendStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+list.toNameConstant(l)+").get(index)");
 			appendStatement("return p.get"+accesserType+"()");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		
 //		quote(container.getName()+"_")+"+"+GET_CURRENT_LANG+
@@ -565,14 +565,14 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 //		appendStatement("getListPropertyAnyCase("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
 		appendStatement("getListPropertyAnyCase("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
 		appendStatement("getListProperty("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").remove(index)"); 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
 		increaseIdent();
@@ -587,7 +587,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendStatement("(("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index2)).set"+accesserType+"(tmp1)");
 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
 		increaseIdent();
@@ -596,7 +596,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+quote(list.getName()+"_")+"+"+GET_CURRENT_LANG+").get(index)");
 		appendStatement("return p.get"+accesserType+"()");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 	}
 
@@ -621,11 +621,11 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			appendStatement("tmp = getList("+p.toNameConstant()+")"); 
 			appendStatement("tmp.add(new StringProperty(\"\", "+table.extractSubName(p)+"))");
 			appendStatement("setList("+p.toNameConstant()+", tmp)");
-			appendEmptyline();
+			emptyline();
 		}
 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public void "+getContainerEntryDeleterName(table)+"(int index){");
 		increaseIdent();
@@ -635,7 +635,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		}
 		
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public List<String> get"+StringUtils.capitalize(table.getName())+"Row(int index){");
 		increaseIdent();
@@ -650,7 +650,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		}
 		appendStatement("return ret");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("public List<List<String>> "+getTableGetterName(table)+"(){");
 		increaseIdent();
@@ -660,7 +660,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendIncreasedStatement("ret.add(get"+StringUtils.capitalize(table.getName())+"Row(i))");
 		appendStatement("return ret");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 	
 /*	
@@ -751,7 +751,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendString("}");
 		append(closeBlock());
 
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public void setMultilingualDisabledInstance(boolean value){");
 		increaseIdent();

@@ -123,7 +123,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 
 	    startClassBody();
 	    appendStatement("private static "+getImplementationName(module)+" instance");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    String throwsClause = " throws "+ServiceGenerator.getExceptionName(module)+" ";
 	    String throwClause = "throw new "+ServiceGenerator.getExceptionName(module)+"("+quote("Undelying service failed: ")+"+e.getMessage())";
@@ -136,7 +136,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    	appendStatement("public static final String ID_PREFIX_"+fedDef.getKey()+" = "+quote(fedDef.getKey())+"+ID_DELIMITER");
 	    	targetModules.put(fedDef.getKey(), target);
 	    }
-	    appendEmptyline();
+	    emptyline();
 	    appendStatement("private HashMap<String, Object> federatedServiceMap");
 	    
 	    appendString("private "+getImplementationName(module)+"(){");
@@ -146,7 +146,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    		String listClassName = (String)module.getListeners().get(i);
 	    		appendStatement("addServiceListener(new "+listClassName+"())");
 	    	}
-	    	appendEmptyline();
+	    	emptyline();
 	    }
 	    
 	    //initialize federated servises;
@@ -159,7 +159,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    }
 	    
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("static final "+getImplementationName(module)+" getInstance(){");
 	    increaseIdent();
@@ -169,7 +169,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    append(closeBlock());
 	    appendStatement("return instance");
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
@@ -196,7 +196,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        	
 	        	appendStatement("return ret");
 	        	append(closeBlock());
-	        	appendEmptyline();
+	        	emptyline();
 	        	appendString("private List<"+doc.getName()+"> copy"+doc.getName()+"List"+mapping.getTargetKey()+"(List<"+target.getName()+"> list){");
 	        	increaseIdent();
 	        	appendStatement("List<"+doc.getName()+"> ret = new ArrayList<"+doc.getName()+">(list.size())");
@@ -205,7 +205,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        	//we assume that we always have identical properties, or at least all properties from federation doc have a corresponding property in target doc.
 	        	appendStatement("return ret");
 	        	append(closeBlock());
-	        	appendEmptyline();
+	        	emptyline();
 	        }
 	        //... end copy methods
 	        
@@ -229,25 +229,25 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        //"+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()"));
 	        appendStatement("return "+doc.getMultiple().toLowerCase());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 
 	        appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        appendString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("throw new RuntimeException(\"not implemented.\")");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        //delete multiple
 	        appendComment("Deletes multiple "+doc.getName()+" objects.");
@@ -255,7 +255,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        increaseIdent();
 	        appendStatement("throw new RuntimeException("+quote("Not yet implemented")+")");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
@@ -279,13 +279,13 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        }
 	        appendStatement("throw new RuntimeException("+quote("Unknown federated key: ")+"+tokens[0]+"+quote(" in ")+"+id)");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        appendString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("throw new RuntimeException(\"no import in federated services.\")");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -302,7 +302,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        
 	        //create multiple
@@ -311,7 +311,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        increaseIdent();
 	        appendStatement("throw new RuntimeException("+quote("Not yet implemented")+")");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        
 	        //update multiple
@@ -320,7 +320,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        increaseIdent();
 	        appendStatement("throw new RuntimeException("+quote("Not yet implemented")+")");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        
 	        appendString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -341,7 +341,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
 	        increaseIdent();
@@ -363,7 +363,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        //"+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()"));
 	        appendStatement("return "+doc.getMultiple().toLowerCase());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{");
 			increaseIdent();
@@ -383,33 +383,33 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 			
 			appendStatement("return result");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 			
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 	        append(closeBlock());
-			appendEmptyline();
+			emptyline();
 			
 			
 	    }
 	    
 	    //generate export function
-	    appendEmptyline();
+	    emptyline();
 	    appendString("public XMLNode exportToXML()"+throwsClause+"{");
 	    increaseIdent();
         appendStatement("return new XMLNode("+quote("unimplemented_federated_export_"+module.getName())+")");
 	    append(closeBlock());
 	    
-	    appendEmptyline();
+	    emptyline();
 	    appendString("public XMLNode exportToXML(String[] languages)"+throwsClause+"{");
 	    increaseIdent();
         appendStatement("return new XMLNode("+quote("unimplemented_federated_export_"+module.getName())+")");

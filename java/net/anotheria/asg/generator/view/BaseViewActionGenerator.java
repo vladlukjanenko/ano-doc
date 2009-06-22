@@ -1,6 +1,7 @@
 package net.anotheria.asg.generator.view;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -70,21 +71,31 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 
 		appendStatement("public static final String BEAN_MENU = "+quote("menu"));
 		appendStatement("public static final String BEAN_QUERIES_MENU = "+quote("queriesMenu"));
-		appendEmptyline();
+		emptyline();
 		
 		appendString("protected abstract String getTitle();");
-		appendEmptyline();
+		emptyline();
 		
 		appendString("protected void init(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
 		appendStatement("super.init(mapping, af, req, res)");
-		//add check for roles
-		if (view.getRequiredRoles()!=null && view.getRequiredRoles().size()>0){
-			appendCommentLine("check whether user has one of following roles: "+view.getRequiredRoles());
-		}
 		appendStatement("prepareMenu(req)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
+		
+		if (view.getRequiredRoles()!=null && view.getRequiredRoles().size()>0){
+			clazz.addImport(Arrays.class);
+			String roles = "";
+			for (String r : view.getRequiredRoles()){
+				if (roles.length()>0)
+					roles += ", ";
+				roles += quote(r);
+			}
+			appendStatement("private static final List<String> MY_ROLES = Arrays.asList(new String[]{"+roles+"})");
+			appendString("protected List<String> getRequiredRoles(){");
+			appendIncreasedStatement("return MY_ROLES");
+			appendString("}");
+		}
 					
 		appendString("private void prepareMenu(HttpServletRequest req){");
 		increaseIdent();
@@ -99,7 +110,7 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 		}
 		appendStatement("addBeanToRequest(req, BEAN_MENU, menu)");
 		
-		appendEmptyline();
+		emptyline();
 		appendStatement("List<MenuItemBean> queriesMenu = new ArrayList<MenuItemBean>()");
 		for (int i=0; i<sections.size(); i++){
 			MetaSection section = (MetaSection)sections.get(i);
@@ -114,8 +125,8 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 		
 		
 		append(closeBlock());
-		appendEmptyline();
-		
+		emptyline();
+
 		appendString("private MenuItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();
 		appendString("MenuItemBean bean = new MenuItemBean();");
@@ -133,16 +144,14 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 		append(closeBlock());		
 		appendString("return bean;");
 		append(closeBlock());
-		appendEmptyline();
-		
+		emptyline();
+
 		//security...
 		appendString("protected boolean isAuthorizationRequired(){");
 		increaseIdent();
-		//System.out.println("Warning authorization is off.");
 		appendStatement("return true");
-		//ret+= writeStatement("return false");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		return clazz;
 	}

@@ -98,34 +98,34 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        String listDecl = "List<"+doc.getName()+">";
 	        appendComment("Returns all "+doc.getMultiple()+" objects stored.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Deletes a "+doc.getName()+" object by id.");
 	        appendStatement("public void delete"+doc.getName()+"(String id)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Deletes multiple "+doc.getName()+" object.");
 	        appendStatement("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
 	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Imports a new "+doc.getName()+" object.\nReturns the imported version.");
 	        appendStatement("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
 	        appendStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
 	        appendStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
 	        appendStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Updates multiple "+doc.getName()+" object.\nReturns the updated versions.");
 	        appendStatement("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Returns all "+doc.getName()+" objects which match the given property or properties.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty"+"(QueryProperty... properties)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	    }
 	    
 	    return clazz;
@@ -158,7 +158,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    clazz.addImport("net.anotheria.db.dao.DAOException");
 	    clazz.addImport("java.sql.Connection");
 	    clazz.addImport("java.sql.SQLException");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    clazz.setName(getImplementationName(module));
 	    clazz.setParent("BasePersistenceServiceJDBCImpl");
@@ -166,19 +166,19 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 
 	    startClassBody();
 	    appendStatement("private static "+getImplementationName(module)+" instance");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendCommentLine("DAO Objects for data access.");
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        appendStatement("private "+PersistenceServiceDAOGenerator.getDAOName(doc)+" "+getDAOVariableName(doc));
 	    }
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("static final "+getImplementationName(module)+" getInstance(){");
 	    increaseIdent();
@@ -188,7 +188,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    append(closeBlock());
 	    appendStatement("return instance");
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("public void init(){");
 	    increaseIdent();
@@ -220,7 +220,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		//appendIncreasedStatement("throw new RuntimeException(\"init failed (sql) cause: \"+e.getMessage())"));
 		appendString("}");
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    
 	    String throwsClause = " throws "+getExceptionName(module);
@@ -237,7 +237,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return "+getDAOVariableName(doc)+".get"+doc.getMultiple()+"(c)");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        callLog = "\"Call delete"+doc.getName()+"(\"+id+\") \"";
 	        appendComment("Deletes a "+doc.getName()+" object by id.");
@@ -246,7 +246,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement(getDAOVariableName(doc)+".delete"+doc.getName()+"(c, id)");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        callLog = "\"Call delete"+doc.getMultiple()+"(\"+list+\") \"";
 	        appendComment("Deletes multiple  "+doc.getName()+" objects.");
@@ -256,7 +256,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        callLog = "\"Call get"+doc.getName()+"(\"+id+\") \"";
 	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
@@ -265,7 +265,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return "+getDAOVariableName(doc)+".get"+doc.getName()+"(c, id)");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        callLog = "\"Call import"+doc.getName()+"(\"+"+doc.getVariableName()+"+\") \"";
 	        appendComment("Imports a new "+doc.getName()+" object.\nReturns the imported version.");
@@ -274,7 +274,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return "+getDAOVariableName(doc)+".import"+doc.getName()+"(c, "+doc.getVariableName()+")");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        
 	        callLog = "\"Call create"+doc.getName()+"(\"+"+doc.getVariableName()+"+\") \"";
@@ -284,7 +284,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return "+getDAOVariableName(doc)+".create"+doc.getName()+"(c, "+doc.getVariableName()+")");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        callLog = "\"Call create"+doc.getMultiple()+"(\"+list+\") \"";
 	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
@@ -293,7 +293,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return "+getDAOVariableName(doc)+".create"+doc.getMultiple()+"(c, list)");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 
 	        callLog = "\"Call update"+doc.getName()+"(\"+"+doc.getVariableName()+"+\") \"";
@@ -303,7 +303,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return "+getDAOVariableName(doc)+".update"+doc.getName()+"(c, "+doc.getVariableName()+")");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        callLog = "\"Call update"+doc.getMultiple()+"(\"+list+\") \"";
 	        appendComment("Updates multiple  "+doc.getName()+" objects.\nReturns the updated versions.");
@@ -312,7 +312,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return "+getDAOVariableName(doc)+".update"+doc.getMultiple()+"(c, list)");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        callLog = "\"Call get"+doc.getMultiple()+"ByProperty(\"+properties+\") \"";
 	        appendComment("Returns all "+doc.getName()+" objects which match the given property.");
@@ -321,12 +321,12 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("return "+getDAOVariableName(doc)+".get"+doc.getMultiple()+"ByProperty(c, Arrays.asList(properties))");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 /*	        
 	        appendComment("Returns all "+doc.getName()+" objects which match given properties."));
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperties"+"(List<QueryProperty> properties)"+throwsClause));
-	        appendEmptyline();
+	        emptyline();
 */	        
 	    }
 	    

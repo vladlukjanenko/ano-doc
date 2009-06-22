@@ -52,7 +52,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    clazz.addImport("net.anotheria.util.sorter.SortType");
 	    clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
 	    clazz.addImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
-	    //ret.append(emptyline());
+	    //ret.emptyline();
 	    clazz.addImport(JDBCPersistenceServiceGenerator.getInterfaceImport(context, module));
 	    clazz.addImport(JDBCPersistenceServiceGenerator.getFactoryImport(context, module));
 	    clazz.addImport(JDBCPersistenceServiceGenerator.getExceptionImport(context, module));
@@ -72,7 +72,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    
 	    startClassBody();
 	    appendStatement("private static "+getImplementationName(module)+" instance");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendStatement("private "+JDBCPersistenceServiceGenerator.getInterfaceName(module)+" pService");
 	    
@@ -86,7 +86,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	}
 	    }
 	    append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 	    
 	    appendString("static final "+getImplementationName(module)+" getInstance(){");
 	    increaseIdent();
@@ -96,7 +96,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    append(closeBlock());
 	    appendStatement("return instance");
 	    append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 	    
 
 	    String throwsClause = " throws "+getExceptionName(module)+" ";
@@ -118,31 +118,31 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			append(closeBlock());
-			append(emptyline());
+			emptyline();
 
 			//appendString("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids)"+throwsClause+"{");
 			//increaseIdent();
 			//appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			//append(closeBlock());
-			//append(emptyline());
+			//emptyline();
 
 			//appendString("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids, SortType sortType)"+throwsClause+"{");
 			//increaseIdent();
 			//appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(ids), sortType)");
 			//append(closeBlock());
-			//append(emptyline());
+			//emptyline();
 
 			appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 	        appendString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
@@ -160,7 +160,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 //	        appendIncreasedStatement("myListeners.get(i).documentDeleted(oldVersion, "+doc.getVariableName()+")"));
 //	        append(closeBlock());
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 
 	        appendComment("Deletes multiple "+doc.getName()+" objects.");
 	        appendString("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
@@ -182,7 +182,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        decreaseIdent();
 	        append(closeBlock());	
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
@@ -193,7 +193,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 	        
 	        appendString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -206,7 +206,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}");
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 
 	        
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -225,7 +225,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        append(closeBlock());	
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 	        //
 	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
@@ -249,7 +249,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        append(closeBlock());	
 	        appendStatement("return ret");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 
 	        appendComment("Updates multiple new "+doc.getName()+" objects.\nReturns the updated versions.");
 	        appendString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
@@ -273,7 +273,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        append(closeBlock());	
 	        appendStatement("return ret");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 
 	        
 	        appendString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -299,7 +299,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
 	        increaseIdent();
@@ -337,7 +337,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        append(closeBlock());
 	        appendString("return ret;"));
 	*/      append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{");
 			increaseIdent();
@@ -357,7 +357,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			
 			appendStatement("return result");
 			append(closeBlock());
-			append(emptyline());
+			emptyline();
 
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause+"{");
@@ -368,19 +368,19 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 			appendString("}");
 	        append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
 	        append(closeBlock());
-			append(emptyline());
+			emptyline();
 			
 	    }
 	    
 	    //generate export function
-	    append(emptyline());
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(){");
 	    	increaseIdent();
@@ -399,7 +399,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
 	    	append(closeBlock());
 	    	append(closeBlock());
-	    	append(emptyline());
+	    	emptyline();
 	    	
 	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(String languages[]){");
 	    	increaseIdent();
@@ -418,30 +418,30 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
 	    	append(closeBlock());
 	    	append(closeBlock());
-	    	append(emptyline());
+	    	emptyline();
 	    }
 	    
 
 	    appendString("public XMLNode exportToXML(){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
-	    append(emptyline());
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML())");
 	    }
-	    append(emptyline());
+	    emptyline();
 	    appendStatement("return ret");
 	    append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 	    
 	    appendString("public XMLNode exportToXML(String[] languages){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
-	    append(emptyline());
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML(languages))");
 	    }
-	    append(emptyline());
+	    emptyline();
 	    appendStatement("return ret");
 	    append(closeBlock());
 

@@ -5,10 +5,7 @@ import java.util.List;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.util.StringUtils;
 
 public class SharedJspFooterGenerator extends AbstractJSPGenerator {
 
@@ -36,15 +33,13 @@ public class SharedJspFooterGenerator extends AbstractJSPGenerator {
 		if (views.size()>1){
 		
 			String viewSwitcher = "";
-			for (MetaView v : views){
-				if (viewSwitcher.length()!=0)
-					viewSwitcher += "&nbsp;|&nbsp;";
-				MetaSection asection = v.getSections().get(0);
-				//hack, assuming first section is always a module section.
-				MetaModuleSection section = (MetaModuleSection)asection;
-				String link = StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW);
-				viewSwitcher += "<a href="+quote("<ano:tslink>"+link+"</ano:tslink>")+">"+StringUtils.capitalize(v.getName())+"</a>";
-			}
+			viewSwitcher += "<bean:size id="+quote("listsize")+" name="+quote("views")+"/>";
+			viewSwitcher +="<logic:iterate name="+quote("views")+" type="+quote("net.anotheria.webutils.bean.MenuItemBean")+" id="+quote("v")+" indexId="+quote("ind")+" >";
+			viewSwitcher += "<a href="+quote("<ano:tslink><bean:write name="+quote("v")+" property="+quote("link")+"/></ano:tslink>")+">";
+			viewSwitcher += "<bean:write name="+quote("v")+" property="+quote("caption")+"/>";
+			viewSwitcher += "</a>";
+			viewSwitcher += "<logic:notEqual name="+quote("ind")+" value="+quote("<%=\"\"+(listsize-1)%>")+">&nbsp;|&nbsp;</logic:notEqual>";
+			viewSwitcher += "</logic:iterate>";
 			viewSwitcher = "Views:&nbsp;" + viewSwitcher;
 			
 			ret += writeString(viewSwitcher);

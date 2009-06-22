@@ -100,37 +100,37 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		
 		startClassBody();
 		generatePropertyFields(doc);
-		appendEmptyline();
+		emptyline();
 		generateDefaultConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		generateCloneConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		generateBuilderConstructor(doc);
-		appendEmptyline();
+		emptyline();
 		generatePropertyAccessMethods(doc);
-		appendEmptyline();
+		emptyline();
 		generateToStringMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateCloneMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateCopyMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateGetPropertyValueMethod(doc);
-		appendEmptyline();
+		emptyline();
 		generateAdditionalMethods(doc);
 		
 		if (doc.isComparable()){
-			appendEmptyline();
+			emptyline();
 			generateCompareMethod(doc);
 		}
 		
-		appendEmptyline();
+		emptyline();
 		generateDefNameMethod(doc);
 		
-		appendEmptyline();
+		emptyline();
 		generateGetFootprintMethod(doc);
 
-		appendEmptyline();
+		emptyline();
 		generateEqualsMethod(doc);
 
 		return clazz;
@@ -223,9 +223,9 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
 			generatePropertyGetterMethod(p);
-			appendEmptyline();
+			emptyline();
 			generatePropertySetterMethod(p);
-			appendEmptyline();
+			emptyline();
 		}
 	}
 	
@@ -255,14 +255,14 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 			increaseIdent();
 			appendStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
 		increaseIdent();
 		String v = "ContextManager.getCallContext().getCurrentLanguage()";
 		appendStatement("return "+p.toPropertyGetter()+"("+quote(p.getName()+"_")+"+"+v+")");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 	
 	
@@ -304,14 +304,14 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 			increaseIdent();
 			appendStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
 		increaseIdent();
 		String v = "ContextManager.getCallContext().getCurrentLanguage()";
 		appendStatement(""+p.toPropertySetter()+"("+"("+quote(p.getName()+"_")+"+"+v+")"+", value)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		return ret;
 	}
 
@@ -406,7 +406,7 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 			container;
 		appendStatement("return getList("+pr.toNameConstant()+").size()"); 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 	}
 	
@@ -424,14 +424,14 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		appendStatement("tmp.add(p)");
 		appendStatement("set"+list.getAccesserName()+"(tmp)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
 		appendStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
 		increaseIdent();
@@ -441,14 +441,14 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		appendStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+c.toJavaType()+"(tmp2)");
 		appendStatement("(("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+c.toJavaType()+"(tmp1)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
 		increaseIdent();
 		appendStatement(c.toJavaType()+"Property p = ("+c.toJavaType()+"Property"+")getList("+list.toNameConstant()+").get(index)");
 		appendStatement("return p.get"+c.toJavaType()+"()");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 	
 	private void generateTableMethods(MetaTableProperty table){
@@ -472,11 +472,11 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 			appendStatement("tmp = getList("+p.toNameConstant()+")"); 
 			appendStatement("tmp.add(new StringProperty(\"\", "+table.extractSubName(p)+"))");
 			appendStatement("setList("+p.toNameConstant()+", tmp)");
-			appendEmptyline();
+			emptyline();
 		}
 
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public void "+getContainerEntryDeleterName(table)+"(int index){");
 		increaseIdent();
@@ -486,7 +486,7 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		}
 		
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public List get"+StringUtils.capitalize(table.getName())+"Row(int index){");
 		increaseIdent();
@@ -501,7 +501,7 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		}
 		appendStatement("return ret");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("public List "+getTableGetterName(table)+"(){");
 		increaseIdent();
@@ -511,7 +511,7 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		appendIncreasedStatement("ret.add(get"+StringUtils.capitalize(table.getName())+"Row(i))");
 		appendStatement("return ret");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 	
 	public static String getContainerSizeGetterName(MetaContainerProperty p){

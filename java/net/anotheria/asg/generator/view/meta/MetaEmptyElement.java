@@ -5,6 +5,9 @@ package net.anotheria.asg.generator.view.meta;
  * @author another
  */
 public class MetaEmptyElement extends MetaViewElement{
+	/**
+	 * Creates a new empty element.
+	 */
 	public MetaEmptyElement(){
 		super(null);
 	}

@@ -184,9 +184,17 @@ public class AbstractGenerator{
 	
 	/**
 	 * Returns an empty line.
+	 * @deprecated use emptyline.
 	 */
-	protected/*private*/ static String emptyline(){
+	public static String writeEmptyline(){
 		return CRLF;
+	}
+
+	/**
+	 * Appends an empty line.
+	 */
+	public static void emptyline(){
+		getCurrentJobContent().append(CRLF);
 	}
 	
 	/**
@@ -197,6 +205,9 @@ public class AbstractGenerator{
 		b.append(CRLF);
 	}
 
+	/**
+	 * @deprecated use emptyline instead
+	 */
 	protected static void appendEmptyline(){
 		emptyline(getCurrentJobContent());
 	}

@@ -41,10 +41,10 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 		
 		appendString("<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>");
 		increaseIdent();
-		appendEmptyline();
+		emptyline();
 		
 		appendString("<!-- File Appenders for generated code -->");
-		appendEmptyline();
+		emptyline();
 		
 		for (String cat : categories){
 		  	appendString("<!-- File Appender for ", cat, " and higher -->");
@@ -62,10 +62,10 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 			decreaseIdent();
 		  	appendString("</appender>");
 		}
-		appendEmptyline();
+		emptyline();
 		
 		appendString("<!-- File Appenders for written code -->");
-		appendEmptyline();
+		emptyline();
 
 		for (String cat : categories){
 		  	appendString("<!-- File Appender for ", cat, " and higher -->");
@@ -83,7 +83,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 			decreaseIdent();
 		  	appendString("</appender>");
 		}
-		appendEmptyline();
+		emptyline();
 		
 		appendString("<!-- Console appender -->");
 		appendString("<appender name="+quote("ConsoleAppender"), " class=", quote("org.apache.log4j.ConsoleAppender"),">");
@@ -96,7 +96,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 		appendString("</layout>");
 		decreaseIdent();
 		appendString("</appender>");
-		appendEmptyline();
+		emptyline();
 
 		appendString("<logger name=", quote(context.getTopPackageName()), " additivity=", quote("false"), ">");
 		increaseIdent(); 
@@ -105,7 +105,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 			appendString("<appender-ref ref=",quote(StringUtils.capitalize(cat)+"GenAppender"), "/>");
 		decreaseIdent();
 		appendString("</logger>");
-		appendEmptyline();
+		emptyline();
 		
 		appendString("<logger name=", quote("net.anotheria."+context.getApplicationName().toLowerCase()), " additivity=", quote("false"), ">");
 		increaseIdent(); 
@@ -114,7 +114,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 			appendString("<appender-ref ref=",quote(StringUtils.capitalize(cat)+"Appender"), "/>");
 		decreaseIdent();
 		appendString("</logger>");
-		appendEmptyline();
+		emptyline();
 
 		decreaseIdent();
 		appendString("</log4j:configuration>");

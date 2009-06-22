@@ -319,9 +319,9 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		MetaModule module = section.getModule();
 		MetaDocument doc  = section.getDocument();
 		
-		ret += emptyline();
+		ret += writeEmptyline();
 		ret += writeString("<!-- Generating mapping for "+module.getName()+"."+doc.getName()+" -->");
-		ret += emptyline();
+		ret += writeEmptyline();
 		
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_SHOW), 
@@ -463,9 +463,9 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			FileEntry.package2path(JspViewGenerator.getPackage(context, MetaModule.SHARED)).substring(FileEntry.package2path(JspViewGenerator.getPackage(context, module)).indexOf('/'))+"/"+JspViewGenerator.getVersionInfoPageName(doc)+".jsp"
 			);
 		
-		ret += emptyline();
+		ret += writeEmptyline();
 		ret += writeString("<!-- Finished mapping for "+module.getName()+"."+doc.getName()+" -->");
-		ret += emptyline();
+		ret += writeEmptyline();
 
 		
 		return ret;

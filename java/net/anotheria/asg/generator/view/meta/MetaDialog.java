@@ -4,14 +4,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO please remined another to comment this class
+ * The definition of a dialog.
  * @author another
  */
 public class MetaDialog {
+	/**
+	 * Name of the dialog.
+	 */
 	private String name;
+	/**
+	 * Title of the dialog.
+	 */
 	private String title;
+	/**
+	 * Elements of the dialog.
+	 */
 	private List<MetaViewElement> elements;
-	
+	/**
+	 * Creates a new dialog with the given name.
+	 * @param aName the name of the dialog.
+	 */
 	public MetaDialog(String aName){
 		this.name = aName;
 		elements = new ArrayList<MetaViewElement>();
@@ -66,7 +78,7 @@ public class MetaDialog {
 		title = string;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return name+" "+elements;
 	}
 

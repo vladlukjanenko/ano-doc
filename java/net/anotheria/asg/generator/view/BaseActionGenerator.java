@@ -1,6 +1,7 @@
 package net.anotheria.asg.generator.view;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
+import net.anotheria.asg.generator.view.meta.MetaModuleSection;
+import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.metafactory.Extension;
 import net.anotheria.asg.metafactory.MetaFactory;
@@ -73,17 +76,22 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendStatement("public static final String PARAM_SORT_TYPE = "+quote(ViewConstants.PARAM_SORT_TYPE));
 		appendStatement("public static final String PARAM_SORT_TYPE_NAME = "+quote(ViewConstants.PARAM_SORT_TYPE_NAME));
 		appendStatement("public static final String PARAM_SORT_ORDER = "+quote(ViewConstants.PARAM_SORT_ORDER));
-		appendEmptyline();
+		emptyline();
 
 		//generate constants for session attributes
 		appendCommentLine("prefixes for session attributes.");
 		appendStatement("public static final String SA_PREFIX = "+quote(ViewConstants.SA_PREFIX));
 		appendStatement("public static final String SA_SORT_TYPE_PREFIX = SA_PREFIX+"+quote(ViewConstants.SA_SORT_TYPE_PREFIX));
 		appendStatement("public static final String SA_FILTER_PREFIX = SA_PREFIX+"+quote(ViewConstants.SA_FILTER_PREFIX));
-		appendEmptyline();
+		emptyline();
+		appendStatement("public static final String BEAN_VIEW_SELECTOR = "+quote("views"));
+		emptyline();
 		
 		for (MetaModule m:modules)
 			appendStatement("private static "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceInstanceName(m));
+
+		appendStatement("private static XMLUserManager userManager");
+		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
 
 		appendString("static{");
 		increaseIdent();
@@ -105,8 +113,19 @@ public class BaseActionGenerator extends AbstractGenerator {
 			appendString("}");
 		}
 
+		//init user manager
+		emptyline();
+		appendComment("//initializing user manager");
+		appendString("try{");
+		appendIncreasedStatement("userManager = XMLUserManager.getInstance()");
+		appendString("}catch(Exception e){");
+		appendIncreasedStatement("staticlogger.fatal("+quote("Can't init user manager")+", e)");
+		appendString("}");
+		//end init user manager
+
+	
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public abstract ActionForward anoDocExecute(");
 		increaseIdent();
@@ -116,7 +135,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendString("HttpServletResponse res)");
 		appendString("throws Exception;");
 		decreaseIdent();
-		appendEmptyline();
+		emptyline();
 
 		appendString("public ActionForward doExecute(");
 		increaseIdent();
@@ -144,6 +163,9 @@ public class BaseActionGenerator extends AbstractGenerator {
 		append(closeBlock());	
 		append(closeBlock());
 		
+		appendStatement("checkAccessPermissions(req)");
+		emptyline();
+
 		appendString("return anoDocExecute(mapping, af, req, res);");
 		append(closeBlock());
 
@@ -153,7 +175,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 			increaseIdent();
 			appendStatement("return "+ModuleActionsGenerator.getServiceInstanceName(m));
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		
 		//security...
@@ -161,20 +183,29 @@ public class BaseActionGenerator extends AbstractGenerator {
 		increaseIdent();
 		appendStatement("return false");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
+		clazz.addImport(List.class);
+		clazz.addImport(ArrayList.class);
+		appendStatement("private static final List<String> EMPTY_ROLE_LIST = new ArrayList<String>()");
+		appendString("protected List<String> getRequiredRoles(){");
+		increaseIdent();
+		appendStatement("return EMPTY_ROLE_LIST");
+		append(closeBlock());
+		emptyline();
+
 		appendString("protected boolean checkAuthorization(HttpServletRequest req){");
 		increaseIdent();
 		appendStatement("String userId = (String )getBeanFromSession(req, BEAN_USER_ID)");
 		appendStatement("return userId!=null");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public String getSubsystem() {");
 		increaseIdent();
 		appendStatement("return "+quote("asg"));
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	
 		appendString("protected String stripPath(String path){");
 		increaseIdent();
@@ -182,7 +213,90 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendIncreasedStatement("throw new IllegalArgumentException("+quote("path null or empty")+")");
 		appendStatement("return path.startsWith("+quote("/")+") ? path.substring(1) : path");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
+		
+		appendString("private void checkAccessPermissions(HttpServletRequest req){");
+		increaseIdent();
+		appendStatement("List<String> requiredRoles = getRequiredRoles()");
+		appendString("if (requiredRoles==null || requiredRoles.size()==0)");
+		appendIncreasedStatement("return");
+		appendStatement("String userId = getUserId(req)");
+		appendString("if (userId==null || userId.length()==0)");
+		appendIncreasedStatement("throw new RuntimeException("+quote("Permission denied, uid not found!")+")");
+		appendString("for (String role : requiredRoles){");
+		increaseIdent();
+		appendString("if (userManager.userInRole(userId, role))");
+		appendIncreasedStatement("return");
+		append(closeBlock());
+		appendStatement("throw new RuntimeException("+quote("Permission denied, expected one of those: ")+"+requiredRoles)");
+		append(closeBlock());
+		emptyline();
+
+		
+/*		appendString("private boolean isUserInRole(HttpServletRequest req, String role){");
+		increaseIdent();
+		appendStatement("String userId = getUserId(req)");
+		appendStatement("return userId==null ? false : userManager.userInRole(userId, role)");
+		append(closeBlock());
+		emptyline();
+*/
+		appendString("private boolean isUserInRole(HttpServletRequest req, String ... roles){");
+		increaseIdent();
+		appendStatement("String userId = getUserId(req)");
+		appendString("if (userId==null)");
+		appendIncreasedStatement("return false");
+		appendString("for (String role : roles){");
+		increaseIdent();
+		appendString("if (userManager.userInRole(userId, role))");
+		appendIncreasedStatement("return true");
+		append(closeBlock());
+		appendStatement("return false");
+		append(closeBlock());
+
+		
+		appendString("private void prepareViewSelection(HttpServletRequest req){");
+		increaseIdent();
+		clazz.addImport("net.anotheria.webutils.bean.MenuItemBean");
+		appendStatement("List<MenuItemBean> menu = new ArrayList<MenuItemBean>()");
+		for (int i=0; i<views.size(); i++){
+			MetaView view = views.get(i);
+			MetaSection first = view.getSections().get(0);
+			String statement = "menu.add(makeMenuItemBean("+quote(view.getTitle())+", "+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)first).getDocument(), StrutsConfigGenerator.ACTION_SHOW))+"))";
+			if (view.getRequiredRoles()!=null && view.getRequiredRoles().size()>0){
+				String roles = "";
+				for (String r :view.getRequiredRoles()){
+					if (roles.length()>0)
+						roles += ", ";
+					roles += quote(r);
+				}
+				appendString("if (isUserInRole(req, new String[]{"+roles+"})){");
+				appendIncreasedStatement(statement);
+				appendString("}");
+			}else{
+				appendStatement(statement);
+			}
+		}
+		appendStatement("addBeanToRequest(req, BEAN_VIEW_SELECTOR, menu)");
+		append(closeBlock());
+		emptyline();
+
+		appendString("protected void init(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
+		increaseIdent();
+		appendStatement("super.init(mapping, af, req, res)");
+		appendStatement("prepareViewSelection(req)");
+		append(closeBlock());
+		emptyline();
+
+		appendString("private MenuItemBean makeMenuItemBean(String title, String link){");
+		increaseIdent();
+		appendString("MenuItemBean bean = new MenuItemBean();");
+		appendString("bean.setCaption(title);");
+		appendString("bean.setLink(link);");
+		appendString("bean.setActive(true);");
+		appendString("bean.setStyle(\"menuTitle\");");
+		appendString("return bean;");
+		append(closeBlock());
+		emptyline();
 
 		return clazz;
 	}

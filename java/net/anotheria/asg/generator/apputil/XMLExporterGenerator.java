@@ -73,7 +73,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		appendString("if (expLanguages!=null && expLanguages.length()>0)");
 		appendIncreasedStatement("LANGUAGES = StringUtils.tokenize(expLanguages, ',')");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		appendComment("Create an XML Document (ano-util) with data from all modules.");
@@ -85,21 +85,21 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		}
 		appendStatement("return createExport(nodes)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendComment("Write XML data from all modules into given stream.");
 		appendString("public static void writeCompleteXMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
 		appendStatement("new XMLWriter().write(createCompleteXMLExport(), target)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendComment("Write XML data from all modules into given file.");
 		appendString("public static void writeCompleteXMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 		increaseIdent();
 		appendStatement("writeToFile(createCompleteXMLExport(), target)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		
 		
@@ -112,21 +112,21 @@ public class XMLExporterGenerator extends AbstractGenerator{
 			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
 			appendStatement("return createExport(nodes)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 
 			appendComment("Write "+m.getName()+" as XML into given stream.");
 			appendString("public static void write"+m.getName()+"XMLExportToStream(OutputStream target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
 			appendStatement("new XMLWriter().write(create"+m.getName()+"XMLExport(), target)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 			
 			appendComment("Write "+m.getName()+" as XML into given file.");
 			appendString("public static void write"+m.getName()+"XMLExportToFile(File target) throws IOException, ASGRuntimeException{");
 			increaseIdent();
 			appendStatement("writeToFile(create"+m.getName()+"XMLExport(), target)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 		
 		//private methods
@@ -151,7 +151,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		appendStatement("throw e");
 		append(closeBlock());
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("private static XMLTree createExport(List<XMLNode> nodes){");
 		increaseIdent();
@@ -164,7 +164,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		appendStatement("root.setChildren(nodes)");
 		appendStatement("return tree");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
 		increaseIdent();
@@ -174,7 +174,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		appendString("else");
 		appendIncreasedStatement("automaticMode(a)");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public static void interactiveMode(String a[]) throws IOException,ASGRuntimeException{");
 		increaseIdent();
@@ -200,14 +200,14 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		append(closeBlock());
 		
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		appendString("public static void automaticMode(String a[]) throws IOException,ASGRuntimeException{");
 		increaseIdent();
 		appendStatement("new "+getExporterClassName(context)+"().writeCompleteXMLExportToFile(new File("+quote(context.getApplicationName()+"_export.xml")+"))");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		appendString("public static final XMLTree createExportForInput(String input) throws ASGRuntimeException{");

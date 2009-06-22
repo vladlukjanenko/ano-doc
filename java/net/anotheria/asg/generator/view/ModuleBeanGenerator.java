@@ -188,7 +188,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			}
 		}
 		
-		appendEmptyline();
+		emptyline();
 		for (int i=0; i<elements.size(); i++){
 			MetaProperty p = elements.get(i);
 			generateMethods(null, p);
@@ -199,17 +199,17 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				increaseIdent();
 				appendStatement(propName+" = l");
 				append(closeBlock());
-				appendEmptyline();
+				emptyline();
 				appendString("@SuppressWarnings(\"unchecked\")");
 				appendStatement("public List get"+StringUtils.capitalize(propName)+"(){");
 				increaseIdent();
 				appendStatement("return "+propName);
 				append(closeBlock());
-				append(emptyline());
+				emptyline();
 			}
 			
 		}
-		appendEmptyline();
+		emptyline();
 		
 		
 
@@ -244,26 +244,26 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		appendStatement("private String quickAddIds");
 		appendStatement("private String ownerId");
 		
-		appendEmptyline();
+		emptyline();
 		appendString("public void setQuickAddIds(String someIds){");
 		appendIncreasedStatement("quickAddIds = someIds");
 		appendString("}");
-		appendEmptyline();
+		emptyline();
 		appendString("public String getQuickAddIds(){");
 		appendIncreasedStatement("return quickAddIds");
 		appendString("}");
 		
-		appendEmptyline();
+		emptyline();
 		
-		appendEmptyline();
+		emptyline();
 		appendString("public void setOwnerId(String anId){");
 		appendIncreasedStatement("ownerId = anId");
 		appendString("}");
-		appendEmptyline();
+		emptyline();
 		appendString("public String getOwnerId(){");
 		appendIncreasedStatement("return ownerId");
 		appendString("}");
-		appendEmptyline();
+		emptyline();
 		
 
 		//generate encoding.
@@ -300,7 +300,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		for (MetaProperty pr : columns)
 			appendStatement("private String "+p.extractSubName(pr));
 		
-		appendEmptyline();
+		emptyline();
 		for (int i=0; i<columns.size(); i++){
 			MetaProperty pr = columns.get(i);
 			appendString("public void set"+StringUtils.capitalize(p.extractSubName(pr))+"(String a"+StringUtils.capitalize(p.extractSubName(pr))+" ){");
@@ -311,7 +311,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			increaseIdent();
 			appendStatement("return "+p.extractSubName(pr));
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 		}
 
 		//generate encoding.
@@ -386,7 +386,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			
 		}
 
-		appendEmptyline();
+		emptyline();
 		for (MetaViewElement element : elements){
 			if (element instanceof MetaFieldElement)
 				generateFieldMethodsInDialog((MetaFieldElement)element, doc);
@@ -399,7 +399,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 			
 		
-		appendEmptyline();
+		emptyline();
 		
 		//generate encoding.
 		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
@@ -466,24 +466,24 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 		
 		appendStatement("public static final int SORT_BY_DEFAULT = "+defaultElemName);
-		appendEmptyline();
+		emptyline();
 		appendString("public "+getListItemBeanSortTypeName(section.getDocument())+"(){");
 		increaseIdent();
 		appendString("super(SORT_BY_DEFAULT);");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 		appendString("public "+getListItemBeanSortTypeName(section.getDocument())+"(int method){");
 		increaseIdent();
 		appendString("super(method);");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 				
 		appendString("public "+getListItemBeanSortTypeName(section.getDocument())+"(int method, boolean order){");
 		increaseIdent();
 		appendString("super(method, order);");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public static int name2method(String name){");
 		increaseIdent();
@@ -507,7 +507,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 		appendStatement("throw new RuntimeException("+quote("Unknown sort type name: ")+"+name)");		
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 
 // 		GENERATE method2name
 		appendString("public static String method2name(int method){");
@@ -535,7 +535,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		append(closeBlock());
 		appendStatement("throw new RuntimeException("+quote("Unknown sort type method: ")+"+method)");		
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		//
 		appendString("public String getMethodAndOrderCode(){");
@@ -633,7 +633,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				appendStatement("private String "+function.getPropertyName());
 			}
 		}
-		appendEmptyline();
+		emptyline();
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 			if (element instanceof MetaFieldElement)
@@ -649,7 +649,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			
 			clazz.addInterface("IComparable");
 			
-			appendEmptyline();
+			emptyline();
 			generateCompareMethod(doc, elements);
 		}
 		
@@ -722,13 +722,13 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		increaseIdent();
 		appendStatement("this."+p.getName()+" = "+p.getName());
 		append(closeBlock());			
-		appendEmptyline();
+		emptyline();
 			
 		appendString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
 		increaseIdent();
 		appendStatement("return "+p.getName());
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 	}
 	
 	private void generateMethodsMultilinguage(MultilingualFieldElement element, MetaProperty p){
@@ -740,7 +740,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		increaseIdent();
 		appendStatement("this."+p.getName(element.getLanguage())+" = "+p.getName());
 		append(closeBlock());			
-		appendEmptyline();
+		emptyline();
 			
 		if (p.getType().equals("list"))
 			appendString("@SuppressWarnings(\"unchecked\")");
@@ -748,7 +748,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		increaseIdent();
 		appendStatement("return "+p.getName(element.getLanguage()));
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 	}
 	
@@ -865,7 +865,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			}
 		}
 
-		appendEmptyline();
+		emptyline();
 
 		for (int i=0; i<elements.size(); i++){
 		    MetaFormField element = elements.get(i);
@@ -873,12 +873,12 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		    	MetaFormSingleField field = (MetaFormSingleField )element;
 				if (field.isSpacer())
 					continue;
-				appendEmptyline();
+				emptyline();
 				appendString("public "+field.getJavaType()+" get"+StringUtils.capitalize(element.getName())+"(){");
 				increaseIdent();
 				appendStatement("return "+element.getName());
 				append(closeBlock());
-				appendEmptyline();
+				emptyline();
 				appendString("public void set"+StringUtils.capitalize(element.getName())+"("+field.getJavaType()+" s){");
 				increaseIdent();
 				appendStatement(element.getName()+" = s");
@@ -892,12 +892,12 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 					for (int c = 0; c<columns.size(); c++){
 						MetaFormTableColumn col = columns.get(c);
 						
-						appendEmptyline();
+						emptyline();
 						appendString("public "+col.getField().getJavaType()+" get"+StringUtils.capitalize(table.getVariableName(r, c))+"(){");
 						increaseIdent();
 						appendStatement("return "+table.getVariableName(r, c));
 						append(closeBlock());
-						appendEmptyline();
+						emptyline();
 						appendString("public void set"+StringUtils.capitalize(table.getVariableName(r, c))+"("+col.getField().getJavaType()+" s){");
 						increaseIdent();
 						appendStatement(table.getVariableName(r, c)+" = s");
@@ -907,7 +907,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		    }
 		}
 
-		appendEmptyline();
+		emptyline();
 		
 		//generate encoding.
 		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");

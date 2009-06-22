@@ -61,42 +61,42 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    
 		startClassBody();
 	    appendStatement(getInterfaceName(module)+" service");
-	    append(emptyline());
+	    emptyline();
 	    appendString("public ", getCRUDServiceName(doc), "(){");
 	    increaseIdent();
 	    appendStatement("this("+getFactoryName(module)+".getDefaultInstance())");
 	    append(closeBlock());
 	    
-	    append(emptyline());
+	    emptyline();
 	    appendString("public ", getCRUDServiceName(doc), "("+getInterfaceName(module)+" aService){");
 	    increaseIdent();
 	    appendStatement("service = aService");
 	    append(closeBlock());
 	    
-	    append(emptyline());
+	    emptyline();
 	    appendString("public "+doc.getName()+" create("+doc.getName()+" "+doc.getVariableName()+")  throws ASGRuntimeException {");
 	    increaseIdent();
 		appendStatement("return service.create"+doc.getName()+"(", doc.getVariableName(), ")");
 		append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 
 		appendString("public void delete(", doc.getName(), " ", doc.getVariableName(), ") throws ASGRuntimeException {");
 	    increaseIdent();
 	    appendStatement("service.delete",doc.getName(),"(",doc.getVariableName(),")");
 		append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 
 		appendString("public "+doc.getName()+" get(String id) throws ASGRuntimeException {");
 	    increaseIdent();
 	    appendStatement("return service.get",doc.getName(),"(id)");
 		append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 
 		appendString("public ", doc.getName(), " update(", doc.getName(), " ", doc.getVariableName(), ") throws ASGRuntimeException {");
 	    increaseIdent();
 	    appendStatement("return service.update",doc.getName(),"(",doc.getVariableName(),")");
 		append(closeBlock());
-	    append(emptyline());
+	    emptyline();
 
 	    
 		return clazz;
@@ -136,7 +136,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    startClassBody();
 
 	    appendStatement("private static "+getImplementationName(module)+" instance");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
@@ -147,7 +147,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	}
 	    }
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("static final "+getImplementationName(module)+" getInstance(){");
 	    increaseIdent();
@@ -157,14 +157,14 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    append(closeBlock());
 	    appendStatement("return instance");
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    //generate module handling.
 	    appendString("private "+module.getModuleClassName()+" "+getModuleGetterCall(module)+"{");
 	    increaseIdent();
 	    appendStatement("return ("+module.getModuleClassName()+") getModule("+module.getModuleClassName()+".MODULE_ID)");
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    boolean containsAnyMultilingualDocs = false;
 	    List<MetaDocument> docs = module.getDocuments();
@@ -184,13 +184,13 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("List "+doc.getMultiple().toLowerCase()+" = "+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()");
 	        appendStatement("return "+doc.getMultiple().toLowerCase());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType){");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 			
 			appendComment("Returns the "+doc.getName()+" objects with the specified ids.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids){");
@@ -208,21 +208,21 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        appendStatement("return ret");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 
 	        appendComment("Returns the "+doc.getName()+" objects with the specified ids, sorted by given sorttype.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids, SortType sortType){");
 	        increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(ids), sortType)");
 			append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 
 	        appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	        increaseIdent();
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        appendString("public void delete"+doc.getName()+"(String id){");
 	        increaseIdent();
@@ -230,7 +230,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("module.delete"+doc.getName()+"(id)");
 	        appendStatement("updateModule(module)");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 
 	        //deletemultiple
@@ -256,13 +256,13 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id){");
 	        increaseIdent();
 	        appendStatement("return "+getModuleGetterCall(module)+".get"+doc.getName()+"(id)");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        //import
 	        appendString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
@@ -272,7 +272,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("updateModule(module)");
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        //create
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
@@ -291,7 +291,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 
 	        
 	        
@@ -322,7 +322,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        appendStatement("return ret");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        
 	        appendString("public ",doc.getName()," update",doc.getName(),"(",doc.getName()," ",doc.getVariableName(),"){");
@@ -345,7 +345,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 
 	        //updatemultiple
@@ -377,7 +377,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        appendStatement("return list");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 	        
 	        
@@ -409,7 +409,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        appendString("return ret;");
 	        append(closeBlock());
-	        appendEmptyline();
+	        emptyline();
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType){");
 			increaseIdent();
@@ -429,21 +429,21 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			
 			appendStatement("return result");
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 			
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
 //	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
 //	        increaseIdent();
 //	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 //	        append(closeBlock());
-//	        appendEmptyline();
+//	        emptyline();
 //	        
 //			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 //			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
 //	        increaseIdent();
 //	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 //	        append(closeBlock());
-//			appendEmptyline();
+//			emptyline();
 			
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
 			increaseIdent();
@@ -464,14 +464,14 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			
 			appendStatement("return ret");
 			append(closeBlock());
-	        append(emptyline());
+	        emptyline();
 	        
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
 	        increaseIdent();
 	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
 	        append(closeBlock());
-			append(emptyline());
+			emptyline();
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 				containsAnyMultilingualDocs = true;
@@ -488,7 +488,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 				append(closeBlock());
 				appendStatement("update"+doc.getMultiple()+"(allDocuments)");
 				append(closeBlock());
-				appendEmptyline();
+				emptyline();
 			
 			}
 			
@@ -504,12 +504,12 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 					appendStatement("copyMultilingualAttributesInAll"+doc.getMultiple()+"(sourceLanguage, targetLanguage)");
 			}
 			append(closeBlock());
-			appendEmptyline();
+			emptyline();
 	    }
 
 	    
 	    //generate export function
-	    appendEmptyline();
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendStatement("public XMLNode export"+d.getMultiple()+"ToXML(){");
 	    	increaseIdent();
@@ -521,7 +521,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	appendStatement("return ret");
 	    	
 	    	append(closeBlock());
-	    	appendEmptyline();
+	    	emptyline();
 
 	    	appendStatement("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages){");
 	    	increaseIdent();
@@ -533,18 +533,18 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	appendStatement("return ret");
 	    	
 	    	append(closeBlock());
-	    	appendEmptyline();
+	    	emptyline();
 	    }
 	    
 
 	    appendString("public XMLNode exportToXML(){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
-	    appendEmptyline();
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML())");
 	    }
-	    appendEmptyline();
+	    emptyline();
 	    appendStatement("return ret");
 	    append(closeBlock());
 	    
@@ -552,11 +552,11 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    appendString("public XMLNode exportToXML(String[] languages){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
-	    appendEmptyline();
+	    emptyline();
 	    for (MetaDocument d : docs){
 	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML(languages))");
 	    }
-	    appendEmptyline();
+	    emptyline();
 	    appendStatement("return ret");
 	    append(closeBlock());
 	    return clazz;

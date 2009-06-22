@@ -53,7 +53,7 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 		startClassBody();
 
 		appendStatement("private static volatile boolean configured");
-		appendEmptyline();
+		emptyline();
 		appendString("public static void configure(){");
 		increaseIdent();
 		appendString("if (configured)");
@@ -110,7 +110,7 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 		
 		appendComment("Returns the selected encoding. Using method instead of constant to prevent compilation dependencies");
 		appendString("public static final String getEncoding(){ return "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+"; }");
-		appendEmptyline();
+		emptyline();
 
 		appendString("private static void addCommonStorage(String moduleId, IModuleService service, IModuleFactory factory, String storageDirConfigKey){");
 		increaseIdent();
@@ -120,11 +120,11 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 		appendString("else");
 		appendIncreasedString("service.attachModuleStorage(moduleId, new CommonHashtableModuleStorage(moduleId+\".dat\", factory, storageDirConfigKey));");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		
 		appendStatement("private static volatile boolean configured");
-		appendEmptyline();
+		emptyline();
 		appendString("public static void configure(){");
 		increaseIdent();
 		appendString("if (configured)");

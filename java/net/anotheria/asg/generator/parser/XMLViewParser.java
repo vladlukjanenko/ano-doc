@@ -27,7 +27,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
- * TODO please remined another to comment this class
+ * XML Parser for MetaViews.
  * @author another
  */
 public class XMLViewParser {
@@ -49,9 +49,11 @@ public class XMLViewParser {
 			Document doc = reader.build(new StringReader(content));
 			Element root = doc.getRootElement();
 			List<Element> views = root.getChildren("view");
-			for (Element elem :views)
-				ret.add(parseView(elem));
-			
+			for (Element elem :views){
+				MetaView view = parseView(elem);
+				System.out.println("parsed view: "+view);
+				ret.add(view);
+			}
 		}catch(JDOMException e){
 			e.printStackTrace();
 			throw new RuntimeException("Can't parse view because: "+e.getMessage());

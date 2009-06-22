@@ -7,8 +7,8 @@ import net.anotheria.asg.generator.util.FileWriter;
 
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ *  
+ * @author lrosenberg
  */
 public class AbstractAnoDocGenerator {
 	protected void runGenerator(IGenerator generator, IGenerateable target, Context context, List<FileEntry> results){

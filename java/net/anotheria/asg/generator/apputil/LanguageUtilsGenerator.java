@@ -51,7 +51,7 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.Arrays");
 		clazz.addImport("org.apache.log4j.BasicConfigurator");
-		appendEmptyline();
+		emptyline();
 		for (MetaModule m : modulesSet){
 			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
 			//appendImport(ServiceGenerator.getInterfaceImport(context, m));
@@ -68,18 +68,18 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 			appendString(quote(l)+","); 
 		decreaseIdent();
 		appendString("});");
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public static List<String> getSupportedLanguages(){");
 		increaseIdent();
 		appendStatement("return supportedLanguages");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public static void copyAttributesFromLanguage2Language(String sourceLang, String targetLanguage){");
 		increaseIdent();
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		appendString("public static void main(String[] a) throws Exception{");
 		increaseIdent();
@@ -91,12 +91,12 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		appendStatement("checkParameter(sourceLang)");
 		appendStatement("targetLang = a[1].toUpperCase()");
 		appendStatement("checkParameter(targetLang)");
-		appendEmptyline();
+		emptyline();
 		appendStatement("copy(sourceLang, targetLang)");
 		
 		
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 
 		
@@ -105,7 +105,7 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		appendString("if (supportedLanguages.indexOf(lang)==-1)");
 		appendIncreasedStatement("throw new RuntimeException("+quote("Language ")+"+lang+"+quote("not supported")+")");
 		append(closeBlock());
-		appendEmptyline();
+		emptyline();
 		
 		//TODO replace with Ano-Doc exception
 		appendString("private static void copy(String sourceLanguage, String targetLanguage) throws Exception {");
@@ -115,7 +115,7 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 			appendStatement("System.out.println(\"Working on "+ServiceGenerator.getServiceName(m)+"\")");
 			appendStatement(ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().copyMultilingualAttributesInAllObjects(sourceLanguage, targetLanguage)");
 		}
-		appendEmptyline();
+		emptyline();
 		append(closeBlock());
 
 		return new FileEntry(clazz);

@@ -23,7 +23,7 @@ import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
 /**
- * Generates a DB-Backed implementation of a module interface and the according factory.
+ * Generates a RMI-Backed distribution of a module interface and the according factory.
  * @author another
  *
  */
@@ -103,7 +103,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRemoteExceptionName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRemoteExceptionName(module), this));
 		clazz.setPackageName(getPackageName(module));
 		clazz.addImport("java.rmi.RemoteException");
 		clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
@@ -124,7 +124,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module), this));
 		clazz.setPackageName(getPackageName(module));
 		clazz.setType(TypeOfClass.INTERFACE);
 		
@@ -335,7 +335,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	private GeneratedClass generateLookup(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getLookupName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getLookupName(module), this));
 		clazz.setPackageName(getPackageName(module));
 
 		clazz.addImport("org.apache.log4j.Logger");
@@ -349,7 +349,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		startClassBody();
 		
 	    appendStatement("private static Logger log = Logger.getLogger(", quote(getLookupName(module)), ")");
-	    appendEmptyline();
+	    emptyline();
 	    appendStatement("private static Registry rmiRegistry");
 	    appendString("static{");
 	    increaseIdent();
@@ -361,7 +361,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendIncreasedStatement("log.fatal(\"Coulnd't obtain rmi registry\", e)");
 	    appendString("}");
         append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
         
 	    appendString("public static final String getServiceId(){");
 	    appendIncreasedStatement("return ", quote(StringUtils.replace(ServiceGenerator.getInterfaceImport(context, module), '.', '_')));
@@ -379,7 +379,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getServerName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getServerName(module), this));
 		clazz.setPackageName(getPackageName(module));
 		
 	    clazz.addImport("org.apache.log4j.xml.DOMConfigurator");
@@ -413,7 +413,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendIncreasedStatement("System.exit(-1)");
 	    appendString("}");
 	    
-	    appendEmptyline();
+	    emptyline();
 	    appendString("try{");
 	    appendIncreasedStatement("startService(rmiRegistry)");
 	    appendString("}catch(Exception e){");
@@ -464,7 +464,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getStubName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getStubName(module), this));
 		clazz.setPackageName(getPackageName(module));
 
 		clazz.addImport("java.util.List");
@@ -492,11 +492,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    startClassBody();
 	    
 	    appendStatement("private ", getInterfaceName(module), " delegate");
-	    appendEmptyline();
+	    emptyline();
 	    appendString("protected void notifyDelegateFailed(){");
 	    appendIncreasedStatement("delegate = null");
 	    appendString("}");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("protected "+getInterfaceName(module)+" getDelegate() throws "+ServiceGenerator.getExceptionName(module)+"{");
         increaseIdent();
@@ -519,7 +519,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         append(closeBlock());
 	    appendStatement("return delegate");
         append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
@@ -726,12 +726,12 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("public void addServiceListener(IServiceListener listener){");
 	    appendIncreasedStatement("throw new RuntimeException(", quote("Method not supported"), ")");
 	    appendString("}");
-	    appendEmptyline();
+	    emptyline();
 
 	    appendString("public void removeServiceListener(IServiceListener listener){");
 	    appendIncreasedStatement("throw new RuntimeException(", quote("Method not supported"), ")");
 	    appendString("}");
-	    appendEmptyline();
+	    emptyline();
 
 	    appendString("public boolean hasServiceListeners(){");
 	    appendIncreasedStatement("throw new RuntimeException(", quote("Method not supported"), ")");
@@ -744,7 +744,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getSkeletonName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getSkeletonName(module), this));
 		clazz.setPackageName(getPackageName(module));
 		
 	    clazz.addImport("java.util.List");
@@ -772,12 +772,12 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    startClassBody();
 	    
 	    appendStatement("private ", ServiceGenerator.getInterfaceName(module), " service");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString(getSkeletonName(module)+"("+ServiceGenerator.getInterfaceName(module)+" aService){");
 	    appendIncreasedStatement("service = aService");
 	    appendString("}");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    List<MetaDocument> docs = module.getDocuments();
 
@@ -1005,16 +1005,16 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendIncreasedStatement("throw new RemoteExceptionWrapper(e)");
         appendString("}");
         append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	}
 	
 	private void writeInterfaceFun(String comment, String returnType, String funName, String parametersFull){
         appendComment(comment);
         appendStatement("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+", RemoteException");
-	    appendEmptyline();
+	    emptyline();
         appendComment(comment);
         appendStatement("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "(CallContext callContext"+(parametersFull.length()>0 ? ", ": "")+ parametersFull+") throws "+getExceptionName(module)+", RemoteException");
-	    appendEmptyline();
+	    emptyline();
 	}
 	
 	private void writeSkeletonFun(String comment, String returnType, String funName, String parametersFull, String parametersStripped, String parametersForLogging){
@@ -1037,7 +1037,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
     	appendString("}");
         append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 
 	    //version with callcontext
         appendComment(comment);
@@ -1060,7 +1060,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
     	appendString("}");
         append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 
 	}
 

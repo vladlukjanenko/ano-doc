@@ -53,9 +53,9 @@ public class ModuleFactoryGenerator extends AbstractGenerator implements IGenera
 
 		startClassBody();
 		generateModuleCreator(module);
-		appendEmptyline();
+		emptyline();
 		generateSecondLevelDocumentCreator(module);
-		appendEmptyline();
+		emptyline();
 		
 		return new FileEntry(clazz);
 	}

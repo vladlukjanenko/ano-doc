@@ -64,7 +64,7 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 		appendString("public int compareTo("+doc.getName()+" comparable){");
 		appendIncreasedStatement("return compareTo(comparable, "+getSortTypeName(doc)+".SORT_BY_DEFAULT)");
 		appendString("}");
-		append(emptyline());
+		appendEmptyline();
 
 		appendString("public int compareTo(IComparable anotherComparable, int method){");
 		increaseIdent();

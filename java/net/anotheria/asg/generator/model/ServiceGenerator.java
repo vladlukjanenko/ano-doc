@@ -150,12 +150,12 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    appendString("public "+getExceptionName(module)+" (String message){" );
 	    appendIncreasedStatement("super(message)");
 	    appendString("}");
-	    append(emptyline());
+	    emptyline();
 	    
 	    appendString("public "+getExceptionName(module)+" (Throwable cause){" );
 	    appendIncreasedStatement("super(cause)");
 	    appendString("}");
-	    append(emptyline());
+	    emptyline();
 	    
 	    appendString("public "+getExceptionName(module)+" (String message, Throwable cause){" );
 	    appendIncreasedStatement("super(message, cause)");
@@ -201,89 +201,91 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	        String listDecl = "List<"+doc.getName()+">";
 	        appendComment("Returns all "+doc.getMultiple()+" objects stored.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 			appendComment("Returns all "+doc.getMultiple()+" objects sorted by given sortType.");
 			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause);
-			appendEmptyline();
+			emptyline();
 
 			//get multiple by id
 //			appendComment("Returns the "+doc.getName()+" objects with the specified ids.");
 //	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids)"+throwsClause);
-//	        appendEmptyline();
+//	        emptyline();
 
 //	        appendComment("Returns the "+doc.getName()+" objects with the specified ids, sorted by given sorttype.");
 //	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids, SortType sortType)"+throwsClause);
-//	        appendEmptyline();
+//	        emptyline();
 
 	        appendComment("Deletes a "+doc.getName()+" object by id.");
 	        appendStatement("public void delete"+doc.getName()+"(String id)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Deletes a "+doc.getName()+" object.");
 	        appendStatement("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Deletes multiple "+doc.getName()+" object.");
 	        appendStatement("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
 	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 
 
 	        appendComment("Imports a new "+doc.getName()+" object.\nReturns the created version.");
 	        appendStatement("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 
 	        appendComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
 	        appendStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        
 	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
 	        appendStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 
 	        appendComment("Updates a "+doc.getName()+" object.\nReturns the updated version.");
 	        appendStatement("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 
 	        appendComment("Updates mutiple "+doc.getName()+" objects.\nReturns the updated versions.");
 	        appendStatement("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 	        
 	        
 	        //special functions
 	        appendComment("Returns all "+doc.getName()+" objects, where property with given name equals object.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 			appendComment("Returns all "+doc.getName()+" objects, where property with given name equals object, sorted");
 			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause);
-			appendEmptyline();
+			emptyline();
 			appendComment("Executes a query");
 			appendStatement("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause);
-			appendEmptyline();
+			emptyline();
 	        appendComment("Returns all "+doc.getName()+" objects, where property matches.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause);
-	        appendEmptyline();
+	        emptyline();
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause);
-			appendEmptyline();
+			emptyline();
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 				appendComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage");
 				appendStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)"+throwsClause);
-				appendEmptyline();
+				emptyline();
 				containsAnyMultilingualDocs = true;
 			}
+			
+			//this method checks whether a document with the given document set exists or no.
 	    }
 	    
 	    if (containsAnyMultilingualDocs){
 			appendComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
 			appendStatement("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage)"+throwsClause);
-			appendEmptyline();
+			emptyline();
 	    }
 	    
 		appendComment("creates an xml element with all contained data.");
 		appendStatement("public XMLNode exportToXML()"+throwsClause);
-		appendEmptyline();
+		emptyline();
 	    
 		appendComment("creates an xml element with all contained data but only selected languages in multilingual attributes");
 		appendStatement("public XMLNode exportToXML(String[] languages)"+throwsClause);
