@@ -30,16 +30,10 @@ import org.jdom.input.SAXBuilder;
  * XML Parser for MetaViews.
  * @author another
  */
-public class XMLViewParser {
-	
-	String content;
-	
-	public XMLViewParser(String content){
-		this.content = content;
-	}
+public final class XMLViewParser {
 	
 	@SuppressWarnings("unchecked")
-	public List<MetaView> parseViews(){
+	public static final List<MetaView> parseViews(String content){
 		
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
@@ -62,7 +56,7 @@ public class XMLViewParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private MetaView parseView(Element m){
+	private static final MetaView parseView(Element m){
 		
 		String name = m.getAttributeValue("name");
 		MetaView view = new MetaView(name);
@@ -82,7 +76,7 @@ public class XMLViewParser {
 		return view;
 	}
 	
-	private MetaSection parseSection(Element section){
+	private static final MetaSection parseSection(Element section){
 		String type = section.getAttributeValue("type");
 		if (type.equals("module"))
 			return parseModuleSection(section);
@@ -91,7 +85,7 @@ public class XMLViewParser {
 		throw new RuntimeException("Unknown section type: "+type);
 	}
 	
-	private MetaCustomSection parseCustomSection(Element section){
+	private static final MetaCustomSection parseCustomSection(Element section){
 		String title = section.getAttributeValue("title");
 		String path = section.getChildText("path");
 		MetaCustomSection ret = new MetaCustomSection(title);
@@ -100,7 +94,7 @@ public class XMLViewParser {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private MetaModuleSection parseModuleSection(Element section){
+	private static final MetaModuleSection parseModuleSection(Element section){
 		String title = section.getAttributeValue("title");
 		//System.out.println("Parse section:; "+title);
 		MetaModuleSection s = new MetaModuleSection(title);
@@ -141,7 +135,7 @@ public class XMLViewParser {
 		return s;
 	}
 	
-	private MetaViewElement parseViewElement(MetaModuleSection section, Element elem){
+	private static final MetaViewElement parseViewElement(MetaModuleSection section, Element elem){
 		String type = elem.getAttributeValue("type");
 		
 		MetaViewElement element = null;
@@ -187,14 +181,14 @@ public class XMLViewParser {
 		
 	}
 	
-	private MetaDecorator parseDecorator(Element e){
+	private static final MetaDecorator parseDecorator(Element e){
 		String name = e.getAttributeValue("name");
 		String rule = e.getChildText("rule");
 		MetaDecorator dec = GeneratorDataRegistry.getInstance().createDecorator(name, rule);
 		return dec;
 	}
 	
-	private MetaFieldElement parseFieldElement(Element elem){
+	private static final MetaFieldElement parseFieldElement(Element elem){
 		String name = elem.getAttributeValue("name");
 		String readonly = elem.getAttributeValue("readonly");
 		String rich = elem.getAttributeValue("rich");
@@ -206,11 +200,11 @@ public class XMLViewParser {
 		return field;
 	}
 	
-	private MetaEmptyElement parseEmptyElement(Element elem){
+	private static final MetaEmptyElement parseEmptyElement(Element elem){
 		return new MetaEmptyElement();
 	}
 
-	private MetaFunctionElement parseFunctionElement(Element elem){
+	private static final MetaFunctionElement parseFunctionElement(Element elem){
 		String name = elem.getAttributeValue("name");
 		MetaFunctionElement  ret = new MetaFunctionElement(name);
 		if (elem.getAttribute("caption")!=null)
@@ -218,7 +212,7 @@ public class XMLViewParser {
 		return ret;
 	}
 	
-	private MetaCustomFunctionElement parseCustomFunctionElement(Element elem){
+	private static final MetaCustomFunctionElement parseCustomFunctionElement(Element elem){
 		String name = elem.getAttributeValue("name");
 		MetaCustomFunctionElement  ret = new MetaCustomFunctionElement(name);
 		ret.setCaption(elem.getChildText("caption"));
@@ -227,7 +221,7 @@ public class XMLViewParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private MetaListElement parseListElement(Element e){
+	private static final MetaListElement parseListElement(Element e){
 		MetaListElement ret = new MetaListElement();
 		List<Element> elements = e.getChildren("element");
 		for (int i=0; i<elements.size(); i++)
@@ -235,5 +229,8 @@ public class XMLViewParser {
 		return ret; 	
 	}
 	
-
+	private XMLViewParser(){
+		
+	}
+	
 }
