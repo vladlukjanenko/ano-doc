@@ -8,6 +8,11 @@ import java.util.List;
 import net.anotheria.util.IOUtils;
 import net.anotheria.util.StringUtils;
 
+/**
+ * This class preprocess an xml file. Its mainly used to put together a splitted xml file.
+ * @author another
+ *
+ */
 public class XMLPreprocessor {
 	
 	public static final String INCLUDE_COMMAND = "@include:";
@@ -17,6 +22,12 @@ public class XMLPreprocessor {
 		System.out.println("file: "+file);
 	}
 	
+	/**
+	 * Loads a file from the disk. Include marks are replaced with the content of the included files.
+	 * @param f
+	 * @return
+	 * @throws IOException
+	 */
 	public static String loadFile(File f) throws IOException{
 		if (!f.exists())
 			throw new IOException("File doesn't exists: "+f.getAbsolutePath());
