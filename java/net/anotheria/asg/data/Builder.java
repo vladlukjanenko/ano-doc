@@ -1,5 +1,15 @@
 package net.anotheria.asg.data;
 
+/**
+ * Generic interface for DataObject Builders.
+ * @author lrosenberg
+ *
+ * @param <T> the type to build.
+ */
 public interface Builder <T extends DataObject>{
-	public T build();
+	/**
+	 * Builds a new instance of T.
+	 * @return
+	 */
+	T build();
 }
