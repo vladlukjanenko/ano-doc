@@ -11,20 +11,16 @@ import org.jdom.input.SAXBuilder;
 import net.anotheria.asg.generator.Context;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Parser for the context-xml.
+ * @author lrosenberg
  */
 public class XMLContextParser {
 
-	private String content;
-	
-	public XMLContextParser(String content){
-		this.content = content;
-	}
-
-
-	@SuppressWarnings("unchecked")
-	public Context parseContext(){
+	/**
+	 * Returns a parsed generation context.
+	 * @return
+	 */
+	public static final Context parseContext(String content){
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
 		Context ret = new Context();
@@ -48,7 +44,7 @@ public class XMLContextParser {
 			try{
 				Element parameters = context.getChild("parameters");
 				if (parameters!=null){
-					List<Element> params = parameters.getChildren("parameter");
+					@SuppressWarnings("unchecked")List<Element> params = parameters.getChildren("parameter");
 					for (Element e : params){
 						ret.addContextParameter(e.getAttributeValue("name"), e.getAttributeValue("value"));
 					}
@@ -68,7 +64,7 @@ public class XMLContextParser {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Context parseLanguages(Context src, Element languages){
+	private static final Context parseLanguages(Context src, Element languages){
 		src.enableMultiLanguageSupport();
 		Element supportedLanguages = languages.getChild("supported");
 		List<Element> supLangs = supportedLanguages.getChildren("language");
@@ -82,4 +78,7 @@ public class XMLContextParser {
 		return src;
 	}
 
+	private XMLContextParser(){
+		
+	}
 }

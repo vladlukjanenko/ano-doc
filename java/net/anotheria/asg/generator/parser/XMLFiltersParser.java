@@ -12,18 +12,17 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
- * TODO please remined another to comment this class
+ * Parser for the filters definition.
  * @author another
  */
-public class XMLFiltersParser {
-	private String content;
+public final class XMLFiltersParser {
 
-	public XMLFiltersParser(String content){
-		this.content = content;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<MetaFilter> parseFilters(){
+	/**
+	 * Parses the filter definition.
+	 * @param content
+	 * @return
+	 */
+	public static final List<MetaFilter> parseFilters(String content){
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
 		List<MetaFilter> ret = new ArrayList<MetaFilter>();
@@ -32,7 +31,7 @@ public class XMLFiltersParser {
 			Document doc = reader.build(new StringReader(content));
 	
 			Element root = doc.getRootElement();
-			List<Element> filters = root.getChildren("filter");
+			@SuppressWarnings("unchecked")List<Element> filters = root.getChildren("filter");
 			for (int i=0; i<filters.size(); i++){
 				Element d = filters.get(i);
 				ret.add(parseFilter(d));
@@ -45,10 +44,11 @@ public class XMLFiltersParser {
 		return ret;
 	}
 	
-	private MetaFilter parseFilter(Element e){
+	private static final MetaFilter parseFilter(final Element e){
 		String name = e.getAttributeValue("name");
 		String className = e.getAttributeValue("class");
 		return new MetaFilter(name, className);
 	}
 
+	private XMLFiltersParser(){}
 }

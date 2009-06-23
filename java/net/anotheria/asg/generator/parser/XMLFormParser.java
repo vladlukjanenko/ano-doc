@@ -4,7 +4,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import net.anotheria.asg.generator.forms.meta.MetaForm;
 import net.anotheria.asg.generator.forms.meta.MetaFormField;
 import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
@@ -18,18 +17,12 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
- * TODO please remined another to comment this class
+ * Parser for the forms.
  * @author another
  */
-public class XMLFormParser {
-	private String content;
-	
-	public XMLFormParser(String content){
-		this.content = content;
-	}
-
+public final class XMLFormParser {
 	@SuppressWarnings("unchecked")
-	public List<MetaForm> parseForms(){
+	public static final List<MetaForm> parseForms(String content){
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
 		List ret = new ArrayList();
@@ -51,7 +44,7 @@ public class XMLFormParser {
 		return ret;
 	}
 	
-	private MetaForm parseForm(Element formElement){
+	private static MetaForm parseForm(Element formElement){
 	    String id = formElement.getAttributeValue("id");
 	    MetaForm form = new MetaForm(id); 
 		Element fields = formElement.getChild("fields");
@@ -64,7 +57,7 @@ public class XMLFormParser {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<String> parseTargets(Element formElement){
+	private static List<String> parseTargets(Element formElement){
 	    List<Element> targets = formElement.getChildren("target");
 	    List<String> ret = new ArrayList<String>(targets.size());
 	    for (int i=0; i<targets.size(); i++){
@@ -74,7 +67,7 @@ public class XMLFormParser {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private List<MetaFormField> parseFields(Element fields){
+	private static List<MetaFormField> parseFields(Element fields){
 		List<Element> fieldElements = fields.getChildren("field");
 		List<MetaFormField> ret = new ArrayList<MetaFormField>(fieldElements.size());
 		for (int i=0; i<fieldElements.size(); i++){
@@ -86,13 +79,13 @@ public class XMLFormParser {
 		return ret;
 	}
 	
-	private MetaFormField parseField(Element field, int position){
+	private static MetaFormField parseField(Element field, int position){
 		String type  = field.getAttributeValue("type");
 		if (type.equals("table"))
 			return parseTableField(field, position);
 		return parseSingleField(field, position);
 	}
-	private MetaFormTableField parseTableField(Element field, int position){
+	private static MetaFormTableField parseTableField(Element field, int position){
 		Element table = field.getChild("table");
 		String name = table.getAttributeValue("name");
 		if (name==null || name.length()==0)
@@ -112,7 +105,7 @@ public class XMLFormParser {
 		return ret;
 	}
 	
-	private MetaFormTableColumn parseColumn(Element e){
+	private static MetaFormTableColumn parseColumn(Element e){
 		MetaFormTableColumn column = new MetaFormTableColumn();
 		String type  = e.getAttributeValue("type");
 		int size = 80;
@@ -138,7 +131,7 @@ public class XMLFormParser {
 		
 	} 
 	
-	private MetaFormSingleField parseSingleField(Element field, int position){
+	private static MetaFormSingleField parseSingleField(Element field, int position){
 		String title = field.getChildText("title");
 		String type  = field.getAttributeValue("type");
 		String name = field.getAttributeValue("name");
@@ -158,6 +151,7 @@ public class XMLFormParser {
 		return element;
 	}
 	
+	private XMLFormParser(){}
 	
 	
 }

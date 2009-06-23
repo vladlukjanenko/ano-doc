@@ -57,11 +57,10 @@ public class Generator {
 			ignored.printStackTrace();
 		}
 		//*/
-		XMLContextParser contextParser = new XMLContextParser(contextContent);
-		Context c = contextParser.parseContext();
+		Context c = XMLContextParser.parseContext(contextContent);
 		GeneratorDataRegistry.getInstance().setContext(c);
 		
-		System.out.println("Context parameters: "+c.getContextParameters());
+		//System.out.println("Context parameters: "+c.getContextParameters());
 		long s3 = System.currentTimeMillis();
 		
 		/*System.out.println("Context ist multilanguage enabled: "+c.areLanguagesSupported());
@@ -71,8 +70,7 @@ public class Generator {
 		
 		try{
 			String typesContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/datatypes.xml"));
-			XMLTypesParser typesParser = new XMLTypesParser(typesContent);
-			List<DataType> types = typesParser.parseTypes();
+			List<DataType> types = XMLTypesParser.parseTypes(typesContent);
 			TypesGenerator tg = new TypesGenerator();
 			tg.generate("java", types);
 			GeneratorDataRegistry.getInstance().addTypes(types);
@@ -91,8 +89,7 @@ public class Generator {
 		long s5 = System.currentTimeMillis();
 		try{
 			String filtersContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/filters-def.xml"));
-			XMLFiltersParser dParser = new XMLFiltersParser(filtersContent);
-			List<MetaFilter> filters = dParser.parseFilters();
+			List<MetaFilter> filters = XMLFiltersParser.parseFilters(filtersContent);
 			//System.out.println("parsed filters: "+filters);
 			GeneratorDataRegistry.getInstance().addFilters(filters);
 			//System.out.println(decorators); 
@@ -130,8 +127,7 @@ public class Generator {
 		
 		try{
 			String formContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/forms_def.xml"));
-			XMLFormParser formParser = new XMLFormParser(formContent);
-			List<MetaForm> forms = formParser.parseForms();
+			List<MetaForm> forms = XMLFormParser.parseForms(formContent);
 			FormsGenerator fg = new FormsGenerator();
 			fg.generate("java", forms);
 			//System.out.println(forms); 

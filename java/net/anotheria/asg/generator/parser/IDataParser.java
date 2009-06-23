@@ -9,5 +9,5 @@ import net.anotheria.asg.generator.meta.MetaModule;
  * @author another
  */
 public interface IDataParser {
-	public List<MetaModule> parseModules();
+	List<MetaModule> parseModules();
 }

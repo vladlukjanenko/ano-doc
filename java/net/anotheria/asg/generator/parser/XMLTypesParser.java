@@ -16,17 +16,9 @@ import org.jdom.input.SAXBuilder;
  * TODO please remined another to comment this class
  * @author another
  */
-public class XMLTypesParser {
-
-	private String content;
-
-	public XMLTypesParser(String content){
-		this.content = content;
-	}
-
-
+public final class XMLTypesParser {
 	@SuppressWarnings("unchecked")
-	public List<DataType> parseTypes(){
+	public static final List<DataType> parseTypes(String content){
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
 		List<DataType> ret = new ArrayList<DataType>();
@@ -47,7 +39,7 @@ public class XMLTypesParser {
 		return ret;
 	}
 	
-	private DataType parseType(Element elem){
+	private static final DataType parseType(Element elem){
 		String name = elem.getName();
 		if ("enumeration".equals(name))
 			return parseEnumeration(elem);
@@ -55,7 +47,7 @@ public class XMLTypesParser {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private EnumerationType parseEnumeration(Element elem){
+	private static final EnumerationType parseEnumeration(Element elem){
 		String name = elem.getAttributeValue("name");
 		EnumerationType type = new EnumerationType(name);
 		List<Element> children = elem.getChildren("element");
@@ -66,4 +58,5 @@ public class XMLTypesParser {
 		return type;
 	}
 
+	private XMLTypesParser(){}
 }
