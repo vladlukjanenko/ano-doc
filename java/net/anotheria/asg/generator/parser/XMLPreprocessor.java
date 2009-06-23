@@ -15,6 +15,9 @@ import net.anotheria.util.StringUtils;
  */
 public class XMLPreprocessor {
 	
+	/**
+	 * Include commands 'tag'.
+	 */
 	public static final String INCLUDE_COMMAND = "@include:";
 	
 	public static void main(String a[]) throws IOException{

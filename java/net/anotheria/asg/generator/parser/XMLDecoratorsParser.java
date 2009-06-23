@@ -12,18 +12,12 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Parser for the decorator definition file.
+ * @author lrosenberg
  */
-public class XMLDecoratorsParser {
-	private String content;
-
-	public XMLDecoratorsParser(String content){
-		this.content = content;
-	}
-
+public final class XMLDecoratorsParser {
 	@SuppressWarnings("unchecked")
-	public List<MetaDecorator> parseDecorators(){
+	public static final List<MetaDecorator> parseDecorators(String content){
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
 		List<MetaDecorator> ret = new ArrayList<MetaDecorator>();
@@ -45,7 +39,12 @@ public class XMLDecoratorsParser {
 		return ret;
 	}
 	
-	private MetaDecorator parseDecorator(Element e){
+	/**
+	 * Parses a single decorator element.
+	 * @param e
+	 * @return
+	 */
+	private static final MetaDecorator parseDecorator(Element e){
 		String name = e.getAttributeValue("name");
 		String className = e.getAttributeValue("class");
 		return new MetaDecorator(name, className);

@@ -80,8 +80,7 @@ public class Generator {
 		long s4 = System.currentTimeMillis();
 		try{
 			String decoratorsContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/decorators-def.xml"));
-			XMLDecoratorsParser dParser = new XMLDecoratorsParser(decoratorsContent);
-			List<MetaDecorator> decorators = dParser.parseDecorators();
+			List<MetaDecorator> decorators = XMLDecoratorsParser.parseDecorators(decoratorsContent);
 			GeneratorDataRegistry.getInstance().addDecorators(decorators);
 			//System.out.println(decorators); 
 		}catch(Exception e){}
