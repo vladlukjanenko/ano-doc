@@ -118,6 +118,11 @@ public final class XMLDataParser {
 		
 	}
 	
+	/**
+	 * Parses a document from a document tag.
+	 * @param d
+	 * @return
+	 */
 	private static final MetaDocument parseDocument(Element d){
 		MetaDocument doc = new MetaDocument(d.getAttributeValue("name"));
 		@SuppressWarnings("unchecked")List<Element> properties = d.getChildren("property");
@@ -136,6 +141,11 @@ public final class XMLDataParser {
 		return doc; 		
 	}
 	
+	/**
+	 * Parses an attribute of a document. That may be a link or a property.
+	 * @param e
+	 * @return
+	 */
 	private static final MetaProperty parseAttribute(Element e){
 		if (e.getName().equals("property"))
 			return parseProperty(e);
@@ -144,6 +154,11 @@ public final class XMLDataParser {
 		throw new RuntimeException("Unknown attribute type:"+e.getName());
 	}
 		
+	/**
+	 * Parses a property. May call subsequent methods depending on property type.
+	 * @param p
+	 * @return
+	 */
 	private static final MetaProperty parseProperty(Element p){
 		String name = p.getAttributeValue("name");
 		String type = p.getAttributeValue("type");
@@ -155,13 +170,18 @@ public final class XMLDataParser {
 		if (type.equals("enumeration"))
 			return parseEnumeration(p);
 
-		MetaProperty ret = new MetaProperty(name, type);; 
+		MetaProperty ret = new MetaProperty(name, type); 
 		String multilingual = p.getAttributeValue("multilingual");
 		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
 			ret.setMultilingual(true);
 		return ret;
 	}
 	
+	/**
+	 * Parser for enumeration properties.
+	 * @param p
+	 * @return
+	 */
 	private static final MetaEnumerationProperty parseEnumeration(Element p){
 		String name = p.getAttributeValue("name");
 		String enumeration = p.getAttributeValue("enumeration");
@@ -170,6 +190,11 @@ public final class XMLDataParser {
 		return ret;
 	}
 	
+	/**
+	 * Parses table properties.
+	 * @param p
+	 * @return
+	 */
 	private static final MetaProperty parseTable(Element p){
 		String name = p.getAttributeValue("name");
 		MetaTableProperty ret = new MetaTableProperty(name);
@@ -184,6 +209,11 @@ public final class XMLDataParser {
 		
 	}
 	
+	/**
+	 * Parses list properties.
+	 * @param p
+	 * @return
+	 */
 	private static final MetaProperty parseList(Element p){
 		String name = p.getAttributeValue("name");
 		MetaListProperty ret = new MetaListProperty(name);
@@ -199,6 +229,11 @@ public final class XMLDataParser {
 		return ret;
 	}
 
+	/**
+	 * Parses a link.
+	 * @param p
+	 * @return
+	 */
 	private static final MetaLink parseLink(Element p){
 		String name = p.getAttributeValue("name");
 		String linkType = p.getAttributeValue("type");
