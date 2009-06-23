@@ -24,19 +24,13 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 /**
- * TODO please remined another to comment this class
+ * XMLParser for the data definition files.
  * @author another
  */
-public class XMLDataParser implements IDataParser {
-	
-	private String content;
-	
-	public XMLDataParser(String content){
-		this.content = content;
-	}
+public final class XMLDataParser {
 	
 	@SuppressWarnings("unchecked")
-	public List<MetaModule> parseModules(){
+	public static final List<MetaModule> parseModules(String content){
 		
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
@@ -56,8 +50,7 @@ public class XMLDataParser implements IDataParser {
 		return ret;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private MetaModule parseModule(Element m){
+	private static final MetaModule parseModule(Element m){
 		//System.out.println("Parsing "+m.getName());
 		String name = m.getAttributeValue("name");
 		MetaModule mod = new MetaModule();
@@ -80,23 +73,23 @@ public class XMLDataParser implements IDataParser {
 		}catch(Exception ignored){
 			ignored.printStackTrace();
 		}
-		List childs = m.getChildren("document");
+		@SuppressWarnings("unchecked")List<Element> childs = m.getChildren("document");
 		for (int i=0; i<childs.size(); i++)
-			mod.addDocument(parseDocument((Element)childs.get(i)));
+			mod.addDocument(parseDocument(childs.get(i)));
 		
-		List listeners = m.getChildren("listener");
+		@SuppressWarnings("unchecked")List<Element> listeners = m.getChildren("listener");
 		for (int i=0; i<listeners.size(); i++){
-			String listenerClass = ((Element)listeners.get(i)).getAttributeValue("class");
+			String listenerClass = listeners.get(i).getAttributeValue("class");
 			mod.addListener(listenerClass);
 		}
 		
 		if (mod instanceof MetaFederationModule){
-			List<Element> federated = m.getChildren("federatedmodule");
+			@SuppressWarnings("unchecked")List<Element> federated = m.getChildren("federatedmodule");
 			for (Element e: federated){
 				((MetaFederationModule)mod).addFederatedModule(e.getAttributeValue("key"), e.getAttributeValue("name"));
 			}
 			
-			List<Element> mappings = m.getChildren("mapping");
+			@SuppressWarnings("unchecked")List<Element> mappings = m.getChildren("mapping");
 			for (Element e : mappings){
 				String sourceDocumentName = e.getAttributeValue("sourceDocument");
 				String targetDocument = e.getAttributeValue("targetDocument");
@@ -110,7 +103,7 @@ public class XMLDataParser implements IDataParser {
 		}
 		
 		//parse parameters
-		List<Element> parameters = m.getChildren("parameter");
+		@SuppressWarnings("unchecked")List<Element> parameters = m.getChildren("parameter");
 		for (Element p : parameters){
 			ModuleParameter param = new ModuleParameter(p.getAttributeValue("name"), p.getAttributeValue("value"));
 			System.out.println("Parsed module parameter "+param+" for module "+mod.getName());
@@ -125,11 +118,10 @@ public class XMLDataParser implements IDataParser {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
-	private MetaDocument parseDocument(Element d){
+	private static final MetaDocument parseDocument(Element d){
 		MetaDocument doc = new MetaDocument(d.getAttributeValue("name"));
-		List<Element> properties = d.getChildren("property");
-		List<Element> links = d.getChildren("link");
+		@SuppressWarnings("unchecked")List<Element> properties = d.getChildren("property");
+		@SuppressWarnings("unchecked")List<Element> links = d.getChildren("link");
 
 		for (int i=0; i<properties.size(); i++){
 			Element p = (Element) properties.get(i);
@@ -144,7 +136,7 @@ public class XMLDataParser implements IDataParser {
 		return doc; 		
 	}
 	
-	private MetaProperty parseAttribute(Element e){
+	private static final MetaProperty parseAttribute(Element e){
 		if (e.getName().equals("property"))
 			return parseProperty(e);
 		if (e.getName().equals("link"))
@@ -152,7 +144,7 @@ public class XMLDataParser implements IDataParser {
 		throw new RuntimeException("Unknown attribute type:"+e.getName());
 	}
 		
-	private MetaProperty parseProperty(Element p){
+	private static final MetaProperty parseProperty(Element p){
 		String name = p.getAttributeValue("name");
 		String type = p.getAttributeValue("type");
 			
@@ -170,7 +162,7 @@ public class XMLDataParser implements IDataParser {
 		return ret;
 	}
 	
-	private MetaEnumerationProperty parseEnumeration(Element p){
+	private static final MetaEnumerationProperty parseEnumeration(Element p){
 		String name = p.getAttributeValue("name");
 		String enumeration = p.getAttributeValue("enumeration");
 		MetaEnumerationProperty ret = new MetaEnumerationProperty(name, "int");
@@ -178,12 +170,11 @@ public class XMLDataParser implements IDataParser {
 		return ret;
 	}
 	
-	@SuppressWarnings("unchecked")
-	private MetaProperty parseTable(Element p){
+	private static final MetaProperty parseTable(Element p){
 		String name = p.getAttributeValue("name");
 		MetaTableProperty ret = new MetaTableProperty(name);
 		
-		List<Element> columns = p.getChildren("column");
+		@SuppressWarnings("unchecked")List<Element> columns = p.getChildren("column");
 		for (int i=0; i<columns.size(); i++){
 			Element e = columns.get(i);
 				ret.addColumn(e.getAttributeValue("name"));
@@ -193,7 +184,7 @@ public class XMLDataParser implements IDataParser {
 		
 	}
 	
-	private MetaProperty parseList(Element p){
+	private static final MetaProperty parseList(Element p){
 		String name = p.getAttributeValue("name");
 		MetaListProperty ret = new MetaListProperty(name);
 		
@@ -208,7 +199,7 @@ public class XMLDataParser implements IDataParser {
 		return ret;
 	}
 
-	private MetaLink parseLink(Element p){
+	private static final MetaLink parseLink(Element p){
 		String name = p.getAttributeValue("name");
 		String linkType = p.getAttributeValue("type");
 		String target = p.getAttributeValue("target");

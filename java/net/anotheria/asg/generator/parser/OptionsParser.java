@@ -7,8 +7,8 @@ import org.jdom.Element;
 import net.anotheria.asg.generator.GenerationOption;
 import net.anotheria.asg.generator.GenerationOptions;
 
-public class OptionsParser {
-	public static GenerationOptions parseOptions(Element element){
+public final class OptionsParser {
+	public static final GenerationOptions parseOptions(Element element){
 		GenerationOptions ret = new GenerationOptions();
 		
 		if (element==null)
@@ -22,5 +22,12 @@ public class OptionsParser {
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 * Prevent instantiation.
+	 */
+	private OptionsParser(){
+		
 	}
 }

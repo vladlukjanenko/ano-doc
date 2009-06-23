@@ -14,7 +14,7 @@ import net.anotheria.asg.generator.Context;
  * Parser for the context-xml.
  * @author lrosenberg
  */
-public class XMLContextParser {
+public final class XMLContextParser {
 
 	/**
 	 * Returns a parsed generation context.
@@ -78,6 +78,9 @@ public class XMLContextParser {
 		return src;
 	}
 
+	/**
+	 * Prevent instantiation.
+	 */
 	private XMLContextParser(){
 		
 	}

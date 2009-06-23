@@ -96,8 +96,7 @@ public class Generator {
 		}catch(Exception e){}
 
 		long s6 = System.currentTimeMillis();
-		XMLDataParser dataParser = new XMLDataParser(dataContent);
-		List<MetaModule> modules = dataParser.parseModules();
+		List<MetaModule> modules = XMLDataParser.parseModules(dataContent);
 		GeneratorDataRegistry.getInstance().addModules(modules);
 		
 		AppUtilGenerator utilGen = new AppUtilGenerator(c);
