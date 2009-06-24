@@ -43,11 +43,11 @@ public class MetaLink extends MetaProperty{
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.meta.MetaProperty#toNameConstant()
 	 */
-	public String toNameConstant() {
+	@Override public String toNameConstant() {
 		return "LINK_"+super.toNameConstant();
 	}
 	
-	public boolean isLinked(){
+	@Override public boolean isLinked(){
 		return true;
 	}
 	
@@ -59,6 +59,11 @@ public class MetaLink extends MetaProperty{
 		return getLinkTarget().substring(getLinkTarget().indexOf('.')+1);
 	}
 	
+	/**
+	 * 
+	 * @param document
+	 * @return
+	 */
 	public boolean doesTargetMatch(MetaDocument document){
 		return doesTargetMath(document.getParentModule(), document);
 	}

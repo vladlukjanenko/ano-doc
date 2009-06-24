@@ -64,7 +64,7 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 		appendString("public int compareTo("+doc.getName()+" comparable){");
 		appendIncreasedStatement("return compareTo(comparable, "+getSortTypeName(doc)+".SORT_BY_DEFAULT)");
 		appendString("}");
-		appendEmptyline();
+		emptyline();
 
 		appendString("public int compareTo(IComparable anotherComparable, int method){");
 		increaseIdent();
@@ -141,28 +141,28 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 		appendStatement("return new "+getDataObjectImplName(doc)+"(("+getDataObjectImplName(doc)+")"+"template)");
 		append(closeBlock());
 
-		appendEmptyline();
+		emptyline();
 
 		appendString("public static "+doc.getName()+" create"+doc.getName()+"(){");
 		increaseIdent();
 		appendStatement("return new "+getDataObjectImplName(doc)+"(\"\")");
 		append(closeBlock());
 
-		appendEmptyline();
+		emptyline();
 
 		appendString("static "+doc.getName()+" create"+doc.getName()+"("+getDocumentBuilderName(doc)+" builder){");
 		increaseIdent();
 		appendStatement("return new "+getDataObjectImplName(doc)+"(builder)");
 		append(closeBlock());
 
-		appendEmptyline();
+		emptyline();
 
 		appendString("public static "+doc.getName()+" create"+doc.getName()+"ForImport(String anId){");
 		increaseIdent();
 		appendStatement("return new "+getDataObjectImplName(doc)+"(anId)");
 		append(closeBlock());
 
-		appendEmptyline();
+		emptyline();
 
 		appendComment("For internal use only!");
 		appendString("public static "+doc.getName()+" create"+doc.getName()+"(String anId){");

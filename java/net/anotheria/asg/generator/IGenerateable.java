@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator;
 
 /**
- * TODO please remined another to comment this class
+ * Basic interface for everything thats generateable. Currently not really used.
  * @author another
  */
 public interface IGenerateable {

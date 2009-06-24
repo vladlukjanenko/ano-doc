@@ -6,7 +6,9 @@ import static junit.framework.Assert.*;
 import java.io.File;
 import java.util.List;
 
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.util.StringUtils;
@@ -33,6 +35,33 @@ public class XMLDataParserTest {
 		
 		MetaDocument docA = modA.getDocumentByName("DocumentA1");
 		checkProperties(docA);
+		checkLinks(docA, modules);
+	}
+	
+	private MetaModule findModule(String name, List<MetaModule> modules){
+		for (MetaModule m : modules)
+			if (m.getName().equals(name))
+				return m;
+		throw new AssertionError("Can't find module "+name);
+	}
+	
+	private void checkLinks(MetaDocument document, List<MetaModule> modules){
+		MetaLink linkA = (MetaLink)document.getField("a2");
+		MetaLink linkB = (MetaLink)document.getField("b2");
+		
+		assertTrue(linkA.isLinked()); 
+		assertTrue(linkB.isLinked());
+		
+		MetaDocument targetA = findModule("SimpleModuleA", modules).getDocumentByName("DocumentA2");
+		MetaDocument targetB = findModule("SimpleModuleB", modules).getDocumentByName("DocumentB2");
+		
+		System.out.println("TargetA: "+targetA);
+		System.out.println("TargetA Module: "+targetA.getParentModule());
+		System.out.println("TargetB: "+targetB);
+		System.out.println("TargetB Module: "+targetB.getParentModule());
+		
+		//assertTrue(linkA.doesTargetMatch(targetA));
+		assertTrue(linkB.doesTargetMatch(targetB));
 	}
 	
 	private void checkProperties(MetaDocument document){

@@ -182,8 +182,8 @@ public class MetaModule implements IGenerateable{
 		return storageType;
 	}
 
-	public void setStorageType(StorageType storageType) {
-		this.storageType = storageType;
+	public void setStorageType(StorageType aStorageType) {
+		storageType = aStorageType;
 	}
 
 	/**
@@ -196,8 +196,8 @@ public class MetaModule implements IGenerateable{
 	/**
 	 * @deprecated Noone knows what storagekey does.
 	 */
-	public void setStorageKey(String storageKey) {
-		this.storageKey = storageKey;
+	public void setStorageKey(String aStorageKey) {
+		storageKey = aStorageKey;
 	}
 	
 	public void addModuleParameter(ModuleParameter p){

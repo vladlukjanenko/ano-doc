@@ -18,11 +18,11 @@ public class QueryLessThenProperty<P extends Comparable<P>> extends QueryPropert
 		super(name, value);
 	}
 
-	public String toString(){
+	@Override public String toString(){
 		return getName() + "<" +getValue();
 	}
 	
-	public String getComparator(){
+	@Override public String getComparator(){
 		return " < ";
 	}
 	

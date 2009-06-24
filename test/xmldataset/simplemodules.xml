@@ -8,10 +8,10 @@
 				<link name="box" type="single" target="DocumentA2"/>
         	</content>
         </property>
-		<link type="single" target="DocumentB2" name="b2"/>
+		<link type="single" target="SimpleModuleB.DocumentB2" name="b2"/>
 		<property name="b2list" type="list">
 	        <content>
-				<link name="box" type="single" target="DocumentB2"/>
+				<link name="box" type="single" target="SimpleModuleB.DocumentB2"/>
         	</content>
         </property>
 		<property type="boolean" name="booleanproperty"/>
