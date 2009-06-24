@@ -6,15 +6,15 @@ package net.anotheria.asg.generator.meta;
  */
 public interface IMetaType {
 
-	public String toJava();
+	String toJava();
 	
-	public String toJavaObject();
+	String toJavaObject();
 	
-	public String toPropertySetter();
+	String toPropertySetter();
 	
-	public String toPropertyGetter();
+	String toPropertyGetter();
 	
-	public String toBeanGetter(String name);
+	String toBeanGetter(String name);
 	
-	public String toBeanSetter(String name);	
+	String toBeanSetter(String name);	
 }

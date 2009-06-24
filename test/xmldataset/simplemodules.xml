@@ -1,0 +1,44 @@
+  <module name="SimpleModuleA">
+	<document name="DocumentA1">
+		<property type="string" name="property"/>
+		<property type="string" name="multilangproperty" multilingual="true"/>
+		<link type="single" target="DocumentA2" name="a2"/>
+		<property name="a2list" type="list">
+	        <content>
+				<link name="box" type="single" target="DocumentA2"/>
+        	</content>
+        </property>
+		<link type="single" target="DocumentB2" name="b2"/>
+		<property name="b2list" type="list">
+	        <content>
+				<link name="box" type="single" target="DocumentB2"/>
+        	</content>
+        </property>
+		<property type="boolean" name="booleanproperty"/>
+		<property type="int" name="intproperty"/>
+		<property type="long" name="longproperty"/>
+		<property type="double" name="doubleproperty"/>
+		<property type="float" name="floatproperty"/>
+		<property type="string" name="stringproperty"/>
+		<property type="text" name="textproperty"/>
+		<!-- property type="byte" name="byteproperty"/-->
+	</document>
+	<document name="DocumentA2">
+		<property type="string" name="anotherproperty"/>
+		<property type="string" name="anothermultilangproperty" multilingual="true"/>
+	</document>
+	<document name="SelfIncluded">
+		<property name="name" type="string"/>
+		<property name="subdocuments" type="list">
+	        <content>
+				<link name="type" type="single" target="SelfIncluded"/>
+        	</content>
+        </property>
+	</document>
+  </module>
+    <module name="SimpleModuleB">
+	<document name="DocumentB2">
+		<property type="string" name="anotherproperty"/>
+		<property type="string" name="anothermultilangproperty" multilingual="true"/>
+	</document>
+  </module>

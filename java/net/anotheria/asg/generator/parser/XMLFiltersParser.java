@@ -40,7 +40,6 @@ public final class XMLFiltersParser {
 		}catch(JDOMException e){
 			e.printStackTrace();
 		}
-		//System.out.println("Parsed forms: "+ret);
 		return ret;
 	}
 	

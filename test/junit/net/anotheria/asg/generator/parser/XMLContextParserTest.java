@@ -30,6 +30,7 @@ public class XMLContextParserTest {
 		assertTrue(context.getLanguages().contains("CH_DE"));
 		
 		assertEquals("DE", context.getDefaultLanguage());
+		assertTrue(context.areLanguagesSupported());
 		
 	}
 }

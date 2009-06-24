@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(value=Suite.class)
-@SuiteClasses(value={XMLContextParserTest.class})
+@SuiteClasses(value={XMLContextParserTest.class, XMLDataParserTest.class})
 public class AnoDocXMLParserSuite {
 
 }
