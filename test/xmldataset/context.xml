@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+  <context>
+    <package>net.anotheria.anosite.gen</package>
+    <owner>anotheria</owner>
+    <applicationName>testappname</applicationName>
+    <applicationURLPath>testappurlpath</applicationURLPath>
+    <servletMapping>cms</servletMapping>
+	<encoding>iso-8859-15</encoding> 
+	<languages>
+		<supported>
+			<language>DE</language>
+			<language>CH_DE</language>
+			<language>CH_FR</language>
+			<language>DK</language>
+		</supported>
+		<default>
+			<language>DE</language>
+		</default>
+	</languages>
+	<options>
+		<option name="rmi">false</option>
+		<option name="inmemory">false</option>
+	</options>
+  </context>
+

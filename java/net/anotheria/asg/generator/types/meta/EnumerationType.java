@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO please remined another to comment this class
+ * Internal representation of an enumeration type.
  * @author another
  */
 public class EnumerationType extends DataType{
+	/**
+	 * List of possible values.
+	 */
 	private List<String> values;
 	
 	public EnumerationType(String name){
@@ -19,7 +22,7 @@ public class EnumerationType extends DataType{
 		values.add(aValue);
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "Enumeration "+getName()+" :"+values;
 	}
 	/**

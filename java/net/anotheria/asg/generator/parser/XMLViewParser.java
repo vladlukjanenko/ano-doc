@@ -32,7 +32,6 @@ import org.jdom.input.SAXBuilder;
  */
 public final class XMLViewParser {
 	
-	@SuppressWarnings("unchecked")
 	public static final List<MetaView> parseViews(String content){
 		
 		SAXBuilder reader = new SAXBuilder();
@@ -42,7 +41,7 @@ public final class XMLViewParser {
 		try{
 			Document doc = reader.build(new StringReader(content));
 			Element root = doc.getRootElement();
-			List<Element> views = root.getChildren("view");
+			@SuppressWarnings("unchecked")List<Element> views = root.getChildren("view");
 			for (Element elem :views){
 				MetaView view = parseView(elem);
 				System.out.println("parsed view: "+view);
@@ -55,7 +54,6 @@ public final class XMLViewParser {
 		return ret;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static final MetaView parseView(Element m){
 		
 		String name = m.getAttributeValue("name");
@@ -63,7 +61,7 @@ public final class XMLViewParser {
 
 		//System.out.println("parsing view: "+name);
 		
-		List<Element> sections = m.getChild("sections").getChildren();
+		@SuppressWarnings("unchecked")List<Element> sections = m.getChild("sections").getChildren();
 		for (int i=0; i<sections.size(); i++)
 			view.addSection(parseSection(sections.get(i)));
 		
@@ -93,7 +91,6 @@ public final class XMLViewParser {
 		return ret;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private static final MetaModuleSection parseModuleSection(Element section){
 		String title = section.getAttributeValue("title");
 		//System.out.println("Parse section:; "+title);
@@ -107,27 +104,27 @@ public final class XMLViewParser {
 		s.setDocument(mod.getDocumentByName(documentName));
 		
 		Element elementsRoot = section.getChild("elements");
-		List<Element> elements = elementsRoot.getChildren();
+		@SuppressWarnings("unchecked")List<Element> elements = elementsRoot.getChildren();
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = parseViewElement(s, elements.get(i));
 			s.addElement(element);
 		}
 		
-		List<Element> dialogs = section.getChildren("dialog");
+		@SuppressWarnings("unchecked")List<Element> dialogs = section.getChildren("dialog");
 		//System.out.println("To parse "+dialogs.size()+" dialogs.");
 		for (int i=0; i<dialogs.size(); i++){
 			Element d = dialogs.get(i);
 			MetaDialog dialog = new MetaDialog(d.getAttributeValue("name"));
 			dialog.setTitle(d.getAttributeValue("title"));
-			List dialogElements = d.getChild("elements").getChildren();
+			@SuppressWarnings("unchecked")List<Element> dialogElements = d.getChild("elements").getChildren();
 			for (int e=0; e<dialogElements.size(); e++){
-				MetaViewElement element = parseViewElement(null, (Element)dialogElements.get(e));
+				MetaViewElement element = parseViewElement(null, dialogElements.get(e));
 				dialog.addElement(element);
 			}
 			s.addDialog(dialog);			
 		}
 		
-		List<Element> filters = section.getChildren("filter");
+		@SuppressWarnings("unchecked")List<Element> filters = section.getChildren("filter");
 		for (Element f : filters){
 			s.addMetaFilter(GeneratorDataRegistry.getInstance().createFilter(f.getAttributeValue("name"), f.getAttributeValue("field")));
 		}
@@ -220,10 +217,9 @@ public final class XMLViewParser {
 		return ret;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static final MetaListElement parseListElement(Element e){
 		MetaListElement ret = new MetaListElement();
-		List<Element> elements = e.getChildren("element");
+		@SuppressWarnings("unchecked")List<Element> elements = e.getChildren("element");
 		for (int i=0; i<elements.size(); i++)
 			ret.addElement(parseViewElement(null, elements.get(i)));
 		return ret; 	

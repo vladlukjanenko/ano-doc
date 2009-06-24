@@ -13,7 +13,7 @@ import net.anotheria.util.StringUtils;
  * @author another
  *
  */
-public class XMLPreprocessor {
+public final class XMLPreprocessor {
 	
 	/**
 	 * Include commands 'tag'.
@@ -53,5 +53,12 @@ public class XMLPreprocessor {
 		}
 		
 		return content;
+	}
+	
+	/**
+	 * prevent initialization.
+	 */
+	private XMLPreprocessor(){
+		
 	}
 }
