@@ -20,11 +20,6 @@ public final class XMLPreprocessor {
 	 */
 	public static final String INCLUDE_COMMAND = "@include:";
 	
-	public static void main(String a[]) throws IOException{
-		String file = loadFile(new File("../ano-site/etc/def/datadef.xml"));
-		System.out.println("file: "+file);
-	}
-	
 	/**
 	 * Loads a file from the disk. Include marks are replaced with the content of the included files.
 	 * @param f

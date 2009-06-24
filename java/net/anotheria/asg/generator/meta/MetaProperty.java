@@ -131,7 +131,7 @@ public class MetaProperty implements Cloneable{
 		return language == null ? toBeanSetter() : metaType.toBeanSetter(name)+StringUtils.capitalize(language);
 	}
 
-	public String toString(){
+	@Override public String toString(){
 		return type+" "+name;
 	}
 	

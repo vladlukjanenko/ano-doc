@@ -9,6 +9,7 @@ import java.util.List;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.util.StringUtils;
 
 import org.junit.Test;
 
@@ -48,7 +49,14 @@ public class XMLDataParserTest {
 	private void checkProperty(MetaProperty p, String java, String javaObject){
 		assertNotNull(p);
 		assertEquals(java, p.toJavaType());
+		assertEquals(java, p.toJavaErasedType());
+		assertEquals(java, p.getMetaType().toJava());
 		assertEquals(javaObject, p.toJavaObjectType());
+		assertFalse(p.isLinked());
+		assertFalse(p.isReadonly());
+		
+		assertEquals("get"+StringUtils.capitalize(java), p.toPropertyGetter());
+		assertEquals("set"+StringUtils.capitalize(java), p.toPropertySetter());
 	}
 	
 }
