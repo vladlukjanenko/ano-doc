@@ -21,7 +21,7 @@ public class XMLContextParserTest {
 		assertEquals("anotheria", context.getOwner());
 		assertEquals("net.anotheria.anosite.gen", context.getPackageName());
 		assertEquals("testappname", context.getApplicationName());
-		assertEquals("testappurlpath", context.getApplicationURLPath());
+		assertEquals("/testappurlpath", context.getApplicationURLPath());
 		assertEquals("cms", context.getServletMapping());
 		assertEquals("iso-8859-15", context.getEncoding());
 		
