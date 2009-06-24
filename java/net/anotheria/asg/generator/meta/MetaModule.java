@@ -10,26 +10,56 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 
 /**
- * TODO please remined another to comment this class
+ * Representation of a module definiton.
  * @author another
  */
 public class MetaModule implements IGenerateable{
-	private String name;
-	private List<MetaDocument> documents;
-	//for now listeners are simply class name implementing IServiceListener, extend it to various listener in the future if needed.
-	private List<String> listeners;
+
+	/**
+	 * This is a predefined module used to generate package and class names for shared stuff.
+	 */
+	public static final MetaModule SHARED = new MetaModule("Shared");
 	
+
+	/**
+	 * Unique name of the module. Each module has a name which is used whenever someone refers to it.
+	 */
+	private String name;
+	/**
+	 * List of the documents in this module
+	 */
+	private List<MetaDocument> documents;
+	/**
+	 * Module listeners which can be attached to the generated service.
+	 */
+	private List<String> listeners;
+	/**
+	 * Type of the storge for this module.
+	 */
 	private StorageType storageType;
+	/**
+	 * The sense of this parameter is lost in the depth of the code.
+	 */
 	private String storageKey;
 	
 	private Map<String, ModuleParameter> parameters;
 	
+	/**
+	 * Generation options which can enable or disable generation of some artefacts.
+	 */
 	private GenerationOptions moduleOptions;
 	 
+	/**
+	 * Creates a new empty module.
+	 */
 	public MetaModule(){
 		this(null);
 	}
 	
+	/**
+	 * Creates a new module with the given name.
+	 * @param name name of the module.
+	 */
 	public MetaModule(String name){
 		this.name = name;
 		documents = new ArrayList<MetaDocument>();
@@ -38,12 +68,20 @@ public class MetaModule implements IGenerateable{
 		parameters = new HashMap<String, ModuleParameter>();
 	}
 	
+	/**
+	 * Adds a document definition to the module.
+	 * @param aDocument
+	 */
 	public void addDocument(MetaDocument aDocument){
 		documents.add(aDocument);
 		aDocument.setParentModule(this);
 	}
 	
-	//return true if the generation of the specific element is enabled by a scheme.
+	/**
+	 * Returns true if an option is enabled. For example 'rmi' is an option which can be enabled.
+	 * @param key
+	 * @return
+	 */
 	public boolean isEnabledByOptions(String key){
 		if (moduleOptions!=null){
 			if (moduleOptions.isEnabled(key))
@@ -54,10 +92,11 @@ public class MetaModule implements IGenerateable{
 		
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "module "+name+" storage: "+storageType+" documents: "+documents;
 	}
 	/**
+	 * Returns contained documents.
 	 * @return
 	 */
 	public List<MetaDocument> getDocuments() {
@@ -71,10 +110,18 @@ public class MetaModule implements IGenerateable{
 		return name;
 	}
 	
+	/**
+	 * Returns the name for the module implementation class in the cms storage.
+	 * @return
+	 */
 	public String getModuleClassName(){
 		return "Module"+getName();
 	}
 	
+	/**
+	 * Returns the class name of the generated module factory.
+	 * @return
+	 */
 	public String getFactoryClassName(){
 		return getModuleClassName()+"Factory";
 	}
@@ -93,6 +140,10 @@ public class MetaModule implements IGenerateable{
 		name = string;
 	}
 	
+	/**
+	 * Returns the id of the module. Id is basically name.toLowerCase().
+	 * @return
+	 */
 	public String getId(){
 		return getName().toLowerCase();
 	}
@@ -106,7 +157,7 @@ public class MetaModule implements IGenerateable{
 	    throw new RuntimeException("No such document: "+name + " in module "+getName());
 	}
 
-	public boolean equals(Object o){
+	@Override public boolean equals(Object o){
 		return o instanceof MetaModule ? 
 			((MetaModule)o).name.equals(name) : false;
 	}
@@ -135,15 +186,19 @@ public class MetaModule implements IGenerateable{
 		this.storageType = storageType;
 	}
 
+	/**
+	 * @deprecated Noone knows what storagekey does.
+	 */
 	public String getStorageKey() {
 		return storageKey;
 	}
 
+	/**
+	 * @deprecated Noone knows what storagekey does.
+	 */
 	public void setStorageKey(String storageKey) {
 		this.storageKey = storageKey;
 	}
-	
-	public static final MetaModule SHARED = new MetaModule("Shared");
 	
 	public void addModuleParameter(ModuleParameter p){
 		parameters.put(p.getName(), p);

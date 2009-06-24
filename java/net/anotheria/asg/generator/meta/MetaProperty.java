@@ -4,20 +4,40 @@ import net.anotheria.util.StringUtils;
 
 
 /**
- * TODO please remined another to comment this class
+ * Represents a single property of a document. A property may be basic, like int, boolean, long, or complex, like list or table.
+ * This class defines single one typed property mainly.
  * @author another
  */
 public class MetaProperty implements Cloneable{
+	/**
+	 * The type of the property as string.
+	 */
 	private String type;
+	/**
+	 * Name of the property.
+	 */
 	private String name;
+	/**
+	 * Resolved property type.
+	 */
 	private IMetaType metaType;
-	
+	/**
+	 * True if the property is multilingual.
+	 */
 	private boolean multilingual;
+	/**
+	 * True if the property is readonly. For example id is a readonly property. Basically this is only used by the view, 
+	 * the application itself still free to change a readonly property.
+	 */
 	private boolean readonly;
-	
+	/**
+	 * Creates a new MetaProperty with given name and type description. 
+	 * @param aName
+	 * @param aType
+	 */
 	public MetaProperty(String aName, String aType){
-		this.name = aName;
-		this.type = aType;
+		name = aName;
+		type = aType;
 		metaType = TypeFactory.createType(aType);
 		multilingual = false;
 	}
@@ -35,6 +55,11 @@ public class MetaProperty implements Cloneable{
 		return name;
 	}
 
+	/**
+	 * Returns the internal name of the property for language variant.
+	 * @param language
+	 * @return
+	 */
 	public String getName(String language) {
 		return language == null ? getName() : name+StringUtils.capitalize(language);
 	}
@@ -160,13 +185,24 @@ public class MetaProperty implements Cloneable{
 	}
 	
 	
-	
+	/**
+	 * Returns true if the property is multilingual.
+	 * @return
+	 */
 	public boolean isMultilingual() {
 		return multilingual;
 	}
+	/**
+	 * Sets the multilingual support of the property.
+	 * @param multilingual
+	 */
 	public void setMultilingual(boolean multilingual) {
 		this.multilingual = multilingual;
 	}
+	/**
+	 * Returns true if the property is read only.
+	 * @return
+	 */
 	public boolean isReadonly() {
 		return readonly;
 	}
@@ -180,7 +216,7 @@ public class MetaProperty implements Cloneable{
 		}catch(CloneNotSupportedException e){
 			//ignore
 		}
-		throw new Error("Can't happen");
+		throw new AssertionError("Can't happen");
 	}
 
 }
