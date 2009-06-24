@@ -21,6 +21,16 @@
 		<property type="float" name="floatproperty"/>
 		<property type="string" name="stringproperty"/>
 		<property type="text" name="textproperty"/>
+		<property name="string" type="list">
+	        <content>
+				<property type="string" name="astring"/>
+        	</content>
+        </property>
+		<property name="int" type="list">
+	        <content>
+				<property type="int" name="anint"/>
+        	</content>
+        </property>
 		<!-- property type="byte" name="byteproperty"/-->
 	</document>
 	<document name="DocumentA2">
