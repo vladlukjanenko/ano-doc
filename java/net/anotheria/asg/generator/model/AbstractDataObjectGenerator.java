@@ -12,11 +12,24 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.util.StringUtils;
-
+/**
+ * Base class for the data objects generators (documents, VOs and more).
+ * @author lrosenberg
+ *
+ */
 public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 	
+	/**
+	 * Returns the implementation name of this abstract data object flavour.
+	 * @param doc
+	 * @return
+	 */
 	protected abstract String getDataObjectImplName(MetaDocument doc);
-	
+	/**
+	 * Returns the package name for the given document.
+	 * @param doc
+	 * @return
+	 */
 	protected String getPackageName(MetaDocument doc){
 		return GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc);
 	}
@@ -31,7 +44,7 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 	
 	
 	/**
-	 * Generates getFootprint method 
+	 * Generates getFootprint method. 
 	 * @param doc 
 	 * @return
 	 */
@@ -123,6 +136,11 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 		append(closeBlock());
 	}
 	
+	/**
+	 * Returns the name for the builder for this document.
+	 * @param doc
+	 * @return
+	 */
 	public String getDocumentBuilderName(MetaDocument doc){
 		return doc.getName()+"Builder";
 	}

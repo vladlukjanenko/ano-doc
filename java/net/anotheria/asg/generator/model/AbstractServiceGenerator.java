@@ -7,20 +7,42 @@ import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.metafactory.ServiceFactory;
-
+/**
+ * Base class for service generators.
+ * @author another
+ *
+ */
 public class AbstractServiceGenerator extends AbstractGenerator{
+	/**
+	 * Returns the interface name for the CRUD service for this module.
+	 * @param m
+	 * @return
+	 */
 	public static String getInterfaceName(MetaModule m){
 	    return "I"+getServiceName(m);
 	}
-	
+	/**
+	 * Returns the service name for a module.
+	 * @param m
+	 * @return
+	 */
 	public static final String getServiceName(MetaModule m){
 	    return m.getName()+"Service";
 	}
 
+	/**
+	 * Returns the name of the factory class.
+	 * @param m
+	 * @return
+	 */
 	public String getFactoryName(MetaModule m){
 	    return getServiceName(m)+"Factory";
 	}
-	
+	/**
+	 * Returns the implementation name for the service for this MetaModule.
+	 * @param m
+	 * @return
+	 */
 	public String getImplementationName(MetaModule m){
 	    return getServiceName(m)+"Impl";
 	}
@@ -32,6 +54,11 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
 	}
 
+	/**
+	 * Generates a factory class.
+	 * @param module
+	 * @return
+	 */
 	protected GeneratedClass generateFactory(MetaModule module){
 
 		GeneratedClass clazz = new GeneratedClass();
@@ -54,13 +81,13 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    
 	    appendStatement("private static AtomicInteger instanceCounter = new AtomicInteger(0)");
 	    appendStatement("private static "+getInterfaceName(module)+" defaultInstance = create"+getServiceName(module)+"()");
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("public "+getInterfaceName(module)+" create(){");
 	    increaseIdent();
 	    appendStatement("return create"+getServiceName(module)+"()");
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("public static "+getInterfaceName(module)+" create"+getServiceName(module)+"(){");
 	    increaseIdent();
@@ -78,13 +105,13 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    appendStatement("return ("+getInterfaceName(module)+") proxy.createProxy()");
 	    
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("private static "+getInterfaceName(module)+" createInstance(){");
 	    increaseIdent();
 	    appendString("return "+getImplementationName(module)+".getInstance();");
 	    append(closeBlock());
-	    appendEmptyline();
+	    emptyline();
 	    
 	    appendString("static "+getInterfaceName(module)+" getDefaultInstance(){");
 	    increaseIdent();
@@ -98,6 +125,11 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 		return getInterfaceName(module)+".class"+", ASGService.class";
 	}
 	
+	/**
+	 * Returns the base exception name.
+	 * @param module
+	 * @return
+	 */
 	protected String getExceptionName(MetaModule module){
 		return ServiceGenerator.getExceptionName(module);
 	}
