@@ -1,7 +1,13 @@
 package net.anotheria.asg.service;
 
 import net.anotheria.asg.exception.ASGRuntimeException;
-
+/**
+ * A service that holds all the data in memory. An InMemoryService can operate in different modes. Access to the mode definition and configuration is 
+ * provided by this interface.
+ * @author lrosenberg
+ *
+ * @param <T>
+ */
 public interface InMemoryService<T extends ASGService> {
 	
 	/**
