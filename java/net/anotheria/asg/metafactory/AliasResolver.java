@@ -1,5 +1,6 @@
 package net.anotheria.asg.metafactory;
 
+
 public interface AliasResolver {
 	
 	/**
@@ -7,11 +8,11 @@ public interface AliasResolver {
 	 * @param alias
 	 * @return
 	 */
-	public String resolveAlias(String alias);
+	String resolveAlias(String alias);
 	
 	/**
 	 * Returns the priority of this resolver. The 
 	 * @return
 	 */
-	public int getPriority();
+	int getPriority();
 }
