@@ -53,7 +53,7 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		clazz.addImport("org.apache.log4j.BasicConfigurator");
 		emptyline();
 		for (MetaModule m : modulesSet){
-			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
+			clazz.addImport(ServiceGenerator.getFactoryImport(m));
 			//appendImport(ServiceGenerator.getInterfaceImport(context, m));
 		}
 		

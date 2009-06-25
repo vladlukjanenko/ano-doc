@@ -89,7 +89,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    		throw new RuntimeException("No such module: "+fedDef.getName());
 	    	clazz.addImport(ServiceGenerator.getInterfaceImport(target));
 	    	clazz.addImport(ServiceGenerator.getExceptionImport(context, target));
-	    	clazz.addImport(ServiceGenerator.getFactoryImport(context, target));
+	    	clazz.addImport(ServiceGenerator.getFactoryImport(target));
 	    	targetModules.put(fedDef.getKey(), target);
 	    }
 	    

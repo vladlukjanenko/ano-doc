@@ -57,7 +57,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		clazz.addImport(ASGRuntimeException.class);
 		clazz.addImport("org.apache.log4j.BasicConfigurator");
 		for (MetaModule m : modules){
-			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
+			clazz.addImport(ServiceGenerator.getFactoryImport(m));
 		}
 		
 		clazz.setName(getExporterClassName(context));

@@ -28,10 +28,10 @@ public class DataGenerator extends AbstractAnoDocGenerator{
 		List<FileEntry> todo = new ArrayList<FileEntry>();
 		ExecutionTimer timer = new ExecutionTimer("DataGenerator");
 		timer.startExecution("config");
-		todo.addAll(new ConfiguratorGenerator().generate(modules, context));
+		todo.addAll(new ConfiguratorGenerator().generate(modules));
 		timer.stopExecution("config");
 		timer.startExecution("basic service");
-		todo.addAll(new BasicServiceGenerator().generate(modules, context));
+		todo.addAll(new BasicServiceGenerator().generate(modules));
 		timer.stopExecution("basic service");
 		timer.startExecution("sql");
 		todo.addAll(new SQLGenerator().generate(modules));

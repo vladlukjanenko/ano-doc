@@ -29,21 +29,21 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 		return "MetaFactoryConfigurator";
 	}
 
-	public List<FileEntry> generate(List<MetaModule> modules, Context context){
+	public List<FileEntry> generate(List<MetaModule> modules){
 		List<FileEntry> entries = new ArrayList<FileEntry>();
 		
-		entries.add(generateConfigurator(modules, context));
-		entries.add(generateMetaFactoryConfigurator(modules, context));
+		entries.add(generateConfigurator(modules));
+		entries.add(generateMetaFactoryConfigurator(modules));
 		return entries;
 		
 	}
 	
-	private FileEntry generateMetaFactoryConfigurator(List<MetaModule> modules, Context context){
+	private FileEntry generateMetaFactoryConfigurator(List<MetaModule> modules){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
 		clazz.setGenerator(this);
-		clazz.setPackageName(context.getServicePackageName(MetaModule.SHARED));
+		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(MetaModule.SHARED));
 		
 		clazz.setName(getMetaFactoryConfiguratorClassName());
 		clazz.addImport(Extension.class);
@@ -64,7 +64,7 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 			MetaModule m = modules.get(i);
 			
 			clazz.addImport(ServiceGenerator.getInterfaceImport(m));
-			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
+			clazz.addImport(ServiceGenerator.getFactoryImport(m));
 			appendCommentLine("//aliases for "+ServiceGenerator.getInterfaceName(m));
 			appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.LOCAL)");
 			appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.DOMAIN, Extension.LOCAL)");
@@ -91,10 +91,11 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 			
 	}
 	
-	private FileEntry generateConfigurator(List<MetaModule> modules, Context context){
+	private FileEntry generateConfigurator(List<MetaModule> modules){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
+		Context context = GeneratorDataRegistry.getInstance().getContext();
 		clazz.setPackageName(context.getServicePackageName(MetaModule.SHARED));
 
 

@@ -31,21 +31,21 @@ import net.anotheria.asg.generator.meta.MetaModule;
 public class BasicServiceGenerator extends AbstractGenerator{
 	
 	
-	public List<FileEntry> generate(List<MetaModule>  modules, Context context){
+	public List<FileEntry> generate(List<MetaModule>  modules){
 		List<FileEntry> ret = new ArrayList<FileEntry>(); 
 		
-		ret.add(new FileEntry(generateBasicService(modules, context)));
-		ret.add(new FileEntry(generateBasicCMSService(modules, context)));
+		ret.add(new FileEntry(generateBasicService(modules)));
+		ret.add(new FileEntry(generateBasicCMSService(modules)));
 		
 		return ret;
 	}
 	
-	private GeneratedClass generateBasicService(List<MetaModule> modules, Context context){
+	private GeneratedClass generateBasicService(List<MetaModule> modules){
 		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".service");
+		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".service");
 		
 		clazz.addImport("org.apache.log4j.Logger");
 		clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
@@ -99,12 +99,12 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		return clazz;
 	}
 
-	private GeneratedClass generateBasicCMSService(List<MetaModule> modules, Context context){
+	private GeneratedClass generateBasicCMSService(List<MetaModule> modules){
 		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".service");
+		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".service");
 
 		clazz.addImport("net.anotheria.anodoc.data.Module");
 		clazz.addImport("net.anotheria.anodoc.service.IModuleService");
@@ -116,7 +116,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 
 		startClassBody();
 		
-		appendStatement("public static final String MY_OWNER_ID = "+quote(context.getOwner()));
+		appendStatement("public static final String MY_OWNER_ID = "+quote(GeneratorDataRegistry.getInstance().getContext().getOwner()));
 		appendStatement("protected IModuleService service");
 		emptyline();
 
@@ -161,26 +161,3 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		return clazz;
 	}
 }
-
-
-/* ------------------------------------------------------------------------- *
- * $Log: BasicServiceGenerator.java,v $
- * Revision 1.5  2007/06/07 23:40:19  lrosenberg
- * added db functionality
- *
- * Revision 1.4  2006/12/28 14:26:57  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.3  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.2  2006/03/07 16:04:44  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.1  2005/10/20 21:20:12  lro
- * *** empty log message ***
- *
- * Revision 1.1  2005/02/24 19:48:40  lro
- * *** empty log message ***
- *
- */

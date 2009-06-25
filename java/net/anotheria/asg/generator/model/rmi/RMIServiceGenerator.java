@@ -400,7 +400,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport("net.anotheria.asg.util.rmi.RMIConfig");
 	    clazz.addImport("net.anotheria.asg.util.rmi.RMIConfigFactory");
 	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
-	    clazz.addImport(ServiceGenerator.getFactoryImport(context, module));
+	    clazz.addImport(ServiceGenerator.getFactoryImport(module));
 	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	    clazz.addImport(InMemoryServiceGenerator.getInMemoryFactoryImport(context, module));
 	    

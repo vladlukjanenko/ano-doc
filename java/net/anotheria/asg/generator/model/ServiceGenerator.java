@@ -318,8 +318,8 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    return getServiceName(m)+"Factory";
 	}
 	
-	public static String getFactoryImport(Context ctx, MetaModule m){
-	    return getPackageName(ctx, m)+"."+getFactoryName(m);
+	public static String getFactoryImport(MetaModule m){
+	    return getPackageName(GeneratorDataRegistry.getInstance().getContext(), m)+"."+getFactoryName(m);
 	}
 
 	public static String getImplementationName(MetaModule m){

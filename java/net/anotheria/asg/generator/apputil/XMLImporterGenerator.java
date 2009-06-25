@@ -72,7 +72,7 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		clazz.addImport("org.apache.log4j.BasicConfigurator");
 		emptyline();
 		for (MetaModule m : modules){
-			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
+			clazz.addImport(ServiceGenerator.getFactoryImport(m));
 		}
 		
 		emptyline();
