@@ -3,7 +3,6 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -50,9 +49,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
-	public List<FileEntry> generate(IGenerateable g, Context aContext) {
-		
-		setContext(aContext);
+	public List<FileEntry> generate(IGenerateable g) {
 		
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		MetaView view = (MetaView)g;
@@ -578,7 +575,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		List<MetaViewElement> richTextElements = new ArrayList<MetaViewElement>();
 		
-		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument(), GeneratorDataRegistry.getInstance().getContext()); 
+		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument()); 
 		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
@@ -1176,7 +1173,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
 		appendString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
 
-		List<MetaViewElement> elements = createMultilingualList(section.getElements(), doc, GeneratorDataRegistry.getInstance().getContext());
+		List<MetaViewElement> elements = createMultilingualList(section.getElements(), doc);
 		int colspan = elements.size();
 		
 		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");

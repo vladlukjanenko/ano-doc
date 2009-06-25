@@ -25,16 +25,12 @@ import net.anotheria.util.ExecutionTimer;
  */
 public class InMemoryServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
-	private Context context;
-	
-	@Override public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	@Override public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
 		if (!mod.isEnabledByOptions(GenerationOptions.INMEMORY))
 			return new ArrayList<FileEntry>();
 
-		this.context = context;
-		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ExecutionTimer timer = new ExecutionTimer("InMemory Generator");
@@ -69,11 +65,11 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	}
 	
 	protected String getPackageName(MetaModule module){
-		return getPackageName(context, module);
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext(), module);
 	}
 	
 	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
-		clazz.addImport(context.getServicePackageName(module)+"."+getInterfaceName(module));
+		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module)+"."+getInterfaceName(module));
 		clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	}
 	
@@ -100,6 +96,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	 */
 	private GeneratedClass generateImplementation(MetaModule module){
 
+		Context context = GeneratorDataRegistry.getInstance().getContext();
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
@@ -138,7 +135,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
 	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	    clazz.addImport("net.anotheria.asg.service.InMemoryObjectWrapper");
-	    clazz.addImport(ServiceGenerator.getInterfaceImport(context, module));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
 	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
 
 	    clazz.setName(getImplementationName(module));

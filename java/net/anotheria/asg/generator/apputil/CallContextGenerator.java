@@ -7,17 +7,14 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.util.StringUtils;
 
 public class CallContextGenerator extends AbstractGenerator implements IGenerator {
 
-	private Context context;
-	
-	public List<FileEntry> generate(IGenerateable g, Context context) {
-		this.context = context;
-		
+	public List<FileEntry> generate(IGenerateable g) {
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		ret.add(generateCallContextFactory());
 		ret.add(generateCallContext());
@@ -34,14 +31,14 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
 		clazz.addImport("java.io.Serializable");
 		
-		clazz.setName(getCallContextName(context));
+		clazz.setName(getCallContextName(GeneratorDataRegistry.getInstance().getContext()));
 		clazz.setParent("CallContext");
 		clazz.addInterface("Serializable");
 
 		startClassBody();
 		appendString("public String getDefaultLanguage(){");
 		increaseIdent();
-		appendStatement("return "+quote(context.getDefaultLanguage()));
+		appendStatement("return "+quote(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage()));
 		append(closeBlock());
 		
 		return new FileEntry(clazz);
@@ -59,7 +56,7 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 		clazz.addImport("net.anotheria.anodoc.util.context.CallContextFactory");
 		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
 
-		clazz.setName(getFactoryName(context));
+		clazz.setName(getFactoryName(GeneratorDataRegistry.getInstance().getContext()));
 		clazz.addInterface("CallContextFactory");
 
 		startClassBody();
@@ -75,11 +72,11 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 	}
 
 	private String getPreName(){
-		return getPreName(context);
+		return getPreName(GeneratorDataRegistry.getInstance().getContext());
 	}
 
 	private String getPackageName(){
-		return getPackageName(context);
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext());
 	}
 	
 	private static String getPackageName(Context context){

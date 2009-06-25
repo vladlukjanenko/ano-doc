@@ -3,7 +3,6 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -22,16 +21,14 @@ import net.anotheria.util.StringUtils;
  * Generator for the queries page. Currently obsolete.
  * @author another
  */
-public class JspQueriesGenerator 
-	extends AbstractJSPGenerator implements IGenerator{
+public class JspQueriesGenerator extends AbstractJSPGenerator implements IGenerator{
 	
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
-	public List<FileEntry> generate(IGenerateable g, Context aContext) {
+	public List<FileEntry> generate(IGenerateable g) {
 	
-		setContext(aContext);
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		MetaView view = (MetaView)g;
 	

@@ -50,13 +50,10 @@ import net.anotheria.util.sorter.SortType;
  */
 public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	
-	private Context context;
-	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
 		
-		this.context = context;
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ExecutionTimer timer = new ExecutionTimer("ServiceGenerator");
@@ -72,14 +69,14 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		//add in memory genererator
 		timer.startExecution(mod.getName()+"-InMem");
 		InMemoryServiceGenerator inMemGen = new InMemoryServiceGenerator();
-		ret.addAll(inMemGen.generate(gmodule, context));
+		ret.addAll(inMemGen.generate(gmodule));
 		timer.stopExecution(mod.getName()+"-InMem");
 		// - end in memory
 
 		//addrmi genererator
 		timer.startExecution(mod.getName()+"-RMI");
 		RMIServiceGenerator rmiGen = new RMIServiceGenerator();
-		ret.addAll(rmiGen.generate(gmodule, context));
+		ret.addAll(rmiGen.generate(gmodule));
 		timer.stopExecution(mod.getName()+"-RMI");
 		// - end rmiy
 		
@@ -87,7 +84,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		if (mod.getStorageType()==StorageType.CMS){
 			timer.startExecution(mod.getName()+"-CMS");
 			CMSBasedServiceGenerator cmsGen = new CMSBasedServiceGenerator();
-			ret.addAll(cmsGen.generate(gmodule, context));
+			ret.addAll(cmsGen.generate(gmodule));
 			timer.stopExecution(mod.getName()+"-CMS");
 		}
 		
@@ -96,17 +93,17 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 			
 			timer.startExecution(mod.getName()+"-JDBC");
 			JDBCPersistenceServiceGenerator jdbcGen = new JDBCPersistenceServiceGenerator();
-			ret.addAll(jdbcGen.generate(gmodule, context));
+			ret.addAll(jdbcGen.generate(gmodule));
 			timer.stopExecution(mod.getName()+"-JDBC");
 			
 			timer.startExecution(mod.getName()+"-DAO");
 			PersistenceServiceDAOGenerator daoGen = new PersistenceServiceDAOGenerator();
-			ret.addAll(daoGen.generate(gmodule, context));
+			ret.addAll(daoGen.generate(gmodule));
 			timer.stopExecution(mod.getName()+"-DAO");
 
 			timer.startExecution(mod.getName()+"-JDBC-Serv");
 			JDBCBasedServiceGenerator servGen = new JDBCBasedServiceGenerator();
-			ret.addAll(servGen.generate(gmodule, context));
+			ret.addAll(servGen.generate(gmodule));
 			timer.stopExecution(mod.getName()+"-JDBC-Serv");
 
 			//SQLGenerator sqlGen = new SQLGenerator();
@@ -117,7 +114,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		if (mod.getStorageType()==StorageType.FEDERATION){
 			timer.startExecution(mod.getName()+"-Fed");
 			FederationServiceGenerator cmsGen = new FederationServiceGenerator();
-			ret.addAll(cmsGen.generate(gmodule, context));
+			ret.addAll(cmsGen.generate(gmodule));
 			timer.stopExecution(mod.getName()+"-Fed");
 		}
 		
@@ -127,7 +124,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	}
 	
 	private String getPackageName(MetaModule module){
-		return context.getPackageName(module)+".service";
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(module)+".service";
 	}
 	
 	private GeneratedClass generateException(MetaModule module){
@@ -177,7 +174,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 	    }
 	    
 	    clazz.addImport("net.anotheria.util.xml.XMLNode");
@@ -303,8 +300,8 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    return "I"+getServiceName(module);
 	}
 	
-	public static String getInterfaceImport(Context ctx, MetaModule m){
-		return getPackageName(ctx,m)+"."+getInterfaceName(m);
+	public static String getInterfaceImport(MetaModule m){
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getInterfaceName(m);
 	}
 	
 	public static String getExceptionImport(Context ctx, MetaModule m){

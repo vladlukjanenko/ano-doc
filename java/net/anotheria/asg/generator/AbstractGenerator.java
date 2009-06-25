@@ -312,7 +312,7 @@ public class AbstractGenerator{
 	    appendString(target, " */");
 	}
 
-	protected static List<MetaViewElement> createMultilingualList(List<MetaViewElement> source, MetaDocument doc, Context context){
+	protected static List<MetaViewElement> createMultilingualList(List<MetaViewElement> source, MetaDocument doc){
 		List<MetaViewElement> ret = new ArrayList<MetaViewElement>();
 		for (MetaViewElement e : source){
 			if (e instanceof MetaFieldElement){
@@ -321,10 +321,10 @@ public class AbstractGenerator{
 					System.out.println("Can't find property for filed "+e.getName()+", skipped");
 					continue;
 				}
-				if (!p.isMultilingual() || !context.areLanguagesSupported()){
+				if (!p.isMultilingual() || !GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
 					ret.add(e);
 				}else{
-					for (String l : context.getLanguages())
+					for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages())
 						ret.add(new MultilingualFieldElement(l,(MetaFieldElement)e));
 				}
 			}else{

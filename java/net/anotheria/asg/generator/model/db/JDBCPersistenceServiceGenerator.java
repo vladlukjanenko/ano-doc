@@ -8,6 +8,7 @@ import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.TypeOfClass;
@@ -18,13 +19,9 @@ import net.anotheria.asg.generator.model.DataFacadeGenerator;
 
 public class JDBCPersistenceServiceGenerator extends AbstractGenerator implements IGenerator{
 	
-	private Context context;
-	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
-		
-		this.context = context;
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
@@ -37,7 +34,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	}
 	
 	private String getPackageName(MetaModule m){
-		return getPackageName(context, m);
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext(), m);
 	}
 	
 	private GeneratedClass generateException(MetaModule module){
@@ -84,7 +81,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        clazz.addImport((DataFacadeGenerator.getDocumentImport(context, doc)));
+	        clazz.addImport((DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc)));
 	    }
 	    
 	    clazz.setName(getInterfaceName(module));
@@ -152,7 +149,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (MetaDocument doc : docs){
-	    	clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    	clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 	    }
 	    clazz.addImport("net.anotheria.db.service.BasePersistenceServiceJDBCImpl");
 	    clazz.addImport("net.anotheria.db.dao.DAOException");

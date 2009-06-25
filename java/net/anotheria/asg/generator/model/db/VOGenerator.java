@@ -7,6 +7,7 @@ import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
@@ -27,15 +28,13 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 	public static final String DAO_CREATED = "daoCreated";
 	public static final String DAO_UPDATED = "daoUpdated";
 	
-	private Context context;
 	MetaProperty id = new MetaProperty("id","string");
 	
 	MetaProperty daoCreated = new MetaProperty(DAO_CREATED, "long");
 	MetaProperty daoUpdated = new MetaProperty(DAO_UPDATED, "long");
 	
-	public List<FileEntry> generate(IGenerateable gdoc, Context context){
+	public List<FileEntry> generate(IGenerateable gdoc){
 		MetaDocument doc = (MetaDocument)gdoc;
-		this.context = context;
 		id.setReadonly(true);
 		
 		
@@ -81,7 +80,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		}
 		
 		for (MetaProperty p : doc.getProperties()){
-			if (p.isMultilingual() && context.areLanguagesSupported()){
+			if (p.isMultilingual() && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
 				clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 				break;
 			}
@@ -214,7 +213,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 	}
 	
 	private void _generatePropertyField(MetaProperty p){
-		if (context.areLanguagesSupported() && p.isMultilingual()){
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
 			throw new AssertionError("Multilingual support for VOs not yet implemented!");
 			/*
 			for (String l: context.getLanguages()){
@@ -264,7 +263,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 			generateListPropertyGetterMethods((MetaListProperty)p);
 			return;
 		}
-		if (context.areLanguagesSupported() && p.isMultilingual()){
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
 			generatePropertyGetterMethodMultilingual(p);
 			return;
 		}
@@ -276,7 +275,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 	}
 	
 	private void generatePropertyGetterMethodMultilingual(MetaProperty p){
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"(){");
 			increaseIdent();
 			appendStatement("return "+p.toPropertyGetter()+"("+p.toNameConstant(l)+")");
@@ -314,7 +313,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 			generateListPropertySetterMethods((MetaListProperty)p);
 			return;
 		}
-		if (context.areLanguagesSupported() && p.isMultilingual()){
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
 			generatePropertySetterMethodMultilingual(p);
 			return;
 		}
@@ -326,7 +325,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 	}
 	
 	private void generatePropertySetterMethodMultilingual(MetaProperty p){
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value){");
 			increaseIdent();
 			appendStatement(""+p.toPropertySetter()+"("+p.toNameConstant(l)+", value)");

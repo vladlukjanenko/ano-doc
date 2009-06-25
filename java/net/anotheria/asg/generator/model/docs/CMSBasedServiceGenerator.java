@@ -17,13 +17,9 @@ import net.anotheria.asg.generator.model.DataFacadeGenerator;
 
 public class CMSBasedServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
-	private Context context;
-	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
-		this.context = context;
-		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		ret.add(new FileEntry(generateFactory(mod)));
 		ret.add(new FileEntry(generateImplementation(mod)));
@@ -117,6 +113,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.addImport("net.anotheria.util.sorter.SortType");
 		clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
 		
+		Context context = GeneratorDataRegistry.getInstance().getContext();
 		clazz.addImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
 		clazz.addImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService");
 

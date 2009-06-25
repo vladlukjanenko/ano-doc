@@ -7,6 +7,7 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedXMLFile;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.util.StringUtils;
@@ -19,10 +20,10 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 	
 	public static final String GENERATED_PACKAGE = "net.anotheria.anosite.gen";
 	
-	public List<FileEntry> generate(IGenerateable g, Context context) {
+	public List<FileEntry> generate(IGenerateable g) {
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		
-		GeneratedXMLFile log4Config = generateContent(context);
+		GeneratedXMLFile log4Config = generateContent();
 		log4Config.setPath("/etc/appdata");
 		
 		FileEntry entry = new FileEntry(log4Config);
@@ -32,7 +33,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 		return files;
 	}
 	
-	private GeneratedXMLFile generateContent(Context context){
+	private GeneratedXMLFile generateContent(){
 	
 		GeneratedXMLFile artefact = new GeneratedXMLFile("log4j", "UTF-8");
 		startNewJob(artefact);
@@ -50,7 +51,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 		  	appendString("<!-- File Appender for ", cat, " and higher -->");
 		  	appendString("<appender name=", quote(StringUtils.capitalize(cat) + "GenAppender"), " class="+quote("org.apache.log4j.RollingFileAppender"),">");
 		  	increaseIdent();
-		  	appendString("<param name=", quote("File"), " value=", quote("logs/"+context.getApplicationName()+"-gen-"+cat+".log"), " />");
+		  	appendString("<param name=", quote("File"), " value=", quote("logs/"+GeneratorDataRegistry.getInstance().getContext().getApplicationName()+"-gen-"+cat+".log"), " />");
 		  	appendString("<param name=", quote("Threshold"), " value=", quote(cat.toUpperCase()), " />");
 		  	appendString("<param name=", quote("MaxFileSize"), " value=",quote("100MB"), " />  ");     
 		  	appendString("<param name=", quote("MaxBackupIndex"), " value=", quote(5), " />");
@@ -71,7 +72,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 		  	appendString("<!-- File Appender for ", cat, " and higher -->");
 		  	appendString("<appender name=", quote(StringUtils.capitalize(cat) + "Appender"), " class="+quote("org.apache.log4j.RollingFileAppender"),">");
 		  	increaseIdent();
-		  	appendString("<param name=", quote("File"), " value=", quote("logs/"+context.getApplicationName()+"-"+cat+".log"), " />");
+		  	appendString("<param name=", quote("File"), " value=", quote("logs/"+GeneratorDataRegistry.getInstance().getContext().getApplicationName()+"-"+cat+".log"), " />");
 		  	appendString("<param name=", quote("Threshold"), " value=", quote(cat.toUpperCase()), " />");
 		  	appendString("<param name=", quote("MaxFileSize"), " value=",quote("100MB"), " />  ");     
 		  	appendString("<param name=", quote("MaxBackupIndex"), " value=", quote(5), " />");
@@ -98,7 +99,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 		appendString("</appender>");
 		emptyline();
 
-		appendString("<logger name=", quote(context.getTopPackageName()), " additivity=", quote("false"), ">");
+		appendString("<logger name=", quote(GeneratorDataRegistry.getInstance().getContext().getTopPackageName()), " additivity=", quote("false"), ">");
 		increaseIdent(); 
 		appendString("<level value=", quote("INFO"), "/>");
 		for (String cat : categories)
@@ -107,7 +108,7 @@ public class Log4JConfigurationGenerator extends AbstractGenerator implements IG
 		appendString("</logger>");
 		emptyline();
 		
-		appendString("<logger name=", quote("net.anotheria."+context.getApplicationName().toLowerCase()), " additivity=", quote("false"), ">");
+		appendString("<logger name=", quote("net.anotheria."+GeneratorDataRegistry.getInstance().getContext().getApplicationName().toLowerCase()), " additivity=", quote("false"), ">");
 		increaseIdent(); 
 		appendString("<level value=", quote("INFO"), "/>");
 		for (String cat : categories)

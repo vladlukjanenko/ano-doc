@@ -20,16 +20,12 @@ import net.anotheria.asg.generator.types.meta.EnumerationType;
  */
 public class EnumerationGenerator extends AbstractGenerator implements IGenerator{
 
-	private Context context;
-	
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
-	public List<FileEntry> generate(IGenerateable g, Context context) {
+	public List<FileEntry> generate(IGenerateable g) {
 		EnumerationType type = (EnumerationType)g;
 		List<FileEntry> ret = new ArrayList<FileEntry>();
-		this.context = context;
-		
 		ret.add(new FileEntry(generateDefinition(type)));		
 		ret.add(new FileEntry(generateUtils(type)));		
 
@@ -49,7 +45,7 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 	}
 
 	public final String getPackageName(){
-		return getPackageName(context);
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext());
 	}
 	
 	public static String getPackageName(Context context){

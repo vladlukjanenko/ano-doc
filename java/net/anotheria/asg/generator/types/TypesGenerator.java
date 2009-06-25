@@ -24,7 +24,7 @@ public class TypesGenerator extends AbstractAnoDocGenerator{
 			DataType type = types.get(i);
 			//System.out.println("Generating type: "+type);
 			if (type instanceof EnumerationType)
-				files.addAll(new EnumerationGenerator().generate(type, context));
+				files.addAll(new EnumerationGenerator().generate(type));
 		}
 		
 		writeFiles(files);

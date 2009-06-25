@@ -32,14 +32,13 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	private Context context;
 	private MetaModule module;
 	
-	@Override public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	@Override public List<FileEntry> generate(IGenerateable gmodule){
 		
 		module = (MetaModule)gmodule;
 		
 		if (!module.isEnabledByOptions(GenerationOptions.RMI))
 			return new ArrayList<FileEntry>();
 		
-		this.context = context;
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ExecutionTimer timer = new ExecutionTimer("RMI Generator");
@@ -370,7 +369,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    emptyline();
         
 	    appendString("public static final String getServiceId(){");
-	    appendIncreasedStatement("return ", quote(StringUtils.replace(ServiceGenerator.getInterfaceImport(context, module), '.', '_')));
+	    appendIncreasedStatement("return ", quote(StringUtils.replace(ServiceGenerator.getInterfaceImport(module), '.', '_')));
 	    appendString("}");
 
 	    appendString("static final "+getInterfaceName(module)+" getRemote() throws Exception{");
@@ -400,7 +399,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 	    clazz.addImport("net.anotheria.asg.util.rmi.RMIConfig");
 	    clazz.addImport("net.anotheria.asg.util.rmi.RMIConfigFactory");
-	    clazz.addImport(ServiceGenerator.getInterfaceImport(context, module));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
 	    clazz.addImport(ServiceGenerator.getFactoryImport(context, module));
 	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	    clazz.addImport(InMemoryServiceGenerator.getInMemoryFactoryImport(context, module));
@@ -495,7 +494,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 	    clazz.addImport("java.rmi.RemoteException");
 	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
-	    clazz.addImport(ServiceGenerator.getInterfaceImport(context, module));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
 	    
 	    clazz.setName(getStubName(module));
 	    clazz.setParent("BaseRemoteServiceStub<"+getInterfaceName(module)+">");
@@ -780,7 +779,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 	    clazz.addImport("net.anotheria.asg.service.remote.BaseRemoteServiceSkeleton");
 	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
-	    clazz.addImport(ServiceGenerator.getInterfaceImport(context, module));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
 
 	    clazz.setName(getSkeletonName(module));
 	    clazz.setParent("BaseRemoteServiceSkeleton");

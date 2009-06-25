@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
@@ -27,21 +26,21 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
-	public FileEntry generate(IGenerateable g, Context context) {
+	public FileEntry generate(IGenerateable g) {
 		
 		MetaView view = (MetaView)g;
-		return new FileEntry(generateViewAction(view, context));
+		return new FileEntry(generateViewAction(view));
 	}
 	
 	public static String getViewActionName(MetaView view){
 		return "Base"+StringUtils.capitalize(view.getName())+"Action";
 	}
 	
-	public GeneratedClass generateViewAction(MetaView view, Context context){
+	public GeneratedClass generateViewAction(MetaView view){
 
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".action");
+		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action");
 		
 		List<MetaSection> sections = view.getSections();
 		List<MetaModule> modules = new ArrayList<MetaModule>();
@@ -65,7 +64,7 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 
 		clazz.setAbstractClass(true);
 		clazz.setName(getViewActionName(view));
-		clazz.setParent(BaseActionGenerator.getBaseActionName(context));
+		clazz.setParent(BaseActionGenerator.getBaseActionName());
 
 		startClassBody();
 

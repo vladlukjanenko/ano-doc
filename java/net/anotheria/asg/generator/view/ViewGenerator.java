@@ -28,7 +28,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		//hack, works only with one view.
-		files.add(new BaseActionGenerator().generate(views, context));
+		files.add(new BaseActionGenerator().generate(views));
 		files.add(new SharedJspFooterGenerator().generate(views, context));
 		files.add(new JspMenuGenerator().generate(views, context));
 		files.addAll(new WebXMLGenerator().generate(views, context));
@@ -40,7 +40,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 			timer.startExecution("view-"+view.getName());
 
 			timer.startExecution("v-"+view.getName()+"-BaseViewAction");
-			files.add(new BaseViewActionGenerator().generate(view, context));
+			files.add(new BaseViewActionGenerator().generate(view));
 			timer.stopExecution("v-"+view.getName()+"-BaseViewAction");
 			
 			timer.startExecution("v-"+view.getName()+"-View");
@@ -48,15 +48,15 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 			timer.stopExecution("v-"+view.getName()+"-View");
 
 			timer.startExecution("v-"+view.getName()+"-Jsp");
-			files.addAll(new JspViewGenerator().generate(view, context));
+			files.addAll(new JspViewGenerator().generate(view));
 			timer.stopExecution("v-"+view.getName()+"-Jsp");
 			
 			timer.startExecution("v-"+view.getName()+"-JspQueries");
-			files.addAll(new JspQueriesGenerator().generate(view, context));
+			files.addAll(new JspQueriesGenerator().generate(view));
 			timer.stopExecution("v-"+view.getName()+"-JspQueries");
 			
 			timer.startExecution("v-"+view.getName()+"-StrutsConfig");
-			files.addAll(new StrutsConfigGenerator().generate(view, context));
+			files.addAll(new StrutsConfigGenerator().generate(view));
 			timer.stopExecution("v-"+view.getName()+"-StrutsConfig");
 			
 			timer.stopExecution("view-"+view.getName());
@@ -94,8 +94,8 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 	
 	private List<FileEntry> generateMetaModuleSection(String path, MetaModuleSection section, MetaView view){
 		List<FileEntry> ret = new ArrayList<FileEntry>();
-		ret.addAll(new ModuleBeanGenerator().generate(section, GeneratorDataRegistry.getInstance().getContext()));
-	    ret.addAll(new ModuleActionsGenerator(view).generate(section, GeneratorDataRegistry.getInstance().getContext()));
+		ret.addAll(new ModuleBeanGenerator().generate(section));
+	    ret.addAll(new ModuleActionsGenerator(view).generate(section));
 	    return ret;
 	}
 

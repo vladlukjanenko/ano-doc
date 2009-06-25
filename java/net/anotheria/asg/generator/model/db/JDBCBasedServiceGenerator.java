@@ -7,6 +7,7 @@ import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
@@ -21,13 +22,10 @@ import net.anotheria.asg.generator.model.DataFacadeGenerator;
  */
 public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
-	private Context context;
-	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
 		
-		this.context = context;
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ret.add(new FileEntry(generateFactory(mod)));
@@ -44,6 +42,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	private GeneratedClass generateImplementation(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		Context context = GeneratorDataRegistry.getInstance().getContext();
 		
 	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+"."));
 	    clazz.setPackageName(getPackageName(module));

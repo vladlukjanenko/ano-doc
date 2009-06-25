@@ -299,12 +299,12 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return context.getApplicationURLPath()+"/yui/"+yuiName;
 	}
 
-	public static String getPackage(Context context, MetaModule mod){
-		return context.getJspPackageName(mod);
+	public static String getPackage(MetaModule mod){
+		return GeneratorDataRegistry.getInstance().getContext().getJspPackageName(mod);
 	}
 
-	public static String getPackage(Context context, MetaDocument doc){
-		return context.getJspPackageName(doc);
+	public static String getPackage(MetaDocument doc){
+		return GeneratorDataRegistry.getInstance().getContext().getJspPackageName(doc);
 	}
 
 	/**

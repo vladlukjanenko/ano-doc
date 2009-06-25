@@ -32,8 +32,8 @@ public class BaseActionGenerator extends AbstractGenerator {
 	 * @param context
 	 * @return
 	 */
-	public FileEntry generate(List<MetaView> views , Context context) {
-		return new FileEntry(generateBaseAction(context, views));
+	public FileEntry generate(List<MetaView> views) {
+		return new FileEntry(generateBaseAction(views));
 	}
 	
 	/**
@@ -41,8 +41,8 @@ public class BaseActionGenerator extends AbstractGenerator {
 	 * @param context
 	 * @return
 	 */
-	public static String getBaseActionName(Context context){
-		return "Base"+StringUtils.capitalize(context.getApplicationName())+"Action";
+	public static String getBaseActionName(){
+		return "Base"+StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())+"Action";
 	}
 	
 	/**
@@ -51,12 +51,12 @@ public class BaseActionGenerator extends AbstractGenerator {
 	 * @param views
 	 * @return
 	 */
-	public GeneratedClass generateBaseAction(Context context, List<MetaView> views){
+	public GeneratedClass generateBaseAction(List<MetaView> views){
 
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setPackageName(context.getPackageName(MetaModule.SHARED)+".action");
+		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action");
 
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
 		
@@ -69,7 +69,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 
 		clazz.setAbstractClass(true);
 		clazz.setParent("BaseAction");
-		clazz.setName(getBaseActionName(context));
+		clazz.setName(getBaseActionName());
 
 		startClassBody();
 		
@@ -97,14 +97,14 @@ public class BaseActionGenerator extends AbstractGenerator {
 		increaseIdent();
 		
 		clazz.addImport("org.apache.log4j.Logger");
-		appendStatement("Logger staticlogger = Logger.getLogger("+getBaseActionName(context)+".class)");
+		appendStatement("Logger staticlogger = Logger.getLogger("+getBaseActionName()+".class)");
 		
 		clazz.addImport(MetaFactory.class);
 		clazz.addImport(Extension.class);
 		clazz.addImport(MetaFactoryException.class);
 		
 		for (MetaModule m:modules){
-			clazz.addImport(ServiceGenerator.getInterfaceImport(context, m));
+			clazz.addImport(ServiceGenerator.getInterfaceImport(m));
 			appendCommentLine(ModuleActionsGenerator.getServiceInstanceName(m)+" = "+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"()");
 			appendString("try{");
 			appendIncreasedStatement(ModuleActionsGenerator.getServiceInstanceName(m)+" = MetaFactory.get("+ServiceGenerator.getInterfaceName(m)+".class, Extension.EDITORINTERFACE)");
@@ -156,8 +156,8 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendIncreasedStatement("queryString = \"?\"+queryString");
 		appendString("else");
 		appendIncreasedStatement("queryString = \"\"");
-		appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, \""+context.getApplicationURLPath()+"/"+context.getServletMapping()+"\"+req.getPathInfo()+queryString)");
-		appendStatement("String redUrl = "+quote(context.getApplicationURLPath()+"/"+context.getServletMapping()+"/login"));
+		appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, \""+GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"\"+req.getPathInfo()+queryString)");
+		appendStatement("String redUrl = "+quote(GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"/login"));
 		appendStatement("res.sendRedirect(redUrl)");
 		appendStatement("return null");					
 		append(closeBlock());	

@@ -34,7 +34,7 @@ public class DataGenerator extends AbstractAnoDocGenerator{
 		todo.addAll(new BasicServiceGenerator().generate(modules, context));
 		timer.stopExecution("basic service");
 		timer.startExecution("sql");
-		todo.addAll(new SQLGenerator().generate(modules, context));
+		todo.addAll(new SQLGenerator().generate(modules));
 		timer.stopExecution("sql");
 		timer.startExecution("modules");
 		for (int i=0; i<modules.size(); i++){

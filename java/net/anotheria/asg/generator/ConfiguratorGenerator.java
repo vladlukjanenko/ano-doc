@@ -16,8 +16,7 @@ import net.anotheria.asg.metafactory.MetaFactory;
  */
 public class ConfiguratorGenerator extends AbstractGenerator implements IGenerator{
 	
-	@Override
-	public List<FileEntry> generate(IGenerateable g, Context context) {
+	@Override public List<FileEntry> generate(IGenerateable g) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -64,7 +63,7 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 		for (int i=0; i<modules.size(); i++){
 			MetaModule m = modules.get(i);
 			
-			clazz.addImport(ServiceGenerator.getInterfaceImport(context, m));
+			clazz.addImport(ServiceGenerator.getInterfaceImport(m));
 			clazz.addImport(ServiceGenerator.getFactoryImport(context, m));
 			appendCommentLine("//aliases for "+ServiceGenerator.getInterfaceName(m));
 			appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.LOCAL)");

@@ -56,9 +56,6 @@ import net.anotheria.util.StringUtils;
  */
 public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator {
     
-	//private MetaView view;
-	
-	private Context context;
     
 	/**
 	 * Implementation is moved into ano-web, the constant remains.
@@ -71,8 +68,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
-	public List<FileEntry> generate(IGenerateable g, Context context) {
-		this.context = context;
+	public List<FileEntry> generate(IGenerateable g) {
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		
 		MetaModuleSection section = (MetaModuleSection)g;
@@ -344,7 +340,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		//this is only used if the multilingual support is enabled for the project AND document.
 		MetaFieldElement multilingualInstanceDisabledElement = new MetaFieldElement(FIELD_ML_DISABLED);
 		
-		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc, context);
+		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc);
 		
 		for (MetaViewElement element : elements){
 			if (element instanceof MetaFieldElement){
@@ -443,14 +439,14 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		String defaultElemName = null;
 		int lastIndex = 1;
 		
-		elements = createMultilingualList(elements, section.getDocument(), context);
+		elements = createMultilingualList(elements, section.getDocument());
 		
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 			if (element.isComparable()){
 				if (element.equals(defaultElem)){
 					if (element instanceof MultilingualFieldElement){
-						defaultElemName = "SORT_BY_"+section.getDocument().getField(element.getName()).getName(context.getDefaultLanguage()).toUpperCase();
+						defaultElemName = "SORT_BY_"+section.getDocument().getField(element.getName()).getName(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage()).toUpperCase();
 					}else{					
 						defaultElemName = "SORT_BY_"+element.getName().toUpperCase();
 					}
@@ -555,7 +551,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		MetaDocument doc = section.getDocument();
 		List<MetaViewElement> origElements = section.getElements();
 
-		List<MetaViewElement> elements = createMultilingualList(origElements, doc, context);
+		List<MetaViewElement> elements = createMultilingualList(origElements, doc);
 
 		//elements.addAll(origElements);
 		MetaFieldElement plainId = new MetaFieldElement("plainId");
@@ -818,8 +814,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		return StringUtils.capitalize(dialog.getName())+StringUtils.capitalize(document.getName())+"Form";
 	}
 	
-	public static String getDialogBeanImport(Context context, MetaDialog dialog, MetaDocument doc){
-		return getPackage(context, doc)+"."+getDialogBeanName(dialog, doc);
+	public static String getDialogBeanImport(MetaDialog dialog, MetaDocument doc){
+		return getPackage(GeneratorDataRegistry.getInstance().getContext(), doc)+"."+getDialogBeanName(dialog, doc);
 	}
 	
 	public static String getFormBeanImport(MetaForm form){

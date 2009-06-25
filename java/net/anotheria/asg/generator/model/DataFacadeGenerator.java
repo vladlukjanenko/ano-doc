@@ -28,11 +28,8 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 
 	public static final String PROPERTY_DECLARATION = "public static final String ";	
 	
-	private Context context;
-	
-	public List<FileEntry> generate(IGenerateable gdoc, Context context){
+	public List<FileEntry> generate(IGenerateable gdoc){
 		MetaDocument doc = (MetaDocument)gdoc;
-		this.context = context;
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
@@ -181,9 +178,9 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		
 		startClassBody();
 		increaseIdent();
-		if (context.areLanguagesSupported()){
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
 			String langArray = "";
-			for (String l : context.getLanguages()){
+			for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 				if (langArray.length()>0 )
 					langArray += ",";
 				langArray += quote(l);
@@ -247,7 +244,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 			generateListPropertyToXMLMethods((MetaListProperty)p);
 			return;
 		}
-		if (context.areLanguagesSupported() && p.isMultilingual()){
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
 			generatePropertyToXMLMethodMultilingual(p);
 			return;
 		}
@@ -259,7 +256,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	private void generatePropertyToXMLMethodMultilingual(MetaProperty p){
 		String callArr = "";
 		
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			if (callArr.length()>0)
 				callArr += ", ";
 			callArr += "object.get"+p.getAccesserName(l)+"()";
@@ -362,8 +359,8 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		appendComment("Copies all multilingual properties from source language to destination language ");
 		appendString("public void "+getCopyMethodName()+"(String sourceLanguge, String destLanguage);");
 		emptyline();
-		for (String srclang : context.getLanguages()){
-			for (String targetlang : context.getLanguages()){
+		for (String srclang : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+			for (String targetlang : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 				if (!srclang.equals(targetlang)){
 					appendComment("Copies all multilingual properties from language "+srclang+" to language "+targetlang);
 					appendString("public void "+getCopyMethodName(srclang, targetlang)+"();");
@@ -392,8 +389,8 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 	
 	private void _generatePropertyConstant(MetaProperty p){
-		if (context.areLanguagesSupported() && p.isMultilingual()){
-			for (String l: context.getLanguages()){
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
+			for (String l: GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 				String decl = PROPERTY_DECLARATION;
 				decl += p.toNameConstant(l);
 				decl += "\t= \""+p.getName()+"_"+l+"\"";
@@ -453,7 +450,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 			generateListPropertyGetterMethods((MetaListProperty)p);
 			return;
 		}
-		if (context.areLanguagesSupported() && p.isMultilingual()){
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
 			generatePropertyGetterMethodMultilingual(p);
 			return;
 		}
@@ -481,7 +478,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 
 	private void generatePropertyGetterMethodMultilingual(MetaProperty p){
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendComment("Returns the value of the "+p.getName()+" attribute in the \""+l+"\" domain.");
 			appendString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"();");
 			emptyline();
@@ -525,7 +522,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 			generateListPropertySetterMethods((MetaListProperty)p);
 			return;
 		}
-		if (context.areLanguagesSupported() && p.isMultilingual()){
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
 			generatePropertySetterMethodMultilingual(p);
 			return;
 		}
@@ -555,7 +552,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 
 	private void generatePropertySetterMethodMultilingual(MetaProperty p){
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendComment("Sets the value of the "+p.getName()+" attribute in the domain \""+l+"\"");
 			appendString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value);");
 			emptyline();
@@ -618,7 +615,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 	
 	private void generateContainerMethodsMultilingual(MetaContainerProperty container){
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendComment("Returns the number of elements in the \""+container.getName()+"\" container");
 			appendString("public int "+getContainerSizeGetterName(container, l)+"();");
 			emptyline();
@@ -651,7 +648,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 	
 	private void generateListMethodsMultilingual(MetaListProperty list){
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 		
 			MetaProperty c = list.getContainedProperty();
 			appendComment("Adds a new element to the list.");

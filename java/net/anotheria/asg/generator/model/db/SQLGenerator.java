@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedSQLFile;
 import net.anotheria.asg.generator.GenerationJobManager;
@@ -19,12 +18,12 @@ import net.anotheria.asg.generator.meta.StorageType;
 
 public class SQLGenerator extends AbstractGenerator implements IGenerator{
 	
-	public List<FileEntry> generate(List<MetaModule>  modules, Context context){
+	public List<FileEntry> generate(List<MetaModule>  modules){
 		ArrayList<FileEntry> ret = new ArrayList<FileEntry>();
 		ArrayList<MetaDocument> documents = new ArrayList<MetaDocument>();
 		for (MetaModule m : modules){
 			if (m.getStorageType().equals(StorageType.DB)){
-				ret.addAll(generate(m, context));
+				ret.addAll(generate(m));
 				documents.addAll(m.getDocuments());
 			}
 		}
@@ -48,7 +47,7 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		for (MetaDocument doc : documents){
 			GenerationJobManager.getCurrentJob().setBuilder(allCreate.getBody());
 			generateSQLCreate(doc, dao_created, dao_updated);
-			appendEmptyline();
+			emptyline();
 			
 			if (tableNames.length()>0)
 				tableNames += ",";
@@ -56,7 +55,7 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		
 			GenerationJobManager.getCurrentJob().setBuilder(allDelete.getBody());
 			generateSQLDelete(doc);
-			appendEmptyline();
+			emptyline();
 		}
 		
 		
@@ -68,7 +67,7 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		return entries;
 	}
 	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
 		

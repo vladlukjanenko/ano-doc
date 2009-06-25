@@ -12,7 +12,7 @@ import net.anotheria.asg.generator.util.FileWriter;
  */
 public class AbstractAnoDocGenerator {
 	protected void runGenerator(IGenerator generator, IGenerateable target, Context context, List<FileEntry> results){
-		List<FileEntry> tmp = generator.generate(target, context);
+		List<FileEntry> tmp = generator.generate(target);
 		for (Iterator<FileEntry> it = tmp.iterator(); it.hasNext(); )
 			results.add(it.next());
 		

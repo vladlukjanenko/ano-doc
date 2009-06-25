@@ -30,13 +30,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 	public static final String PROPERTY_DECLARATION = "public static final String ";	
 	public static final String GET_CURRENT_LANG = "ContextManager.getCallContext().getCurrentLanguage()";
 
-	private Context context;
-	
-	public List<FileEntry> generate(IGenerateable gdoc, Context context){
+	public List<FileEntry> generate(IGenerateable gdoc){
 		MetaDocument doc = (MetaDocument)gdoc;
-		this.context = context;
-		
-		
 		
 		//System.out.println(ret);
 		List<FileEntry> _ret = new ArrayList<FileEntry>();
@@ -90,7 +85,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			}
 		}
 		
-		if (doc.isMultilingual() && context.areLanguagesSupported()){
+		if (doc.isMultilingual() && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
 			clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 			clazz.addImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 			clazz.addImport("net.anotheria.anodoc.data.BooleanProperty");
@@ -153,6 +148,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 	}
 	
 	private void generateLanguageCopyMethods(MetaDocument doc){
+		
+		Context context = GeneratorDataRegistry.getInstance().getContext(); 
 		
 		//first the common method lang2lang
 		appendString("public void "+DataFacadeGenerator.getCopyMethodName()+"(String sourceLanguage, String destLanguage){");
@@ -255,7 +252,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			return generateTablePropertyGetterMethods((MetaTableProperty)p);
 		if (p instanceof MetaListProperty)
 			return generateListPropertyGetterMethods((MetaListProperty)p);
-		if (context.areLanguagesSupported() && p.isMultilingual())
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual())
 			return generatePropertyGetterMethodMultilingual(p);
 		
 		appendString("public "+p.toJavaType()+" get"+p.getAccesserName()+"(){");
@@ -270,7 +267,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 	
 	private String generatePropertyGetterMethodMultilingual(MetaProperty p){
 		String ret = "";
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendString("public "+p.toJavaType()+" get"+p.getAccesserName(l)+"(){");
 			increaseIdent();
 			if (p instanceof MetaGenericProperty)
@@ -315,7 +312,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 			return generateTablePropertySetterMethods((MetaTableProperty)p);
 		if (p instanceof MetaListProperty)
 			return generateListPropertySetterMethods((MetaListProperty)p);
-		if (context.areLanguagesSupported() && p.isMultilingual())
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual())
 			return generatePropertySetterMethodMultilingual(p);
 
 		appendString("public void set"+p.getAccesserName()+"("+p.toJavaType()+" value){");
@@ -330,7 +327,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 	
 	private String generatePropertySetterMethodMultilingual(MetaProperty p){
 		String ret = "";
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendString("public void set"+p.getAccesserName(l)+"("+p.toJavaType()+" value){");
 			increaseIdent();
 			if(p instanceof MetaGenericProperty)
@@ -432,7 +429,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 	}
 	
 	private void generateContainerMethodsMultilingual(MetaContainerProperty container){
-		for (String l : context.getLanguages()){
+		for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendString("public int "+getContainerSizeGetterName(container, l)+"(){");
 			increaseIdent();
 			MetaProperty pr = container instanceof MetaTableProperty ? 

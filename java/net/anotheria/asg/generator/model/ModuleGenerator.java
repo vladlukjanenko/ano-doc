@@ -7,6 +7,7 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
@@ -23,32 +24,32 @@ import net.anotheria.asg.generator.model.federation.FederationVOGenerator;
 public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 	
 	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		if (mod.getStorageType()==StorageType.CMS)
-			ret.add(new FileEntry(generateModule(mod, context)));
+			ret.add(new FileEntry(generateModule(mod)));
 		for (int i=0; i<mod.getDocuments().size();i++){
 			DataFacadeGenerator facadeGen = new DataFacadeGenerator();
-			ret.addAll(facadeGen.generate(mod.getDocuments().get(i), context));
+			ret.addAll(facadeGen.generate(mod.getDocuments().get(i)));
 			//System.out.println("Generating module: "+mod);
 
 			if (mod.getStorageType()==StorageType.CMS){
 				DocumentGenerator dg = new DocumentGenerator();
-				ret.addAll(dg.generate(mod.getDocuments().get(i), context));
+				ret.addAll(dg.generate(mod.getDocuments().get(i)));
 			}
 			
 			if (mod.getStorageType()==StorageType.DB){
 				VOGenerator vog = new VOGenerator();
-				ret.addAll(vog.generate(mod.getDocuments().get(i), context));
+				ret.addAll(vog.generate(mod.getDocuments().get(i)));
 			}
 
 			if (mod.getStorageType()==StorageType.FEDERATION){
 				FederationVOGenerator vog = new FederationVOGenerator();
-				ret.addAll(vog.generate(mod.getDocuments().get(i), context));
+				ret.addAll(vog.generate(mod.getDocuments().get(i)));
 			}
 		
 		}
@@ -57,11 +58,11 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		return ret;
 	}
 	
-	private GeneratedClass generateModule(MetaModule module, Context context){
+	private GeneratedClass generateModule(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setPackageName(context.getPackageName(module)+".data");
+		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(module)+".data");
 	
 		clazz.addImport("net.anotheria.anodoc.data.Module");
 		clazz.addImport("net.anotheria.anodoc.data.DocumentList");

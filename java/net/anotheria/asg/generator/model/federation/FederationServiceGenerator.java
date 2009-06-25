@@ -29,19 +29,16 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
  */
 public class FederationServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
-	private Context context;
-	MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
+	private final MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
 
 	
 	/**
 	 * Generates all artefacts.
 	 */
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
 		
-		this.context = context;
-
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ret.add(new FileEntry(generateFactory(mod)));
@@ -79,6 +76,9 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    clazz.addImport("net.anotheria.util.sorter.SortType");
 	    clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
 	    clazz.addImport("net.anotheria.util.StringUtils");
+	    
+	    Context context = GeneratorDataRegistry.getInstance().getContext();
+	    
 	    clazz.addImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
 	    
 	    List<FederatedModuleDef> federatedModules = module.getFederatedModules();
@@ -87,7 +87,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    	MetaModule target = GeneratorDataRegistry.getInstance().getModule(fedDef.getName());
 	    	if (target==null)
 	    		throw new RuntimeException("No such module: "+fedDef.getName());
-	    	clazz.addImport(ServiceGenerator.getInterfaceImport(context, target));
+	    	clazz.addImport(ServiceGenerator.getInterfaceImport(target));
 	    	clazz.addImport(ServiceGenerator.getExceptionImport(context, target));
 	    	clazz.addImport(ServiceGenerator.getFactoryImport(context, target));
 	    	targetModules.put(fedDef.getKey(), target);

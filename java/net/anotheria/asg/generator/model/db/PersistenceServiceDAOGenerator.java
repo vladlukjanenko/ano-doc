@@ -28,11 +28,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	
 	private Context context;
 	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
-		
-		this.context = context;
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
