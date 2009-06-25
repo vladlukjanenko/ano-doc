@@ -12,13 +12,21 @@ import net.anotheria.util.IOUtils;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
+ * Generates the web&dot;xml file.
  * @author another
  */
 public class WebXMLGenerator extends AbstractGenerator {
+	/**
+	 * The mark to replace with servlet definition in the web&dot;xml file.
+	 */
 	public static final String SERVLETS_PLACEHOLDER = "<insert_servlets/>";
+	/**
+	 * Name of the web&dot;xml template.
+	 */
 	public static final String TEMPLATE = "etc/templates/web-template.xml";
-	
+	/**
+	 * Name of the servlet.
+	 */
 	public static final String SERVLET_NAME_EDITOR = "editor";
 	
 	/* (non-Javadoc)
