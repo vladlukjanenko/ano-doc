@@ -7,6 +7,7 @@ public enum Extension {
 	LOCAL,
 	REMOTE,
 	DOMAIN,
+	INMEMORY,
 	CMS,
 	FEDERATION,
 	DB,
