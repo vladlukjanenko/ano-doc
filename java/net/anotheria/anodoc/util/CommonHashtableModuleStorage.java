@@ -38,9 +38,17 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 
 
 	public static final String DEF_KEY_CFG_STORAGE_DIRECTORY = "storage.dir";
-	
+	/**
+	 * Internal storage.
+	 */
 	private Hashtable<String,Module> storage;
+	/**
+	 * Name of the file.
+	 */ 
 	private String filename;
+	/**
+	 * The factory for modules and documents.
+	 */
 	private IModuleFactory factory;
 	public String cfgKeyStorageDir;
 	

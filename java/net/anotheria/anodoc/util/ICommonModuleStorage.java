@@ -19,20 +19,20 @@ public interface ICommonModuleStorage {
 	/**
 	 * Saves the given instance permanently. 
 	 */
-	public void saveModule(Module module) throws CommonModuleStorageException;
+	void saveModule(Module module) throws CommonModuleStorageException;
 
 	/**
 	 * Loads the specified instance. 
 	 */
-	public Module loadModule(String moduleId, String ownerId, String copyId, IModuleFactory factory) throws CommonModuleStorageException;
+	Module loadModule(String moduleId, String ownerId, String copyId, IModuleFactory factory) throws CommonModuleStorageException;
 
 	/**
 	 * Delete the specified instance. 
 	 */
-	public void deleteModule(String moduleId, String ownerId, String copyId) throws CommonModuleStorageException;
+	void deleteModule(String moduleId, String ownerId, String copyId) throws CommonModuleStorageException;
 
 	/**
 	 * Executes the specified query on all stored module instances. This method isn't supported by all implementations. 
 	 */
-	public List<Document> executeQueryOnDocuments(Predicate p, IModuleFactory fac) throws CommonModuleStorageException;
+	List<Document> executeQueryOnDocuments(Predicate p, IModuleFactory fac) throws CommonModuleStorageException;
 }

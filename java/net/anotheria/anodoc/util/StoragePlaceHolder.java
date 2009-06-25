@@ -16,31 +16,28 @@ public class StoragePlaceHolder implements IModuleStorage{
 
 	/**
 	 * Always throws new NoStoredModuleEntityException("placeholder storage") 
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#loadModule(String, String)
 	 */
-	public Module loadModule(String ownerId, String copyId)
+	@Override public Module loadModule(String ownerId, String copyId)
 		throws NoStoredModuleEntityException {
 		throw new NoStoredModuleEntityException("placeholder storage");
 	}
  
 	/**
 	 * Does nothing
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#saveModule(BGLModule)
 	 */
-	public void saveModule(Module module) {
+	@Override public void saveModule(Module module) {
 	}
 
 	/**
 	 * Does nothing
 	 */	
-	public void deleteModule(String ownerId, String copyId){
+	@Override public void deleteModule(String ownerId, String copyId){
 	}
 
 	/**
 	 * Throws a runtime exception - not implemented.
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#executeQueryOnDocuments(BasicPredicate)
 	 */
-	public List<Document> executeQueryOnDocuments(Predicate p) {
+	@Override public List<Document> executeQueryOnDocuments(Predicate p) {
 		throw new RuntimeException("Not implemented");
 	}
 
