@@ -145,6 +145,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return files;
 	}
 	
+	/**
+	 * Returns the name of the base action for the given section.
+	 * @param section
+	 * @return
+	 */
 	public static String getBaseActionName(MetaModuleSection section){
 	    return "Base"+getActionSuffix(section);
 	}
@@ -213,6 +218,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return "Duplicate"+getActionSuffix(section);
 	}
 	
+	/**
+	 * Generates a cumulated action which bundles multiple view operation in one class to reduce the number of generated classes.
+	 * @param section
+	 * @return
+	 */
 	private GeneratedClass generateMultiOpAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
@@ -244,6 +254,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return clazz;
 	}
 	
+	/**
+	 * Generates a cumulated action which bundles multiple view operation for the dialog in one class to reduce the number of generated classes.
+	 * @param section
+	 * @return
+	 */
 	private GeneratedClass generateMultiOpDialogAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
@@ -327,6 +342,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendIncreasedStatement("return "+path+"(mapping, af, req, res)");
 	}
 	
+	/**
+	 * Generates the list presentation action.
+	 * @param section
+	 * @return
+	 */
 	private GeneratedClass generateShowAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz)
@@ -971,6 +991,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); 
 	}
 	
+	/**
+	 * Generates update action, which is called by the dialog to update.
+	 * @param section
+	 * @return
+	 */
 	private GeneratedClass generateUpdateAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
 			return null;
@@ -1005,7 +1030,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		return clazz;
 	}
-
+	/**
+	 * Generates the working part of the update action which is used in both multiop and standalone update action. 
+	 * @param section
+	 * @param methodName
+	 */
 	private void generateUpdateActionMethod(MetaModuleSection section, String methodName){
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
@@ -1090,6 +1119,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); ;
 	}
 	
+	/**
+	 * Generates the switch multilinguality action which switches the multi language support for a single document on and off.
+	 * @param section
+	 * @return
+	 */
 	private GeneratedClass generateSwitchMultilingualityAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
 			return null;
@@ -1112,6 +1146,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return clazz;
 	}
 	
+	/**
+	 * Generates the working part of the switch multilinguality action.
+	 * @param section
+	 * @param methodName
+	 */
 	private void generateSwitchMultilingualityActionMethod(MetaModuleSection section, String methodName){
 	    
 		MetaDocument doc = section.getDocument();
@@ -1131,7 +1170,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); //end doExecute
 	}
 
-	
+	/**
+	 * Generates the language copy action which allows copying content from one language to another on per-document base.
+	 * @param section
+	 * @return
+	 */
 	private GeneratedClass generateLanguageCopyAction(MetaModuleSection section){
 		if (USE_MULTIOP_ACTIONS)
 			return null;
@@ -1154,6 +1197,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return clazz;
 	}
 	
+	/**
+	 * Generates the working part of the language copy action.
+	 * @param section
+	 * @param methodName
+	 */
 	private void generateLanguageCopyActionMethod(MetaModuleSection section, String methodName){
 	    
 		MetaDocument doc = section.getDocument();
@@ -1180,6 +1228,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		append(closeBlock()); ; //end doExecute
 	}
 
+	/**
+	 * Generates the edit action which presents a document for editing in the edit dialog.
+	 * @param section
+	 * @return
+	 */
 	private GeneratedClass generateEditAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
@@ -1248,6 +1301,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 	}
 
+	/**
+	 * Generates the working part of the edit action.
+	 * @param section
+	 * @return
+	 */
 	private void generateEditActionMethod(MetaModuleSection section, String methodname){
 
 		MetaDocument doc = section.getDocument();
@@ -1624,6 +1682,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return clazz;
 	}
 
+	/**
+	 * Generates the base action for a module, which is extended by all other module based actions.
+	 * @param section
+	 * @return
+	 */
 	private GeneratedClass generateBaseAction(MetaModuleSection section){
 		
 		GeneratedClass clazz = new GeneratedClass();
@@ -1695,6 +1758,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return getExecuteDeclaration(null);
 	}
 	
+	/**
+	 * Creates the execute method declaration.
+	 * @param methodName the name of the "execute" method. Null means anoDocExecute.
+	 * @return
+	 */
 	private String getExecuteDeclaration(String methodName){
 	    String ret = "";
 	    ret += "public ActionForward "+(methodName == null ? "anoDocExecute" : methodName ) + "(";
@@ -2051,8 +2119,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 	private GeneratedClass generateContainerMoveEntryAction(MetaModuleSection section, MetaContainerProperty container){
 		if (!(container instanceof MetaListProperty)){
-			//TODO decomment
-			//System.out.println("WARN moveUp only supported by lists, "+container+" is not a list");
 			return null;
 		}
 		
