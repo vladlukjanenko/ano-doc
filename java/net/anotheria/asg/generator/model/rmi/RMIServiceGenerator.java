@@ -32,7 +32,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	private Context context;
 	private MetaModule module;
 	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	@Override public List<FileEntry> generate(IGenerateable gmodule, Context context){
 		
 		module = (MetaModule)gmodule;
 		
@@ -69,14 +69,25 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		return ret;
 	}
 
+	/**
+	 * Returns the name of the remote exception.
+	 * @param m
+	 * @return
+	 */
 	public String getRemoteExceptionName(MetaModule m){
 	    return "RemoteExceptionWrapper";
 	}
 
+	/**
+	 * Returns the implementation name of the rmi service for this module.
+	 */
 	public String getImplementationName(MetaModule m){
 	    return "RMI"+getServiceName(m)+"Impl";
 	}
 	
+	/**
+	 * 
+	 */
 	public String getFactoryName(MetaModule m){
 	    return "RMI"+getServiceName(m)+"Factory";
 	}
@@ -93,11 +104,6 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	public static String getPackageName(Context context, MetaModule module){
 		return context.getPackageName(module)+".service.rmi";
 	}
-	
-	/*
-	protected String getSupportedInterfacesList(MetaModule module){
-		return super.getSupportedInterfacesList(module)+", InMemoryService.class";
-	}*/
 	
 	private GeneratedClass generateRemoteException(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
@@ -374,6 +380,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    return clazz;
 	}
 
+	/**
+	 * Generates the startable rmi server class.
+	 * @param module
+	 * @return
+	 */
 	private GeneratedClass generateServer(MetaModule module){
 		
 		GeneratedClass clazz = new GeneratedClass();
@@ -460,6 +471,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    return clazz;
 	}
 
+	/**
+	 * Generates the rmi stub.
+	 * @param module
+	 * @return
+	 */
 	private GeneratedClass generateStub(MetaModule module){
 	    
 		GeneratedClass clazz = new GeneratedClass();
@@ -739,7 +755,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    return clazz;
 	}
 	
-	
+	/**
+	 * Generates the rmi skeleton.
+	 * @param module
+	 * @return
+	 */
 	private GeneratedClass generateSkeleton(MetaModule module){
 	    
 		GeneratedClass clazz = new GeneratedClass();
@@ -988,7 +1008,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		return clazz;
 	}
 
-	
+	/**
+	 * Writes a function into the stub.
+	 * @param comment comment of the action.
+	 * @param returnType the rerutn type of the action.
+	 * @param funName name of the function.
+	 * @param parametersFull full parameter list.
+	 * @param parametersStripped stripped parameter list.
+ 	 * @param parametersForLogging parameters for logigng.
+	 */
 	private void writeStubFun(String comment, String returnType, String funName, String parametersFull, String parametersStripped, String parametersForLogging){
         appendComment(comment);
         appendString("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+", RemoteExceptionWrapper{");
@@ -1008,6 +1036,13 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    emptyline();
 	}
 	
+	/**
+	 * Writes a function to the interface.
+	 * @param comment
+	 * @param returnType
+	 * @param funName
+	 * @param parametersFull
+	 */
 	private void writeInterfaceFun(String comment, String returnType, String funName, String parametersFull){
         appendComment(comment);
         appendStatement("public ",(returnType.length()>0 ? returnType+" ": "void "), funName, "("+parametersFull+")"+" throws "+getExceptionName(module)+", RemoteException");
