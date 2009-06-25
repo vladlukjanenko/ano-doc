@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
+ * Representation of the boolean type.
  * @author another
  */
 public class BooleanType extends AbstractType{
@@ -9,16 +9,16 @@ public class BooleanType extends AbstractType{
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.meta.IMetaType#toJava()
 	 */
-	public String toJava() {
+	@Override public String toJava() {
 		return "boolean";
 	}
 	
-	public String toJavaObject(){
+	@Override public String toJavaObject(){
 		return "Boolean";
 	}
 
 
-	public String toBeanGetter(String name){
+	@Override public String toBeanGetter(String name){
 		return "is"+Character.toUpperCase(name.charAt(0))+name.substring(1);
 	}
 	

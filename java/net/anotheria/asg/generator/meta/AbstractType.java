@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
+ * Base class for type implementations.
  * @author another
  */
 public abstract class AbstractType implements IMetaType{

@@ -1,19 +1,19 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Internal representation of the FloatType.
+ * @author lrosenberg
  */
 public class FloatType extends AbstractType{
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.meta.IMetaType#toJava()
 	 */
-	public String toJava() {
+	@Override public String toJava() {
 		return "float";
 	}
 	
-	public String toJavaObject(){
+	@Override public String toJavaObject(){
 		return "Float";
 	}
 

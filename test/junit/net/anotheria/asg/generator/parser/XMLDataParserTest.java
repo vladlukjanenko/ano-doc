@@ -1,12 +1,13 @@
 package net.anotheria.asg.generator.parser;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 import java.io.File;
 import java.util.List;
 
-import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaModule;
@@ -60,8 +61,17 @@ public class XMLDataParserTest {
 		System.out.println("TargetB: "+targetB);
 		System.out.println("TargetB Module: "+targetB.getParentModule());
 		
+		assertTrue(linkA.isRelative());
+		//TODO this test fails due the shortcut in the same document.
 		//assertTrue(linkA.doesTargetMatch(targetA));
+		assertEquals("DocumentA2", linkA.getTargetDocumentName());
+		assertEquals(null, linkA.getTargetModuleName());
+		
+		assertFalse(linkB.isRelative());
 		assertTrue(linkB.doesTargetMatch(targetB));
+		assertEquals("DocumentB2", linkB.getTargetDocumentName());
+		assertEquals("SimpleModuleB", linkB.getTargetModuleName());
+		assertEquals("LINK_PROP_B2", linkB.toNameConstant());
 	}
 	
 	private void checkProperties(MetaDocument document){

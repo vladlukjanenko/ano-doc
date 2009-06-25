@@ -1,12 +1,18 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
+ * Representation of an internal link to another document.
  * @author another
  */
 public class MetaLink extends MetaProperty{
 	
+	/**
+	 * Type of the link. Currently the only supported link type is single.
+	 */
 	private String linkType;
+	/**
+	 * Link target as relative or absolute document name.
+	 */
 	private String linkTarget; 
 	
 	public MetaLink(String name){
@@ -52,7 +58,8 @@ public class MetaLink extends MetaProperty{
 	}
 	
 	public String getTargetModuleName(){
-		return getLinkTarget().substring(0, getLinkTarget().indexOf('.'));
+		int index = getLinkTarget().indexOf('.');
+		return index == -1 ? null : getLinkTarget().substring(0, index);
 	}
 
 	public String getTargetDocumentName(){

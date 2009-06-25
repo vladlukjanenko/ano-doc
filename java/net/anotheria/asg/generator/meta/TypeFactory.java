@@ -1,10 +1,15 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
+ * Factory for the meta types.
  * @author another
  */
 public class TypeFactory {
+	/**
+	 * Creates a type out of a string description.
+	 * @param type
+	 * @return
+	 */
 	public static final IMetaType createType(String type){
 		if (type.equals("string"))
 			return new StringType();

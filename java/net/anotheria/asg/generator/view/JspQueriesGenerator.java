@@ -19,7 +19,7 @@ import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
 
 /**
- * TODO please remined another to comment this class
+ * Generator for the queries page. Currently obsolete.
  * @author another
  */
 public class JspQueriesGenerator 

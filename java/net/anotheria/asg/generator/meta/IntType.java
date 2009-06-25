@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
+ * Representation of the Integer type.
  * @author another
  */
 public class IntType extends AbstractType{
@@ -9,10 +9,10 @@ public class IntType extends AbstractType{
 	/* (non-Javadoc)
  	 * @see net.anotheria.anodoc.generator.meta.IMetaType#toJava()
  	 */
-	public String toJava() {
+	@Override public String toJava() {
 		return "int";
 	}
-	public String toJavaObject(){
+	@Override public String toJavaObject(){
 		return "Integer";
 	}
 

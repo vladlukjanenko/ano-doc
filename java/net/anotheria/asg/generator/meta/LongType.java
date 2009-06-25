@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
+ * Representation of the LongType.
  * @author another
  */
 public class LongType extends AbstractType{
@@ -9,11 +9,11 @@ public class LongType extends AbstractType{
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.meta.IMetaType#toJava()
 	 */
-	public String toJava() {
+	@Override public String toJava() {
 		return "long";
 	}
 	
-	public String toJavaObject(){
+	@Override public String toJavaObject(){
 		return "Long";
 	}
 }

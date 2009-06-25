@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
+ * Representation of the image type. Image type is internal support type for images.
  * @author another
  */
 public class ImageType extends StringType{
