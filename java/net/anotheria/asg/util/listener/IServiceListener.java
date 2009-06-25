@@ -18,22 +18,26 @@ See www.friendscout24.de for details.
 package net.anotheria.asg.util.listener;
 
 import net.anotheria.asg.data.DataObject;
-
+/**
+ * A listener which can be configured into a generated service and becomes event on all created/updated/deleted documents (objects).
+ * @author another
+ *
+ */
 public interface IServiceListener {
 	/**
-	 * Called if a document has been updated
+	 * Called if a document has been updated.
 	 * @param oldVersion
 	 * @param newVersion
 	 */
-	public void documentUpdated(DataObject oldVersion, DataObject newVersion);
+	void documentUpdated(DataObject oldVersion, DataObject newVersion);
 	/**
-	 * Called if a document has been deleted
+	 * Called if a document has been deleted.
 	 * @param doc
 	 */
-	public void documentDeleted(DataObject doc);
+	void documentDeleted(DataObject doc);
 	/**
 	 * Called if new document is created.
 	 * @param doc
 	 */
-	public void documentCreated(DataObject doc);
+	void documentCreated(DataObject doc);
 }

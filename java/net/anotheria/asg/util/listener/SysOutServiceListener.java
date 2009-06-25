@@ -18,35 +18,21 @@ See www.friendscout24.de for details.
 package net.anotheria.asg.util.listener;
 
 import net.anotheria.asg.data.DataObject;
-
+/**
+ * A Service Listener which simply prints out all created/updated/deleted documents.
+ * @author lrosenberg
+ */
 public class SysOutServiceListener implements IServiceListener{
 
-	public void documentCreated(DataObject doc) {
+	@Override public void documentCreated(DataObject doc) {
 		System.out.println("Created new document of type: "+doc.getClass()+" : "+doc);
-		
 	}
 
-	public void documentDeleted(DataObject doc) {
+	@Override public void documentDeleted(DataObject doc) {
 		System.out.println("Deleted document of type: "+doc.getClass()+" : "+doc);
-		
 	}
 
-	public void documentUpdated(DataObject oldVersion, DataObject newVersion) {
+	@Override public void documentUpdated(DataObject oldVersion, DataObject newVersion) {
 		System.out.println("Updated a document of type: "+oldVersion.getClass()+" old: "+oldVersion+" new: "+newVersion);		
 	}
-	
-
 }
-
-/* ------------------------------------------------------------------------- *
- * $Log$
- * Revision 1.3  2007/06/07 23:40:19  lrosenberg
- * added db functionality
- *
- * Revision 1.2  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.1  2006/03/07 16:04:44  lrosenberg
- * *** empty log message ***
- *
- */

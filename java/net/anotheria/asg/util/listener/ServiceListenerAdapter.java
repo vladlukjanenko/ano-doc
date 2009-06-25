@@ -18,30 +18,21 @@ See www.friendscout24.de for details.
 package net.anotheria.asg.util.listener;
 
 import net.anotheria.asg.data.DataObject;
+/**
+ * An adapter class for ServiceListeners. 
+ * @author another
+ *
+ */
+public abstract class ServiceListenerAdapter implements IServiceListener{
 
-public class ServiceListenerAdapter implements IServiceListener{
-
-	public void documentCreated(DataObject doc) {
+	@Override public void documentCreated(DataObject doc) {
 	}
 
-	public void documentDeleted(DataObject doc) {
+	@Override public void documentDeleted(DataObject doc) {
 	}
 
-	public void documentUpdated(DataObject oldVersion, DataObject newVersion) {
+	@Override public void documentUpdated(DataObject oldVersion, DataObject newVersion) {
 	}
 	
 
 }
-
-/* ------------------------------------------------------------------------- *
- * $Log$
- * Revision 1.3  2007/06/07 23:40:19  lrosenberg
- * added db functionality
- *
- * Revision 1.2  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.1  2006/03/07 16:04:44  lrosenberg
- * *** empty log message ***
- *
- */
