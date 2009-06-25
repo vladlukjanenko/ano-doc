@@ -52,7 +52,7 @@ public class FloatProperty extends Property{
 	 * Sets the value of this property to given value, whether the value 
 	 * can be a Float or a String.
 	 */	
-	public void setValue(Object o){
+	@Override public void setValue(Object o){
 		if (o instanceof Float){
 			super.setValue(o);
 			return;
@@ -68,29 +68,21 @@ public class FloatProperty extends Property{
 	}
 
 	/**
-	 * Returns the string representation of this property in form of 
-	 * 'F name=value'.
-	 */	
-	public String toString(){
-		return "F "+super.toString();
-	}
-	
-	/**
 	 * Returns the size needed to hold a float value in bytes (8).
 	 * @see net.anotheria.anodoc.data.Property#getSizeInBytes()
 	 */
-	public long getSizeInBytes() {
+	@Override public long getSizeInBytes() {
 		return 8;
 	}
 	
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.data.Property#cloneValue()
 	 */
-	protected Object cloneValue() {
+	@Override protected Object cloneValue() {
 		return new Float(getfloat());
 	}
 
-	public PropertyType getPropertyType(){
+	@Override public PropertyType getPropertyType(){
 		return PropertyType.FLOAT;
 	}
 

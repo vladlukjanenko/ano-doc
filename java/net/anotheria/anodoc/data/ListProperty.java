@@ -79,19 +79,12 @@ public class ListProperty extends Property{
 		getList().remove(index);
 	}
 	
-	/**
-	 * Return the string representation of this object. Representations of BGLListProperty starts with '[' 
-	 */
-	public String toString(){
-		return "[ "+super.toString();
-	}
-	
 
 	/**
 	 * Returns the cumulative size of contained properties. The BGLListProperty itself is not counted.
 	 * @see biz.beaglesoft.bgldoc.data.BGLProperty#getSizeInBytes()
 	 */
-	public long getSizeInBytes() {
+	@Override public long getSizeInBytes() {
 		long sum = 0;
 		int mySize = getList().size();
 		for (int i=0; i<mySize; i++)
@@ -112,7 +105,7 @@ public class ListProperty extends Property{
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.data.Property#cloneValue()
 	 */
-	protected Object cloneValue() throws CloneNotSupportedException{
+	@Override protected Object cloneValue() throws CloneNotSupportedException{
 		List<Property> src = getList();
 		List<Property> ret = new ArrayList<Property>(src.size());
 		
@@ -122,7 +115,7 @@ public class ListProperty extends Property{
 		return ret;
 	}
 
-	public XMLNode toXMLNode(){
+	@Override public XMLNode toXMLNode(){
 		XMLNode elem = super.toXMLNode();
 		
 		elem.setContent("");
@@ -134,7 +127,7 @@ public class ListProperty extends Property{
 		return elem;
 	}
 	
-	public PropertyType getPropertyType(){
+	@Override public PropertyType getPropertyType(){
 		return PropertyType.LIST;
 	}
 

@@ -77,29 +77,22 @@ public class LongProperty extends Property{
 	}
 	
 	/**
-	 * Returns the String representation of this object. LongProperty starts with 'L'.
-	 */
-	public String toString(){
-		return "L "+super.toString();
-	}
-	
-	/**
 	 * Returns the size in bytes (8bytes = 64 bit datatype).
 	 * @see net.anotheria.anodoc.data.Property#getDataSize()
 	 */
-	public long getSizeInBytes() {
+	@Override public long getSizeInBytes() {
 		return 8;
 	}
 	
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.data.Property#cloneValue()
 	 */
-	protected Object cloneValue() {
+	@Override protected Object cloneValue() {
 		return new Long(getlong());
 	}
 
-	public PropertyType getPropertyType(){
-		return PropertyType.LIST;
+	@Override public PropertyType getPropertyType(){
+		return PropertyType.LONG;
 	}
 
 }

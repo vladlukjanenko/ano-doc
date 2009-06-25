@@ -56,7 +56,7 @@ public abstract class Property
 	 * 
 	 */
 	public String toString(){
-		return getName()+"="+value;
+		return getPropertyType().getIndicator()+getName()+"="+value;
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public abstract class Property
 		return getName();
 	}
 	
-	public boolean equals(Object o){
+	@Override public boolean equals(Object o){
 		if (!(o instanceof Property))
 			return false;
 		Property anotherProperty = (Property)o;
@@ -104,4 +104,5 @@ public abstract class Property
 	}
 	
 	public abstract PropertyType getPropertyType();
+	
 }

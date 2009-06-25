@@ -54,7 +54,7 @@ public class IntProperty extends Property{
 	 * Sets the value of this property to the value of the given object. 
 	 * o can be an Integer or a String representing an integer. 
 	 */
-	public void setValue(Object o){
+	@Override public void setValue(Object o){
 		if (o instanceof Integer){
 			super.setValue(o);
 			return;
@@ -70,29 +70,21 @@ public class IntProperty extends Property{
 	}
 	
 	/**
-	 * Returns the string representation of this property in form of 
-	 * 'I name=value'.
-	 */	
-	public String toString(){
-		return "I "+super.toString();
-	}
-	
-	/**
 	 * Returns the amount of bytes needed to hold an integer value - 4. 
 	 * @see net.anotheria.anodoc.data.Property#getDataSize()
 	 */
-	public long getSizeInBytes() {
+	@Override public long getSizeInBytes() {
 		return 4;
 	}
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.data.Property#cloneValue()
 	 */
-	protected Object cloneValue() {
+	@Override protected Object cloneValue() {
 		return new Integer(getInt());
 	}
  
-	public PropertyType getPropertyType(){
+	@Override public PropertyType getPropertyType(){
 		return PropertyType.INT;
 	}
 

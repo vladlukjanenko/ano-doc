@@ -8,33 +8,45 @@ public enum PropertyType {
 	/**
 	 * Integer.
 	 */
-	INT,
+	INT('I'),
 	/**
 	 * Long.
 	 */
-	LONG,
+	LONG('L'),
 	/**
 	 * Double.
 	 */
-	DOUBLE,
+	DOUBLE('D'),
 	/**
 	 * Float.
 	 */
-	FLOAT,
+	FLOAT('F'),
 	/**
 	 * List of properties.
 	 */
-	LIST,
+	LIST('['),
 	/**
 	 * String.
 	 */
-	STRING,
+	STRING('S'),
 	/**
 	 * Text. Same as String but with different editors.
 	 */
-	TEXT,
+	TEXT('T'),
 	/*
 	 * Boolean.
 	 */
-	BOOLEAN
+	BOOLEAN('B');
+	
+	private char indicator;
+	
+	private PropertyType(char anIndicator){
+		indicator = anIndicator;
+	}
+	
+	public char getIndicator(){
+		return indicator;
+	}
+	
+	
 }

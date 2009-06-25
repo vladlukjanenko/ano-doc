@@ -22,15 +22,7 @@ public class TextProperty extends StringProperty {
 		super(name, value);
 	}
 
-	/**
-	 * Returns the type indicator of this property - 'T' (for differencing between
-	 * StringProperty and TextProperty.  
-	 */
-	protected char getIndicator(){
-		return 'T';
-	}
-	
-	public PropertyType getPropertyType(){
+	@Override public PropertyType getPropertyType(){
 		return PropertyType.TEXT;
 	}
 

@@ -54,7 +54,7 @@ public class DoubleProperty extends Property{
 	 * Sets the value of this property to given value, whether the value 
 	 * can be a Float or a String.
 	 */	
-	public void setValue(Object o){
+	@Override public void setValue(Object o){
 		if (o instanceof Double){
 			super.setValue(o);
 			return;
@@ -70,29 +70,21 @@ public class DoubleProperty extends Property{
 	}
 
 	/**
-	 * Returns the string representation of this property in form of 
-	 * 'F name=value'.
-	 */	
-	public String toString(){
-		return "D "+super.toString();
-	}
-	
-	/**
 	 * Returns the size needed to hold a float value in bytes (8).
 	 * @see net.anotheria.anodoc.data.Property#getSizeInBytes()
 	 */
-	public long getSizeInBytes() {
+	@Override public long getSizeInBytes() {
 		return 16;
 	}
 	
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.data.Property#cloneValue()
 	 */
-	protected Object cloneValue() {
+	@Override protected Object cloneValue() {
 		return new Double(getdouble());
 	}
 	 
-	public PropertyType getPropertyType(){
+	@Override public PropertyType getPropertyType(){
 		return PropertyType.DOUBLE;
 	}
 }

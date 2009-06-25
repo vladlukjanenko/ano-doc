@@ -70,13 +70,6 @@ public class BooleanProperty extends Property{
 	}
 	
 	/**
-	 * Returns the string representation of this property <code>(B <value>)</code>
-	 */
-	@Override public String toString(){
-		return "B "+super.toString();
-	}
-	
-	/**
 	 * Returns the size of this property in bytes (one byte).
 	 * @see net.anotheria.anodoc.data.Property#getSizeInBytes()
 	 */

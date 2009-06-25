@@ -40,26 +40,10 @@ public class StringProperty extends Property{
 	 * of the given Object o. If o is null, the value of this property will
 	 * be 'null'.
 	 */
-	public void setValue(Object o){
+	@Override public void setValue(Object o){
 		super.setValue(""+o);			
 	}
 
-	/**
-	 * Returns the string representation of a StringProperty is 'S name=value',
-	 * of a TextProperty: 'T name=value'.
-	 */
-	public String toString(){
-		return getIndicator()+' '+super.toString();
-	}
-	
-	/**
-	 * Returns the type indicator of this property - 'S' (for differencing between
-	 * StringProperty and TextProperty.  
-	 */
-	protected char getIndicator(){
-		return 'S';
-	}
-	
 	/**
 	 * Returns true if the given obj is a StringProperty and the name, value tuples are equal.  
 	 */
@@ -75,7 +59,7 @@ public class StringProperty extends Property{
 	 * Returns the amount of bytes needed to save this property.
 	 * @see net.anotheria.anodoc.data.Property#getSizeInBytes()
 	 */
-	public long getSizeInBytes() { 
+	@Override public long getSizeInBytes() { 
 		String s = getString();
 		return s==null ? 0 : s.length()*2;
 	}
