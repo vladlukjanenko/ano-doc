@@ -19,7 +19,7 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
 
 /**
- * Generates a DB-Backed implementation of a module interface and the according factory.
+ * Generates an inmemory implementation of a module interface and the according factory.
  * @author another
  *
  */
@@ -27,7 +27,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	
 	private Context context;
 	
-	public List<FileEntry> generate(IGenerateable gmodule, Context context){
+	@Override public List<FileEntry> generate(IGenerateable gmodule, Context context){
 		
 		MetaModule mod = (MetaModule)gmodule;
 		if (!mod.isEnabledByOptions(GenerationOptions.INMEMORY))
