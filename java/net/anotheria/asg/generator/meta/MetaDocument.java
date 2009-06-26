@@ -8,22 +8,36 @@ import java.util.Set;
 import net.anotheria.asg.generator.IGenerateable;
 
 /**
- * TODO please remined another to comment this class
+ * Internal representation of a document.
  * @author another
  */
 public class MetaDocument implements IGenerateable{
-	
+	/**
+	 * Name of the document.
+	 */
 	private String name;
+	/**
+	 * List of properties contained in this document.
+	 */
 	private List<MetaProperty> properties;
+	/**
+	 * List of links.
+	 */
 	private List<MetaProperty> links;
 	
 	/**
 	 * Saves the property names to prevent double properties or links.
 	 */
 	private Set<String> propertyNames;
-	
+	/**
+	 * Module i belong to.
+	 */
 	private MetaModule parentModule;
 	
+	/**
+	 * Creates a new document with the given name.
+	 * @param aName
+	 */
 	public MetaDocument(String aName){
 		name = aName;
 		properties = new ArrayList<MetaProperty>();
@@ -95,6 +109,10 @@ public class MetaDocument implements IGenerateable{
 		return "tmp_"+getVariableName();
 	}
 	
+	/**
+	 * Returns the name of the variable to use in generated code for variables of this documents type.
+	 * @return
+	 */
 	public String getVariableName(){
 		if (getName().length()<3)
 			return ""+getName().toLowerCase().charAt(0);
@@ -106,7 +124,10 @@ public class MetaDocument implements IGenerateable{
 		 
 		return vName;
 	}
-	
+	/**
+	 * Returns the links.
+	 * @return
+	 */
 	public List<MetaProperty> getLinks(){
 		return links;
 	}
