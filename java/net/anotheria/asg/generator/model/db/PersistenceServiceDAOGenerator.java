@@ -8,6 +8,7 @@ import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
@@ -25,8 +26,6 @@ import net.anotheria.util.StringUtils;
  *
  */
 public class PersistenceServiceDAOGenerator extends AbstractGenerator implements IGenerator{
-	
-	private Context context;
 	
 	public List<FileEntry> generate(IGenerateable gmodule){
 		
@@ -64,14 +63,14 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	}
 	
 	private String getPackageName(MetaModule module){
-		return context.getPackageName(module)+".service.persistence";
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(module)+".service.persistence";
 	}
 	
 	private GeneratedClass generateException(MetaDocument doc){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getExceptionName(doc)));
+	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getExceptionName(doc), this));
 	    
 	    clazz.setPackageName(getPackageName(doc.getParentModule()));
 	    
@@ -98,7 +97,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getNoItemExceptionName(doc)));
+	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getNoItemExceptionName(doc), this));
 	    clazz.setPackageName(getPackageName(doc.getParentModule()));
 	    clazz.setName(getNoItemExceptionName(doc));
 	    clazz.setParent(getExceptionName(doc));
@@ -127,7 +126,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 	    
-	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRowMapperName(doc)));
+		Context context = GeneratorDataRegistry.getInstance().getContext();
+		
+	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRowMapperName(doc), this));
 	    clazz.setPackageName(getPackageName(doc.getParentModule()));
 	    
 	    clazz.addImport("java.sql.ResultSet");
@@ -302,7 +303,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    properties.addAll(doc.getProperties());
 	    properties.addAll(doc.getLinks());
 		
-	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getDAOName(doc)));
+	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getDAOName(doc), this));
 	    clazz.setPackageName(getPackageName(doc.getParentModule()));
 
 	    boolean moduleDbContextSensitive = doc.getParentModule().isParameterEqual(ModuleParameter.MODULE_DB_CONTEXT_SENSITIVE, "true");
@@ -315,8 +316,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    	clazz.addImport("java.util.HashMap");
 	    }
 	    
-	    clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
-	    clazz.addImport(VOGenerator.getDocumentImport(context, doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	    clazz.addImport(VOGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 	    clazz.addImport("net.anotheria.db.dao.DAO");
 	    clazz.addImport("net.anotheria.db.dao.DAOException");
 	    clazz.addImport("net.anotheria.db.dao.DAOSQLException");

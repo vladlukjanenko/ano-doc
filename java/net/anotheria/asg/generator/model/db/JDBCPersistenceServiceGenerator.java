@@ -42,7 +42,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module), this));
 	    
 	    clazz.setPackageName(getPackageName(module));
 	    clazz.addImport("java.sql.SQLException");
@@ -72,7 +72,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 	    
-	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module)));
+	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module), this));
  
 	    clazz.setPackageName(getPackageName(module));
 	    clazz.addImport("java.util.List");
