@@ -1,13 +1,21 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
+ * A property of enumeration type.
  * @author another
  */
 public class MetaEnumerationProperty extends MetaProperty{
 	
+	/**
+	 * Name of the enumeration.
+	 */
 	private String enumeration;
 	
+	/**
+	 * Creates a new enumeration property.
+	 * @param aName
+	 * @param aType
+	 */
 	public MetaEnumerationProperty(String aName, String aType){
 		super(aName, aType);
 	}
