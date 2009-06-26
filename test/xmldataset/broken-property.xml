@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<datadefinitions>
+	<module name="TestModule">
+		<document name="TestDocument">
+			<property foo="name" type="string"/><!-- property must have an attribute "name" -->
+		</document>
+	</module>
+</datadefinitions>	

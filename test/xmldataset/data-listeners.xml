@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<datadefinitions>
+	<module name="TestModule">
+		<listener class="a.b.c.Test"/>
+	</module>
+</datadefinitions>	

@@ -4,8 +4,10 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import net.anotheria.asg.generator.meta.MetaDocument;
@@ -98,4 +100,27 @@ public class XMLDataParserTest {
 		assertEquals("set"+StringUtils.capitalize(java), p.toPropertySetter());
 	}
 	
+	@Test public void parseListeners() throws IOException{
+		List<MetaModule> modules = loadFile("data-listeners.xml");
+		MetaModule m = modules.get(0);
+		List<String> listeners = m.getListeners();
+		assertEquals(1, listeners.size());
+		assertEquals("a.b.c.Test", listeners.get(0));
+	}
+	
+	private List<MetaModule> loadFile(String name) throws IOException{
+		String content = XMLPreprocessor.loadFile(new File("test/xmldataset/"+name));
+		assertNotNull(content);
+		assertFalse(content.length()==0);
+		
+		/////////
+		
+		List<MetaModule> modules = XMLDataParser.parseModules(content);
+		return modules;
+	}
+	
+	@Test(expected=RuntimeException.class) public void brokenProperty() throws IOException{
+		List<MetaModule> modules = loadFile("broken-property.xml");
+		fail("the file is unparseable");
+	}
 }
