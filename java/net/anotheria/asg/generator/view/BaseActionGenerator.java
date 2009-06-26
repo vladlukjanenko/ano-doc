@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.List;
 
 import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;

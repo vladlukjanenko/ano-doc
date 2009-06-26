@@ -1,9 +1,23 @@
 package net.anotheria.asg.generator;
 
+/**
+ * Represents a free parameter attachable to the context.
+ * @author another
+ *
+ */
 public class ContextParameter {
+	/**
+	 * Name of the parameter.
+	 */
 	private String name;
+	/**
+	 * Value of the parameter.
+	 */
 	private String value;
 	
+	/**
+	 * Constant for cms versioning parameter.
+	 */
 	public static final String CTX_PARAM_CMS_VERSIONING = "cmsversioning";
 	
 	public ContextParameter(){
@@ -15,7 +29,7 @@ public class ContextParameter {
 		value = aValue;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "Parameter "+name+" = "+value;
 	}
 
@@ -23,15 +37,15 @@ public class ContextParameter {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setName(String aName) {
+		name = aName;
 	}
 
 	public String getValue() {
 		return value;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setValue(String aValue) {
+		value = aValue;
 	}
 }

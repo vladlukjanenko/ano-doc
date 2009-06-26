@@ -18,13 +18,8 @@ import net.anotheria.util.ExecutionTimer;
  */
 public class DataGenerator extends AbstractAnoDocGenerator{
 	
-	private Context context;
-	
-	public DataGenerator(Context aContext){
-		context = aContext;
-	}
-	
 	public void generate(String path, List<MetaModule> modules){
+		Context context = GeneratorDataRegistry.getInstance().getContext();
 		List<FileEntry> todo = new ArrayList<FileEntry>();
 		ExecutionTimer timer = new ExecutionTimer("DataGenerator");
 		timer.startExecution("config");

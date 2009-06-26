@@ -103,7 +103,7 @@ public class Generator {
 
 		long s7 = System.currentTimeMillis();
 		
-		DataGenerator g = new DataGenerator(c);
+		DataGenerator g = new DataGenerator();
 		g.generate("java", modules);
 
 		long s8 = System.currentTimeMillis();

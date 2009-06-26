@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedXMLFile;
 import net.anotheria.asg.generator.GeneratorDataRegistry;

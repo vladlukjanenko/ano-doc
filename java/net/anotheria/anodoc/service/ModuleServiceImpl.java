@@ -1,22 +1,22 @@
 package net.anotheria.anodoc.service;
 
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
-import org.configureme.ConfigurationManager;
-import org.configureme.annotations.AfterConfiguration;
-import org.configureme.annotations.ConfigureMe;
-
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
+import net.anotheria.anodoc.query.BasicPredicate;
 import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.stats.IStatisticsConstants;
 import net.anotheria.anodoc.stats.ModuleStatistics;
 import net.anotheria.anodoc.stats.StatisticsFactory;
 import net.anotheria.anodoc.util.CommonHashtableModuleStorage;
+
+import org.apache.log4j.Logger;
+import org.configureme.ConfigurationManager;
+import org.configureme.annotations.AfterConfiguration;
+import org.configureme.annotations.ConfigureMe;
 
 
 /**
@@ -26,7 +26,9 @@ import net.anotheria.anodoc.util.CommonHashtableModuleStorage;
 @ConfigureMe (name="anodoc.storage")
 public class ModuleServiceImpl implements IModuleService{
 	
-	
+	/**
+	 * A delimiter which is used between different parts of the unique module key.
+	 */
 	private static final String DELIMITER = "#";
 
 	/**

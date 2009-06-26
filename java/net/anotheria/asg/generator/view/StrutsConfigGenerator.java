@@ -3,9 +3,7 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.Generator;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
