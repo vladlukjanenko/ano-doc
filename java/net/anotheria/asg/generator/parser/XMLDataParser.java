@@ -129,12 +129,12 @@ public final class XMLDataParser {
 		@SuppressWarnings("unchecked")List<Element> links = d.getChildren("link");
 
 		for (int i=0; i<properties.size(); i++){
-			Element p = (Element) properties.get(i);
+			Element p = properties.get(i);
 			doc.addProperty(parseAttribute(p));		
 		}
 		
 		for (int i=0; i<links.size(); i++){
-			Element p = (Element) links.get(i);
+			Element p = links.get(i);
 			doc.addLink((MetaLink)parseAttribute(p));		
 		}
 
@@ -147,6 +147,7 @@ public final class XMLDataParser {
 	 * @return
 	 */
 	private static final MetaProperty parseAttribute(Element e){
+		System.out.println("Parsing MetaProperty: "+e+", ->>"+e.getAttributeValue("name")+"<<-");
 		if (e.getName().equals("property"))
 			return parseProperty(e);
 		if (e.getName().equals("link"))

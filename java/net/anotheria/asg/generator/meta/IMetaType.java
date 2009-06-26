@@ -1,13 +1,19 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * TODO please remined another to comment this class
- * @author another
+ * Represent the type of a property.
+ * @author lrosenberg
  */
 public interface IMetaType {
-
+	/**
+	 * Returns the type representation of this MetaType in java language.
+	 * @return
+	 */
 	String toJava();
-	
+	/**
+	 * Returns java object for this type (for example Integer for int).
+	 * @return
+	 */
 	String toJavaObject();
 	
 	String toPropertySetter();

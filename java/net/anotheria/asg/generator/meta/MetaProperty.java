@@ -40,12 +40,18 @@ public class MetaProperty implements Cloneable{
 		type = aType;
 		metaType = TypeFactory.createType(aType);
 		multilingual = false;
+		
+		if (name==null)
+			throw new IllegalArgumentException("name is null");
 	}
 	
 	public MetaProperty(String aName, IMetaType aType){
-		this.name = aName;
+		name = aName;
 		metaType = aType;
 		multilingual = false;
+
+		if (name==null)
+			throw new IllegalArgumentException("name is null");
 	}
 
 	/**
