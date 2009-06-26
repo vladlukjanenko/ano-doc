@@ -1,7 +1,9 @@
 package net.anotheria.asg.generator.meta;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.anotheria.asg.generator.IGenerateable;
 
@@ -15,21 +17,32 @@ public class MetaDocument implements IGenerateable{
 	private List<MetaProperty> properties;
 	private List<MetaProperty> links;
 	
+	/**
+	 * Saves the property names to prevent double properties or links.
+	 */
+	private Set<String> propertyNames;
+	
 	private MetaModule parentModule;
 	
 	public MetaDocument(String aName){
 		name = aName;
 		properties = new ArrayList<MetaProperty>();
 		links = new ArrayList<MetaProperty>();
+		propertyNames = new HashSet<String>();
 	}
 	
-	
-	
 	public void addProperty(MetaProperty p){
+		if (propertyNames.contains(p.getName()))
+			throw new IllegalArgumentException("This document already contains a property or link with name "+p.getName());
+				
+		propertyNames.add(p.getName());
 		properties.add(p);
 	}
 	
 	public void addLink(MetaLink l){
+		if (propertyNames.contains(l.getName()))
+			throw new IllegalArgumentException("This document already contains a property or link with name "+l.getName());
+		propertyNames.add(l.getName());
 		links.add(l);
 	}
 		
@@ -54,14 +67,7 @@ public class MetaDocument implements IGenerateable{
 		name = string;
 	}
 
-	/**
-	 * @param list
-	 */
-	public void setProperties(List<MetaProperty> list) {
-		properties = list;
-	}
-	
-	public String toString(){
+	@Override public String toString(){
 		return "D "+name+" "+properties;
 	}
 	
@@ -84,7 +90,7 @@ public class MetaDocument implements IGenerateable{
 	public String getVariableName(){
 		if (getName().length()<3)
 			return ""+getName().toLowerCase().charAt(0);
-		String vName = getName().toLowerCase()/*.substring(0,3)*/;
+		String vName = getName().toLowerCase();
 		if (vName.equals("new") ||
 			vName.equals("int")
 		)
@@ -126,7 +132,7 @@ public class MetaDocument implements IGenerateable{
 				return p; 
 		
 		
-		throw new RuntimeException("No such field: "+name+" in document "+getFullName());
+		throw new IllegalArgumentException("No such field: "+name+" in document "+getFullName());
 	}
 	
 	public boolean isComparable(){
