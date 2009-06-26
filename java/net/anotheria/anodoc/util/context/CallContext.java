@@ -2,7 +2,11 @@ package net.anotheria.anodoc.util.context;
 
 import java.io.Serializable;
 
-
+/**
+ * Abstract class for CallContext which is assigned to each thread and allows multilinguality support and more.
+ * @author another
+ *
+ */
 public abstract class CallContext implements Serializable{
 	
 	private String currentLanguage;

@@ -26,7 +26,7 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 		return log;
 	}
 	/**
-	 * Creates a new BGLDocument from a name and a context (like list). If this function is not overwritten, it call createDocument(name).
+	 * Creates a new Document from a name and a context (like list). If this function is not overwritten, it call createDocument(name).
 	 * @see biz.beaglesoft.bgldoc.service.IModuleFactory#createDocument(String, BGLDataHolder)
 	 */
 	public Document createDocument(String name, DataHolder context) {
@@ -36,7 +36,7 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	}
 	
 	/**
-	 * Creates a new BGLDocument from a name and a typeidentifier. If this function is not overwritten, it call createDocument(name).
+	 * Creates a new Document from a name and a typeidentifier. If this function is not overwritten, it call createDocument(name).
 	 */
 	public Document createDocument(String name, String typeIdentifier){
 		getLog().debug("This Factory doesn't overwrite create document with identifier (Doc:"+name+", identifier:"+typeIdentifier+")"); 
@@ -46,10 +46,9 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 
 
 	/**
-	 * Creates and returns a new BGLDocument. This method should be overwritten by the extending class,
-	 * since usage of BGLDocument directly in your modell is not fitting in the concept of bgldoc.
-	 * @return newly created BGLDocument.
-	 * @see biz.beaglesoft.bgldoc.service.IModuleFactory#createDocument(String)
+	 * Creates and returns a new Document. This method should be overwritten by the extending class,
+	 * since usage of Document directly in your modell is not fitting in the concept of bgldoc.
+	 * @return newly created Document.
 	 */
 	public Document createDocument(String id) {
 		if (id.startsWith(IDHolder.DOC_ID_HOLDER_PRE))
@@ -86,9 +85,9 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	}
 	
 	/**
-	 * Recreates a BGLModule. This method is called by the AbstractModuleFactory in
+	 * Recreates a Module. This method is called by the AbstractModuleFactory in
 	 * the createModule method. It sets the proper owner and copy ids in the newly 
-	 * created BGLModule instance, so the extending class doesn't need to do it itself.
+	 * created Module instance, so the extending class doesn't need to do it itself.
 	 */
 	public abstract Module recreateModule(String ownerId, String copyId);
 	

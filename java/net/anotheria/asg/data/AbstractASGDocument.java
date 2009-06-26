@@ -38,6 +38,11 @@ public abstract class AbstractASGDocument extends Document implements DataObject
 		}
 	}
 
+	/**
+	 * Returns the name for internally used asg-related property with given name.
+	 * @param name
+	 * @return
+	 */
 	private String getInternalPropertyName(String name){
 		return "-asg-"+name+"-asg-";
 	}

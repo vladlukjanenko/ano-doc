@@ -13,7 +13,15 @@ public abstract class AbstractVO implements DataObject{
 				getDaoCreated() : getDaoUpdated();
 	}
 	
+	/**
+	 * Returns the timestamp in millis of the creation time of this object by the DAO.
+	 * @return
+	 */
 	public abstract long  getDaoCreated();
+	/**
+	 * Returns the timestamp in millis of the last time of this object was been updated by the DAO.
+	 * @return
+	 */
 	public abstract long  getDaoUpdated();
 	
 	@Override public XMLNode toXMLNode(){

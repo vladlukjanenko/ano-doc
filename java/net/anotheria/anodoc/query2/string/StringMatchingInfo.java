@@ -54,7 +54,7 @@ public class StringMatchingInfo implements MatchingInfo{
 
 
 
-	public String toHtml(){
+	@Override public String toHtml(){
 		String ret = "";
 		ret += "<i>"+CharacterEntityCoder.htmlEncodeString(pre)+"</i>";
 		ret += "<b>"+CharacterEntityCoder.htmlEncodeString(match)+"</b>";
@@ -62,7 +62,7 @@ public class StringMatchingInfo implements MatchingInfo{
 		return ret;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return toHtml();
 	}
 }

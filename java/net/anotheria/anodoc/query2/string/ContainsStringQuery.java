@@ -72,7 +72,7 @@ public class ContainsStringQuery implements DocumentQuery{
 		return ret;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return criteria;
 	}
 

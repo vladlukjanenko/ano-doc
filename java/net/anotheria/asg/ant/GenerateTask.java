@@ -6,10 +6,19 @@ import net.anotheria.asg.generator.Generator;
 import net.anotheria.asg.generator.util.FileWriter;
 
 import org.apache.tools.ant.Task;
-
+/**
+ * Tasks for generation of java files out of xml data.
+ * @author lrosenberg
+ *
+ */
 public class GenerateTask extends Task {
-	
+	/**
+	 * The output directory for generated files.
+	 */
 	private String outputDir;
+	/**
+	 * The base dir.
+	 */
 	private String baseDir;
 	
 	public void execute(){
