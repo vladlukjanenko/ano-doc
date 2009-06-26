@@ -17,6 +17,10 @@
 			<language>DE</language>
 		</default>
 	</languages>
+    <parameters>
+	    <parameter name="parameter1" value="1"/>
+	    <parameter name="parameter2" value="abcdef"/>
+    </parameters>
 	<options>
 		<option name="rmi">false</option>
 		<option name="inmemory">false</option>
