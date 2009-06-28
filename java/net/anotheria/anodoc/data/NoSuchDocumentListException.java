@@ -1,8 +1,8 @@
 package net.anotheria.anodoc.data;
 
 /**
- * This exception will be thrown when a not existing BGLDocumentList was requested,
- * or the BGLDataHolder with correspoding name is not a BGLDocumentList.
+ * This exception will be thrown when a not existing DocumentList was requested,
+ * or the DataHolder with correspoding name is not a DocumentList.
  */
 public class NoSuchDocumentListException extends RuntimeException{
 	public NoSuchDocumentListException(String name){

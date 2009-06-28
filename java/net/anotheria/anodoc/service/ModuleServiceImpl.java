@@ -248,10 +248,7 @@ public class ModuleServiceImpl implements IModuleService{
 		return factory.createModule(ownerId, copyId);
 	}
 
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleService#storeModule(BGLModule, String)
-	 */
-	public void storeModule(Module module) throws NoStorageForModuleException, StorageFailureException{
+	@Override public void storeModule(Module module) throws NoStorageForModuleException, StorageFailureException{
 		putInCacheDirty(module);
 		if (!module.getId().equals(IStatisticsConstants.MODULE_STATISTICS)){
 			updateStatistics(module);
@@ -272,31 +269,22 @@ public class ModuleServiceImpl implements IModuleService{
 		return getKey(module.getId(), module.getCopyId(), module.getOwnerId());
 	}
 
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleService#deleteModule(BGLModule)
-	 */
-	public void deleteModule(Module module) throws NoStorageForModuleException, StorageFailureException{
+	@Override public void deleteModule(Module module) throws NoStorageForModuleException, StorageFailureException{
 		deleteModule(module.getOwnerId(), module.getId(), module.getCopyId());
 	}
 
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleService#deleteModule(String, String, String)
-	 */
-	public void deleteModule(String ownerId, String moduleId, String copyId)
+	@Override public void deleteModule(String ownerId, String moduleId, String copyId)
 		throws NoStorageForModuleException , StorageFailureException{
 		removeFromCacheDirty(moduleId, ownerId, copyId);
 		
 	}
 
-	public void deleteModule(String ownerId, String moduleId)
+	@Override public void deleteModule(String ownerId, String moduleId)
 		throws NoStorageForModuleException , StorageFailureException{
 		deleteModule(ownerId, moduleId, DEFAULT_COPY_ID);
 	}
 
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleService#executeQueryOnDocuments(BasicPredicate)
-	 */
-	public List<Document> executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException{
+	@Override public List<Document> executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException{
 		IModuleStorage storage = (IModuleStorage)storages.get(moduleId);
 		if (storage==null){
 			log.warn("No storage for "+moduleId);

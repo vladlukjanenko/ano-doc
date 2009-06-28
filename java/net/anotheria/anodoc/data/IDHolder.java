@@ -6,7 +6,13 @@ package net.anotheria.anodoc.data;
  * @author lrosenberg
  */
 public class IDHolder extends Document{
+	/**
+	 * Prefix for the document name.
+	 */
 	public static final String DOC_ID_HOLDER_PRE = "anodoc.id.holder.";
+	/**
+	 * Attribute name of the last id storage.
+	 */
 	public static final String ATT_LAST_ID = "lastId";
 	public static final String TYPE_IDENTIFIER = "type.id.holder"; 
 	
@@ -21,7 +27,10 @@ public class IDHolder extends Document{
 			id = "0"+id;
 		return id;
 	}
-	
+	/**
+	 * Returns the next id. Increased and saves the internal value.
+	 * @return
+	 */
 	public int getNextIdInt(){
 		int id = getInt(ATT_LAST_ID);
 		//System.out.println("next id requested:"+id);
@@ -29,7 +38,10 @@ public class IDHolder extends Document{
 		setInt(ATT_LAST_ID, id);
 		return id;
 	}
-	
+	/**
+	 * Returns the next id.
+	 * @return
+	 */
 	public int getNextIdToGive(){
 		return getInt(ATT_LAST_ID)+1;
 	}

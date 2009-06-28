@@ -27,7 +27,6 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	}
 	/**
 	 * Creates a new Document from a name and a context (like list). If this function is not overwritten, it call createDocument(name).
-	 * @see biz.beaglesoft.bgldoc.service.IModuleFactory#createDocument(String, BGLDataHolder)
 	 */
 	public Document createDocument(String name, DataHolder context) {
 		getLog().debug("This Factory doesn't overwrite create document with context (Doc:"+name+", context:"+context+")"); 
@@ -47,7 +46,7 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 
 	/**
 	 * Creates and returns a new Document. This method should be overwritten by the extending class,
-	 * since usage of Document directly in your modell is not fitting in the concept of bgldoc.
+	 * since usage of Document directly in your modell is not fitting in the concept of ano-doc.
 	 * @return newly created Document.
 	 */
 	public Document createDocument(String id) {

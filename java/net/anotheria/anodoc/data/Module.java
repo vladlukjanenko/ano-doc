@@ -257,9 +257,8 @@ public class Module implements ICompositeDataObject, Serializable{
 	 * @param context	the context in which the resulting Document previously existed and will exists now.
 	 * @return the newly assembled Document
 	 */
-	@SuppressWarnings("unchecked")
 	private Document assembleDocument(String key, Object o, DataHolder context){
-		Hashtable myContainer = (Hashtable)o;
+		@SuppressWarnings("unchecked")Hashtable myContainer = (Hashtable)o;
 		String myName = KeyUtility.getDocumentName(key);
 		
 		log.info("Assembling document with name:"+myName);
@@ -268,7 +267,7 @@ public class Module implements ICompositeDataObject, Serializable{
 			 moduleFactory.createDocument(myName, context);
 		
 		//jetzt versuchen wir properties auszulesen!
-		Enumeration e = myContainer.keys();
+			 @SuppressWarnings("unchecked")Enumeration e = myContainer.keys();
 		while(e.hasMoreElements()){
 			String aKey = (String)e.nextElement();
 			Object anObj = myContainer.get(aKey);
@@ -277,7 +276,7 @@ public class Module implements ICompositeDataObject, Serializable{
 				doc.putProperty((Property)anObj);
 			}else{
 				//dirst decided...whether list or not...
-				Hashtable tmp = (Hashtable)anObj;
+				@SuppressWarnings("unchecked")Hashtable tmp = (Hashtable)anObj;
 				DataHolder containedHolder = null;
 				if (tmp.containsKey(IHelperConstants.IDENTIFIER_KEY) &&
 					((StringProperty)tmp.get(IHelperConstants.IDENTIFIER_KEY)).getString().equals(IHelperConstants.IDENTIFIER_DOCUMENT))
@@ -377,6 +376,11 @@ public class Module implements ICompositeDataObject, Serializable{
 		return holders.keys();
 	}
 
+	/**
+	 * Returns the id holder for a given document (name).
+	 * @param docName
+	 * @return
+	 */
 	protected IDHolder _getIdHolder(String docName){
 		try{
 			IDHolder h = (IDHolder)getDocument(docName);
@@ -384,7 +388,10 @@ public class Module implements ICompositeDataObject, Serializable{
 		}catch(NoSuchDocumentException e){}
 		return new IDHolder(docName);
 	}
-	
+	/**
+	 * Creates an XMLNode for XML export.
+	 * @return
+	 */
 	public XMLNode toXMLNode(){
 		XMLNode root = new XMLNode("module");
 		

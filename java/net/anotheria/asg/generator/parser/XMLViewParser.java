@@ -21,6 +21,7 @@ import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -31,6 +32,8 @@ import org.jdom.input.SAXBuilder;
  * @author another
  */
 public final class XMLViewParser {
+	
+	private static Logger log = Logger.getLogger(XMLViewParser.class);
 	
 	public static final List<MetaView> parseViews(String content){
 		
@@ -44,11 +47,10 @@ public final class XMLViewParser {
 			@SuppressWarnings("unchecked")List<Element> views = root.getChildren("view");
 			for (Element elem :views){
 				MetaView view = parseView(elem);
-				System.out.println("parsed view: "+view);
 				ret.add(view);
 			}
 		}catch(JDOMException e){
-			e.printStackTrace();
+			log.error("parseViews", e);
 			throw new RuntimeException("Can't parse view because: "+e.getMessage());
 		}
 		return ret;

@@ -6,8 +6,6 @@ import java.util.List;
 
 import net.anotheria.util.xml.XMLNode;
 
-
-
 /**
  * This property hold the list of Properties.
  * @since 1.0
@@ -81,8 +79,7 @@ public class ListProperty extends Property{
 	
 
 	/**
-	 * Returns the cumulative size of contained properties. The BGLListProperty itself is not counted.
-	 * @see biz.beaglesoft.bgldoc.data.BGLProperty#getSizeInBytes()
+	 * Returns the cumulative size of contained properties. The ListProperty itself is not counted.
 	 */
 	@Override public long getSizeInBytes() {
 		long sum = 0;

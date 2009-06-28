@@ -8,20 +8,18 @@ public class TestAliasResolver implements AliasResolver{
 		priority = aPriority;
 	}
 	
-	@Override
-	public int getPriority() {
+	@Override public int getPriority() {
 		return priority;
 	}
 
-	@Override
-	public String resolveAlias(String alias) {
+	@Override public String resolveAlias(String alias) {
 		String p = "."+priority;
 		if (alias.indexOf('.')==-1)
 			return alias + p;
 		return null;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "Resolver P"+getPriority();
 	}
 }
