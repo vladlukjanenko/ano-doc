@@ -65,8 +65,8 @@ public class GeneratedClass extends GeneratedArtefact{
 		return abstractClass;
 	}
 
-	public void setAbstractClass(boolean abstractClass) {
-		this.abstractClass = abstractClass;
+	public void setAbstractClass(boolean anAbstractClass) {
+		abstractClass = anAbstractClass;
 	}
 
 	public GeneratedClass(){
@@ -178,8 +178,8 @@ public class GeneratedClass extends GeneratedArtefact{
 	 * Sets the body of the class.
 	 * @param body the body to set.
 	 */
-	public void setBody(StringBuilder body) {
-		this.body = body;
+	public void setBody(StringBuilder aBody) {
+		body = aBody;
 	}
 
 
@@ -210,58 +210,58 @@ public class GeneratedClass extends GeneratedArtefact{
 		setParent(parentClazz.getName().substring(parentClazz.getName().lastIndexOf('.')+1));
 	}
 
-	public void setParent(String parent) {
-		this.parent = parent;
+	public void setParent(String aParent) {
+		parent = aParent;
 	}
 
 	public String getPackageName() {
 		return packageName;
 	}
 
-	public void setPackageName(String packageName) {
-		this.packageName = packageName;
+	public void setPackageName(String aPackageName) {
+		packageName = aPackageName;
 	}
 
 	public String getTypeComment() {
 		return typeComment;
 	}
 
-	public void setTypeComment(String typeComment) {
-		this.typeComment = typeComment;
+	public void setTypeComment(String aTypeComment) {
+		typeComment = aTypeComment;
 	}
 
 	public TypeOfClass getType() {
 		return type;
 	}
 
-	public void setType(TypeOfClass type) {
-		this.type = type;
+	public void setType(TypeOfClass aType) {
+		type = aType;
 	}
 
 	public boolean isGenerateLogger() {
 		return generateLogger;
 	}
 
-	public void setGenerateLogger(boolean generateLogger) {
-		if (generateLogger)
+	public void setGenerateLogger(boolean aGenerateLogger) {
+		if (aGenerateLogger)
 			addImport("org.apache.log4j.Logger");
-		this.generateLogger = generateLogger;
+		generateLogger = aGenerateLogger;
 	}
 
 	public String getClazzComment() {
 		return clazzComment;
 	}
 
-	public void setClazzComment(String clazzComment) {
-		this.clazzComment = clazzComment;
+	public void setClazzComment(String aClazzComment) {
+		clazzComment = aClazzComment;
 	}
 
 	public IGenerator getGenerator() {
 		return generator;
 	}
 
-	public void setGenerator(IGenerator generator) {
-		this.generator = generator;
+	public void setGenerator(IGenerator aGenerator) {
+		generator = aGenerator;
 	}
 
 }
