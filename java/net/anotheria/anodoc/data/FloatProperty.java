@@ -6,6 +6,8 @@ package net.anotheria.anodoc.data;
  */
 public class FloatProperty extends Property{
 	
+	private static final long serialVersionUID = -8097948895367514824L;
+
 	/**
 	 * Creates a new FloatProperty with given name and value.
 	 */
