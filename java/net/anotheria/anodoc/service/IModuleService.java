@@ -1,10 +1,6 @@
 package net.anotheria.anodoc.service;
 
-import java.util.List;
-
-import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
-import net.anotheria.anodoc.query.Predicate;
 
 /**
  * This interface describes the locally available service for Module management.<br>
@@ -80,15 +76,6 @@ public interface IModuleService {
 	 * is assumed to be the standart copyId.   
 	 */
 	void deleteModule(String ownerId, String moduleId) throws NoStorageForModuleException, StorageFailureException;
-
-	/**
-	 * Executes the given query on the module storage for given moduleId if this query 
-	 * is supported by the storage.<br>
-	 * In current implementation queries are supported for POET but not for file storage.
-	 */
-	List<Document> executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException;
-	
-	
 	
 }
  

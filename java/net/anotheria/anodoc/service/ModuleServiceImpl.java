@@ -1,13 +1,9 @@
 package net.anotheria.anodoc.service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
-import net.anotheria.anodoc.query.BasicPredicate;
-import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.stats.IStatisticsConstants;
 import net.anotheria.anodoc.stats.ModuleStatistics;
 import net.anotheria.anodoc.stats.StatisticsFactory;
@@ -282,16 +278,6 @@ public class ModuleServiceImpl implements IModuleService{
 	@Override public void deleteModule(String ownerId, String moduleId)
 		throws NoStorageForModuleException , StorageFailureException{
 		deleteModule(ownerId, moduleId, DEFAULT_COPY_ID);
-	}
-
-	@Override public List<Document> executeQueryOnDocuments(String moduleId, Predicate p) throws NoStorageForModuleException, StorageFailureException{
-		IModuleStorage storage = (IModuleStorage)storages.get(moduleId);
-		if (storage==null){
-			log.warn("No storage for "+moduleId);
-			throw new NoStorageForModuleException(moduleId);
-		}
-		return storage.executeQueryOnDocuments(p);
-
 	}
 
 	/**

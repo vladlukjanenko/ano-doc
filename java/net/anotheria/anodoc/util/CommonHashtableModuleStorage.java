@@ -8,7 +8,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.List;
+
+import net.anotheria.anodoc.data.IBasicStoreableObject;
+import net.anotheria.anodoc.data.ICompositeDataObject;
+import net.anotheria.anodoc.data.IPlainDataObject;
+import net.anotheria.anodoc.data.Module;
+import net.anotheria.anodoc.service.IModuleFactory;
+import net.anotheria.anodoc.service.IModuleStorage;
+import net.anotheria.anodoc.service.NoStoredModuleEntityException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
@@ -16,16 +23,6 @@ import org.configureme.ConfigurationManager;
 import org.configureme.annotations.AfterConfiguration;
 import org.configureme.annotations.Configure;
 import org.configureme.annotations.ConfigureMe;
-
-import net.anotheria.anodoc.data.Document;
-import net.anotheria.anodoc.data.Module;
-import net.anotheria.anodoc.data.IBasicStoreableObject;
-import net.anotheria.anodoc.data.ICompositeDataObject;
-import net.anotheria.anodoc.data.IPlainDataObject;
-import net.anotheria.anodoc.query.Predicate;
-import net.anotheria.anodoc.service.IModuleFactory;
-import net.anotheria.anodoc.service.IModuleStorage;
-import net.anotheria.anodoc.service.NoStoredModuleEntityException;
 
 /**
  * This storage stores everything in a hashtable and stores this 
@@ -253,10 +250,6 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 			System.err.println("\t"+holder.get(key));
 				
 		}
-	}
-
-	public List<Document> executeQueryOnDocuments(Predicate q) {
-		throw new RuntimeException("Not implemented");
 	}
 
 

@@ -1,20 +1,16 @@
 package net.anotheria.anodoc.util;
 
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
-import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
-import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.service.IModuleFactory;
 import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;
 import net.anotheria.anodoc.service.StorageFailureException;
 
+import org.apache.log4j.Logger;
+
 /**
- * This class behaves like {@link biz.beaglesoft.bgldoc.service.IModuleStorage} but
- * delegates all method calls to an instance of {@link biz.beaglesoft.bgldoc.util.ICommonModuleStorage}.
+ * This class behaves like {@link net.anotheria.anodoc.service.IModuleStorage} but
+ * delegates all method calls to an instance of {@link net.anotheria.anodoc.util.ICommonModuleStorage}.
  */
 public class CommonModuleStorageWrapper implements IModuleStorage {
 
@@ -34,10 +30,7 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 		delegate = aDelegate;
 	}
 	
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#saveModule(biz.beaglesoft.bgldoc.data.BGLModule)
-	 */
-	public void saveModule(Module module) throws StorageFailureException{
+	@Override public void saveModule(Module module) throws StorageFailureException{
 		try {
 			delegate.saveModule(module);
 		} catch (CommonModuleStorageException e) {
@@ -50,11 +43,7 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 		}
 	}
 
-	
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#loadModule(java.lang.String, java.lang.String)
-	 */
-	public Module loadModule(String ownerId, String copyId) throws NoStoredModuleEntityException, StorageFailureException{
+	@Override public Module loadModule(String ownerId, String copyId) throws NoStoredModuleEntityException, StorageFailureException{
 		try {
 			Module module = delegate.loadModule(moduleId,ownerId,copyId,factory);
 			if(module == null){
@@ -69,10 +58,7 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 		}
 	}
 	
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#deleteModule(java.lang.String, java.lang.String)
-	 */
-	public void deleteModule(String ownerId, String copyId) throws StorageFailureException{
+	@Override public void deleteModule(String ownerId, String copyId) throws StorageFailureException{
 		try{
 			delegate.deleteModule(moduleId,ownerId,copyId);
 		}catch(Exception ex){
@@ -80,18 +66,4 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 			throw new StorageFailureException(ex.getMessage());
 		}
 	}
-	
-	/**
-	 * @see biz.beaglesoft.bgldoc.service.IModuleStorage#executeQueryOnDocuments(BasicPredicate)
-	 */
-	public List<Document> executeQueryOnDocuments(Predicate p) throws StorageFailureException{
-		try{
-			return delegate.executeQueryOnDocuments(p, factory);
-		}catch(Exception e){
-			log.warn("executeQueryOnDocuments", e);
-			throw new StorageFailureException(e.getMessage());
-		}
-		//return new Vector(0);
-	}
-
 }

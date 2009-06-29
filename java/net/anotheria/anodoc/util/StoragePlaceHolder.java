@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
-import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;
 
@@ -33,12 +32,4 @@ public class StoragePlaceHolder implements IModuleStorage{
 	 */	
 	@Override public void deleteModule(String ownerId, String copyId){
 	}
-
-	/**
-	 * Throws a runtime exception - not implemented.
-	 */
-	@Override public List<Document> executeQueryOnDocuments(Predicate p) {
-		throw new RuntimeException("Not implemented");
-	}
-
 }

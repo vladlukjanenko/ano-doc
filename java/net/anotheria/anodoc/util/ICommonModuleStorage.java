@@ -1,10 +1,6 @@
 package net.anotheria.anodoc.util;
 
-import java.util.List;
-
-import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
-import net.anotheria.anodoc.query.Predicate;
 import net.anotheria.anodoc.service.IModuleFactory;
 
 /**
@@ -31,8 +27,4 @@ public interface ICommonModuleStorage {
 	 */
 	void deleteModule(String moduleId, String ownerId, String copyId) throws CommonModuleStorageException;
 
-	/**
-	 * Executes the specified query on all stored module instances. This method isn't supported by all implementations. 
-	 */
-	List<Document> executeQueryOnDocuments(Predicate p, IModuleFactory fac) throws CommonModuleStorageException;
 }
