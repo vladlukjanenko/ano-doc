@@ -49,7 +49,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.setPackageName(getPackageName(module)); 
 
 		clazz.addImport("net.anotheria.asg.service.CRUDService");
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
 	    
 		clazz.setName(getCRUDServiceName(doc));
@@ -169,7 +169,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
 	        
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        clazz.addImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 	        clazz.addImport(DocumentGenerator.getDocumentImport(context, doc));
 	        

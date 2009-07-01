@@ -105,7 +105,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
 
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        clazz.addImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause+"{");

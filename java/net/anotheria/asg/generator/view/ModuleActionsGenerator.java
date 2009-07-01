@@ -230,7 +230,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    clazz.addImport("net.anotheria.util.NumberUtils");
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(GeneratorDataRegistry.getInstance().getContext(), doc));
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 
 		clazz.setName(getMultiOpActionName(section));
 		clazz.setParent(getBaseActionName(section));
@@ -274,7 +274,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    addStandardActionImports(clazz);
 		
 	    clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
-	    clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual())
 			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
@@ -362,7 +362,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    clazz.addImport("net.anotheria.asg.util.filter.DocumentFilter");
 	    clazz.addImport("net.anotheria.util.NumberUtils");
 	    addStandardActionImports(clazz);
-	    clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    clazz.addImport(ModuleBeanGenerator.getListItemBeanImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 		
 		clazz.addImport("net.anotheria.util.slicer.Slicer");
@@ -820,7 +820,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaModule mod = GeneratorDataRegistry.getInstance().getModule(targetModuleName);
 				MetaDocument targetDocument = mod.getDocumentByName(targetDocumentName);
 			
-				clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
+				clazz.addImport(DataFacadeGenerator.getDocumentImport(targetDocument));
 			
 				linkTargets.add(lt);
 			}else{
@@ -891,7 +891,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		addStandardActionImports(clazz);
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getListItemBeanImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 		
 		clazz.setName(getExecuteQueryActionName(section));
@@ -950,7 +950,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
 
-	    clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    clazz.addImport("net.anotheria.util.NumberUtils");
 
 	    
@@ -1005,7 +1005,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		addStandardActionImports(clazz);
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	    
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc);
@@ -1133,7 +1133,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		//write imports...
 		addStandardActionImports(clazz);
-	    clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    clazz.addImport("net.anotheria.asg.data.MultilingualObject");
 
 	    clazz.setTypeComment("This class enables or disables support for multiple languages for a particular document.");
@@ -1184,7 +1184,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		//write imports...
 		addStandardActionImports(clazz);
-	    clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    
 	    clazz.setTypeComment("This class copies multilingual contents from one language to another in a given document");
 		clazz.setName(getLanguageCopyActionName(section));
@@ -1243,7 +1243,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
 		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
 		if (doc.isMultilingual())
 			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
@@ -1284,7 +1284,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    	clazz.addImport("java.util.List");
 	    	clazz.addImport("java.util.ArrayList");
 	    	for (DirectLink l : backlinks){
-    			clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), l.getDocument()));
+    			clazz.addImport(DataFacadeGenerator.getDocumentImport(l.getDocument()));
 	    	}
 	    }
 		
@@ -1376,10 +1376,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					
 						appendString( "//link "+link.getName()+" to "+link.getLinkTarget());
 						appendString( "//to lazy to include List in the imports.");
-						appendStatement("List<"+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
+						appendStatement("List<"+DataFacadeGenerator.getDocumentImport(targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
 						appendStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
 						appendStatement(listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
-						appendString( "for ("+(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
+						appendString( "for ("+(DataFacadeGenerator.getDocumentImport(targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
 						increaseIdent();
 						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+".getId(), "+targetDocument.getVariableName()+".getName() )");
 						appendStatement(listName,"Values.add(bean)");
@@ -1464,7 +1464,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			for (DirectLink l : backlinks){
 				if (l.getProperty().isMultilingual()){
 					for (String lang : context.getLanguages()){
-						appendString( "private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName(lang))+"(String documentId) throws "+ServiceGenerator.getExceptionImport(context,l.getModule())+"{");
+						appendString( "private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName(lang))+"(String documentId) throws "+ServiceGenerator.getExceptionImport(l.getModule())+"{");
 						increaseIdent();
 						appendStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
 						appendStatement("QueryProperty p = new QueryProperty("+l.getDocument().getName()+"."+l.getProperty().toNameConstant(lang)+", documentId)");
@@ -1479,7 +1479,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						append(closeBlock()); ;
 					}
 				}else{
-					appendString( "private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId) throws "+ServiceGenerator.getExceptionImport(context, l.getModule())+"{");
+					appendString( "private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId) throws "+ServiceGenerator.getExceptionImport(l.getModule())+"{");
 					increaseIdent();
 					appendStatement("List<LinkToMeBean> ret = new ArrayList<LinkToMeBean>()");
 					appendStatement("QueryProperty p = new QueryProperty("+l.getDocument().getName()+"."+l.getProperty().toNameConstant()+", documentId)");
@@ -1539,7 +1539,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//write imports...
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(GeneratorDataRegistry.getInstance().getContext(), doc));
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		
 		clazz.setName(getDuplicateActionName(section));
 		clazz.setParent(getBaseActionName(section));
@@ -1648,10 +1648,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						appendString( "//link "+link.getName()+" to "+link.getLinkTarget()+" reuses collection.");
 					}else{
 						appendString( "//link "+link.getName()+" to "+link.getLinkTarget());
-						appendStatement("List<"+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
+						appendStatement("List<"+DataFacadeGenerator.getDocumentImport(targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
 						appendStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
 						appendStatement(listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
-						appendString( "for ("+(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
+						appendString( "for ("+(DataFacadeGenerator.getDocumentImport(targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
 						increaseIdent();
 						
 						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+".getId(), "+targetDocument.getVariableName()+".getName() )");
@@ -1844,7 +1844,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport("java.util.ArrayList");
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(GeneratorDataRegistry.getInstance().getContext(), doc));
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
 		if (containerProperty instanceof MetaListProperty){
 			MetaProperty containedProperty = ((MetaListProperty)containerProperty).getContainedProperty();
@@ -1858,7 +1858,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
 						doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
 				MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
-				clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
+				clazz.addImport(DataFacadeGenerator.getDocumentImport(targetDocument));
 				clazz.addImport(AbstractDataObjectGenerator.getSortTypeImport(targetDocument));
 				clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
 				clazz.addImport("net.anotheria.anodoc.data.NoSuchDocumentException");
@@ -1944,7 +1944,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
 		
 		clazz.setName(getContainerAddEntryActionName(doc, list));
@@ -1988,7 +1988,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
 		clazz.addImport("net.anotheria.util.StringUtils");
 		
@@ -2048,7 +2048,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 		//write imports...
 		addStandardActionImports(clazz);
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
 		
 		clazz.setName(getContainerAddEntryActionName(doc, table));
@@ -2089,7 +2089,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		
 		clazz.setName(getContainerDeleteEntryActionName(doc, container));
 		clazz.setParent(getContainerShowActionName(doc, container));	
@@ -2136,7 +2136,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 		//write imports...
 		addStandardActionImports(clazz);
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
 		clazz.addImport("java.util.List");
 		
@@ -2258,7 +2258,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
 		addStandardActionImports(clazz);
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
 		if (list.getContainedProperty().isLinked()){
 			clazz.addImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
@@ -2268,7 +2268,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ?
 					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
 			MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
-			clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument));
+			clazz.addImport(DataFacadeGenerator.getDocumentImport(targetDocument));
 			clazz.addImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
 			clazz.addImport("net.anotheria.anodoc.data.NoSuchDocumentException");
 
@@ -2320,7 +2320,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size())");
 			appendString( "for (int i=0; i<"+listName+".size(); i++){");
 			increaseIdent();
-			appendStatement(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+" "+targetDocument.getTemporaryVariableName()+" = ("+DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), targetDocument)+") "+listName+".get(i)");
+			appendStatement(DataFacadeGenerator.getDocumentImport(targetDocument)+" "+targetDocument.getTemporaryVariableName()+" = ("+DataFacadeGenerator.getDocumentImport(targetDocument)+") "+listName+".get(i)");
 			appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getTemporaryVariableName()+".getId(), "+targetDocument.getTemporaryVariableName()+".getName()+\" [\"+"+targetDocument.getTemporaryVariableName()+".getId()+\"]\" )");
 			appendStatement(listName+"Values.add(bean)");
 			append(closeBlock());
@@ -2412,7 +2412,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
 		addStandardActionImports(clazz);
-		clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
 
 		clazz.setName(getContainerShowActionName(doc, table));

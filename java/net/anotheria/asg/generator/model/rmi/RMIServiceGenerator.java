@@ -93,7 +93,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	
 	protected String getPackageName(MetaModule module){
-		return getPackageName(context, module);
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext(), module);
 	}
 	
 	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
@@ -111,7 +111,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRemoteExceptionName(module), this));
 		clazz.setPackageName(getPackageName(module));
 		clazz.addImport("java.rmi.RemoteException");
-		clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+		clazz.addImport(ServiceGenerator.getExceptionImport(module));
 		
 		clazz.setName("RemoteExceptionWrapper");
 		clazz.setParent(ServiceGenerator.getExceptionName(module));
@@ -143,7 +143,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
 		clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
 		clazz.addImport("java.rmi.RemoteException");
-		clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+		clazz.addImport(ServiceGenerator.getExceptionImport(module));
 		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
 		clazz.addImport("net.anotheria.asg.service.remote.RemoteService");
 		
@@ -159,7 +159,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        String listDecl = "List<"+doc.getName()+">";
 	        
 	        
@@ -402,7 +402,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
 	    clazz.addImport(ServiceGenerator.getFactoryImport(module));
 	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
-	    clazz.addImport(InMemoryServiceGenerator.getInMemoryFactoryImport(context, module));
+	    clazz.addImport(InMemoryServiceGenerator.getInMemoryFactoryImport(module));
 	    
 	    clazz.setName(getServerName(module));
 	    clazz.setGenerateLogger(true);
@@ -493,7 +493,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
 	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 	    clazz.addImport("java.rmi.RemoteException");
-	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+	    clazz.addImport(ServiceGenerator.getExceptionImport(module));
 	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
 	    
 	    clazz.setName(getStubName(module));
@@ -539,7 +539,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 
 	        String listDecl = "List<"+doc.getName()+">";
 	        
@@ -778,7 +778,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
 	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 	    clazz.addImport("net.anotheria.asg.service.remote.BaseRemoteServiceSkeleton");
-	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+	    clazz.addImport(ServiceGenerator.getExceptionImport(module));
 	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
 
 	    clazz.setName(getSkeletonName(module));
@@ -803,7 +803,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        String listDecl = "List<"+doc.getName()+">";
 	        
 		    writeSkeletonFun(

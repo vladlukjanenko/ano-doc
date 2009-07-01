@@ -88,7 +88,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    	if (target==null)
 	    		throw new RuntimeException("No such module: "+fedDef.getName());
 	    	clazz.addImport(ServiceGenerator.getInterfaceImport(target));
-	    	clazz.addImport(ServiceGenerator.getExceptionImport(context, target));
+	    	clazz.addImport(ServiceGenerator.getExceptionImport(target));
 	    	clazz.addImport(ServiceGenerator.getFactoryImport(target));
 	    	targetModules.put(fedDef.getKey(), target);
 	    }
@@ -96,7 +96,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        clazz.addImport(FederationVOGenerator.getDocumentImport(context, doc));
 	        clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 
@@ -105,7 +105,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        //generate copy methods
 	        for (FederatedDocumentMapping mapping : mappings){
 	        	MetaDocument target = targetModules.get(mapping.getTargetKey()).getDocumentByName(mapping.getTargetDocument());
-	        	clazz.addImport(DataFacadeGenerator.getDocumentImport(context, target));
+	        	clazz.addImport(DataFacadeGenerator.getDocumentImport(target));
 	        }
 	    }
 

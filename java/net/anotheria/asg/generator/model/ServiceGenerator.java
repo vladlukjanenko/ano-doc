@@ -174,7 +174,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    }
 	    
 	    clazz.addImport("net.anotheria.util.xml.XMLNode");
@@ -304,8 +304,8 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getInterfaceName(m);
 	}
 	
-	public static String getExceptionImport(Context ctx, MetaModule m){
-		return getPackageName(ctx,m)+"."+getExceptionName(m);
+	public static String getExceptionImport(MetaModule m){
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getExceptionName(m);
 	}
 
 	public static String getServiceName(MetaModule m){

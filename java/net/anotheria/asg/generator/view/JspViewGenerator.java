@@ -115,7 +115,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		
-		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
+		jsp.setPackage(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".jsp");
 		jsp.setName(getMenuName(view));
 		
 		append(getBaseJSPHeader());
@@ -1148,7 +1148,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		jsp.setName(getShowPageName(section.getDocument()));
-		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
+		jsp.setPackage(GeneratorDataRegistry.getInstance().getContext().getJspPackageName(section.getModule()));
 		
 		ident = 0;
 		append(getBaseJSPHeader());
@@ -1312,7 +1312,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		jsp.setName(getSearchResultPageName());
-		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
+		jsp.setPackage(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".jsp");
 		
 		ident = 0;
 		
@@ -1378,7 +1378,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		jsp.setName(getVersionInfoPageName());
-		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
+		jsp.setPackage(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".jsp");
 		
 		ident = 0;
 		append(getBaseJSPHeader());

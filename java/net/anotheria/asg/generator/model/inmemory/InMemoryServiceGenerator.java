@@ -60,8 +60,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    return getInMemoryFactoryName(m);
 	}
 	
-	public static String getInMemoryFactoryImport(Context ctx, MetaModule m){
-	    return getPackageName(ctx, m)+"."+getInMemoryFactoryName(m);
+	public static String getInMemoryFactoryImport(MetaModule m){
+	    return getPackageName(GeneratorDataRegistry.getInstance().getContext(), m)+"."+getInMemoryFactoryName(m);
 	}
 	
 	protected String getPackageName(MetaModule module){
@@ -120,7 +120,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
-	        clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	        clazz.addImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 	    }
@@ -136,7 +136,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	    clazz.addImport("net.anotheria.asg.service.InMemoryObjectWrapper");
 	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
-	    clazz.addImport(ServiceGenerator.getExceptionImport(context, module));
+	    clazz.addImport(ServiceGenerator.getExceptionImport(module));
 
 	    clazz.setName(getImplementationName(module));
 	    clazz.setParent("BasicService");

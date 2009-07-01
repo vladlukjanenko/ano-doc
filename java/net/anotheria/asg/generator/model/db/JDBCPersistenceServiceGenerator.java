@@ -81,7 +81,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
-	        clazz.addImport((DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc)));
+	        clazz.addImport((DataFacadeGenerator.getDocumentImport(doc)));
 	    }
 	    
 	    clazz.setName(getInterfaceName(module));
@@ -149,7 +149,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (MetaDocument doc : docs){
-	    	clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	    	clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    }
 	    clazz.addImport("net.anotheria.db.service.BasePersistenceServiceJDBCImpl");
 	    clazz.addImport("net.anotheria.db.dao.DAOException");

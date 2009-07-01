@@ -101,7 +101,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		
-		jsp.setPackage(getContext().getPackageName(MetaModule.SHARED)+".jsp");
+		jsp.setPackage(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".jsp");
 		jsp.setName(name);
 		
 		append(getBaseJSPHeader());
@@ -268,7 +268,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	
 
 	protected String getCurrentImagePath(String imageName){
-		return getImagePath(imageName, context);
+		return getImagePath(imageName, GeneratorDataRegistry.getInstance().getContext());
 	}
 	
 	public static String getImagePath(String imageName, Context context){
@@ -276,11 +276,11 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 
 	protected String getCurrentCSSPath(String stylesheetName){
-		return getCSSPath(stylesheetName, context);
+		return getCSSPath(stylesheetName, GeneratorDataRegistry.getInstance().getContext());
 	}
 	
 	protected String getCurrentJSPath(String jsName){
-		return getJSPath(jsName, context);
+		return getJSPath(jsName, GeneratorDataRegistry.getInstance().getContext());
 	}
 	
 	protected String getCurrentYUIPath(String yuiName){
@@ -390,11 +390,11 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	protected String getImage(String name, String alt){
-		return "<img src=\""+context.getApplicationURLPath()+"/img/"+name+".gif"+"\" border=\"0\" alt="+quote(alt)+" title="+quote(alt)+">";
+		return "<img src=\""+GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/img/"+name+".gif"+"\" border=\"0\" alt="+quote(alt)+" title="+quote(alt)+">";
 	}
 
 	public Context getContext() {
-		return context;
+		return GeneratorDataRegistry.getInstance().getContext();
 	}
 
 	public void setContext(final Context aContext) {
@@ -417,7 +417,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		appendString("<META http-equiv=\"pragma\" content=\"no-cache\">");
 		appendString("<META http-equiv=\"Cache-Control\" content=\"no-cache, must-revalidate\">");
 		appendString("<META name=\"Expires\" content=\"0\">");
-		appendString("<META http-equiv=\"Content-Type\" content=\"text/html; charset="+getContext().getEncoding()+"\">");
+		appendString("<META http-equiv=\"Content-Type\" content=\"text/html; charset="+GeneratorDataRegistry.getInstance().getContext().getEncoding()+"\">");
 	}
 	
 	protected void openTag(String tag, String params){

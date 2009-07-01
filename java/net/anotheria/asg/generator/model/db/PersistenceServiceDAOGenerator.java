@@ -135,7 +135,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    clazz.addImport("java.sql.SQLException");
 	    clazz.addImport("net.anotheria.db.dao.RowMapper");
 	    clazz.addImport("net.anotheria.db.dao.RowMapperException");
-	    clazz.addImport(DataFacadeGenerator.getDocumentImport(context, doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    clazz.addImport(VOGenerator.getDocumentImport(context, doc));
 	    
 	    clazz.setName(getRowMapperName(doc));
@@ -316,7 +316,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    	clazz.addImport("java.util.HashMap");
 	    }
 	    
-	    clazz.addImport(DataFacadeGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    clazz.addImport(VOGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 	    clazz.addImport("net.anotheria.db.dao.DAO");
 	    clazz.addImport("net.anotheria.db.dao.DAOException");

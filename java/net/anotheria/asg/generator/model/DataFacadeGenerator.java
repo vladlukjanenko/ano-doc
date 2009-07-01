@@ -585,8 +585,8 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 			generateBuilderPropertySetterMethod(doc, columns.get(t));
 	}
 	
-	public static final String getDocumentImport(Context context, MetaDocument doc){
-		return context.getDataPackageName(doc)+"."+doc.getName();
+	public static final String getDocumentImport(MetaDocument doc){
+		return GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc)+"."+doc.getName();
 	}
 	
 	public static final String getXMLHelperImport(Context context, MetaDocument doc){
