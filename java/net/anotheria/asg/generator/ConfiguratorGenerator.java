@@ -1,14 +1,14 @@
 package net.anotheria.asg.generator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.generator.apputil.CallContextGenerator;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.metafactory.Extension;
 import net.anotheria.asg.metafactory.MetaFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO please remined another to comment this class
@@ -48,6 +48,12 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 		clazz.setName(getMetaFactoryConfiguratorClassName());
 		clazz.addImport(Extension.class);
 		clazz.addImport(MetaFactory.class);
+        //adding RMI factory Imports if should be added
+        for(MetaModule mod:modules){
+          if(isRMIEnabled(mod)){
+           clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(mod)+".rmi."+"RMI"+ServiceGenerator.getFactoryName(mod));
+          }
+        }
 		
 		startClassBody();
 
@@ -84,12 +90,24 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 				appendStatement("MetaFactory.addAlias("+ServiceGenerator.getInterfaceName(m)+".class, Extension.FEDERATION, Extension.DOMAIN)");
 				appendStatement("MetaFactory.addFactoryClass("+ServiceGenerator.getInterfaceName(m)+".class, Extension.FEDERATION, "+ServiceGenerator.getFactoryName(m)+".class)");
 			}
+            if(isRMIEnabled(m)){
+                appendStatement("MetaFactory.addFactoryClass("+ServiceGenerator.getInterfaceName(m)+".class, Extension.REMOTE, "+"RMI"+ServiceGenerator.getFactoryName(m)+".class)");
+            }
 			
 		}
 		append(closeBlock());
 		return new FileEntry(clazz);
 			
 	}
+
+    /**
+     * Simply checks for  RMI option
+     * @param m module which should be checked
+     * @return boolean result
+     */
+    private boolean isRMIEnabled(MetaModule m){
+        return m.getModuleOptions()!=null && m.getModuleOptions().isEnabled(GenerationOptions.RMI);
+    }
 	
 	private FileEntry generateConfigurator(List<MetaModule> modules){
 		GeneratedClass clazz = new GeneratedClass();

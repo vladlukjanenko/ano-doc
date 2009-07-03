@@ -1,18 +1,7 @@
 package net.anotheria.asg.generator.model.rmi;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.CommentGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GenerationOptions;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.TypeOfClass;
+import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
@@ -21,6 +10,9 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generates a RMI-Backed distribution of a module interface and the according factory.
@@ -42,10 +34,6 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
 		ExecutionTimer timer = new ExecutionTimer("RMI Generator");
-		timer.startExecution(module.getName()+"Factory");
-		//ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
-		timer.stopExecution(module.getName()+"Factory");
-		
 
 		ret.add(new FileEntry(generateRemoteException(module)));
 		ret.add(new FileEntry(generateLookup(module)));
@@ -63,6 +51,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		ret.add(new FileEntry(generateRemoteInterface(module)));
 		timer.stopExecution(module.getName()+"Interface");
 
+        timer.startExecution(module.getName()+"Factory");
+        ret.add(new FileEntry(generateFactory(module)));
+		//ret.add(new FileEntry(FileEntry.package2path(packageName), getFactoryName(mod), generateFactory(mod)));
+		timer.stopExecution(module.getName()+"Factory");
+
 		//timer.printExecutionTimesOrderedByCreation();
 		
 		return ret;
@@ -79,9 +72,10 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	/**
 	 * Returns the implementation name of the rmi service for this module.
+     * Currently implementation not used! Hack  for using  Stub
 	 */
 	public String getImplementationName(MetaModule m){
-	    return "RMI"+getServiceName(m)+"Impl";
+	    return getStubName(m);//"RMI"+getServiceName(m)+"Impl";
 	}
 	
 	/**
@@ -97,7 +91,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	}
 	
 	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
-		clazz.addImport(context.getServicePackageName(module)+"."+getInterfaceName(module));
+       clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module)+"."+ServiceGenerator.getInterfaceName(module));
 	}
 	
 	public static String getPackageName(Context context, MetaModule module){
@@ -505,12 +499,29 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 	    clazz.setGenerateLogger(true);
 	    startClassBody();
+        //Static instance
+        appendStatement("private static "+getStubName(module)+" instance");
+	    emptyline();
 	    
 	    appendStatement("private ", getInterfaceName(module), " delegate");
 	    emptyline();
 	    appendString("protected void notifyDelegateFailed(){");
 	    appendIncreasedStatement("delegate = null");
 	    appendString("}");
+	    emptyline();
+
+        //Private constructor
+        appendString("private "+getStubName(module)+"(){ }");
+	    emptyline();
+
+        appendString("public static final "+getStubName(module)+" getInstance(){");
+	    increaseIdent();
+	    appendString("if (instance==null){");
+	    increaseIdent();
+	    appendStatement("instance = new "+getStubName(module)+"()");
+	    append(closeBlock());
+	    appendStatement("return instance");
+	    append(closeBlock());
 	    emptyline();
 	    
 	    appendString("protected "+getInterfaceName(module)+" getDelegate() throws "+ServiceGenerator.getExceptionName(module)+"{");
