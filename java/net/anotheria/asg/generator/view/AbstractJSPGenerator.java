@@ -397,10 +397,6 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return GeneratorDataRegistry.getInstance().getContext();
 	}
 
-	public void setContext(final Context aContext) {
-		context = aContext;
-	}
-
 	/**
 	 * Generates pragmas for a given view.
 	 * @param view the view to generate pragmas for.
