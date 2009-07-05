@@ -34,12 +34,8 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 		return GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc);
 	}
 	
-	public static String getPackageName(Context context, MetaDocument doc){
-		return context.getPackageName(doc);
-	}
-
-	public static String getPackageName(Context context, MetaModule module){
-		return context.getPackageName(module);
+	public static String getPackageName(MetaModule module){
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(module);
 	}
 	
 	
