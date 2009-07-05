@@ -1,6 +1,10 @@
 package net.anotheria.asg.metafactory;
 
-
+/**
+ * Interface for an resolver used by MetaFactory.
+ * @author lrosenberg
+ *
+ */
 public interface AliasResolver {
 	
 	/**
