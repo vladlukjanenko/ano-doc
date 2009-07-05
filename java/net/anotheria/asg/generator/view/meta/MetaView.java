@@ -20,7 +20,14 @@ public class MetaView implements IGenerateable{
 	 * Sections of the view.
 	 */
 	private List<MetaSection> sections;
+	/**
+	 * Title of the view.
+	 */
 	private String title;
+	/**
+	 * List of roles required to access this view. Having any of the roles is sufficent to obtain access to the view. If no roles are specified, access is granted to 
+	 * every editor.
+	 */
 	private List<String> requiredRoles;
 	/**
 	 * Creates a new MetaView.
@@ -48,19 +55,22 @@ public class MetaView implements IGenerateable{
 	//}
 //--- // END OUTCOMMENTED	
 	
+	/**
+	 * Adds a section to this view.
+	 */
 	public void addSection(MetaSection section){
 		sections.add(section);	
 	}
 
 	/**
-	 * @return
+	 * Returns sections which are part of this view.
 	 */
 	public List<MetaSection> getSections() {
 		return sections;
 	}
 
 	/**
-	 * @param list
+	 * Sets the sections.
 	 */
 	public void setSections(List<MetaSection> list) {
 		sections = list;

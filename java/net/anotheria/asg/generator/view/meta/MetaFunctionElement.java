@@ -5,8 +5,15 @@ package net.anotheria.asg.generator.view.meta;
  * @author another
  */
 public class MetaFunctionElement extends MetaViewElement{
+	/**
+	 * Functions caption.
+	 */
 	private String caption;
-	
+
+	/**
+	 * Creates a new MetaFunctionElement.
+	 * @param aName
+	 */
 	public MetaFunctionElement(String aName){
 		super(aName);
 	}
@@ -16,16 +23,10 @@ public class MetaFunctionElement extends MetaViewElement{
 	}
 	
 
-	/**
-	 * @return
-	 */
 	public String getCaption() {
 		return caption == null || caption.length() == 0 ? getName() : caption;
 	}
 
-	/**
-	 * @param string
-	 */
 	public void setCaption(String string) {
 		caption = string;
 	}

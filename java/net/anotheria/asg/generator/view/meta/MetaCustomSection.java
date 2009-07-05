@@ -16,15 +16,22 @@ you entered into with FriendScout24 GmbH.
 See www.friendscout24.de for details.
 ** ------------------------------------------------------------------------- */
 package net.anotheria.asg.generator.view.meta;
-
+/**
+ * Allows the developer to integrate a custom section into generated frontend.
+ * @author another
+ *
+ */
 public class MetaCustomSection extends MetaSection{
+	/**
+	 * Path to be called whenever the section is selected.
+	 */
 	private String path;
 	
 	public MetaCustomSection(String title){
 		super(title);
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return getTitle()+": "+path;
 	}
 
@@ -37,13 +44,3 @@ public class MetaCustomSection extends MetaSection{
 	}
 
 }
-
-/* ------------------------------------------------------------------------- *
- * $Log$
- * Revision 1.2  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.1  2006/03/07 16:04:44  lrosenberg
- * *** empty log message ***
- *
- */

@@ -93,6 +93,10 @@ public class MetaDecorator implements Cloneable{
 			((MetaDecorator)o).getName().equals(name) : false; 
 	}
 	
+	@Override public int hashCode(){
+		return name == null ? 0 : name.hashCode();
+	}
+	
 	/**
 	 * Returns the name of the class of the decorator without a package.
 	 * @return
