@@ -186,6 +186,10 @@ public class MetaProperty implements Cloneable{
 		return "get"+getAccesserName(language);
 	}
 
+	/**
+	 * Returns the metatype of this property.
+	 * @return
+	 */
 	public IMetaType getMetaType(){
 		return metaType;
 	}
@@ -216,7 +220,7 @@ public class MetaProperty implements Cloneable{
 		this.readonly = readonly;
 	}
 	
-	public Object clone(){
+	@Override public Object clone(){
 		try{
 			return super.clone();
 		}catch(CloneNotSupportedException e){

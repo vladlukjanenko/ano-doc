@@ -2,12 +2,14 @@ package net.anotheria.asg.generator.meta;
 
 
 /**
- * TODO please remined another to comment this class
+ * A container property is a container of a property of another type. This is usually used for lists or tables. They may only contain one type of the data - the containedPoperty.
  * @author another
  */
 public class MetaListProperty extends MetaContainerProperty{
 	
-	
+	/**
+	 * The property inside this container.
+	 */
 	private MetaProperty containedProperty;
 	
 	public MetaListProperty(String name){
@@ -40,11 +42,11 @@ public class MetaListProperty extends MetaContainerProperty{
 		return "Element";
 	}
 	
-	public String toJavaType(){
+	@Override public String toJavaType(){
 		return super.toJavaType()+"<"+containedProperty.toJavaObjectType()+">";
 	}
 	
-	public String toJavaErasedType(){
+	@Override public String toJavaErasedType(){
 		return super.toJavaType();
 	}
 

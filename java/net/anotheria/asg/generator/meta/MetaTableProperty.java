@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO please remined another to comment this class
+ * A property type for representation of tables.
  * @author another
  */
 public class MetaTableProperty extends MetaContainerProperty{
+	/**
+	 * Columns of the table.
+	 */
 	private List<MetaProperty> columns;
 	
 	public MetaTableProperty(String name){

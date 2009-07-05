@@ -217,8 +217,8 @@ public class MetaModule implements IGenerateable{
 		return moduleOptions;
 	}
 
-	public void setModuleOptions(GenerationOptions moduleOptions) {
-		this.moduleOptions = moduleOptions;
+	public void setModuleOptions(GenerationOptions someModuleOptions) {
+		moduleOptions = someModuleOptions;
 	}
 	
 	
