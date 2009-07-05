@@ -44,12 +44,15 @@ import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.sorter.SortType;
 
 /**
- * TODO Please remain lrosenberg to comment ServiceGenerator.java
+ * Controls different sub generators for generation of the service layer. Generates factories and interfaces.
  * @author lrosenberg
  * @created on Feb 24, 2005
  */
 public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	
+	/**
+	 * Generates the service layer for a MetaModule.
+	 */
 	public List<FileEntry> generate(IGenerateable gmodule){
 		
 		MetaModule mod = (MetaModule)gmodule;
@@ -123,10 +126,20 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		return ret;
 	}
 	
+	/**
+	 * Returns the package name for the service generation.
+	 * @param module
+	 * @return
+	 */
 	private String getPackageName(MetaModule module){
 		return GeneratorDataRegistry.getInstance().getContext().getPackageName(module)+".service";
 	}
 	
+	/**
+	 * Generates the base exception class for a module.
+	 * @param module
+	 * @return
+	 */
 	private GeneratedClass generateException(MetaModule module){
 
 		GeneratedClass clazz = new GeneratedClass();
@@ -160,7 +173,12 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 
 	    return clazz;
 	}
-
+	
+	/**
+	 * Generates the service interface for the module.
+	 * @param module
+	 * @return
+	 */
 	private GeneratedClass generateInterface(MetaModule module){
 	    
 		GeneratedClass clazz = new GeneratedClass();
@@ -290,34 +308,64 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    return clazz;
 	}
 	
-	
+	/**
+	 * Returns the name of the base exception class for the service for the given module.
+	 * @param m
+	 * @return
+	 */
 	public static String getExceptionName(MetaModule m){
 	    return getServiceName(m)+"Exception";
 	}
 
-	
+	/**
+	 * Returns the interface name for the service for the module. 
+	 * @param module
+	 * @return
+	 */
 	public static String getInterfaceName(MetaModule module){
 	    return "I"+getServiceName(module);
 	}
 	
+	/**
+	 * Returns the import (package and class name) for the service interface for the given module. 
+	 * @param m
+	 * @return
+	 */
 	public static String getInterfaceImport(MetaModule m){
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getInterfaceName(m);
 	}
 	
+	/**
+	 * Returns the base exception name for the service for this module
+	 * @param m the module.
+	 * @return
+	 */
 	public static String getExceptionImport(MetaModule m){
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getExceptionName(m);
 	}
-
+	
+	/**
+	 * Returns the service name for this module.
+	 * @param m
+	 * @return
+	 */
 	public static String getServiceName(MetaModule m){
 	    return m.getName()+"Service";
 	}
-	
-	
 
+	/**
+	 * Returns the factory name for the service for a metamodule.
+	 * @param m
+	 * @return
+	 */
 	public static String getFactoryName(MetaModule m){
 	    return getServiceName(m)+"Factory";
 	}
-	
+	/**
+	 * Returns the import for the factory for the service for a metamodule.
+	 * @param m
+	 * @return
+	 */
 	public static String getFactoryImport(MetaModule m){
 	    return getPackageName(GeneratorDataRegistry.getInstance().getContext(), m)+"."+getFactoryName(m);
 	}
