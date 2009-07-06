@@ -8,8 +8,9 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
 public class SharedJspFooterGenerator extends AbstractJSPGenerator {
+    private static final String SEPARATOR = "\\\"\\\"";
 
-	public FileEntry generate(List<MetaView> views , Context context) {
+    public FileEntry generate(List<MetaView> views , Context context) {
 		
 		String ret = generateSharedFooter(views, context);
 		FileEntry footer = new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".jsp"), getSharedJspFooterName(), ret);
@@ -38,7 +39,7 @@ public class SharedJspFooterGenerator extends AbstractJSPGenerator {
 			viewSwitcher += "<a href="+quote("<ano:tslink><bean:write name="+quote("v")+" property="+quote("link")+"/></ano:tslink>")+">";
 			viewSwitcher += "<bean:write name="+quote("v")+" property="+quote("caption")+"/>";
 			viewSwitcher += "</a>";
-			viewSwitcher += "<logic:notEqual name="+quote("ind")+" value="+quote("<%=\"\"+(listsize-1)%>")+">&nbsp;|&nbsp;</logic:notEqual>";
+			viewSwitcher += "<logic:notEqual name="+quote("ind")+" value="+quote("<%"+SEPARATOR+"+(listsize-1)%>")+">&nbsp;|&nbsp;</logic:notEqual>";
 			viewSwitcher += "</logic:iterate>";
 			viewSwitcher = "Views:&nbsp;" + viewSwitcher;
 			
