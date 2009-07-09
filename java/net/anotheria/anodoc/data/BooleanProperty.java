@@ -6,7 +6,9 @@ package net.anotheria.anodoc.data;
  * @author lrosenberg
  */
 public class BooleanProperty extends Property{
-	
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = -6112656517280319094L;
 	
 	/**
