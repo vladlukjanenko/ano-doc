@@ -4,10 +4,16 @@ import java.io.Serializable;
 
 public class QueryProperty implements Serializable{
 	/**
-	 * 
+	 * svid.
 	 */
 	private static final long serialVersionUID = 2030752289719048811L;
+	/**
+	 * Name of the property.
+	 */
 	private String name;
+	/**
+	 * Value of the property.
+	 */
 	private Object value;
 	private boolean unprepaireable;
 	
@@ -34,10 +40,14 @@ public class QueryProperty implements Serializable{
 		this.value = value;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return getName() + "=" +getValue();
 	}
 	
+	/**
+	 * Returns the comparator operation for this query.
+	 * @return
+	 */
 	public String getComparator(){
 		return " = ";
 	}
