@@ -40,6 +40,9 @@ public class QueryResult {
 		return entries;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override public String toString(){
 		return "QueryResult with "+entries.size()+" entries: \n"+entries;
 	}
