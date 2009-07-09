@@ -10,22 +10,28 @@ package net.anotheria.anodoc.query2;
  *
  */
 public class QueryNotEqualProperty extends QueryProperty{
-	
+	/**
+	 * svuid.
+	 */
 	private static final long serialVersionUID = 4846334131763003505L;
-
+	/**
+	 * Creates a new QueryNotEqualProperty.
+	 * @param name
+	 * @param value
+	 */
 	public QueryNotEqualProperty(String name, Object value) {
 		super(name, value);
 	}
 
-	public String toString(){
+	@Override public String toString(){
 		return getName() + "!=" +getValue();
 	}
 	
-	public String getComparator(){
+	@Override public String getComparator(){
 		return " != ";
 	}
 	
-	public boolean doesMatch(Object o){
+	@Override public boolean doesMatch(Object o){
 		return !super.doesMatch(o);
 	}
 }

@@ -6,6 +6,9 @@ package net.anotheria.anodoc.data;
  */
 public class FloatProperty extends Property{
 	
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = -8097948895367514824L;
 
 	/**
