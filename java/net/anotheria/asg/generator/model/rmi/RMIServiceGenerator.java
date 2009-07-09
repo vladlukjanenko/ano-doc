@@ -21,7 +21,6 @@ import java.util.List;
  */
 public class RMIServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
-	private Context context;
 	private MetaModule module;
 	
 	@Override public List<FileEntry> generate(IGenerateable gmodule){
@@ -79,13 +78,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	}
 	
 	/**
-	 * 
+	 * Returns the name of the factory for the service.
 	 */
 	public String getFactoryName(MetaModule m){
 	    return "RMI"+getServiceName(m)+"Factory";
 	}
 
-	
+	/**
+	 * Returns the package name for the given module.
+	 */
 	protected String getPackageName(MetaModule module){
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext(), module);
 	}
@@ -98,6 +99,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		return context.getPackageName(module)+".service.rmi";
 	}
 	
+	/**
+	 * Generates the RemoteException class for this modules service.
+	 * @param module
+	 * @return
+	 */
 	private GeneratedClass generateRemoteException(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
@@ -119,6 +125,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		return clazz;
 	}
 
+	/**
+	 * Generates the interface for the remote invocation for the given module.
+	 * @param module
+	 * @return
+	 */
 	private GeneratedClass generateRemoteInterface(MetaModule module){
 	    
 		GeneratedClass clazz = new GeneratedClass();
@@ -311,26 +322,56 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    return clazz;
 	}
 	
+	/**
+	 * Returns the name of the remote interface.
+	 * @param mod
+	 * @return
+	 */
 	public static String getInterfaceName(MetaModule mod){
 		return "Remote"+getServiceName(mod);
 	}
 	
+	/**
+	 * Returns the name of the rmi stub.
+	 * @param mod
+	 * @return
+	 */
 	public static String getStubName(MetaModule mod){
 		return "Remote"+getServiceName(mod)+"Stub";
 	}
 
+	/**
+	 * Returns the name of the rmi server class.
+	 * @param mod
+	 * @return
+	 */
 	public static String getServerName(MetaModule mod){
 		return mod.getName()+"Server";
 	}
 
+	/**
+	 * Returns the name of the rmi lookup function class.
+	 * @param mod
+	 * @return
+	 */
 	public static String getLookupName(MetaModule mod){
 		return getServiceName(mod)+"RMILookup";
 	}
 
+	/**
+	 * Returns the name of the rmi skeleton class.
+	 * @param mod
+	 * @return
+	 */
 	public static String getSkeletonName(MetaModule mod){
 		return "Remote"+getServiceName(mod)+"Skeleton";
 	}
 	
+	/**
+	 * Generates lookup utility class.
+	 * @param module
+	 * @return
+	 */
 	private GeneratedClass generateLookup(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
