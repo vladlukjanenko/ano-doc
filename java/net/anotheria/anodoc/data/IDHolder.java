@@ -14,13 +14,22 @@ public class IDHolder extends Document{
 	 * Attribute name of the last id storage.
 	 */
 	public static final String ATT_LAST_ID = "lastId";
+	/**
+	 * Constant for type identifier.
+	 */
 	public static final String TYPE_IDENTIFIER = "type.id.holder"; 
-	
+	/**
+	 * Creates a new idholder object with given id.
+	 * @param id
+	 */
 	public IDHolder(String id){
 		super(id);
 		setTypeIdentifier(TYPE_IDENTIFIER);
 	}
-	 
+	/**
+	 * Returns next id as string. The id is unique.
+	 * @return
+	 */
 	public String getNextIdString(){
 		String id = ""+getNextIdInt();
 		while(id.length()<4)
@@ -39,7 +48,7 @@ public class IDHolder extends Document{
 		return id;
 	}
 	/**
-	 * Returns the next id.
+	 * Returns the next id without increasing it.
 	 * @return
 	 */
 	public int getNextIdToGive(){

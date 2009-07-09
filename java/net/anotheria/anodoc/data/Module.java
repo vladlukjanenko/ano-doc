@@ -50,6 +50,9 @@ public class Module implements ICompositeDataObject, Serializable{
 	 */
 	private transient Logger log;
 
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = 4896753471545492611L;
 
 	/**

@@ -19,6 +19,9 @@ import net.anotheria.util.xml.XMLNode;
 public class Document extends DataHolder 
 		implements ICompositeDataObject, Cloneable{
 	
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = -5433016437476873070L;
 	
 	/**
@@ -32,7 +35,9 @@ public class Document extends DataHolder
 	 */
 	public static final String PROP_TYPE_IDENTIFIER = "###my_type###";
 	
-	
+	/**
+	 * Constant for property name of the property under which last update timestamp is stored.
+	 */
 	public static final String PROP_LAST_UPDATE = "###last_update###";
 
 	/**
@@ -89,6 +94,10 @@ public class Document extends DataHolder
 		throw new NoSuchDocumentException(name);
 	}
 	
+	/**
+	 * Returns a list of all contained properties.
+	 * @return
+	 */
 	public List<Property> getProperties(){
 		Collection<DataHolder> holders = dataStorage.values();
 		List<Property> ret = new ArrayList<Property>();

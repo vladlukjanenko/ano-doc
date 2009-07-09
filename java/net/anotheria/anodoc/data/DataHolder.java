@@ -9,10 +9,12 @@ import net.anotheria.util.xml.XMLNode;
  * This class represents the root class for all objects that can hold information
  * and therefore data. In particular its Document, DocumentList and Property.
  * @since 1.0
- * @author lro
+ * @author lrosenberg
  **/
 public abstract class DataHolder implements Serializable, Cloneable{
-	
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = -145899051333223122L;
  
 	/**

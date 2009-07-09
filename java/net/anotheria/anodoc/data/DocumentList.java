@@ -20,6 +20,9 @@ import net.anotheria.util.xml.XMLNode;
  * @since 1.0
  **/
 public class DocumentList<D extends Document> extends DataHolder implements ICompositeDataObject{
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = -6201606233792279067L;
 	
 	/**

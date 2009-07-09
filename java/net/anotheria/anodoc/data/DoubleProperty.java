@@ -5,7 +5,9 @@ package net.anotheria.anodoc.data;
  * @since 1.1
  */
 public class DoubleProperty extends Property{
-	
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = 5268122271480317179L;
 	
 	/**

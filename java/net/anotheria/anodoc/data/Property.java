@@ -12,7 +12,10 @@ import net.anotheria.util.xml.XMLNode;
  */
 public abstract class Property
 	 extends DataHolder implements IPlainDataObject,Cloneable{
-	 	
+	 
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = -4170023770710073469L;
 
 	/**
