@@ -1,9 +1,22 @@
 package net.anotheria.asg.generator;
 
+/**
+ * Mostly currently executed generation job.
+ * @author another
+ *
+ */
 public class GenerationJob {
+	/**
+	 * The string builder with file content.
+	 */
 	private StringBuilder builder;
+	/**
+	 * Currently generated artefact.
+	 */
 	private GeneratedArtefact artefact;
-	
+	/**
+	 * Creates and starts a new job.
+	 */
 	public GenerationJob(){
 		reset();
 	}
@@ -12,7 +25,10 @@ public class GenerationJob {
 		builder = aBuilder;
 		artefact = null;
 	}
-
+	/**
+	 * Sets the generation of the given artefact as the current job.
+	 * @param anArtefact
+	 */
 	public GenerationJob(GeneratedArtefact anArtefact){
 		artefact = anArtefact;
 		builder = artefact.getBody();
