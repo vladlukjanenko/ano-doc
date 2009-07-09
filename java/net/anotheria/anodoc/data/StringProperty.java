@@ -4,7 +4,9 @@ package net.anotheria.anodoc.data;
  * This property represents a string value.
  */
 public class StringProperty extends Property{
-	
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = -7506812728258106500L;
 	
 	/**
