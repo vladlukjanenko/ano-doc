@@ -7,7 +7,7 @@ import net.anotheria.asg.generator.util.FileWriter;
 
 
 /**
- *  
+ * Base class for generators.  
  * @author lrosenberg
  */
 public class AbstractAnoDocGenerator {

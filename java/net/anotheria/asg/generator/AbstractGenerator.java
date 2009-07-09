@@ -17,18 +17,38 @@ import net.anotheria.util.StringUtils;
  */
 public class AbstractGenerator{
 
+	/**
+	 * Quotes a string with double quotes &quot;.
+	 * @param s
+	 * @return
+	 */
 	protected String quote(String s){
 		return "\""+s+"\"";
 	}
-	
+
+	/**
+	 * Quotes a string with double quotes &quot;.
+	 * @param s
+	 * @return
+	 */
 	protected String quote(StringBuilder s){
 		return "\""+s.toString()+"\"";
 	}
-
+	
+	/**
+	 * Quotes the string representation of the integer parameter with double quotes &quot;.
+	 * @param a
+	 * @return
+	 */
 	protected String quote(int a){
 		return quote(""+a);
 	}
 
+	/**
+	 * Returns a line with increased ident and the parameter string.
+	 * @param s
+	 * @return
+	 */
 	protected String writeIncreasedString(String s){
 		increaseIdent();
 		String ret = writeString(s);
@@ -36,10 +56,19 @@ public class AbstractGenerator{
 		return ret;
 	}
 	
+	/**
+	 * Adds all string parameters after each other to the current target StringBuilder with an increased ident.
+	 * @param strings
+	 */
 	protected void appendIncreasedString(String... strings){
 		appendIncreasedString(getCurrentJobContent(), strings);
 	}
 		
+	/**
+	 * Adds all string parameters after each other to the given target StringBuilder with an increased ident.
+	 * @param target
+	 * @param strings
+	 */
 	protected void appendIncreasedString(StringBuilder target, String... strings){
 		increaseIdent();
 		appendString(target, strings);
@@ -60,6 +89,9 @@ public class AbstractGenerator{
 		decreaseIdent();
 	}
 
+	/**
+	 * Constant for line break.
+	 */
 	public static final String CRLF = "\n";
 	
 	/**
@@ -337,41 +369,44 @@ public class AbstractGenerator{
 		
 	}
 	
+	/**
+	 * Returns the language of the selected multilingual element or null if the element is not multilingual.
+	 * @param element
+	 * @return
+	 */
 	protected String getElementLanguage(MetaViewElement element){
 		return element instanceof MultilingualFieldElement ? ((MultilingualFieldElement)element).getLanguage() : null;
 	}
 	
 	///////// NEW GENERATION INTERFACE ///////////
 	/**
-	 * @deprecated use startNewJob(GeneratedArtefact) instead
+	 * Starts new job. Sets the parameter artefact as generated artefact.
+	 * @param clazz
 	 */
-	public static final void startNewJob(){
-		GenerationJobManager.startNewJob();
-	}
-	
 	public final void startNewJob(GeneratedArtefact clazz){
 		GenerationJobManager.startNewJob(clazz);
 	}
 
+	/**
+	 * Returns the content of the currently active job.
+	 * @return
+	 */
 	public static final StringBuilder getCurrentJobContent(){
 		return GenerationJobManager.getCurrentJob().getStringBuilder();
 	}
 	
+	/**
+	 * Returns the artefact currently being generated.
+	 * @return
+	 */
 	public static final GeneratedArtefact getCurrentJob(){
 		return GenerationJobManager.getCurrentJob().getArtefact();
 	}
 
+	/**
+	 * Starts the body of a class. Resets the ident.
+	 */
 	protected void startClassBody(){
 		ident = 1;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 }
