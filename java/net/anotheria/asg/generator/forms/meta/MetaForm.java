@@ -26,9 +26,21 @@ import java.util.List;
  * @created on Mar 14, 2005
  */
 public class MetaForm {
+	/**
+	 * Recipients of the submitted form.
+	 */
     private List<String> targets;
+    /**
+     * Elements of the form.
+     */
     private List<MetaFormField> elements;
+    /**
+     * Id of the form.
+     */
     private String id;
+    /**
+     * Action of the form.
+     */
     private String action;
     
     private String path;
@@ -105,31 +117,3 @@ public class MetaForm {
         this.action = action;
     }
 }
-
-/* ------------------------------------------------------------------------- *
- * $Log: MetaForm.java,v $
- * Revision 1.4  2006/12/28 22:22:04  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.3  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.2  2005/11/01 23:31:52  lro
- * *** empty log message ***
- *
- * Revision 1.1  2005/10/20 21:20:12  lro
- * *** empty log message ***
- *
- * Revision 1.4  2005/06/30 00:03:12  lro
- * *** empty log message ***
- *
- * Revision 1.3  2005/06/29 11:46:50  lro
- * *** empty log message ***
- *
- * Revision 1.2  2005/03/14 19:55:08  lro
- * *** empty log message ***
- *
- * Revision 1.1  2005/03/14 19:31:26  lro
- * *** empty log message ***
- *
- */

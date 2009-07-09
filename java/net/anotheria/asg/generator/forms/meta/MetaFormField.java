@@ -18,11 +18,14 @@ See www.friendscout24.de for details.
 package net.anotheria.asg.generator.forms.meta;
 
 /**
- * TODO Please remain lrosenberg to comment MetaFormElement.java
+ * Base class for FormFields which are parts of a Form.
  * @author lrosenberg
  * @created on Mar 14, 2005
  */
 public abstract class MetaFormField {
+	/**
+	 * Name of the field.
+	 */
     private String name;
     
     public MetaFormField(String aName){
@@ -42,7 +45,7 @@ public abstract class MetaFormField {
         this.name = name;
     }
     
-    public String toString(){
+    @Override public String toString(){
         return name;
     }
     
@@ -51,22 +54,3 @@ public abstract class MetaFormField {
     public abstract boolean isComplex();
     
 }
-
-/* ------------------------------------------------------------------------- *
- * $Log: MetaFormField.java,v $
- * Revision 1.2  2006/12/27 23:47:59  lrosenberg
- * *** empty log message ***
- *
- * Revision 1.1  2005/10/20 21:20:12  lro
- * *** empty log message ***
- *
- * Revision 1.1  2005/06/30 00:03:12  lro
- * *** empty log message ***
- *
- * Revision 1.2  2005/06/29 00:02:48  lro
- * *** empty log message ***
- *
- * Revision 1.1  2005/03/14 19:31:26  lro
- * *** empty log message ***
- *
- */
