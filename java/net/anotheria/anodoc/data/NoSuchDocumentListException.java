@@ -5,6 +5,10 @@ package net.anotheria.anodoc.data;
  * or the DataHolder with correspoding name is not a DocumentList.
  */
 public class NoSuchDocumentListException extends RuntimeException{
+	/**
+	 * Creates a new exception instance.
+	 * @param name
+	 */
 	public NoSuchDocumentListException(String name){
 		super("No such list "+name+", or "+name+" is not a list");
 	}

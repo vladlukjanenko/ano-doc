@@ -5,6 +5,10 @@ package net.anotheria.anodoc.data;
  * or the DataHolder with correspoding name is not a Document.
  */
 public class NoSuchDocumentException extends RuntimeException{
+	/**
+	 * Creates a new instance.
+	 * @param name
+	 */
 	public NoSuchDocumentException(String name){
 		super("No such document "+name+", or "+name+" is not a document");
 	}

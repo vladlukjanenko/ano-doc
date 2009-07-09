@@ -11,7 +11,9 @@ import net.anotheria.util.xml.XMLNode;
  * @since 1.0
  */
 public class ListProperty extends Property{
-	
+	/**
+	 * svid.
+	 */
 	private static final long serialVersionUID = -8714197156967135129L;
 	
 	/**

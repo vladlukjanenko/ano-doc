@@ -79,16 +79,25 @@ public abstract class Property
 			   value.equals(anotherProperty.value); 
 	}
 	
+	/**
+	 * Returns the name of the property. 
+	 * @return
+	 */
 	protected String getName(){
 		return getId();
 	}
 	
-	public Object clone() throws CloneNotSupportedException{
+	@Override public Object clone() throws CloneNotSupportedException{
 		Property newP = (Property)super.clone();
 		newP.setValue(cloneValue());
 		return newP;
 	}
-	
+	/**
+	 * Creates a copy of this property with a new name.
+	 * @param newName
+	 * @return
+	 * @throws CloneNotSupportedException
+	 */
 	public Property cloneAs(String newName) throws CloneNotSupportedException{
 		Property newP = (Property)super.clone();
 		newP.setValue(cloneValue());
@@ -98,6 +107,9 @@ public abstract class Property
 	
 	protected abstract Object cloneValue() throws CloneNotSupportedException;
 	
+	/**
+	 * Creates an xml node for export.
+	 */
 	public XMLNode toXMLNode(){
 		XMLNode ret = new XMLNode("property");
 		ret.addAttribute(new XMLAttribute("name", getName()));
