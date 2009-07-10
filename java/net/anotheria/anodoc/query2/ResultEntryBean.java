@@ -1,10 +1,27 @@
 package net.anotheria.anodoc.query2;
 
+/**
+ * A bean which contains one result entry. 
+ * @author lrosenberg
+ */
 public class ResultEntryBean {
+	/**
+	 * The link for document edit dialog.
+	 */
 	private String editLink;
+	/**
+	 * The id of the document/object which was found.
+	 */
 	private String documentId;
+	/**
+	 * The name of the property which matched.
+	 */
 	private String propertyName;
+	/**
+	 * The matching info (additional information).
+	 */
 	private String info;
+	
 	public String getDocumentId() {
 		return documentId;
 	}
