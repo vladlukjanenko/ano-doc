@@ -2,8 +2,7 @@ package net.anotheria.asg.generator;
 
 /**
  * Mostly currently executed generation job.
- * @author another
- *
+ * @author lrosenberg
  */
 public class GenerationJob {
 	/**

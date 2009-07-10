@@ -1,10 +1,18 @@
 package net.anotheria.asg.generator;
 
-
+/**
+ * Represents a generated jsp file.
+ * @author lrosenberg
+ */
 public class GeneratedJSPFile extends GeneratedArtefact{
 
-	
+	/**
+	 * Body of the artefact.
+	 */
 	private StringBuilder body;
+	/**
+	 * Path of the artefact.
+	 */
 	private String path;
 	
 	
@@ -33,12 +41,11 @@ public class GeneratedJSPFile extends GeneratedArtefact{
 		this.path = path;
 	}
 
-	public StringBuilder getBody() {
+	@Override public StringBuilder getBody() {
 		return body;
 	}
 	
 	public void setPackage(String aPackage){
 		path = FileEntry.package2path(aPackage);
 	}
-
 }
