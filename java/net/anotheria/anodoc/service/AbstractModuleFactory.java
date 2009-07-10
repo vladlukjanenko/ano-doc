@@ -49,7 +49,7 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	 * since usage of Document directly in your modell is not fitting in the concept of ano-doc.
 	 * @return newly created Document.
 	 */
-	public Document createDocument(String id) {
+	@Override public Document createDocument(String id) {
 		if (id.startsWith(IDHolder.DOC_ID_HOLDER_PRE))
 			return new IDHolder(id);
 		
@@ -76,7 +76,7 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	}
 
 
-	public final Module createModule(String ownerId, String copyId) {
+	@Override public final Module createModule(String ownerId, String copyId) {
 		Module module = recreateModule(ownerId, copyId);
 		module.setOwnerId(ownerId);
 		module.setCopyId(copyId);
