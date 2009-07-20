@@ -543,9 +543,9 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		}
 
 		appendComment("Sets the value of the "+p.getName()+" attribute.");
-		appendString("public "+getDocumentBuilderName(doc)+" "+p.getName()+"("+p.toJavaType()+" value){");
+		appendString("public "+getDocumentBuilderName(doc)+" "+p.getName()+"("+p.toJavaType()+" aValue){");
 		increaseIdent();
-		appendStatement(p.getName(), " = ", "value");
+		appendStatement(p.getName(), " = ", "aValue");
 		appendStatement("return this");
 		append(closeBlock());
 		
