@@ -28,7 +28,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	/*
 	 * The context for the generation.
 	 */
-	private Context context;
+//	private Context context;
 	
 	/**
 	 * Generates the header for all jsp files. 
@@ -284,7 +284,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	protected String getCurrentYUIPath(String yuiName){
-		return getYUIPath(yuiName, context);
+		return getYUIPath(yuiName, GeneratorDataRegistry.getInstance().getContext());
 	}
 
 	public static String getCSSPath(String stylesheetName, Context context){
