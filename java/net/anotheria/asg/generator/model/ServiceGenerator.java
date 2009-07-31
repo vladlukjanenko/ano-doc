@@ -248,6 +248,11 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	        appendStatement("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        emptyline();
 
+            appendComment("Imports multiple new  "+doc.getName()+" object.\nReturns the created versions.");
+            appendStatement("public "+listDecl+" import"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
+	        emptyline();
+            
+
 	        appendComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
 	        appendStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        emptyline();

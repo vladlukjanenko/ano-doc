@@ -604,6 +604,48 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         
         append(closeBlock());
         emptyline();
+
+        ii = 0;
+
+         //ImportXYZ method List<>
+        callLog = quote("import "+doc.getMultiple()+"(")+"+con+"+quote(", ")+"+list+"+quote(")");
+        appendComment("Imports multiple new "+doc.getName()+" objects.\nReturns the imported versions.");
+        openFun("public "+listDecl+" import"+doc.getMultiple()+"(Connection con,"+listDecl+" list)"+throwsClause);
+        appendStatement("PreparedStatement ps = null");
+        appendString("try{");
+        increaseIdent();
+        appendStatement("con.setAutoCommit(false)");
+        appendStatement("ps = con.prepareStatement(createSQL(SQL_CREATE_1, SQL_CREATE_2))");
+        appendStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
+        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
+        increaseIdent();
+         appendStatement("ps.setLong(1, Long.parseLong("+doc.getVariableName()+".getId()))");
+        for (int i=0; i<properties.size(); i++){
+        	generateDB2PropertyMapping(doc.getVariableName(), properties.get(i), i+2);
+        	ii = i +2;
+        }
+        appendCommentLine("set create timestamp");
+        
+        appendStatement("ps.setLong("+(ii+1)+", System.currentTimeMillis())");
+        appendStatement("int rows = ps.executeUpdate()");
+        appendString("if (rows!=1)");
+        appendIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)");
+
+        copyResVarName = "new"+StringUtils.capitalize(doc.getVariableName());
+        createCopyCall = VOGenerator.getDocumentImplName(doc)+" "+copyResVarName + " = new "+VOGenerator.getDocumentImplName(doc);
+        createCopyCall += "("+doc.getVariableName()+".getId())";
+        appendStatement(createCopyCall);
+        appendStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")");
+        appendStatement("adjustLastId(con, Long.parseLong("+doc.getVariableName()+".getId()))");
+        appendStatement("ret.add("+copyResVarName+")");
+        append(closeBlock());
+        appendStatement("con.commit()");
+        appendStatement("return ret");
+        generateFunctionEnd(callLog, true);
+        append(closeBlock());
+        emptyline();
+
+
         ii = 0;
         
         //createXYZ method

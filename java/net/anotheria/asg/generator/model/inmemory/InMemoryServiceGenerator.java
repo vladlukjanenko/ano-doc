@@ -309,6 +309,17 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        emptyline();
+
+            appendString("public "+listDecl+" import"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
+	        increaseIdent();
+	        appendStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">(list.size())");
+	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
+	        increaseIdent();
+	        appendStatement("ret.add(import"+doc.getName()+"("+doc.getVariableName()+"))");
+            append(closeBlock());
+            appendStatement("return ret");
+	        append(closeBlock());
+	        emptyline();
 	        
 ///*	        
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");

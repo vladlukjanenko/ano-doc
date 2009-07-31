@@ -16,45 +16,45 @@ import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 
 public class CMSBasedServiceGenerator extends AbstractServiceGenerator implements IGenerator{
-	
+
 	public List<FileEntry> generate(IGenerateable gmodule){
-		
+
 		MetaModule mod = (MetaModule)gmodule;
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		ret.add(new FileEntry(generateFactory(mod)));
 		ret.add(new FileEntry(generateImplementation(mod)));
 		ret.addAll(generateCRUDServices(mod));
-		
+
 		return ret;
 	}
-	
+
 	private List<FileEntry> generateCRUDServices(MetaModule module){
 		List<FileEntry> ret = new ArrayList<FileEntry>();
-		
+
 		for (MetaDocument doc : module.getDocuments())
 			ret.add(new FileEntry(generateCRUDService(module, doc)));
 
 		return ret;
 	}
-	
+
 	private String getCRUDServiceName(MetaDocument doc){
 		return doc.getName()+"CRUDServiceImpl";
 	}
-	
+
 	private GeneratedClass generateCRUDService(MetaModule module, MetaDocument doc){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		
+
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getCRUDServiceName(doc),"The implementation of the "+getCRUDServiceName(doc)+"."));
-		clazz.setPackageName(getPackageName(module)); 
+		clazz.setPackageName(getPackageName(module));
 
 		clazz.addImport("net.anotheria.asg.service.CRUDService");
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
-	    
+
 		clazz.setName(getCRUDServiceName(doc));
 		clazz.addInterface("CRUDService<"+doc.getName()+">");
-	    
+
 		startClassBody();
 	    appendStatement(getInterfaceName(module)+" service");
 	    emptyline();
@@ -62,13 +62,13 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    increaseIdent();
 	    appendStatement("this("+getFactoryName(module)+".getDefaultInstance())");
 	    append(closeBlock());
-	    
+
 	    emptyline();
 	    appendString("public ", getCRUDServiceName(doc), "("+getInterfaceName(module)+" aService){");
 	    increaseIdent();
 	    appendStatement("service = aService");
 	    append(closeBlock());
-	    
+
 	    emptyline();
 	    appendString("public "+doc.getName()+" create("+doc.getName()+" "+doc.getVariableName()+")  throws ASGRuntimeException {");
 	    increaseIdent();
@@ -94,25 +94,25 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		append(closeBlock());
 	    emptyline();
 
-	    
+
 		return clazz;
 	}
-	
+
 	private GeneratedClass generateImplementation(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+"."));
 		clazz.setPackageName(getPackageName(module));
-		
-		
+
+
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
 		clazz.addImport("net.anotheria.anodoc.data.Property");
 		clazz.addImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 		clazz.addImport("net.anotheria.util.sorter.SortType");
 		clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
-		
+
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		clazz.addImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
 		clazz.addImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService");
@@ -122,19 +122,19 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
 		clazz.addImport("net.anotheria.anodoc.query2.QueryResultEntry");
 		clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
-	    
+
 		clazz.addImport("net.anotheria.util.xml.XMLNode");
 		clazz.addImport("net.anotheria.util.xml.XMLAttribute");
 
 	    clazz.setName(getImplementationName(module));
 	    clazz.setParent("BasicCMSService");
 	    clazz.addInterface(getInterfaceName(module));
-		
+
 	    startClassBody();
 
 	    appendStatement("private static "+getImplementationName(module)+" instance");
 	    emptyline();
-	    
+
 	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
 	    if (module.getListeners().size()>0){
@@ -145,7 +145,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    }
 	    append(closeBlock());
 	    emptyline();
-	    
+
 	    appendString("static final "+getImplementationName(module)+" getInstance(){");
 	    increaseIdent();
 	    appendString("if (instance==null){");
@@ -155,26 +155,26 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    appendStatement("return instance");
 	    append(closeBlock());
 	    emptyline();
-	    
+
 	    //generate module handling.
 	    appendString("private "+module.getModuleClassName()+" "+getModuleGetterCall(module)+"{");
 	    increaseIdent();
 	    appendStatement("return ("+module.getModuleClassName()+") getModule("+module.getModuleClassName()+".MODULE_ID)");
 	    append(closeBlock());
 	    emptyline();
-	    
+
 	    boolean containsAnyMultilingualDocs = false;
 	    List<MetaDocument> docs = module.getDocuments();
 
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
-	        
+
 	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        clazz.addImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 	        clazz.addImport(DocumentGenerator.getDocumentImport(context, doc));
-	        
+
 	        String listDecl = "List<"+doc.getName()+">";
-	        
+
 	        appendString("@SuppressWarnings(\"unchecked\")");
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"(){");
 	        increaseIdent();
@@ -182,13 +182,13 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("return "+doc.getMultiple().toLowerCase());
 	        append(closeBlock());
 	        emptyline();
-	        
+
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType){");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			append(closeBlock());
 			emptyline();
-			
+
 			appendComment("Returns the "+doc.getName()+" objects with the specified ids.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids){");
 	        increaseIdent();
@@ -220,7 +220,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        append(closeBlock());
 	        emptyline();
-	        
+
 	        appendString("public void delete"+doc.getName()+"(String id){");
 	        increaseIdent();
 	        appendStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
@@ -241,7 +241,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("module.delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        append(closeBlock());
 	        appendStatement("updateModule(module)");
-	        
+
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
 	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
@@ -251,16 +251,16 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendIncreasedStatement("myListeners.get(i).documentDeleted(list.get(t))");
 	        decreaseIdent();
 	        append(closeBlock());
-	        
+
 	        append(closeBlock());
 	        emptyline();
-	        
+
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id){");
 	        increaseIdent();
 	        appendStatement("return "+getModuleGetterCall(module)+".get"+doc.getName()+"(id)");
 	        append(closeBlock());
 	        emptyline();
-	        
+
 	        //import
 	        appendString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	        increaseIdent();
@@ -271,27 +271,43 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        emptyline();
 
+            //importList
+	        appendString("public "+listDecl+" import"+doc.getMultiple()+"("+listDecl+" list){");
+	        increaseIdent();
+	        appendStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
+            appendStatement(listDecl+" ret = new ArrayList<"+doc.getName()+">()");
+	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
+	        increaseIdent();
+	        appendStatement(doc.getName()+" imported = module.import"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
+            appendStatement("ret.add(imported)");
+            decreaseIdent();
+	        append(closeBlock());
+	        appendStatement("updateModule(module)");
+	        appendStatement("return ret");
+	        append(closeBlock());
+	        emptyline();
+
 	        //create
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+"){");
 	        increaseIdent();
 	        appendStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
 	        appendStatement("module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
 	        appendStatement("updateModule(module)");
-	        
+
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
 	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
 	        appendString("for (int i=0; i<myListeners.size(); i++)");
 	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        append(closeBlock());	
-	        
-	        
+	        append(closeBlock());
+
+
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        emptyline();
 
-	        
-	        
+
+
 	        //create multiple
 	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
 	        appendStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list){");
@@ -303,9 +319,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement(doc.getName()+" created = module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
 	        appendStatement("ret.add(created)");
 	        append(closeBlock());
-	        
+
 	        appendStatement("updateModule(module)");
-	        
+
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
 	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
@@ -314,36 +330,36 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
 	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
 	        decreaseIdent();
-	        append(closeBlock());	
-	        
-	        
+	        append(closeBlock());
+
+
 	        appendStatement("return ret");
 	        append(closeBlock());
 	        emptyline();
-	        
-	        
+
+
 	        appendString("public ",doc.getName()," update",doc.getName(),"(",doc.getName()," ",doc.getVariableName(),"){");
 	        increaseIdent();
 	        appendStatement(doc.getName()+" oldVersion = null");
 	        appendStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
-	        
+
 	        appendString("if (hasServiceListeners())");
 	        appendIncreasedStatement("oldVersion = module.get"+doc.getName()+"("+doc.getVariableName()+".getId())");
-	        
+
 	        appendStatement("module.update"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
 	        appendStatement("updateModule(module)");
-	        
+
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
 	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
 	        appendString("for (int i=0; i<myListeners.size(); i++)");
 	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
 	        append(closeBlock());
-	        
+
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        emptyline();
-	        
+
 
 	        //updatemultiple
 	        appendString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list){");
@@ -351,7 +367,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement(listDecl+" oldList = null");
 	        appendString("if (hasServiceListeners())");
 	        appendIncreasedStatement("oldList = new ArrayList<"+doc.getName()+">(list.size())");
-	        
+
 	        appendStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
 
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
@@ -361,7 +377,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("module.update"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
 	        append(closeBlock());
 	        appendStatement("updateModule(module)");
-	        
+
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
 	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
@@ -371,13 +387,13 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldList.get(t), list.get(t))");
 	        decreaseIdent();
 	        append(closeBlock());
-	        
+
 	        appendStatement("return list");
 	        append(closeBlock());
 	        emptyline();
-	        
-	        
-	        
+
+
+
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value){");
 	        increaseIdent();
 	        appendStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()");
@@ -402,17 +418,17 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
 			decreaseIdent();
 	        appendString("}catch(Exception ignored){}");
-	        
+
 	        append(closeBlock());
 	        appendString("return ret;");
 	        append(closeBlock());
 	        emptyline();
-	        
+
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType){");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
 			append(closeBlock());
-			
+
 			appendComment("Executes a query on "+doc.getMultiple());
 			appendString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query){");
 			increaseIdent();
@@ -423,11 +439,11 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendStatement("List<QueryResultEntry> partialResult = query.match(all"+doc.getMultiple()+".get(i))");
 			appendStatement("result.add(partialResult)");
 			append(closeBlock());
-			
+
 			appendStatement("return result");
 			append(closeBlock());
 			emptyline();
-			
+
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
 //	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
 //	        increaseIdent();
@@ -441,7 +457,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 //	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 //	        append(closeBlock());
 //			emptyline();
-			
+
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
 			increaseIdent();
 			appendString("//first the slow version, the fast version is a todo.");
@@ -454,22 +470,22 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			increaseIdent();
 			appendStatement("mayPass = mayPass && qp.doesMatch("+doc.getVariableName()+".getPropertyValue(qp.getName()))");
 			append(closeBlock());
-			
+
 			appendString("if (mayPass)");
 			appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
 			append(closeBlock());
-			
+
 			appendStatement("return ret");
 			append(closeBlock());
 	        emptyline();
-	        
+
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
 	        increaseIdent();
 	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
 	        append(closeBlock());
 			emptyline();
-			
+
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 				containsAnyMultilingualDocs = true;
 				appendCommentLine("This method is not very fast, since it makes an update (eff. save) after each doc.");
@@ -486,12 +502,12 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 				appendStatement("update"+doc.getMultiple()+"(allDocuments)");
 				append(closeBlock());
 				emptyline();
-			
+
 			}
-			
-			
+
+
 	    }
-	    
+
 	    if (containsAnyMultilingualDocs){
 			appendComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
 			appendString("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage){");
@@ -504,7 +520,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			emptyline();
 	    }
 
-	    
+
 	    //generate export function
 	    emptyline();
 	    for (MetaDocument d : docs){
@@ -516,7 +532,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
 	    	appendStatement("return ret");
-	    	
+
 	    	append(closeBlock());
 	    	emptyline();
 
@@ -528,11 +544,11 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
 	    	appendStatement("return ret");
-	    	
+
 	    	append(closeBlock());
 	    	emptyline();
 	    }
-	    
+
 
 	    appendString("public XMLNode exportToXML(){");
 	    increaseIdent();
@@ -544,8 +560,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    emptyline();
 	    appendStatement("return ret");
 	    append(closeBlock());
-	    
-	    
+
+
 	    appendString("public XMLNode exportToXML(String[] languages){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
@@ -558,13 +574,13 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    append(closeBlock());
 	    return clazz;
 	}
-	
+
 	private String getModuleGetterMethod(MetaModule module){
-	    return "_get"+module.getModuleClassName();	    
+	    return "_get"+module.getModuleClassName();
 	}
-	
+
 	private String getModuleGetterCall(MetaModule module){
 	    return getModuleGetterMethod(module)+"()";
 	}
-	
+
 }

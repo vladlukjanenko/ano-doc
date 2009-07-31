@@ -108,6 +108,9 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendComment("Imports a new "+doc.getName()+" object.\nReturns the imported version.");
 	        appendStatement("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        emptyline();
+            appendComment("Imports multiple new "+doc.getName()+" objects.\nReturns the imported versions.");
+	        appendStatement("public "+listDecl+" import"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
+	        emptyline();
 	        appendComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
 	        appendStatement("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        emptyline();
@@ -269,6 +272,15 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        openFun("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
 	        generateMethodStart(callLog);
 	        appendStatement("return "+getDAOVariableName(doc)+".import"+doc.getName()+"(c, "+doc.getVariableName()+")");
+	        generateMethodEnd(module, callLog);
+	        append(closeBlock());
+	        emptyline();
+
+            callLog = "\"Call import"+doc.getMultiple()+"(\"+list+\") \"";
+	        appendComment("Imports multiple new "+doc.getName()+" objects.\nReturns the imported versions.");
+	        openFun("public "+listDecl+" import"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
+	        generateMethodStart(callLog);
+	        appendStatement("return "+getDAOVariableName(doc)+".import"+doc.getMultiple()+"(c, list)");
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
 	        emptyline();
