@@ -265,10 +265,19 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 	
 	private void generateListPropertyToXMLMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
-		if (p.isMultilingual())
-			tmp.setMultilingual(true);
-		generatePropertyToXMLMethod(tmp);
+		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeForListValue("+quote(p.getName())+", " + quote(p.getContainedProperty().getType()) + ", object.get"+p.getAccesserName()+"()))");
+		
+		//Alternative variant to maintain current approach:
+		//XMLHelper.createXMLNodeForXXXValue methods to XMLHelper must be added
+//		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list" + StringUtils.capitalize(p.getType()), p.getContainedProperty());
+//		if (p.isMultilingual())
+//			tmp.setMultilingual(true);
+//		generatePropertyToXMLMethod(tmp);
+		
+//		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+//		if (p.isMultilingual())
+//			tmp.setMultilingual(true);
+//		generatePropertyToXMLMethod(tmp);
 	}
 	
 	

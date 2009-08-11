@@ -11,8 +11,24 @@ import net.anotheria.util.xml.XMLNode;
  *
  */
 public class XMLHelper {
-	public static <T> XMLNode createXMLNodeForListValue(String name, String[] language, List<T>... value){
-		return createXMLNodeWithContent(name, language, "list", "not_yet_implemented");
+//	public static <T> XMLNode createXMLNodeForListValue(String name, String[] language, List<T>... value){
+//		return createXMLNodeWithContent(name, language, "list", "not_yet_implemented");
+//	}
+	
+	public static <T> XMLNode createXMLNodeForListValue(String name, String contentType, List<T> content){
+		XMLNode ret = new XMLNode(name);
+		
+		XMLNode val = new XMLNode("value");
+		ret.addChildNode(val);
+		
+		val.addAttribute(new XMLAttribute("type", "list"));
+		val.addAttribute(new XMLAttribute("contentType", contentType));
+		for(Object c:content){
+			XMLNode el = new XMLNode("element");
+			val.addChildNode(el);
+			el.setContent(""+c);
+		}
+		return ret;
 	}
 	
 	public static XMLNode createXMLNodeForImageValue(String name, String[] language, String... value){
