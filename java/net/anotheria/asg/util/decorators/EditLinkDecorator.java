@@ -5,15 +5,12 @@ import net.anotheria.asg.data.DataObject;
 import net.anotheria.asg.util.decorators.IAttributeDecorator;
 
 /**
- * This decorator changes the name field to the edit link
- * 
- * @author another
- *
+ * This decorator decorates the link to another object with the name property of the linked object.
+ * @author lrosenberg
  */
 public class EditLinkDecorator implements IAttributeDecorator{
 
-	public String decorate(DataObject obj, String attributeName, String rule) {
-//		String docName = Character.toLowerCase(obj.getDefinedName().charAt(0))+obj.getDefinedName().substring(1);
+	@Override public String decorate(DataObject obj, String attributeName, String rule) {
 	    String docName = obj.getDefinedName().toLowerCase();
 		String linkTarget = docName+"Edit?ts="+System.currentTimeMillis()+"&pId="+obj.getId();
 		
@@ -28,7 +25,11 @@ public class EditLinkDecorator implements IAttributeDecorator{
 		return "<a href="+quote(linkTarget)+">"+caption+"</a>";
 			
 	}
-	
+	/**
+	 * Surrounds the parameter with double quotes.
+	 * @param a
+	 * @return
+	 */
 	private String quote(String a){
 		return "\"" + a + "\"";
 	}

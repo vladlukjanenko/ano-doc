@@ -13,10 +13,7 @@ import net.anotheria.util.NumberUtils;
 public class IDItoADecorator implements IAttributeDecorator{
 	
 
-	/* (non-Javadoc)
-	 * @see net.anotheria.asg.util.decorators.IAttributeDecorator#decorate(net.anotheria.anodoc.data.Document, java.lang.String, java.lang.String)
-	 */
-	public String decorate(DataObject doc, String attributeName, String rule) {
+	@Override public String decorate(DataObject doc, String attributeName, String rule) {
 		int fillage = Integer.parseInt(rule);
 		int value = Integer.parseInt(""+doc.getId());
 		return ""+NumberUtils.itoa(value, fillage);
