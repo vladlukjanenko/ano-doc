@@ -47,7 +47,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 		return ret;
 	}
 
-	public String getImplementationName(MetaModule m){
+	@Override public String getImplementationName(MetaModule m){
 	    return "InMemory"+getServiceName(m)+"Impl";
 	}
 	
