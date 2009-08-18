@@ -18,6 +18,10 @@ public class GenerationOptions {
 	 */
 	public static final String INMEMORY = "inmemory";
 	/**
+	 * Name of the fixture option.
+	 */
+	public static final String FIXTURE = "fixture";
+	/**
 	 * Internal map with generation options.
 	 */
 	private Map<String, GenerationOption> options;

@@ -38,6 +38,7 @@ import net.anotheria.asg.generator.model.db.JDBCPersistenceServiceGenerator;
 import net.anotheria.asg.generator.model.db.PersistenceServiceDAOGenerator;
 import net.anotheria.asg.generator.model.docs.CMSBasedServiceGenerator;
 import net.anotheria.asg.generator.model.federation.FederationServiceGenerator;
+import net.anotheria.asg.generator.model.fixture.FixtureServiceGenerator;
 import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
 import net.anotheria.asg.generator.model.rmi.RMIServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
@@ -76,6 +77,15 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		timer.stopExecution(mod.getName()+"-InMem");
 		// - end in memory
 
+		//add fixture generator
+		timer.startExecution(mod.getName()+"-Fixture");
+		FixtureServiceGenerator fixtureGen = new FixtureServiceGenerator();
+		ret.addAll(fixtureGen.generate(gmodule));
+		timer.stopExecution(mod.getName()+"-Fixture");
+		// - end fixture
+
+		
+		
 		//addrmi genererator
 		timer.startExecution(mod.getName()+"-RMI");
 		RMIServiceGenerator rmiGen = new RMIServiceGenerator();
