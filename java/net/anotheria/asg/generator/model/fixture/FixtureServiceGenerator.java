@@ -18,7 +18,7 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
-import net.anotheria.asg.generator.model.db.JDBCPersistenceServiceGenerator;
+import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.model.db.VOGenerator;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
@@ -75,7 +75,6 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    clazz.addImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
 	    //ret.emptyline();
 
-	    clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResultEntry");
@@ -83,6 +82,9 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    
 	    clazz.addImport("net.anotheria.util.xml.XMLNode");
 	    clazz.addImport("net.anotheria.util.xml.XMLAttribute");
+	    
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
+	    clazz.addImport(ServiceGenerator.getExceptionImport(module));
 
 	    clazz.setName(getImplementationName(module));
 	    clazz.setParent("BasicService");
@@ -92,7 +94,6 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    appendStatement("private static "+getImplementationName(module)+" instance");
 	    emptyline();
 	    
-	    //appendStatement("private "+JDBCPersistenceServiceGenerator.getInterfaceName(module)+" pService");
 	    List<MetaDocument> docs = module.getDocuments();
 	    clazz.addImport(ConcurrentHashMap.class);
 	    clazz.addImport(Map.class);
@@ -102,7 +103,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    for (MetaDocument doc : docs){
 	    	appendStatement("private Map<String, "+doc.getName()+"> "+getMapName(doc)+" = new ConcurrentHashMap<String, "+doc.getName()+">()" );
 	    	appendStatement("private AtomicInteger "+getIdHolderName(doc) +" = new AtomicInteger(0)");
-	    	appendEmptyline();
+	    	emptyline();
 	    }
 	    
 	    appendString("private "+getImplementationName(module)+"(){");
@@ -162,12 +163,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        appendStatement(doc.getName()+" old = "+getMapName(doc)+".remove(id)");
 	        appendString("if (old!=null){");
 	        increaseIdent();
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentDeleted(old)");
-	        append(closeBlock());
+	        appendStatement("fireObjectDeletedEvent(old)");
 	        append(closeBlock());
 	        append(closeBlock());
 	        emptyline();
@@ -217,12 +213,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        appendStatement(VOGenerator.getDocumentImplName(doc)+" new"+StringUtils.capitalize(doc.getVariableName())+" = new "+VOGenerator.getDocumentImplName(doc)+"(nextId)");
 	        appendStatement("new"+StringUtils.capitalize(doc.getVariableName())+".copyAttributesFrom("+doc.getVariableName()+")");
 	        appendStatement(getMapName(doc)+".put("+"new"+StringUtils.capitalize(doc.getVariableName())+".getId(), "+"new"+StringUtils.capitalize(doc.getVariableName())+")");
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentCreated("+"new"+StringUtils.capitalize(doc.getVariableName())+")");
-	        append(closeBlock());	
+	        appendStatement("fireObjectCreatedEvent("+"new"+StringUtils.capitalize(doc.getVariableName())+")");
 	        appendStatement("return "+"new"+StringUtils.capitalize(doc.getVariableName()));
 	        append(closeBlock());
 	        emptyline();
@@ -253,11 +244,8 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        appendString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(doc.getName()+" oldVersion = "+getMapName(doc)+".put("+doc.getVariableName()+".getId(), "+doc.getVariableName()+")");
-	        appendString("if (hasServiceListeners() && oldVersion!=null){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
+	        appendString("if (oldVersion!=null){");
+	        appendIncreasedStatement("fireObjectUpdatedEvent(oldVersion, "+doc.getVariableName()+")");
 	        append(closeBlock());
 	        
 	        appendStatement("return "+doc.getVariableName());
@@ -390,6 +378,15 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 
 	private String getIterator(MetaDocument doc){
 		return "for ("+doc.getName()+" "+doc.getVariableName()+" : list)";
+	}
+	
+	
+	@Override protected String getPackageName(MetaModule module){
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(module)+".service.fixture";	
+	}
+
+	@Override protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
+		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module)+"."+getInterfaceName(module));
 	}
 
 }

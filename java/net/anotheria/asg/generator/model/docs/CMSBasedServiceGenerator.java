@@ -117,7 +117,6 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.addImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
 		clazz.addImport(context.getServicePackageName(MetaModule.SHARED)+".BasicCMSService");
 
-		clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
 		clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 		clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
 		clazz.addImport("net.anotheria.anodoc.query2.QueryResultEntry");
@@ -244,12 +243,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        increaseIdent();
 	        appendString("for (int t=0; t<list.size(); t++)");
-	        appendIncreasedStatement("myListeners.get(i).documentDeleted(list.get(t))");
-	        decreaseIdent();
+	        appendIncreasedStatement("fireObjectDeletedEvent(list.get(t))");
 	        append(closeBlock());
 
 	        append(closeBlock());
@@ -280,7 +275,6 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        appendStatement(doc.getName()+" imported = module.import"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
             appendStatement("ret.add(imported)");
-            decreaseIdent();
 	        append(closeBlock());
 	        appendStatement("updateModule(module)");
 	        appendStatement("return ret");
@@ -293,15 +287,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement(module.getModuleClassName()+" module = "+getModuleGetterCall(module));
 	        appendStatement("module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
 	        appendStatement("updateModule(module)");
-
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        append(closeBlock());
-
-
+	        appendStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        emptyline();
@@ -324,14 +310,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        increaseIdent();
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
-	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        decreaseIdent();
+	        appendIncreasedStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
 	        append(closeBlock());
-
 
 	        appendStatement("return ret");
 	        append(closeBlock());
@@ -349,11 +330,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("module.update"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
 	        appendStatement("updateModule(module)");
 
-	        appendString("if (hasServiceListeners()){");
+	        appendString("if (oldVersion != null){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
+	        appendStatement("fireObjectUpdatedEvent(oldVersion, "+doc.getVariableName()+")");
 	        append(closeBlock());
 
 	        appendStatement("return "+doc.getVariableName());
@@ -372,20 +351,16 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
 	        increaseIdent();
-	        appendString("if (hasServiceListeners())");
+	        appendString("if (oldList!=null)");
 	        appendIncreasedStatement("oldList.add(module.get"+doc.getName()+"("+doc.getVariableName()+".getId()))");
 	        appendStatement("module.update"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
 	        append(closeBlock());
 	        appendStatement("updateModule(module)");
 
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
+	        appendString("if (oldList!=null){");
 	        increaseIdent();
 	        appendString("for (int t=0; t<list.size(); t++)");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldList.get(t), list.get(t))");
-	        decreaseIdent();
+	        appendIncreasedStatement("fireObjectUpdatedEvent(oldList.get(t), list.get(t))");
 	        append(closeBlock());
 
 	        appendStatement("return list");

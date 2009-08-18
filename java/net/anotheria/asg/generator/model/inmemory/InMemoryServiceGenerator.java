@@ -64,11 +64,11 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    return getPackageName(GeneratorDataRegistry.getInstance().getContext(), m)+"."+getInMemoryFactoryName(m);
 	}
 	
-	protected String getPackageName(MetaModule module){
+	@Override protected String getPackageName(MetaModule module){
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext(), module);
 	}
 	
-	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
+	@Override protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module)+"."+getInterfaceName(module));
 		clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	}
@@ -124,7 +124,6 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	        clazz.addImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 	    }
-	    clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResultEntry");
@@ -257,14 +256,10 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        increaseIdent();
-	        appendString("for (int t = 0; t<list.size(); t++){");
-	        appendIncreasedStatement("myListeners.get(i).documentDeleted(list.get(t))");
-	        appendString("}");
-	        decreaseIdent();
+	        appendString("for (int t = 0; t<list.size(); t++)");
+	        appendIncreasedStatement("fireObjectDeletedEvent(list.get(t))");
 	        append(closeBlock());
+
 	        append(closeBlock());
 	        emptyline();
 	        
@@ -330,12 +325,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("// should check whether an object with this id already exists... which however can only happen in case of an error ");
 	        appendStatement(getCacheName(doc)+".put(wrapper.getId(), wrapper)");
 	        appendStatement(getCachedListName(doc), " = null");
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        append(closeBlock());
+	        appendIncreasedStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        emptyline();
@@ -359,12 +349,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        increaseIdent();
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
-	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        decreaseIdent();
+	        appendIncreasedStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
 	        append(closeBlock());
 	        appendStatement("return ret");
 	        append(closeBlock());
@@ -387,13 +373,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        increaseIdent();
-	        appendString("for (int t = 0; t<list.size(); t++){");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(old.get(t), list.get(t))");
-	        appendString("}");
-	        decreaseIdent();
+	        appendString("for (int t = 0; t<list.size(); t++)");
+	        appendIncreasedStatement("fireObjectUpdatedEvent(old.get(t), list.get(t))");
 	        append(closeBlock());
 	        appendStatement("return list");
 	        append(closeBlock());
@@ -410,14 +391,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("if (hasServiceListeners())");
 	        appendIncreasedStatement("oldVersion = w.get()");
 	        appendStatement("w.update("+doc.getVariableName()+")");
-	        
-	        
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
-	        append(closeBlock());
+	        appendString("if (oldVersion!=null)");
+	        appendIncreasedStatement("fireObjectUpdatedEvent(oldVersion, "+doc.getVariableName()+")");
 	        
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());

@@ -56,7 +56,6 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    clazz.addImport(JDBCPersistenceServiceGenerator.getFactoryImport(context, module));
 	    clazz.addImport(JDBCPersistenceServiceGenerator.getExceptionImport(context, module));
 
-	    clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResultEntry");
@@ -172,15 +171,10 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}");
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        increaseIdent();
-	        appendString("for (int t = 0; t<list.size(); t++){");
-	        appendIncreasedStatement("myListeners.get(i).documentDeleted(list.get(t))");
-	        appendString("}");
-	        decreaseIdent();
+	        appendString("for (int t = 0; t<list.size(); t++)");
+	        appendIncreasedStatement("fireObjectDeletedEvent(list.get(t))");
 	        append(closeBlock());	
-	        append(closeBlock());
+	        append(closeBlock());	
 	        emptyline();
 	        
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
@@ -229,12 +223,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        append(closeBlock());	
+	        appendStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        emptyline();
@@ -252,18 +241,14 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}");
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        increaseIdent();
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
-	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        decreaseIdent();
+	        appendIncreasedStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
 	        append(closeBlock());	
 	        appendStatement("return ret");
 	        append(closeBlock());
 	        emptyline();
 
-	        appendComment("Updates multiple new "+doc.getName()+" objects.\nReturns the updated versions.");
+	        appendComment("Updates multiple "+doc.getName()+" objects.\nReturns the updated versions.");
 	        appendString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(listDecl+" ret = null");
@@ -275,13 +260,8 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}");
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        increaseIdent();
-	        appendString("for (int t = 0; t<ret.size(); t++){");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(list.get(t), ret.get(t))");
-	        appendString("}");
-	        decreaseIdent();
+	        appendString("for (int t = 0; t<ret.size(); t++)");
+	        appendIncreasedStatement("fireObjectUpdatedEvent(list.get(t), ret.get(t))");
 	        append(closeBlock());	
 	        appendStatement("return ret");
 	        append(closeBlock());
@@ -302,12 +282,8 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}");
 	        
 	        
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
-	        append(closeBlock());
+	        appendString("if (oldVersion!=null)");
+	        appendIncreasedStatement("fireObjectUpdatedEvent(oldVersion, "+doc.getVariableName()+")");
 	        
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());

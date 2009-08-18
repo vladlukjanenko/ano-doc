@@ -110,7 +110,6 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    }
 
 	    
-	    clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResultEntry");
@@ -296,17 +295,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 
 	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
-	        appendStatement("if (1==1) throw new RuntimeException(\"not implemented.\")");
-	        
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentCreated("+doc.getVariableName()+")");
-	        append(closeBlock());	
-	        
-	        
-	        appendStatement("return "+doc.getVariableName());
+	        appendStatement("throw new AssertionError(\"not implemented.\")");
 	        append(closeBlock());
 	        emptyline();
 	        
@@ -315,7 +304,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
 	        appendStatement("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
-	        appendStatement("throw new RuntimeException("+quote("Not yet implemented")+")");
+	        appendStatement("throw new AssertionError(\"not implemented.\")");
 	        append(closeBlock());
 	        emptyline();
 
@@ -331,21 +320,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        
 	        appendString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
-	        appendStatement("if (1==1) throw new RuntimeException(\"not implemented.\")");
-	        appendStatement(doc.getName()+" oldVersion = null");
-	        
-	        appendString("//if (hasServiceListeners())");
-	        appendIncreasedStatement("//oldVersion = module.get"+doc.getName()+"("+doc.getVariableName()+".getId())");
-	        
-	        
-	        appendString("if (hasServiceListeners()){");
-	        increaseIdent();
-	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()");
-	        appendString("for (int i=0; i<myListeners.size(); i++)");
-	        appendIncreasedStatement("myListeners.get(i).documentUpdated(oldVersion, "+doc.getVariableName()+")");
-	        append(closeBlock());
-	        
-	        appendStatement("return "+doc.getVariableName());
+	        appendStatement("throw new AssertionError(\"not implemented.\")");
 	        append(closeBlock());
 	        emptyline();
 	        

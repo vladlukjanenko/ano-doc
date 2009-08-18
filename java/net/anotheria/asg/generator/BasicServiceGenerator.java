@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.service.AbstractASGService;
 
 
 /**
@@ -48,54 +49,25 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".service");
 		
 		clazz.addImport("org.apache.log4j.Logger");
-		clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
-		clazz.addImport("java.util.List");
-		clazz.addImport("java.util.ArrayList");
+		clazz.addImport(AbstractASGService.class);
 
 
 		clazz.setAbstractClass(true);
 		clazz.setName("BasicService");
+		clazz.setParent(AbstractASGService.class);
 		
 		startClassBody();
 
 		appendStatement("protected Logger log");
 		emptyline();
 		
-		appendString("//Support for listeners.");
-		appendStatement("private List<IServiceListener> listeners");
 
         //generate constructor
         appendString("protected BasicService(){");
         increaseIdent();
         appendStatement("log = Logger.getLogger(this.getClass())");
-        appendStatement("listeners = new ArrayList<IServiceListener>()");
         append(closeBlock());
         emptyline();
-        
-        //support for listeners.
-        appendString("public void addServiceListener(IServiceListener listener){");
-        increaseIdent();
-        appendStatement("listeners.add(listener)");
-        append(closeBlock());
-        emptyline();
-        
-        appendString("public void removeServiceListener(IServiceListener listener){");
-        increaseIdent();
-        appendStatement("listeners.remove(listener)");
-        append(closeBlock());
-        emptyline();
-        
-        appendString("public boolean hasServiceListeners(){");
-        increaseIdent();
-        appendStatement("return listeners.size() > 0");
-        append(closeBlock());
-        emptyline();
-        
-        appendString("protected List<IServiceListener> getServiceListeners(){");
-        increaseIdent();
-        appendStatement("return listeners");
-        append(closeBlock());
-
 		return clazz;
 	}
 
