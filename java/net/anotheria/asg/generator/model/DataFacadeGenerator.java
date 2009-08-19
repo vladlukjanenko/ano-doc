@@ -160,7 +160,8 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		clazz.addImport("net.anotheria.util.xml.XMLNode");
 		clazz.addImport("net.anotheria.util.xml.XMLAttribute");
 		clazz.addImport("net.anotheria.asg.data.XMLHelper");
-		
+		clazz.addImport("net.anotheria.asg.data.MultilingualObject");
+
 		for (int i=0; i<doc.getProperties().size(); i++){
 			if (doc.getProperties().get(i) instanceof MetaContainerProperty){
 				clazz.addImport("java.util.List");
@@ -201,6 +202,13 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		for (MetaProperty p : doc.getLinks()){
 			generatePropertyToXMLMethod(p);
 		}
+        emptyline();
+        
+        appendString("if(object instanceof MultilingualObject){");
+        increaseIdent();
+        appendStatement("MultilingualObject multilangDoc = (MultilingualObject) object");
+        appendStatement("ret.addChildNode(XMLHelper.createXMLNodeForBooleanValue("+quote("multilingualDisabled")+", null,multilangDoc.isMultilingualDisabledInstance()))");
+        append(closeBlock());
 		appendStatement("return ret");
 		append(closeBlock());
 		emptyline();

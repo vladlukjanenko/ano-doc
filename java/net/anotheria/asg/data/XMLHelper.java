@@ -85,9 +85,10 @@ public class XMLHelper {
 				
 				val.addAttribute(new XMLAttribute("language", l));
 
-				if (value!=null)
-					val.setContent(""+value[i]);
-				
+				if (value!=null){
+                    Object valueToSet = value[i]!=null?value[i]:"";
+					val.setContent("" + valueToSet);
+                }
 				ret.addChildNode(val);
 				
 			}
