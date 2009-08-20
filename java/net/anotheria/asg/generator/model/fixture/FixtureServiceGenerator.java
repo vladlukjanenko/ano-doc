@@ -245,6 +245,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        appendStatement(doc.getName()+" oldVersion = "+getMapName(doc)+".put("+doc.getVariableName()+".getId(), "+doc.getVariableName()+")");
 	        appendString("if (oldVersion!=null){");
+	        increaseIdent();
 	        appendIncreasedStatement("fireObjectUpdatedEvent(oldVersion, "+doc.getVariableName()+")");
 	        append(closeBlock());
 	        
@@ -254,6 +255,15 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
 	        increaseIdent();
+	        appendStatement(listDecl+" list = get"+doc.getMultiple()+"()");
+	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
+	        appendString(getIterator(doc)+"{");
+	        increaseIdent();
+	        appendStatement("Object propertyValue = "+doc.getVariableName()+".getPropertyValue(propertyName)");
+	        appendString("if (propertyValue!=null && propertyValue.equals(value))");
+	        appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
+	        
+	        append(closeBlock());
 	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
 	        append(closeBlock());
 	        emptyline();
