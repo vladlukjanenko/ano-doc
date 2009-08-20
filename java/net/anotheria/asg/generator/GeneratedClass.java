@@ -134,6 +134,12 @@ public class GeneratedClass extends GeneratedArtefact{
 		interfaces.add(anInterface);
 	}
 	
+	public void addInterface(Class<?> anInterfaceClazz){
+		if (!anInterfaceClazz.getPackage().getName().equals(getPackageName()))
+			addImport(anInterfaceClazz);
+		interfaces.add(extractClassName(anInterfaceClazz));
+	}
+
 	public void addImport(Class<?> clazz){
 		addImport(clazz.getName());
 	}
@@ -207,7 +213,13 @@ public class GeneratedClass extends GeneratedArtefact{
 	}
 	
 	public void setParent(Class<?> parentClazz){
-		setParent(parentClazz.getName().substring(parentClazz.getName().lastIndexOf('.')+1));
+		if (!parentClazz.getPackage().getName().equals(getPackageName()))
+			addImport(parentClazz);
+		setParent(extractClassName(parentClazz));
+	}
+	
+	private String extractClassName(Class<?> aClazz){
+		return aClazz.getName().substring(aClazz.getName().lastIndexOf('.')+1);
 	}
 
 	public void setParent(String aParent) {

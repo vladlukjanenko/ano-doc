@@ -20,6 +20,8 @@ import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.model.db.VOGenerator;
+import net.anotheria.asg.service.BaseFixtureService;
+import net.anotheria.asg.service.IFixtureService;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
@@ -72,7 +74,6 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    clazz.addImport("java.util.List");
 	    clazz.addImport("net.anotheria.util.sorter.SortType");
 	    clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
-	    clazz.addImport(context.getServicePackageName(MetaModule.SHARED)+".BasicService");
 	    //ret.emptyline();
 
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
@@ -87,8 +88,9 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    clazz.addImport(ServiceGenerator.getExceptionImport(module));
 
 	    clazz.setName(getImplementationName(module));
-	    clazz.setParent("BasicService");
+	    clazz.setParent(BaseFixtureService.class);
 	    clazz.addInterface(getInterfaceName(module));
+	    clazz.addInterface(IFixtureService.class);
 	    
 	    startClassBody();
 	    appendStatement("private static "+getImplementationName(module)+" instance");
@@ -101,13 +103,14 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    clazz.addImport(ArrayList.class);
 	    
 	    for (MetaDocument doc : docs){
-	    	appendStatement("private Map<String, "+doc.getName()+"> "+getMapName(doc)+" = new ConcurrentHashMap<String, "+doc.getName()+">()" );
-	    	appendStatement("private AtomicInteger "+getIdHolderName(doc) +" = new AtomicInteger(0)");
+	    	appendStatement("private Map<String, "+doc.getName()+"> "+getMapName(doc));
+	    	appendStatement("private AtomicInteger "+getIdHolderName(doc));
 	    	emptyline();
 	    }
 	    
 	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
+	    appendStatement("reset()");
 	    //appendStatement("pService = "+JDBCPersistenceServiceGenerator.getFactoryName(module)+".create"+JDBCPersistenceServiceGenerator.getServiceName(module)+"()");
 	    if (module.getListeners().size()>0){
 	    	for (int i=0; i<module.getListeners().size(); i++){
@@ -128,6 +131,16 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    append(closeBlock());
 	    emptyline();
 	    
+	    appendString("@Override public void reset(){");
+	    increaseIdent();
+	    for (MetaDocument doc : docs){
+	    	appendStatement(getMapName(doc)+" = new ConcurrentHashMap<String, "+doc.getName()+">()" );
+	    	appendStatement(getIdHolderName(doc) +" = new AtomicInteger(0)");
+	    	emptyline();
+	    }
+	    append(closeBlock());
+	    emptyline();
+	    
 
 	    String throwsClause = " throws "+getExceptionName(module)+" ";
 	    
@@ -138,7 +151,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        clazz.addImport(DataFacadeGenerator.getXMLHelperImport(context, doc));
 
-	        appendString("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause+"{");
+	        appendString("@Override public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
 	        appendStatement("ret.addAll("+getMapName(doc)+".values())");
@@ -146,19 +159,19 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        emptyline();
 	        
-			appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{");
+			appendString("@Override public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
 			append(closeBlock());
 			emptyline();
 
-			appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
+			appendString("@Override public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
 	        append(closeBlock());
 	        emptyline();
 	        
-	        appendString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
+	        appendString("@Override public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(doc.getName()+" old = "+getMapName(doc)+".remove(id)");
 	        appendString("if (old!=null){");
@@ -169,7 +182,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        emptyline();
 
 	        appendComment("Deletes multiple "+doc.getName()+" objects.");
-	        appendString("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
+	        appendString("@Override public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
 	        increaseIdent();
@@ -178,7 +191,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        emptyline();
 	        
-	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
+	        appendString("@Override public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getMapName(doc)+".get(id)");
 	        appendString("if ("+doc.getVariableName()+"==null)");
@@ -188,14 +201,14 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        emptyline();
 	        
 	        
-	        appendString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
+	        appendString("@Override public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(getMapName(doc)+".put("+doc.getVariableName()+".getId(), "+doc.getVariableName()+")");
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        emptyline();
 
-            appendString("public "+listDecl+" import"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
+            appendString("@Override public "+listDecl+" import"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list)");
@@ -205,7 +218,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        emptyline();
 
 	        
-	        appendString("public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
+	        appendString("@Override public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("String nextId = \"\"+"+getIdHolderName(doc)+".incrementAndGet();");
 	        appendCommentLine("//Warning, following will work only with jdbc based classes for now...");
@@ -220,7 +233,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        
 	        //
 	        appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
-	        appendString("public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
+	        appendString("@Override public "+listDecl+" create"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
 	        appendString(getIterator(doc));
@@ -231,7 +244,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        emptyline();
 
 	        appendComment("Updates multiple new "+doc.getName()+" objects.\nReturns the updated versions.");
-	        appendString("public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
+	        appendString("@Override public "+listDecl+" update"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
 	        appendString(getIterator(doc));
@@ -241,7 +254,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        emptyline();
 
 	        
-	        appendString("public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
+	        appendString("@Override public "+doc.getName()+" update"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(doc.getName()+" oldVersion = "+getMapName(doc)+".put("+doc.getVariableName()+".getId(), "+doc.getVariableName()+")");
 	        appendString("if (oldVersion!=null){");
@@ -253,7 +266,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        append(closeBlock());
 	        emptyline();
 	        
-	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
+	        appendString("@Override public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement(listDecl+" list = get"+doc.getMultiple()+"()");
 	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
@@ -264,17 +277,17 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
 	        
 	        append(closeBlock());
-	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+	        appendStatement("return ret");
 	        append(closeBlock());
 	        emptyline();
 	        
-			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{");
+			appendString("@Override public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
 			append(closeBlock());
 			
 			appendComment("Executes a query on "+doc.getMultiple());
-			appendString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause+"{");
+			appendString("@Override public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement(listDecl+" all"+doc.getMultiple()+" = get"+doc.getMultiple()+"()");
 			appendStatement("QueryResult result = new QueryResult()");
@@ -289,14 +302,30 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 			emptyline();
 
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
-	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property)"+throwsClause+"{");
+	        appendStatement("@Override public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... properties)"+throwsClause+"{");
 	        increaseIdent();
-	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+	        appendStatement(listDecl+" list = get"+doc.getMultiple()+"()");
+	        appendString("if (properties==null || properties.length==0)");
+	        appendIncreasedStatement("return list");
+	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
+	        appendString(getIterator(doc)+"{");
+	        increaseIdent();
+	        appendStatement("boolean mayPass = true;");
+	        appendString("for (QueryProperty p : properties){");
+	        increaseIdent();
+	        appendStatement("Object propertyValue = "+doc.getVariableName()+".getPropertyValue(p.getName())");
+	        appendString("if (mayPass && (propertyValue==null || (!(propertyValue.equals(p.getValue())))))");
+	        appendIncreasedStatement("mayPass = false");
+	        append(closeBlock());
+	        appendString("if (mayPass)");
+	        appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
+	        append(closeBlock());
+	        appendStatement("return ret");
 	        append(closeBlock());
 	        emptyline();
 	        
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
-			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause+"{");
+			appendStatement("@Override public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
 	        append(closeBlock());
@@ -347,7 +376,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    }
 	    
 
-	    appendString("public XMLNode exportToXML(){");
+	    appendString("@Override public XMLNode exportToXML(){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
 	    emptyline();
@@ -359,7 +388,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    append(closeBlock());
 	    emptyline();
 	    
-	    appendString("public XMLNode exportToXML(String[] languages){");
+	    appendString("@Override public XMLNode exportToXML(String[] languages){");
 	    increaseIdent();
 	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
 	    emptyline();
@@ -397,6 +426,11 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 
 	@Override protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module)+"."+getInterfaceName(module));
+		clazz.addImport(IFixtureService.class);
+	}
+
+	protected String getSupportedInterfacesList(MetaModule module){
+		return super.getSupportedInterfacesList(module)+", IFixtureService.class";
 	}
 
 }

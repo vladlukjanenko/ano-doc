@@ -16,6 +16,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
+import net.anotheria.asg.service.InMemoryService;
 import net.anotheria.util.ExecutionTimer;
 
 /**
@@ -70,7 +71,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	
 	@Override protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module)+"."+getInterfaceName(module));
-		clazz.addImport("net.anotheria.asg.service.InMemoryService");
+		clazz.addImport(InMemoryService.class);
 	}
 	
 	private String getCacheName(MetaDocument doc){

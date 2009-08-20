@@ -147,7 +147,7 @@ public final class XMLDataParser {
 	 * @return
 	 */
 	private static final MetaProperty parseAttribute(Element e){
-		System.out.println("Parsing MetaProperty: "+e+", ->>"+e.getAttributeValue("name")+"<<-");
+		//System.out.println("Parsing MetaProperty: "+e+", ->>"+e.getAttributeValue("name")+"<<-");
 		if (e.getName().equals("property"))
 			return parseProperty(e);
 		if (e.getName().equals("link"))
