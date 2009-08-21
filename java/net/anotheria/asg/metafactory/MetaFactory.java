@@ -10,7 +10,7 @@ import net.anotheria.asg.service.ASGService;
 
 public class MetaFactory {
 	
-	private static final Map<String, ASGService> instances = new HashMap<String, ASGService>();
+	private static Map<String, ASGService> instances = new HashMap<String, ASGService>();
 	
 	private static Map<String, String> aliases = new HashMap<String, String>();
 	
@@ -23,6 +23,13 @@ public class MetaFactory {
 	static{
 		resolverList = new ArrayList<AliasResolver>();
 		resolverList.add(new SystemPropertyResolver());
+	}
+	
+	public static void reset(){
+		factoryClasses = new HashMap<String, Class<? extends ServiceFactory<? extends ASGService>>>();
+		factories = new HashMap<String, ServiceFactory<? extends ASGService>>();
+		aliases = new HashMap<String, String>();
+		instances = new HashMap<String, ASGService>();
 	}
 	
 	
