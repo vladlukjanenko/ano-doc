@@ -16,10 +16,12 @@ import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.model.db.VOGenerator;
+import net.anotheria.asg.generator.model.docs.DocumentGenerator;
 import net.anotheria.asg.service.BaseFixtureService;
 import net.anotheria.asg.service.IFixtureService;
 import net.anotheria.util.ExecutionTimer;
@@ -145,7 +147,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    String throwsClause = " throws "+getExceptionName(module)+" ";
 	    
 	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        MetaDocument doc = docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
 
 	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
@@ -221,10 +223,18 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        appendString("@Override public "+doc.getName()+" create"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("String nextId = \"\"+"+getIdHolderName(doc)+".incrementAndGet();");
-	        appendCommentLine("//Warning, following will work only with jdbc based classes for now...");
-	        clazz.addImport(VOGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
-	        appendStatement(VOGenerator.getDocumentImplName(doc)+" new"+StringUtils.capitalize(doc.getVariableName())+" = new "+VOGenerator.getDocumentImplName(doc)+"(nextId)");
-	        appendStatement("new"+StringUtils.capitalize(doc.getVariableName())+".copyAttributesFrom("+doc.getVariableName()+")");
+	        if (module.getStorageType()==StorageType.DB){
+	        	appendCommentLine("//DB Specific code");
+	        	clazz.addImport(VOGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	        	appendStatement(VOGenerator.getDocumentImplName(doc)+" new"+StringUtils.capitalize(doc.getVariableName())+" = new "+VOGenerator.getDocumentImplName(doc)+"(nextId)");
+		        appendStatement("new"+StringUtils.capitalize(doc.getVariableName())+".copyAttributesFrom("+doc.getVariableName()+")");
+	        }
+	        if (module.getStorageType()==StorageType.CMS){
+	        	appendCommentLine("//CMS Specific code");
+	        	clazz.addImport(DocumentGenerator.getDocumentImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	        	appendStatement(DocumentGenerator.getDocumentImplName(doc)+" new"+StringUtils.capitalize(doc.getVariableName())+" = ("+DocumentGenerator.getDocumentImplName(doc)+")"+doc.getVariableName());
+	        	appendStatement("new"+StringUtils.capitalize(doc.getVariableName())+".renameTo(nextId)");
+	        }
 	        appendStatement(getMapName(doc)+".put("+"new"+StringUtils.capitalize(doc.getVariableName())+".getId(), "+"new"+StringUtils.capitalize(doc.getVariableName())+")");
 	        appendStatement("fireObjectCreatedEvent("+"new"+StringUtils.capitalize(doc.getVariableName())+")");
 	        appendStatement("return "+"new"+StringUtils.capitalize(doc.getVariableName()));
@@ -333,6 +343,9 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 			
 	    }
 	    
+		boolean containsAnyMultilingualDocs = false;
+	    
+	    
 	    //generate export function
 	    emptyline();
 	    for (MetaDocument d : docs){
@@ -373,6 +386,31 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    	append(closeBlock());
 	    	append(closeBlock());
 	    	emptyline();
+
+	    	if (GeneratorDataRegistry.hasLanguageCopyMethods(d)){
+				containsAnyMultilingualDocs = true;
+				appendCommentLine("This method is not very fast, since it makes an update (eff. save) after each doc.");
+				appendString("public void copyMultilingualAttributesInAll"+d.getMultiple()+"(String sourceLanguage, String targetLanguage){");
+				increaseIdent();
+				appendStatement("throw new AssertionError(\"Not implemented\")");
+				append(closeBlock());
+				emptyline();
+
+			}
+
+
+	    }
+
+	    if (containsAnyMultilingualDocs){
+			appendComment("Copies all multilingual fields from sourceLanguage to targetLanguage in all data objects (documents, vo) which are part of this module and managed by this service");
+			appendString("public void copyMultilingualAttributesInAllObjects(String sourceLanguage, String targetLanguage){");
+			increaseIdent();
+			for (MetaDocument doc : docs){
+				if (GeneratorDataRegistry.hasLanguageCopyMethods(doc))
+					appendStatement("copyMultilingualAttributesInAll"+doc.getMultiple()+"(sourceLanguage, targetLanguage)");
+			}
+			append(closeBlock());
+			emptyline();
 	    }
 	    
 
