@@ -384,18 +384,6 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		append(closeBlock());
 	}
 	
-	private void generateCopyMethod(MetaDocument doc){
-		appendString("public void copyAttributesFrom("+doc.getName()+" toCopy){");
-		increaseIdent();
-		for (MetaProperty p : doc.getProperties()){
-			appendStatement("this."+p.getName().toLowerCase() + " = toCopy."+p.toGetter()+"()");
-		}
-		for (MetaProperty p : doc.getLinks()){
-			appendStatement("this."+p.getName().toLowerCase() + " = toCopy."+p.toGetter()+"()");
-		}
-		append(closeBlock());
-	}
-
 	private void generateGetPropertyValueMethod(MetaDocument doc){
 		appendString("public Object getPropertyValue(String propertyName){");
 		increaseIdent();
@@ -612,5 +600,19 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 	public static String getListElementGetterName(MetaListProperty list){
 		return "get"+StringUtils.capitalize(list.getName())+list.getContainerEntryName();
 	}
+	
+	private void generateCopyMethod(MetaDocument doc){
+		appendString("public void copyAttributesFrom("+doc.getName()+" toCopy){");
+		increaseIdent();
+		for (MetaProperty p : doc.getProperties()){
+			appendStatement("this."+p.getName().toLowerCase() + " = toCopy."+p.toGetter()+"()");
+		}
+		for (MetaProperty p : doc.getLinks()){
+			appendStatement("this."+p.getName().toLowerCase() + " = toCopy."+p.toGetter()+"()");
+		}
+		append(closeBlock());
+	}
+
+
 
 }

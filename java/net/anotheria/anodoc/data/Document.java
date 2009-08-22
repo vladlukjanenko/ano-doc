@@ -385,7 +385,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the string representation of this document.
 	 */
-	public String toString(){
+	@Override public String toString(){
 		return "DOC "+getId()+" "+dataStorage;
 	}
 	
@@ -634,13 +634,13 @@ public class Document extends DataHolder
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Object clone() throws CloneNotSupportedException{
+	@Override public Object clone() throws CloneNotSupportedException{
 		Object ret = super.clone();
 		((Document)ret).dataStorage = (Hashtable<String,DataHolder>)dataStorage.clone();
 		return ret;
 	}
 
-	public XMLNode toXMLNode(){
+	@Override public XMLNode toXMLNode(){
 		XMLNode root = new XMLNode("document");
 		
 		root.addAttribute(new XMLAttribute("documentId", getId()));

@@ -144,6 +144,9 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		emptyline();
 		generateEqualsMethod(doc);
 		
+		//emptyline();
+		//generateCopyMethod(doc);
+		
 		return clazz;
 	}
 	
@@ -755,6 +758,21 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendStatement("setInternalProperty(new BooleanProperty(INT_PROPERTY_MULTILINGUAL_DISABLED, value))");
 		append(closeBlock());
 	}
+
+	/* This method is yet not finished, multilinguality should be added ..
+	private void generateCopyMethod(MetaDocument doc){
+		appendString("public void copyAttributesFrom("+doc.getName()+" toCopy){");
+		increaseIdent();
+		for (MetaProperty p : doc.getProperties()){
+			appendStatement(p.toSetter() + "(toCopy."+p.toGetter()+"())");
+		}
+		for (MetaProperty p : doc.getLinks()){
+			appendStatement(p.toSetter() + "(toCopy."+p.toGetter()+"())");
+		}
+		append(closeBlock());
+	}*/
+
+
 
 
 }
