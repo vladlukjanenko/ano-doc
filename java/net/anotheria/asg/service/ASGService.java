@@ -1,12 +1,13 @@
 package net.anotheria.asg.service;
 
+import net.anotheria.asg.metafactory.Service;
 import net.anotheria.asg.util.listener.IServiceListener;
 /**
  * Interface for the basic ASGService. 
  * @author lrosenberg
  *
  */
-public interface ASGService {
+public interface ASGService extends Service{
 	/**
 	 * Adds a service listener to this service.
 	 * @param listener the listener to add.

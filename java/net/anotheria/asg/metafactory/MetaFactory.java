@@ -6,16 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.anotheria.asg.service.ASGService;
-
 public class MetaFactory {
 	
-	private static Map<String, ASGService> instances = new HashMap<String, ASGService>();
+	private static Map<String, Service> instances = new HashMap<String, Service>();
 	
 	private static Map<String, String> aliases = new HashMap<String, String>();
 	
-	private static Map<String, Class<? extends ServiceFactory<? extends ASGService>>> factoryClasses = new HashMap<String, Class<? extends ServiceFactory<? extends ASGService>>>();
-	private static Map<String, ServiceFactory<? extends ASGService>> factories = new HashMap<String, ServiceFactory<? extends ASGService>>();
+	private static Map<String, Class<? extends ServiceFactory<? extends Service>>> factoryClasses = new HashMap<String, Class<? extends ServiceFactory<? extends Service>>>();
+	private static Map<String, ServiceFactory<? extends Service>> factories = new HashMap<String, ServiceFactory<? extends Service>>();
 	
 	
 	private static final List<AliasResolver> resolverList;
@@ -26,24 +24,24 @@ public class MetaFactory {
 	}
 	
 	public static void reset(){
-		factoryClasses = new HashMap<String, Class<? extends ServiceFactory<? extends ASGService>>>();
-		factories = new HashMap<String, ServiceFactory<? extends ASGService>>();
+		factoryClasses = new HashMap<String, Class<? extends ServiceFactory<? extends Service>>>();
+		factories = new HashMap<String, ServiceFactory<? extends Service>>();
 		aliases = new HashMap<String, String>();
-		instances = new HashMap<String, ASGService>();
+		instances = new HashMap<String, Service>();
 	}
 	
 	
 	
-	public static <T extends ASGService> T create(Class<T> pattern, Extension extension)throws MetaFactoryException{
+	public static <T extends Service> T create(Class<T> pattern, Extension extension)throws MetaFactoryException{
 		return pattern.cast(create(extension.toName(pattern)));
 	}
 
-	public static <T extends ASGService> T create(Class<T> pattern)throws MetaFactoryException{
+	public static <T extends Service> T create(Class<T> pattern)throws MetaFactoryException{
 		return pattern.cast(create(pattern, Extension.NONE));
 	}
 ///*
 	@SuppressWarnings("unchecked")
-	private static <T extends ASGService> T create(String name) throws MetaFactoryException{
+	private static <T extends Service> T create(String name) throws MetaFactoryException{
 		
 		ServiceFactory<T> factory = (ServiceFactory<T>)factories.get(name);
 		if (factory!=null)
@@ -71,11 +69,11 @@ public class MetaFactory {
 	}
 	//*/
 	
-	public static <T extends ASGService> T get(Class<T> pattern) throws MetaFactoryException{
+	public static <T extends Service> T get(Class<T> pattern) throws MetaFactoryException{
 		return get(pattern, Extension.NONE);
 	}
 
-	public static <T extends ASGService> T get(Class<T> pattern, Extension extension) throws MetaFactoryException{
+	public static <T extends Service> T get(Class<T> pattern, Extension extension) throws MetaFactoryException{
 		
 		out("get called, pattern: "+pattern+", extension: "+extension);
 		
@@ -124,7 +122,7 @@ public class MetaFactory {
 		return alias == null ? name : resolveAlias(alias);
 	}
 	
-	public static final String resolveAlias(Class<? extends ASGService> clazz){
+	public static final String resolveAlias(Class<? extends Service> clazz){
 		return resolveAlias(clazz.getName());
 	}
 
@@ -132,11 +130,11 @@ public class MetaFactory {
 		aliases.put(alias, name);
 	}
 	
-	public static <T extends ASGService> void addAlias(Class<T> pattern, Extension nameExtension){
+	public static <T extends Service> void addAlias(Class<T> pattern, Extension nameExtension){
 		addAlias(pattern, nameExtension, null);
 	}
 	
-	public static <T extends ASGService> void addAlias(Class<T> pattern, Extension nameExt, Extension aliasExtension){
+	public static <T extends Service> void addAlias(Class<T> pattern, Extension nameExt, Extension aliasExtension){
 		if (nameExt==null)
 			nameExt = Extension.NONE;
 		if (aliasExtension==null)
@@ -144,7 +142,7 @@ public class MetaFactory {
 		addAlias(nameExt.toName(pattern), aliasExtension.toName(pattern));
 	}
 	
-	public static <T extends ASGService> void addFactoryClass(Class<T> service, Extension extension, Class<? extends ServiceFactory<T>> factoryClass){
+	public static <T extends Service> void addFactoryClass(Class<T> service, Extension extension, Class<? extends ServiceFactory<T>> factoryClass){
 		addFactoryClass(extension.toName(service), factoryClass);
 	}
 	
@@ -152,7 +150,7 @@ public class MetaFactory {
 //		addFactoryClass(extension.toName(serviceClassName), factoryClass);
 //	}
 
-	public static <T extends ASGService>  void addFactoryClass(String name, Class<? extends ServiceFactory<T>> factoryClass){
+	public static <T extends Service>  void addFactoryClass(String name, Class<? extends ServiceFactory<T>> factoryClass){
 		factoryClasses.put(name, factoryClass);
 	}
 	

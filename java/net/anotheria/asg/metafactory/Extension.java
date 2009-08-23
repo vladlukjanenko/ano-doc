@@ -1,6 +1,5 @@
 package net.anotheria.asg.metafactory;
 
-import net.anotheria.asg.service.ASGService;
 /**
  * Extensions definition for factory types.
  * @author lrosenberg
@@ -55,7 +54,7 @@ public enum Extension {
 		return toString().toLowerCase();
 	}
 	
-	public String toName(Class<? extends ASGService> clazz){
+	public String toName(Class<? extends Service> clazz){
 		return toName(clazz.getName());
 	}
 
