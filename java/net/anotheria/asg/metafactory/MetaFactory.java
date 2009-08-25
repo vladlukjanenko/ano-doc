@@ -60,6 +60,7 @@ public class MetaFactory {
 				}catch(IllegalAccessException e){
 					throw new FactoryInstantiationError(clazz, name, e.getMessage());
 				}catch(InstantiationException e){
+					e.printStackTrace();
 					throw new FactoryInstantiationError(clazz, name, e.getMessage());
 				}
 			}
