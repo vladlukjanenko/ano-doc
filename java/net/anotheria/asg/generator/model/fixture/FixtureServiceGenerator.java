@@ -320,11 +320,11 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
 	        appendString(getIterator(doc)+"{");
 	        increaseIdent();
-	        appendStatement("boolean mayPass = true;");
+	        appendStatement("boolean mayPass = true");
 	        appendString("for (QueryProperty p : properties){");
 	        increaseIdent();
 	        appendStatement("Object propertyValue = "+doc.getVariableName()+".getPropertyValue(p.getName())");
-	        appendString("if (mayPass && (propertyValue==null || (!(propertyValue.equals(p.getValue())))))");
+	        appendString("if (mayPass && (propertyValue==null || (!(p.doesMatch(propertyValue)))))");
 	        appendIncreasedStatement("mayPass = false");
 	        append(closeBlock());
 	        appendString("if (mayPass)");
