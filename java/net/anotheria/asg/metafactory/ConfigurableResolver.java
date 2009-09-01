@@ -1,35 +1,40 @@
 package net.anotheria.asg.metafactory;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.configureme.ConfigurationManager;
+import org.configureme.annotations.ConfigureMe;
+import org.configureme.annotations.SetAll;
+
+@ConfigureMe(name="factories",allfields=false,watch=true)
 public class ConfigurableResolver implements AliasResolver{
-	private String configurationName;
 	private Map<String,String> aliasMap;
 	private int priority;
+
+//	private static ConfigurableResolver instance;
+//	
+//	private static Object lock = new Object();
+//    public static ConfigurableResolver getInstance(){
+//		if(instance != null)
+//			return instance;
+//		synchronized(lock){
+//			if(instance != null)
+//				return instance;
+//			instance = new ConfigurableResolver();
+//			ConfigurationManager.INSTANCE.configure(instance);
+//			return instance;
+//		}
+//	}
 	
 	public ConfigurableResolver(){
-		this("factories", 50);
-	}
-	
-	public ConfigurableResolver(String aConfigurationName, int aPriority){
-		configurationName = aConfigurationName;
-		priority = aPriority;
-		throw new AssertionError("Not implemented, must be migrated to ConfigureMe");
-		//ConfigurationServiceFactory.getConfigurationService().addConfigurable(this);
+		priority = 50;
+		aliasMap = new ConcurrentHashMap<String, String>();
+		ConfigurationManager.INSTANCE.configure(this);
 	}
 
-	public String getConfigurationName() {
-		return configurationName;
-	}
-	public void notifyConfigurationFinished() {
-		
-	}
-	public void notifyConfigurationStarted() {
-		aliasMap = new HashMap<String, String>();
-	}
-	
-	public void setProperty(String name, String value) {
+	@SetAll
+	public void addFactory(String name, String value) {
 		aliasMap.put(name,value);
 	}
 

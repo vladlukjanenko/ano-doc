@@ -1,33 +1,37 @@
 package net.anotheria.asg.metafactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MetaFactory {
 	
-	private static Map<String, Service> instances = new HashMap<String, Service>();
+	private static Map<String, Service> instances;
 	
-	private static Map<String, String> aliases = new HashMap<String, String>();
+	private static Map<String, String> aliases;
 	
-	private static Map<String, Class<? extends ServiceFactory<? extends Service>>> factoryClasses = new HashMap<String, Class<? extends ServiceFactory<? extends Service>>>();
-	private static Map<String, ServiceFactory<? extends Service>> factories = new HashMap<String, ServiceFactory<? extends Service>>();
+	private static Map<String, Class<? extends ServiceFactory<? extends Service>>> factoryClasses;
+	private static Map<String, ServiceFactory<? extends Service>> factories;
 	
 	
-	private static final List<AliasResolver> resolverList;
+	private static List<AliasResolver> resolverList;
 	
 	static{
-		resolverList = new ArrayList<AliasResolver>();
-		resolverList.add(new SystemPropertyResolver());
+		reset();
 	}
 	
 	public static void reset(){
-		factoryClasses = new HashMap<String, Class<? extends ServiceFactory<? extends Service>>>();
-		factories = new HashMap<String, ServiceFactory<? extends Service>>();
-		aliases = new HashMap<String, String>();
-		instances = new HashMap<String, Service>();
+		resolverList = new CopyOnWriteArrayList<AliasResolver>();
+		resolverList.add(new SystemPropertyResolver());
+		resolverList.add(new ConfigurableResolver());		
+		
+		factoryClasses = new ConcurrentHashMap<String, Class<? extends ServiceFactory<? extends Service>>>();
+		factories = new ConcurrentHashMap<String, ServiceFactory<? extends Service>>();
+		aliases = new ConcurrentHashMap<String, String>();
+		instances = new ConcurrentHashMap<String, Service>();
 	}
 	
 	
