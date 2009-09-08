@@ -1,7 +1,6 @@
 package net.anotheria.asg.metafactory;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
 
 import java.util.List;
 

@@ -1,0 +1,10 @@
+{
+	
+	test:{
+		unit:{
+			XxxService: "foo.bar.XxxService",
+			DomainXxxService: "XxxService",
+			CmsXxxService: "XxxService",
+		}
+	}
+}
