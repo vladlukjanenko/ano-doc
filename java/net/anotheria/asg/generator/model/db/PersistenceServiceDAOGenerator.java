@@ -796,7 +796,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         appendString("if (whereClause.length()>0)");
         appendIncreasedStatement("whereClause += "+quote(" AND "));
         appendStatement("String statement = p.unprepaireable()? (String) p.getValue(): " + quote("?"));
-        appendStatement("whereClause += p.getName()+p.getComparator()+statement");
+        //http://infra.anotheria.net:9080/jira/browse/ANODOC-8
+        appendStatement("whereClause += p.getName().toLowerCase()+p.getComparator()+statement");
         append(closeBlock());
         appendStatement("SQL += whereClause");
         //appendStatement("System.out.println(SQL)"));
