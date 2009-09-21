@@ -77,6 +77,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    clazz.setPackageName(getPackageName(module));
 	    clazz.addImport("java.util.List");
 	    clazz.addImport(("net.anotheria.anodoc.query2.QueryProperty"));
+	    clazz.addImport("net.anotheria.util.slicer.Segment");
 	    
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
@@ -126,6 +127,25 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendComment("Returns all "+doc.getName()+" objects which match the given property or properties.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty"+"(QueryProperty... properties)"+throwsClause);
 	        emptyline();
+	        
+	        // get elements COUNT
+			appendComment("Returns all " + doc.getMultiple() + " count.");
+			appendStatement("public int get" + doc.getMultiple() + "Count()" + throwsClause);
+			emptyline();
+			// end get elements COUNT
+
+			// get elements Segment
+			appendComment("Returns " + doc.getMultiple() + " objects segment.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment)" + throwsClause);
+			emptyline();
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			appendComment("Returns " + doc.getName() + " objects segment which match the given property or properties.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple() + "ByProperty"
+					+ "(Segment aSegment, QueryProperty... properties)" + throwsClause);
+			emptyline();
+			// end get elements Segment with FILTER
 	    }
 	    
 	    return clazz;
@@ -149,6 +169,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    clazz.addImport("java.util.Arrays");
 	    clazz.addImport("net.anotheria.util.sorter.SortType");
 	    clazz.addImport("net.anotheria.util.Date");
+	    clazz.addImport("net.anotheria.util.slicer.Segment");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (MetaDocument doc : docs){
@@ -331,6 +352,41 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
 	        emptyline();
+	        
+	        // get elements COUNT
+			callLog = "\"Call get" + doc.getMultiple() + "Count() \"";
+			appendComment("Returns " + doc.getMultiple() + " objects count.");
+			openFun("public int get" + doc.getMultiple() + "Count()" + throwsClause);
+			generateMethodStart(callLog);
+			appendStatement("return " + getDAOVariableName(doc) + ".get" + doc.getMultiple() + "Count(c)");
+			generateMethodEnd(module, callLog);
+			append(closeBlock());
+			emptyline();
+			// end get elements COUNT
+	        
+			// get elements Segment
+			callLog = "\"Call get" + doc.getMultiple() + "(\" + aSegment + \") \"";
+			appendComment("Returns " + doc.getMultiple() + " objects segment.");
+			openFun("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment)" + throwsClause);
+			generateMethodStart(callLog);
+			appendStatement("return " + getDAOVariableName(doc) + ".get" + doc.getMultiple() + "(c, aSegment)");
+			generateMethodEnd(module, callLog);
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			callLog = "\"Call get" + doc.getMultiple() + "ByProperty(\" + aSegment + \",\" + aProperties + \") \"";
+			appendComment("Returns " + doc.getName() + " objects segment which match the given property.");
+			openFun("public " + listDecl + " get" + doc.getMultiple() + "ByProperty" + "(Segment aSegment, QueryProperty... aProperties)"
+					+ throwsClause);
+			generateMethodStart(callLog);
+			appendStatement("return " + getDAOVariableName(doc) + ".get" + doc.getMultiple()
+					+ "ByProperty(c, aSegment, Arrays.asList(aProperties))");
+			generateMethodEnd(module, callLog);
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment with FILTER
 	        
 /*	        
 	        appendComment("Returns all "+doc.getName()+" objects which match given properties."));

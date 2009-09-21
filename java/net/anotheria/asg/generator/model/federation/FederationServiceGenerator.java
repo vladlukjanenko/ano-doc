@@ -76,6 +76,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    clazz.addImport("net.anotheria.util.sorter.SortType");
 	    clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
 	    clazz.addImport("net.anotheria.util.StringUtils");
+	    clazz.addImport("net.anotheria.util.slicer.Segment");
 	    
 	    Context context = GeneratorDataRegistry.getInstance().getContext();
 	    
@@ -380,7 +381,58 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	        append(closeBlock());
 			emptyline();
 			
-			
+			// get elements COUNT
+			appendComment("Returns " + doc.getName() + " objects count.");
+			appendString("public int get" + doc.getMultiple() + "Count()" + throwsClause + "{");
+			increaseIdent();
+			appendString("int pCount = 0;");
+			for (FederatedDocumentMapping mapping : mappings) {
+				MetaDocument target = targetModules.get(mapping.getTargetKey()).getDocumentByName(mapping.getTargetDocument());
+				appendString("try {");
+				increaseIdent();
+				appendStatement("pCount = pCount + " + FEDERATION_VARIABLE_PREFIX + mapping.getTargetKey() + ".get" + target.getMultiple()
+						+ "().size()");
+				decreaseIdent();
+				appendString("} catch (" + ServiceGenerator.getExceptionName(targetModules.get(mapping.getTargetKey())) + " e) {");
+				appendIncreasedStatement(throwClause);
+				appendString("}");
+			}
+			appendStatement("return pCount");
+			append(closeBlock());
+			emptyline();
+			// end get elements COUNT
+
+			// get elements Segment
+			// TODO need make implementation
+			appendComment("Returns " + doc.getName() + " objects segment.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment)" + throwsClause + "{");
+			increaseIdent();
+			appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			// TODO need make implementation
+			appendComment("Returns " + doc.getName() + " objects segment, where property matched.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple() + "ByProperty(Segment aSegment, QueryProperty... aProperty)"
+					+ throwsClause + "{");
+			increaseIdent();
+			appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment with FILTER
+
+			// get elements Segment with SORTING, FILTER
+			// TODO need make implementation
+			appendComment("Returns " + doc.getName() + " objects segment, where property matched, sorted.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple()
+					+ "ByProperty(Segment aSegment, SortType aSortType, QueryProperty... aProperty)" + throwsClause + "{");
+			increaseIdent();
+			appendStatement("throw new RuntimeException(\"Not yet implemented\")");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment with SORTING, FILTER
 	    }
 	    
 	    //generate export function

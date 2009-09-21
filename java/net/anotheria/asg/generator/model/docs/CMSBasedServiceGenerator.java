@@ -112,6 +112,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.addImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 		clazz.addImport("net.anotheria.util.sorter.SortType");
 		clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
+		clazz.addImport("net.anotheria.util.slicer.Segment");
 
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		clazz.addImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
@@ -460,6 +461,76 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
 	        append(closeBlock());
 			emptyline();
+			
+			// get elements COUNT
+			appendComment("Returns " + doc.getName() + " objects count.");
+			appendString("public int get" + doc.getMultiple() + "Count() {");
+			increaseIdent();
+			appendStatement("return " + getModuleGetterCall(module) + ".get" + doc.getMultiple() + "().size()");
+			append(closeBlock());
+			emptyline();
+			// end get elements COUNT
+
+			// get elements Segment
+			appendComment("Returns " + doc.getName() + " objects segment.");
+			appendString("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment) {");
+			increaseIdent();
+			appendString("//first the slow version, the fast version is a todo.");
+			appendStatement("int pCurrentElement = 0");
+			appendStatement("int pLimit = aSegment.getElementsPerSlice()");
+			appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
+			appendStatement(listDecl + " ret = new ArrayList<" + doc.getName() + ">()");
+			appendStatement(listDecl + " src = get" + doc.getMultiple() + "()");
+			appendStatement("for (" + doc.getName() + " " + doc.getVariableName() + " : src) {");
+			increaseIdent();
+			appendStatement("pCurrentElement++");
+			appendString("if (pCurrentElement >= pOffset && pCurrentElement <= pOffset + pLimit)");
+			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
+			appendString("if (ret.size() == pLimit)");			
+			appendIncreasedStatement("break");
+			append(closeBlock());
+			appendStatement("return ret");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			appendComment("Returns " + doc.getName() + " objects segment, where property matched.");
+			appendString("public " + listDecl + " get" + doc.getMultiple() + "ByProperty(Segment aSegment, QueryProperty... property) {");
+			increaseIdent();
+			appendString("//first the slow version, the fast version is a todo.");
+			appendStatement("int pCurrentElement = 0");
+			appendStatement("int pLimit = aSegment.getElementsPerSlice()");
+			appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
+			appendStatement(listDecl + " ret = new ArrayList<" + doc.getName() + ">()");
+			appendStatement(listDecl + " src = get" + doc.getMultiple() + "()");
+			appendStatement("for (" + doc.getName() + " " + doc.getVariableName() + " : src) {");
+			increaseIdent();
+			appendStatement("pCurrentElement++");
+			appendStatement("boolean mayPass = true");
+			appendStatement("for (QueryProperty qp : property) {");
+			increaseIdent();
+			appendStatement("mayPass = mayPass && qp.doesMatch(" + doc.getVariableName() + ".getPropertyValue(qp.getName()))");
+			append(closeBlock());
+			appendString("if (mayPass && pCurrentElement >= pOffset && pCurrentElement <= pOffset + pLimit)");
+			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
+			appendString("if (ret.size() == pLimit)");			
+			appendIncreasedStatement("break");
+			append(closeBlock());
+			appendStatement("return ret");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment with FILTER
+			
+			// get elements Segment with SORTING, FILTER
+			appendComment("Returns " + doc.getName() + " objects segment, where property matched, sorted.");
+			appendString("public " + listDecl + " get" + doc.getMultiple()
+					+ "ByProperty(Segment aSegment, SortType aSortType, QueryProperty... aProperty){");
+			increaseIdent();
+			appendStatement("return StaticQuickSorter.sort(get" + doc.getMultiple() + "ByProperty(aSegment, aProperty), aSortType)");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment with SORTING, FILTER
 
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 				containsAnyMultilingualDocs = true;

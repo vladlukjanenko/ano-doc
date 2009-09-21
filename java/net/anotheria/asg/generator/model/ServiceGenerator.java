@@ -206,6 +206,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    }
 	    
 	    clazz.addImport("net.anotheria.util.xml.XMLNode");
+	    clazz.addImport("net.anotheria.util.slicer.Segment");
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
@@ -297,6 +298,32 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause);
 			emptyline();
 			
+			// get elements COUNT
+			appendComment("Returns all " + doc.getMultiple() + " count.");
+			appendStatement("public int get" + doc.getMultiple() + "Count()" + throwsClause);
+			emptyline();
+			// end get elements COUNT
+
+			// get elements Segment
+			appendComment("Returns " + doc.getMultiple() + " objects segment.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment)" + throwsClause);
+			emptyline();
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			appendComment("Returns " + doc.getName() + " objects segment, where property matches.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple() + "ByProperty(Segment aSegment, QueryProperty... aProperty)"
+					+ throwsClause);
+			emptyline();
+			// end get elements Segment with FILTER
+
+			// get elements Segment with SORTING, FILTER
+			appendComment("Returns " + doc.getName() + " objects segment, where property matches, sorted.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple()
+					+ "ByProperty(Segment aSegment, SortType aSortType, QueryProperty... aProperty)" + throwsClause);
+			emptyline();
+			// end get elements Segment with SORTING, FILTER
+
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 				appendComment("In all documents of type "+doc.getName()+" copies all multilingual fields from sourceLanguage to targetLanguage");
 				appendStatement("public void copyMultilingualAttributesInAll"+doc.getMultiple()+"(String sourceLanguage, String targetLanguage)"+throwsClause);

@@ -325,6 +325,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
 	    clazz.addImport("net.anotheria.anodoc.util.context.DBContext");
 	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
+	    clazz.addImport("net.anotheria.util.slicer.Segment");
 
 	    clazz.addImport("java.sql.Connection");
 	    clazz.addImport("java.sql.PreparedStatement");
@@ -424,6 +425,17 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    String sqlReadAllByProperty2 = quote(" WHERE ");
 	    appendStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_1 \t= "+sqlReadAllByProperty1);
 	    appendStatement(constDecl + " SQL_READ_ALL_BY_PROPERTY_2 \t= "+sqlReadAllByProperty2);
+	    
+	    
+	    // SQL_COUNT_1
+		String sqlReadCount1 = quote("SELECT COUNT(id) FROM ");
+		appendStatement(constDecl + " SQL_COUNT_1 \t= " + sqlReadCount1);
+	    
+	    // SQL_LIMIT_OFFSET_1
+		String sqlReadLimit1 = quote(" LIMIT ?");
+		String sqlReadOffcet1 = quote(" OFFSET ?");
+		appendStatement(constDecl + " SQL_LIMIT_1 \t= " + sqlReadLimit1);
+		appendStatement(constDecl + " SQL_OFFSET_1 \t= " + sqlReadOffcet1);
 
 	    emptyline();
 	    appendStatement("private RowMapper<"+doc.getName()+"> rowMapper = new "+doc.getName()+"RowMapper()");
@@ -820,6 +832,85 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         append(closeBlock());
         emptyline();
         
+        // get elements COUNT
+		callLog = quote("get" + doc.getMultiple() + "Count(") + " + con + " + quote(")");
+		appendComment("Returns " + doc.getMultiple() + " objects count.");
+		openFun("public int get" + doc.getMultiple() + "Count(Connection con)" + throwsClause);
+		appendStatement("PreparedStatement ps = null");
+		openTry();
+		appendStatement("ps = con.prepareStatement(SQL_COUNT_1 + TABNAME)");
+		appendStatement("ResultSet result = ps.executeQuery()");
+		appendStatement("int pCount = 0");
+		appendString("if (result.next())");
+		appendIncreasedStatement("pCount = result.getInt(1)");
+		appendStatement("return pCount");
+		generateFunctionEnd(callLog, true);
+		append(closeBlock());
+		emptyline();
+		// end get elements COUNT
+
+		// get elements Segment
+		callLog = quote("get" + doc.getMultiple() + "(") + " + con + " + quote(",") + "+ aSegment +" + quote(")");
+		appendComment("Returns " + doc.getMultiple() + " objects segment.");
+		openFun("public List<" + doc.getName() + ">" + " get" + doc.getMultiple() + "(Connection con, Segment aSegment)" + throwsClause);
+		generateFunctionStartWithLimitAndOffset("SQL_READ_ALL");
+		appendStatement("int pLimit = aSegment.getElementsPerSlice()");
+		appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
+		appendStatement("ps.setInt(1, pLimit)");
+		appendStatement("ps.setInt(2, pOffset)");
+		appendStatement("ResultSet result = ps.executeQuery()");
+		appendStatement("ArrayList<" + doc.getName() + "> ret = new ArrayList<" + doc.getName() + ">()");
+		appendString("while(result.next())");
+		appendIncreasedStatement("ret.add(rowMapper.map(result))");
+		appendStatement("return  ret");
+		generateFunctionEnd(callLog, true);
+		append(closeBlock());
+		emptyline();
+		// end get elements Segment
+
+		// get elements Segment with FILTER
+		callLog = quote("get" + doc.getMultiple() + "ByProperty(") + " + con + " + quote(",") + " + aSegment + " + quote(",")
+				+ " + properties + " + quote(")");
+		appendComment("Returns " + doc.getMultiple() + " objects segment which matches given properties.");
+		openFun("public List<" + doc.getName() + ">" + " get" + doc.getMultiple()
+				+ "ByProperty(Connection con, Segment aSegment, List<QueryProperty> properties)" + throwsClause);
+		appendStatement("PreparedStatement ps = null");
+		openTry();
+		//TODO Caching fuer generierte SQL Statements
+		appendCommentLine("//enable caching of statements one day");
+		appendStatement("String SQL = createSQL(SQL_READ_ALL_BY_PROPERTY_1, SQL_READ_ALL_BY_PROPERTY_2)");
+		appendStatement("String whereClause = " + quote(""));
+		appendString("for (QueryProperty p : properties){");
+		increaseIdent();
+		appendString("if (whereClause.length()>0)");
+		appendIncreasedStatement("whereClause += " + quote(" AND "));
+		appendStatement("String statement = p.unprepaireable()? (String) p.getValue(): " + quote("?"));
+		appendStatement("whereClause += p.getName()+p.getComparator()+statement");
+		append(closeBlock());
+		appendStatement("SQL += whereClause");
+		appendStatement("ps = con.prepareStatement(SQL)");
+		appendStatement("int propertyPosition = 0");
+		appendString("for (QueryProperty property: properties){");
+		increaseIdent();
+		appendString("if(property.unprepaireable())");
+		appendIncreasedStatement("continue");
+		appendStatement("setProperty(++propertyPosition, ps, property)");
+		append(closeBlock());
+		appendStatement("SQL += SQL_LIMIT_1 + SQL_OFFSET_1");
+		appendStatement("int pLimit = aSegment.getElementsPerSlice()");
+		appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
+		appendStatement("ps.setInt(++propertyPosition, pLimit)");
+		appendStatement("ps.setInt(++propertyPosition, pOffset)");
+		appendStatement("ResultSet result = ps.executeQuery()");
+		appendStatement("ArrayList<" + doc.getName() + "> ret = new ArrayList<" + doc.getName() + ">()");
+		appendString("while(result.next())");
+		appendIncreasedStatement("ret.add(rowMapper.map(result))");
+		appendStatement("return  ret");
+		generateFunctionEnd(callLog, true);
+		append(closeBlock());
+		emptyline();
+		// end get elements Segment with FILTER
+        
         //setProperty
         openFun("private void setProperty(int position, PreparedStatement ps, QueryProperty property) throws SQLException");
         appendString("if(property.unprepaireable()){");
@@ -985,14 +1076,22 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		}
 	}
 	
+	private void generateFunctionStartWithLimitAndOffset(String SQL_STATEMENT) {
+		appendStatement("PreparedStatement ps = null");
+		openTry();
+		appendStatement("con.setAutoCommit(true)");
+		appendStatement("ps = con.prepareStatement(createSQL(" + SQL_STATEMENT + "_1, " + SQL_STATEMENT + "_2)" + " + SQL_LIMIT_1"
+				+ " + SQL_OFFSET_1" + ")");
+	}
+	
 	private void generateFunctionEnd(String callLog, boolean usePreparedSt){
 		decreaseIdent();
-		appendString("}catch(SQLException e){");
+		appendString("} catch (SQLException e) {");
 		increaseIdent();
 		appendStatement("log.error("+callLog+", e)");
 		appendStatement("throw new DAOSQLException(e)");
 		decreaseIdent();
-		appendString("}finally{");
+		appendString("} finally {");
 		increaseIdent();
 		appendStatement("finish("+(usePreparedSt ? "ps": "st")+")");
 		append(closeBlock());

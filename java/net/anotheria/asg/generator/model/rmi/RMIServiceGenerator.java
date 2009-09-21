@@ -140,8 +140,8 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		
 		clazz.addImport("java.util.List");
 		clazz.addImport("net.anotheria.util.sorter.SortType");
-	    
-	    
+		clazz.addImport("net.anotheria.util.slicer.Segment");
+	    	    
 		clazz.addImport("net.anotheria.util.xml.XMLNode");
 		clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
@@ -284,13 +284,29 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         			);
 
 	        writeInterfaceFun(
-	        		"Returns all "+doc.getName()+" objects, where property matches, sorted", 
+	        		"Returns all "+doc.getName()+" objects, where property matches, sorted.", 
         			listDecl, 
         			"get"+doc.getMultiple()+"ByProperty", 
         			"SortType sortType, QueryProperty... property"
         			);
 
-	        
+	        // get elements COUNT
+			writeInterfaceFun("Returns " + doc.getMultiple() + "objects count.", "int", "get" + doc.getMultiple() + "Count", "");
+			// end get elements COUNT
+
+			// get elements Segment
+			writeInterfaceFun("Returns " + doc.getName() + " objects segment.", listDecl, "get" + doc.getMultiple(), "Segment aSegment");
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			writeInterfaceFun("Returns " + doc.getName() + " objects segment, where property matched.", listDecl, "get" + doc.getMultiple()
+					+ "ByProperty", "Segment aSegment, QueryProperty... property");
+			// end get elements Segment with FILTER
+
+			// get elements Segment with SORTING, FILTER
+			writeInterfaceFun("Returns " + doc.getName() + " objects segment, where property matched, sorted.", listDecl, "get"
+					+ doc.getMultiple() + "ByProperty", "Segment aSegment, SortType sortType, QueryProperty... property");
+			// end get elements Segment with SORTING, FILTER
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 		        writeInterfaceFun(
@@ -527,6 +543,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		clazz.addImport("java.util.List");
 		clazz.addImport("net.anotheria.util.sorter.SortType");
 		clazz.addImport("net.anotheria.util.xml.XMLNode");
+		clazz.addImport("net.anotheria.util.slicer.Segment");
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
@@ -751,7 +768,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		);
 		    
 		    writeStubFun(
-		    		"Returns all "+doc.getName()+" objects, where property matches, sorted",
+		    		"Returns all "+doc.getName()+" objects, where property matches, sorted.",
 		    		listDecl,
 		    		"get"+doc.getMultiple()+"ByProperty",
 		    		"SortType sortType, QueryProperty... property",
@@ -759,7 +776,26 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		"sortType + "+quote(", ")+" + java.util.Arrays.asList(property)"
 		    		);
 			
-			
+		    // get elements COUNT
+			writeStubFun("Returns all " + doc.getMultiple() + " count.", "int", "get" + doc.getMultiple() + "Count", "", "", null);
+			// end get elements COUNT
+
+			// get elements Segment
+			writeStubFun("Returns " + doc.getMultiple() + " objects segment.", listDecl, "get" + doc.getMultiple(), "Segment aSegment",
+					"aSegment", null);
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			writeStubFun("Returns " + doc.getName() + " objects segment, where property matched.", listDecl, "get"
+					+ doc.getMultiple() + "ByProperty", "Segment aSegment, QueryProperty... property", "aSegment, property",
+					"java.util.Arrays.asList(property)");
+			// end get elements Segment with FILTER
+
+			// get elements Segment with SORTING, FILTER
+			writeStubFun("Returns " + doc.getName() + " objects segment, where property matched, sorted.", listDecl, "get"
+					+ doc.getMultiple() + "ByProperty", "Segment aSegment, SortType sortType, QueryProperty... property",
+					"aSegment, sortType, property", "sortType + " + quote(", ") + " + java.util.Arrays.asList(property)");
+			// end get elements Segment with SORTING, FILTER
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 			    writeStubFun(
@@ -836,8 +872,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		
 	    clazz.addImport("java.util.List");
 	    clazz.addImport("net.anotheria.util.sorter.SortType");
-	    
-	    
+	    clazz.addImport("net.anotheria.util.slicer.Segment"); 
 	    clazz.addImport("net.anotheria.util.xml.XMLNode");
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	   
@@ -1023,15 +1058,34 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		);
 		    
 		    writeSkeletonFun(
-		    		"Returns all "+doc.getName()+" objects, where property matches, sorted",
+		    		"Returns all "+doc.getName()+" objects, where property matches, sorted.",
 		    		listDecl,
 		    		"get"+doc.getMultiple()+"ByProperty",
 		    		"SortType sortType, QueryProperty... property",
 		    		"sortType, property",
 		    		"sortType + "+quote(", ")+" + java.util.Arrays.asList(property)"
 		    		);
-			
-			
+		    
+		    // get elements COUNT
+			writeSkeletonFun("Returns all " + doc.getMultiple() + " count.", "int", "get" + doc.getMultiple() + "Count", "", "", null);
+			// end get elements COUNT
+
+			// get elements Segment
+			writeSkeletonFun("Returns " + doc.getName() + " objects segment.", listDecl, "get" + doc.getMultiple(), "Segment aSegment",
+					"aSegment", null);
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			writeSkeletonFun("Returns " + doc.getName() + " objects segment, where property matched.", listDecl, "get" + doc.getMultiple()
+					+ "ByProperty", "Segment aSegment, QueryProperty... property", "aSegment, property",
+					"java.util.Arrays.asList(property)");
+			// end get elements Segment with FILTER
+
+			// get elements Segment with SORTING, FILTER
+			writeSkeletonFun("Returns " + doc.getName() + " objects segment, where property matched, sorted.", listDecl, "get"
+					+ doc.getMultiple() + "ByProperty", "Segment aSegment, SortType sortType, QueryProperty... property",
+					"aSegment, sortType, property", "sortType + " + quote(", ") + " + java.util.Arrays.asList(property)");
+			// end get elements Segment with SORTING, FILTER
 			
 			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 			    writeSkeletonFun(

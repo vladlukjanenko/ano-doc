@@ -63,6 +63,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    
 	    clazz.addImport("net.anotheria.util.xml.XMLNode");
 	    clazz.addImport("net.anotheria.util.xml.XMLAttribute");
+	    clazz.addImport("net.anotheria.util.slicer.Segment");
 
 	    clazz.setName(getImplementationName(module));
 	    clazz.setParent("BasicService");
@@ -365,6 +366,57 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        append(closeBlock());
 			emptyline();
 			
+			// get elements COUNT
+			appendComment("Returns " + doc.getName() + " objects count.");
+			appendString("public int get" + doc.getMultiple() + "Count()" + throwsClause + "{");
+			increaseIdent();
+			openTry();
+			appendStatement("return pService.get" + doc.getMultiple() + "Count()");
+			decreaseIdent();
+			appendString("} catch (" + JDBCPersistenceServiceGenerator.getExceptionName(module) + " e) {");
+			appendIncreasedStatement("throw new " + getExceptionName(module) + "(\"Persistence failed: \"+e.getMessage())");
+			appendString("}");
+			append(closeBlock());
+			emptyline();
+			// end get elements COUNT
+
+			// get elements Segment
+			appendComment("Returns " + doc.getName() + " objects segment.");
+			appendString("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment)" + throwsClause + "{");
+			increaseIdent();
+			openTry();
+			appendStatement("return pService.get" + doc.getMultiple() + "(aSegment)");
+			decreaseIdent();
+			appendString("} catch (" + JDBCPersistenceServiceGenerator.getExceptionName(module) + " e) {");
+			appendIncreasedStatement("throw new " + getExceptionName(module) + "(\"Persistence failed: \"+e.getMessage())");
+			appendString("}");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment
+
+			// get elements Segment with FILTER
+			appendComment("Returns " + doc.getName() + " objects segment, where property matches.");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple() + "ByProperty(Segment aSegment, QueryProperty... aProperty)"
+					+ throwsClause + "{");
+			increaseIdent();
+			appendString("try {");
+			appendIncreasedStatement("return pService.get" + doc.getMultiple() + "ByProperty(aSegment, aProperty)");
+			appendString("} catch (" + JDBCPersistenceServiceGenerator.getExceptionName(module) + " e) {");
+			appendIncreasedStatement("throw new " + getExceptionName(module) + "(\"Persistence failed: \"+e.getMessage())");
+			appendString("}");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment with FILTER
+
+			// get elements Segment with SORTING, FILTER
+			appendComment("Returns " + doc.getName() + " objects segment, where property matches, sorted");
+			appendStatement("public " + listDecl + " get" + doc.getMultiple()
+					+ "ByProperty(Segment aSegment, SortType aSortType, QueryProperty... aProperty)" + throwsClause + "{");
+			increaseIdent();
+			appendStatement("return StaticQuickSorter.sort(get" + doc.getMultiple() + "ByProperty(aSegment, aProperty), aSortType)");
+			append(closeBlock());
+			emptyline();
+			// end get elements Segment with SORTING, FILTER
 	    }
 	    
 	    //generate export function
@@ -435,6 +487,35 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 
 	    
 	    return clazz;
+	}
+	
+	public List<String> getAll() {
+		return getAllByLimit(Integer.MIN_VALUE);
+	}
+	
+	public List<String> getAllByLimit(int aLimit) {
+		return getAllByLimitAndOffset(aLimit, Integer.MIN_VALUE);
+	}
+	
+	public List<String> getAllByLimitAndOffset(int aLimit, long aOffcet) {
+		List<String> result = new ArrayList<String>();
+		String sqlQuery = "SELECT * FROM table";
+		String sqlQueryLimit = "";
+		String sqlQueryOffcet = "";
+		
+		if (aLimit != Integer.MIN_VALUE) {
+			sqlQueryLimit = " LIMIT " + aLimit;
+		}
+		
+		if (aOffcet == Integer.MIN_VALUE) {
+			sqlQueryOffcet = " OFFSET " + aLimit;
+		}
+		
+		sqlQuery = sqlQuery + sqlQueryLimit + sqlQueryOffcet;
+
+		// some db logic 
+		
+		return result;
 	}
 		
 }

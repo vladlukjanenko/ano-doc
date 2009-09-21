@@ -125,7 +125,7 @@ public class AbstractGenerator{
 
 	//later replace with openTry
 	protected void openTry(){
-		appendString("try{");
+		appendString("try {");
 		increaseIdent();
 	}
 
