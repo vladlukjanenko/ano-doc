@@ -133,6 +133,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    clazz.addImport("net.anotheria.util.xml.XMLNode");
 	    clazz.addImport("net.anotheria.util.xml.XMLAttribute");
 	    clazz.addImport("net.anotheria.util.slicer.Segment");
+	    clazz.addImport("net.anotheria.util.slicer.Slicer");
 	    clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
 	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	    clazz.addImport("net.anotheria.asg.service.InMemoryObjectWrapper");
@@ -488,20 +489,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 			appendComment("Returns " + doc.getName() + " objects segment.");
 			appendString("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment)" + throwsClause + "{");
 			increaseIdent();
-			appendStatement("int pCurrentElement = 0");
-			appendStatement("int pLimit = aSegment.getElementsPerSlice()");
-			appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
-			appendStatement(listDecl + " ret = new ArrayList<" + doc.getName() + ">()");
-			appendStatement(listDecl + " src = _getCached" + doc.getMultiple() + "()");
-			appendStatement("for (" + doc.getName() + " " + doc.getVariableName() + " : src) {");
-			increaseIdent();
-			appendStatement("pCurrentElement++");
-			appendString("if (pCurrentElement >= pOffset && pCurrentElement <= pOffset + pLimit)");
-			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
-			appendString("if (ret.size() == pLimit)");			
-			appendIncreasedStatement("break");			
-			append(closeBlock());
-			appendStatement("return ret");
+			appendStatement("return Slicer.slice(aSegment, get" + doc.getMultiple() + "()).getSliceData()");
 			append(closeBlock());
 			emptyline();
 			// end get elements Segment
@@ -511,25 +499,23 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 			appendString("public " + listDecl + " get" + doc.getMultiple() + "ByProperty(Segment aSegment, QueryProperty... property)"
 					+ throwsClause + "{");
 			increaseIdent();
-			appendStatement("int pCurrentElement = 0");
 			appendStatement("int pLimit = aSegment.getElementsPerSlice()");
 			appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
 			appendStatement(listDecl + " ret = new ArrayList<" + doc.getName() + ">()");
 			appendStatement(listDecl + " src = _getCached" + doc.getMultiple() + "()");
 			appendStatement("for (" + doc.getName() + " " + doc.getVariableName() + " : src) {");
 			increaseIdent();
-			appendStatement("pCurrentElement++");
 			appendStatement("boolean mayPass = true");
 			appendStatement("for (QueryProperty qp : property) {");
 			increaseIdent();
 			appendStatement("mayPass = mayPass && qp.doesMatch(" + doc.getVariableName() + ".getPropertyValue(qp.getName()))");
 			append(closeBlock());
-			appendString("if (mayPass && pCurrentElement >= pOffset && pCurrentElement <= pOffset + pLimit)");
+			appendString("if (mayPass)");
 			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
-			appendString("if (ret.size() == pLimit)");			
+			appendString("if (ret.size() > pOffset + pLimit)");			
 			appendIncreasedStatement("break");
 			append(closeBlock());
-			appendStatement("return ret");
+			appendStatement("return Slicer.slice(aSegment, ret).getSliceData()");
 			append(closeBlock());
 			emptyline();
 			// end get elements Segment with FILTER

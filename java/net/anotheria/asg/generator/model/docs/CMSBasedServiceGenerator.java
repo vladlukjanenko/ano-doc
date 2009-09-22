@@ -113,6 +113,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.addImport("net.anotheria.util.sorter.SortType");
 		clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
 		clazz.addImport("net.anotheria.util.slicer.Segment");
+		clazz.addImport("net.anotheria.util.slicer.Slicer");
 
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		clazz.addImport(context.getPackageName(module)+".data."+ module.getModuleClassName());
@@ -475,21 +476,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendComment("Returns " + doc.getName() + " objects segment.");
 			appendString("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment) {");
 			increaseIdent();
-			appendString("//first the slow version, the fast version is a todo.");
-			appendStatement("int pCurrentElement = 0");
-			appendStatement("int pLimit = aSegment.getElementsPerSlice()");
-			appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
-			appendStatement(listDecl + " ret = new ArrayList<" + doc.getName() + ">()");
-			appendStatement(listDecl + " src = get" + doc.getMultiple() + "()");
-			appendStatement("for (" + doc.getName() + " " + doc.getVariableName() + " : src) {");
-			increaseIdent();
-			appendStatement("pCurrentElement++");
-			appendString("if (pCurrentElement >= pOffset && pCurrentElement <= pOffset + pLimit)");
-			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
-			appendString("if (ret.size() == pLimit)");			
-			appendIncreasedStatement("break");
-			append(closeBlock());
-			appendStatement("return ret");
+			appendStatement("return Slicer.slice(aSegment, get" + doc.getMultiple() + "()).getSliceData()");
 			append(closeBlock());
 			emptyline();
 			// end get elements Segment
@@ -498,26 +485,23 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendComment("Returns " + doc.getName() + " objects segment, where property matched.");
 			appendString("public " + listDecl + " get" + doc.getMultiple() + "ByProperty(Segment aSegment, QueryProperty... property) {");
 			increaseIdent();
-			appendString("//first the slow version, the fast version is a todo.");
-			appendStatement("int pCurrentElement = 0");
 			appendStatement("int pLimit = aSegment.getElementsPerSlice()");
 			appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
 			appendStatement(listDecl + " ret = new ArrayList<" + doc.getName() + ">()");
 			appendStatement(listDecl + " src = get" + doc.getMultiple() + "()");
 			appendStatement("for (" + doc.getName() + " " + doc.getVariableName() + " : src) {");
 			increaseIdent();
-			appendStatement("pCurrentElement++");
 			appendStatement("boolean mayPass = true");
 			appendStatement("for (QueryProperty qp : property) {");
 			increaseIdent();
 			appendStatement("mayPass = mayPass && qp.doesMatch(" + doc.getVariableName() + ".getPropertyValue(qp.getName()))");
 			append(closeBlock());
-			appendString("if (mayPass && pCurrentElement >= pOffset && pCurrentElement <= pOffset + pLimit)");
+			appendString("if (mayPass)");
 			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
-			appendString("if (ret.size() == pLimit)");			
+			appendString("if (ret.size() > pOffset + pLimit)");			
 			appendIncreasedStatement("break");
 			append(closeBlock());
-			appendStatement("return ret");
+			appendStatement("return Slicer.slice(aSegment, ret).getSliceData()");
 			append(closeBlock());
 			emptyline();
 			// end get elements Segment with FILTER

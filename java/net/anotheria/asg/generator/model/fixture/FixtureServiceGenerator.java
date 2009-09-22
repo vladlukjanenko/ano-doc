@@ -77,7 +77,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    clazz.addImport("net.anotheria.util.sorter.SortType");
 	    clazz.addImport("net.anotheria.util.sorter.StaticQuickSorter");
 	    clazz.addImport("net.anotheria.util.slicer.Segment");
-	    //ret.emptyline();
+	    clazz.addImport("net.anotheria.util.slicer.Slicer");
 
 	    clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
@@ -353,23 +353,9 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 
 			// get elements Segment
 			appendComment("Returns " + doc.getName() + " objects segment.");
-			appendString("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment) {");
+			appendString("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment)" + throwsClause + "{");
 			increaseIdent();
-			appendStatement("int pCurrentElement = 0");
-			appendStatement("int pLimit = aSegment.getElementsPerSlice()");
-			appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
-			appendStatement(listDecl + " ret = new ArrayList<" + doc.getName() + ">()");
-			appendStatement(listDecl + " src = new ArrayList<" + doc.getName() + ">()");
-			appendStatement("src.addAll(" + getMapName(doc) + ".values())");
-			appendStatement("for (" + doc.getName() + " " + doc.getVariableName() + " : src) {");
-			increaseIdent();
-			appendStatement("pCurrentElement++");
-			appendString("if (pCurrentElement >= pOffset && pCurrentElement <= pOffset + pLimit)");
-			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
-			appendString("if (ret.size() == pLimit)");			
-			appendIncreasedStatement("break");
-			append(closeBlock());
-			appendStatement("return ret");
+			appendStatement("return Slicer.slice(aSegment, get" + doc.getMultiple() + "()).getSliceData()");
 			append(closeBlock());
 			emptyline();
 			// end get elements Segment
@@ -378,7 +364,6 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 			appendComment("Returns " + doc.getName() + " objects segment, where property matched.");
 			appendString("public " + listDecl + " get" + doc.getMultiple() + "ByProperty(Segment aSegment, QueryProperty... property) {");
 			increaseIdent();
-			appendStatement("int pCurrentElement = 0");
 			appendStatement("int pLimit = aSegment.getElementsPerSlice()");
 			appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
 			appendStatement(listDecl + " ret = new ArrayList<" + doc.getName() + ">()");
@@ -386,18 +371,17 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 			appendStatement("src.addAll(" + getMapName(doc) + ".values())");
 			appendStatement("for (" + doc.getName() + " " + doc.getVariableName() + " : src) {");
 			increaseIdent();
-			appendStatement("pCurrentElement++");
 			appendStatement("boolean mayPass = true");
 			appendStatement("for (QueryProperty qp : property) {");
 			increaseIdent();
 			appendStatement("mayPass = mayPass && qp.doesMatch(" + doc.getVariableName() + ".getPropertyValue(qp.getName()))");
 			append(closeBlock());
-			appendString("if (mayPass && pCurrentElement >= pOffset && pCurrentElement <= pOffset + pLimit)");
+			appendString("if (mayPass)");
 			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
-			appendString("if (ret.size() == pLimit)");			
+			appendString("if (ret.size() > pOffset + pLimit)");			
 			appendIncreasedStatement("break");
 			append(closeBlock());
-			appendStatement("return ret");
+			appendStatement("return Slicer.slice(aSegment, ret).getSliceData()");
 			append(closeBlock());
 			emptyline();
 			// end get elements Segment with FILTER
