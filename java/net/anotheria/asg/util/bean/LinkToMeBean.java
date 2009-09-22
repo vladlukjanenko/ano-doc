@@ -2,6 +2,7 @@ package net.anotheria.asg.util.bean;
 
 import net.anotheria.anodoc.data.NoSuchPropertyException;
 import net.anotheria.asg.data.DataObject;
+import net.anotheria.util.StringUtils;
 
 public class LinkToMeBean {
 	private String targetDocumentType;
@@ -17,7 +18,7 @@ public class LinkToMeBean {
 	public LinkToMeBean(DataObject doc, String propertyName){
 		targetDocumentType = doc.getDefinedName();
 		targetDocumentId = doc.getId();
-		targetDocumentLink = doc.getDefinedName().toLowerCase()+"Edit?ts="+System.currentTimeMillis()+"&pId="+doc.getId();
+		targetDocumentLink = doc.getDefinedParentName().toLowerCase()+StringUtils.capitalize(doc.getDefinedName())+"Edit?ts="+System.currentTimeMillis()+"&pId="+doc.getId();
 		targetDocumentProperty = propertyName;
 		try{
 			targetDocumentDescription = ""+doc.getPropertyValue("name");

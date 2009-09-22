@@ -127,6 +127,9 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		generateDefNameMethod(doc);
 		
 		emptyline();
+		generateDefParentNameMethod(doc);
+		
+		emptyline();
 		generateGetFootprintMethod(doc);
 
 		emptyline();

@@ -137,6 +137,9 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		
 		emptyline();
 		generateDefNameMethod(doc);
+		
+		emptyline();
+		generateDefParentNameMethod(doc);
 
 		emptyline();
 		generateGetFootprintMethod(doc);

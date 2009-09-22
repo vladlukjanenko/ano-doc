@@ -201,11 +201,11 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	}
 	
 	public static final String getPath(MetaDocument doc, String action){
-		return doc.getName().toLowerCase()+StringUtils.capitalize(action);
+		return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(action);
 	}
 	
 	public static final String getContainerPath(MetaDocument doc, MetaContainerProperty container, String action){
-		return doc.getName().toLowerCase()+StringUtils.capitalize(container.getName())+StringUtils.capitalize(action);
+		return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(container.getName())+StringUtils.capitalize(action);
 	}
 	
 	public static final String getContainerEntryFormName(MetaDocument doc, MetaContainerProperty property){
@@ -214,14 +214,14 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			nameAddy = "Row";
 		if (property instanceof MetaListProperty)
 			nameAddy = "Element";
-	    return doc.getName()+StringUtils.capitalize(property.getName())+nameAddy+"Form";
+	    return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(property.getName())+nameAddy+"Form";
 	}
 
 	public static final String getContainerQuickAddFormName(MetaDocument doc, MetaContainerProperty property){
 		String nameAddy = "XXX";
 		if (property instanceof MetaListProperty)
 			nameAddy = "QuickAdd";
-	    return doc.getName()+StringUtils.capitalize(property.getName())+nameAddy+"Form";
+	    return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(property.getName())+nameAddy+"Form";
 	}
 
 	private String generateContainerMappings(MetaDocument doc, MetaContainerProperty container){

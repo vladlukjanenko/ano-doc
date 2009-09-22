@@ -132,6 +132,8 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		emptyline();
 		generateDefNameMethod(doc);
 		emptyline();
+		generateDefParentNameMethod(doc);
+		emptyline();
 		generateGetFootprintMethod(doc);
 		
 		if (DataFacadeGenerator.hasLanguageCopyMethods(doc)){

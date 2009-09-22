@@ -33,6 +33,12 @@ public interface DataObject extends Cloneable{
 	 * @return
 	 */
 	String getDefinedName();
+	
+	/**
+	 * Returns the parent module name under which the object was defined in xml originally.
+	 * @return
+	 */
+	String getDefinedParentName();
 
 	/**
 	 * Returns the timestamp (time in ms since 1970) of the last change.

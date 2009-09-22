@@ -132,6 +132,13 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 		append(closeBlock());
 	}
 	
+	protected final void generateDefParentNameMethod(MetaDocument doc){
+		appendString("public String getDefinedParentName(){");
+		increaseIdent();
+		appendStatement("return "+quote(doc.getParentModule().getName()));
+		append(closeBlock());
+	}
+	
 	/**
 	 * Returns the name for the builder for this document.
 	 * @param doc
