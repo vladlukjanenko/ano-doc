@@ -29,6 +29,9 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		//hack, works only with one view.
 		files.add(new BaseActionGenerator().generate(views));
+		files.add(new IndexPageActionGenerator().generate(views));
+		files.add(new IndexPageJspGenerator().generate(context));
+		files.add(new StrutsConfigGenerator().generateSystemConfig());
 		files.add(new SharedJspFooterGenerator().generate(views, context));
 		files.add(new JspMenuGenerator().generate(views, context));
 		files.addAll(new WebXMLGenerator().generate(views, context));
