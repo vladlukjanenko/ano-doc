@@ -7,40 +7,57 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import net.java.dev.moskito.util.storage.Storage;
+
 public class MetaFactory {
 	
+	/**
+	 * Storage for instances.
+	 */
 	private static Map<String, Service> instances;
-	
+	/**
+	 * Storage for aliases.
+	 */
 	private static Map<String, String> aliases;
-	
+	/**
+	 * Storage for factory classes.
+	 */
 	private static Map<String, Class<? extends ServiceFactory<? extends Service>>> factoryClasses;
+	/**
+	 * Storage for factories.
+	 */
 	private static Map<String, ServiceFactory<? extends Service>> factories;
 	
-	
+	/**
+	 * List of additional resolvers for aliases.
+	 */
 	private static List<AliasResolver> resolverList;
 	
 	static{
 		reset();
 	}
 	
+	/**
+	 * Performs a complete reset of the inner state. Useful for unit testing to call @AfterClass or @After.
+	 */
 	public static void reset(){
 		resolverList = new CopyOnWriteArrayList<AliasResolver>();
 		resolverList.add(new SystemPropertyResolver());
 		resolverList.add(new ConfigurableResolver());		
 		
-		factoryClasses = new ConcurrentHashMap<String, Class<? extends ServiceFactory<? extends Service>>>();
-		factories = new ConcurrentHashMap<String, ServiceFactory<? extends Service>>();
-		aliases = new ConcurrentHashMap<String, String>();
-		instances = new ConcurrentHashMap<String, Service>();
+		factoryClasses = Storage.createConcurrentHashMapStorage("mf-factoryClasses");
+		factories = Storage.createConcurrentHashMapStorage("mf-factories");
+		aliases = Storage.createConcurrentHashMapStorage("mf-aliases");
+		instances = Storage.createConcurrentHashMapStorage("mf-instances");
 	}
 	
 	
 	
-	public static <T extends Service> T create(Class<T> pattern, Extension extension)throws MetaFactoryException{
+	public static <T extends Service> T create(Class<T> pattern, Extension extension) throws MetaFactoryException{
 		return pattern.cast(create(extension.toName(pattern)));
 	}
 
-	public static <T extends Service> T create(Class<T> pattern)throws MetaFactoryException{
+	public static <T extends Service> T create(Class<T> pattern) throws MetaFactoryException{
 		return pattern.cast(create(pattern, Extension.NONE));
 	}
 ///*
