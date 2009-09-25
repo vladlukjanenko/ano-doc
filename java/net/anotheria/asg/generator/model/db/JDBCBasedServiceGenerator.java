@@ -517,5 +517,9 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 		
 		return result;
 	}
+	
+	@Override protected String getMoskitoSubsystem(){
+		return super.getMoskitoSubsystem()+"-jdbc";
+	}
 		
 }

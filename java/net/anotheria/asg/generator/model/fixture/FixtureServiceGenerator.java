@@ -525,4 +525,8 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 		return super.getSupportedInterfacesList(module)+", IFixtureService.class";
 	}
 
+	@Override protected String getMoskitoSubsystem(){
+		return super.getMoskitoSubsystem()+"-fixture";
+	}
+
 }

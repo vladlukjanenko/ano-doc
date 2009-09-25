@@ -613,4 +613,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    return getModuleGetterMethod(module)+"()";
 	}
 
+	@Override protected String getMoskitoSubsystem(){
+		return super.getMoskitoSubsystem()+"-cms";
+	}
+
 }

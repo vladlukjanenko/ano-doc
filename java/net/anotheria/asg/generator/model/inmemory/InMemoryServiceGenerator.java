@@ -718,5 +718,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 		return super.getSupportedInterfacesList(module)+", InMemoryService.class";
 	}
 
+	@Override protected String getMoskitoSubsystem(){
+		return super.getMoskitoSubsystem()+"-inmem";
+	}
 
 }

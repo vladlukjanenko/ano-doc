@@ -98,7 +98,7 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	    appendString("new ServiceStatsFactory(),");
 	    appendString("\""+getInterfaceName(module)+"-\"+instanceCounter.incrementAndGet(),");
 	    appendString(quote("service"),",");
-	    appendString("\"asg\",");
+	    appendString(quote(getMoskitoSubsystem()),",");
 	    appendString(getSupportedInterfacesList(module));
 	    decreaseIdent();
 	    appendString(");");
@@ -132,6 +132,10 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 	 */
 	protected String getExceptionName(MetaModule module){
 		return ServiceGenerator.getExceptionName(module);
+	}
+	
+	protected String getMoskitoSubsystem(){
+		return "asg";
 	}
 	
 }

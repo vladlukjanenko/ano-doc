@@ -1229,4 +1229,8 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	}
 
+	@Override protected String getMoskitoSubsystem(){
+		return super.getMoskitoSubsystem()+"-rmi";
+	}
+
 }

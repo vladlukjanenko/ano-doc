@@ -450,4 +450,9 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 	    
 	    return clazz;
 	}
+	
+	@Override protected String getMoskitoSubsystem(){
+		return super.getMoskitoSubsystem()+"-fed";
+	}
+
 }
