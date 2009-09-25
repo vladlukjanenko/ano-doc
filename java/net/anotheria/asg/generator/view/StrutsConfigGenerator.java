@@ -159,8 +159,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return ret;
 	}
 	
-	public static final String getDialogFormName(MetaDialog dialog, MetaDocument document){
-		return dialog.getName()+document.getName()+"Form"; 
+	public static final String getDialogFormName(MetaDialog dialog, MetaDocument document) {
+		return dialog.getName() + document.getParentModule().getName() + document.getName() + "Form";
 	}
 	
 	/**
