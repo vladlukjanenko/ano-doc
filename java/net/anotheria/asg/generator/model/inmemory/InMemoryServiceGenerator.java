@@ -228,23 +228,31 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
+            appendString("if (hasServiceListeners())");
+	        appendIncreasedStatement("fireObjectDeletedEvent("+doc.getVariableName()+")");
 	        append(closeBlock());
 	        emptyline();
 	        
 	        appendString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
+            appendStatement(doc.getName()+ " doc = null");
 	        appendString("if (paired){");
 	        increaseIdent();
 	        appendStatement(getWrapperDecl(doc)+" w = "+getCacheName(doc)+".get(id)");
+            appendStatement("doc = hasServiceListeners() && w!=null?w.get():null");
 	        appendString("if (w!=null)");
 	        appendIncreasedStatement("w.delete()");
 	        decreaseIdent();
 	        appendString("}else{");
 	        increaseIdent();
+            appendStatement("doc=hasServiceListeners() && "+getCacheName(doc)+".get(id)!=null?"+getCacheName(doc)+".get(id).get():null");
 	        appendStatement(getCacheName(doc)+".remove(id)");
 	        append(closeBlock());
+            appendString("if (doc!=null)");
+            appendIncreasedStatement("fireObjectDeletedEvent(doc)");
 	        append(closeBlock());
 	        emptyline();
+
 	        
 	        appendComment("Deletes multiple "+doc.getName()+" objects.");
 	        appendString("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
@@ -297,6 +305,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("throw new RuntimeException(\"Unknown document type: \"+template.getClass())");
 
 	        append(closeBlock());
+            emptyline();
 
 
 	        appendString("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -304,6 +313,8 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("InMemoryObjectWrapper<", doc.getName(),"> wrapper = new InMemoryObjectWrapper<",doc.getName(),">(",doc.getVariableName(),")");
 	        appendStatement(getCacheName(doc), ".put(wrapper.getId(), wrapper)");
 	        appendStatement(getCachedListName(doc), " = null");
+            appendString("if (hasServiceListeners())");
+	        appendIncreasedStatement("fireObjectImportedEvent("+doc.getVariableName()+")");
 	        appendStatement("return "+doc.getVariableName());
 	        append(closeBlock());
 	        emptyline();
@@ -315,6 +326,11 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        appendStatement("ret.add(import"+doc.getName()+"("+doc.getVariableName()+"))");
             append(closeBlock());
+            appendString("if (hasServiceListeners()){");
+	        increaseIdent();
+	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
+	        appendIncreasedStatement("fireObjectImportedEvent("+doc.getVariableName()+")");
+	        append(closeBlock());
             appendStatement("return ret");
 	        append(closeBlock());
 	        emptyline();

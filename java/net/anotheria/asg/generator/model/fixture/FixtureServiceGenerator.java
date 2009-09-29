@@ -216,6 +216,7 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	        appendStatement(listDecl+" ret = new Array"+listDecl+"()");
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list)");
 	        appendIncreasedStatement("ret.add(import"+doc.getName()+"("+doc.getVariableName()+"))");
+
 	        appendStatement("return ret");
 	        append(closeBlock());
 	        emptyline();

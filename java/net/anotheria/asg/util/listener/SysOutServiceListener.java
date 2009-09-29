@@ -28,7 +28,12 @@ public class SysOutServiceListener implements IServiceListener{
 		System.out.println("Created new document of type: "+doc.getClass()+" : "+doc);
 	}
 
-	@Override public void documentDeleted(DataObject doc) {
+    @Override
+    public void documentImported(DataObject doc) {
+       System.out.println("Imported document of type: "+doc.getClass()+" : "+doc);
+    }
+
+    @Override public void documentDeleted(DataObject doc) {
 		System.out.println("Deleted document of type: "+doc.getClass()+" : "+doc);
 	}
 

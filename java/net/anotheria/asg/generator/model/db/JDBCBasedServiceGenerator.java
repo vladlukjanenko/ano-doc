@@ -140,24 +140,27 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
+            appendString("if(hasServiceListeners()){");
+            increaseIdent();
+            appendStatement("fireObjectDeletedEvent("+doc.getVariableName()+")");
+	        append(closeBlock());
 	        append(closeBlock());
 	        emptyline();
-	        
+
+
 	        appendString("public void delete"+doc.getName()+"(String id)"+throwsClause+"{");
 	        increaseIdent();
 	        openTry();
+            appendStatement(doc.getName()+" varValue = hasServiceListeners()?pService.get"+doc.getName()+"(id):null");
 	        appendStatement("pService.delete"+doc.getName()+"(id)");
+            appendString("if(varValue!=null){");
+            increaseIdent();
+            appendStatement("fireObjectDeletedEvent(varValue)");
+	        append(closeBlock());
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
-//	        TODO: fix service delete listening
-//	        appendString("if (hasServiceListeners()){"));
-//	        increaseIdent();
-//	        appendStatement("List<IServiceListener> myListeners = getServiceListeners()"));
-//	        appendString("for (int i=0; i<myListeners.size(); i++)"));
-//	        appendIncreasedStatement("myListeners.get(i).documentDeleted(oldVersion, "+doc.getVariableName()+")"));
-//	        append(closeBlock());
 	        append(closeBlock());
 	        emptyline();
 
@@ -194,6 +197,10 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        increaseIdent();
 	        openTry();
 	        appendStatement(doc.getVariableName() + " = pService.import"+doc.getName()+"("+doc.getVariableName()+")");
+            appendString("if(hasServiceListeners()){");
+            increaseIdent();
+            appendStatement("fireObjectImportedEvent("+doc.getVariableName()+")");
+            append(closeBlock());
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
@@ -207,6 +214,13 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendStatement(listDecl+" ret = null");
 	        openTry();
 	        appendStatement("ret = pService.import"+doc.getMultiple()+"(list)");
+            appendString("if(hasServiceListeners()){");
+            increaseIdent();
+            appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
+            increaseIdent();
+            appendStatement("fireObjectImportedEvent("+doc.getVariableName()+")");
+            decreaseIdent();
+            append(closeBlock());
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");

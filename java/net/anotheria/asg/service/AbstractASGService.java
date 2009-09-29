@@ -55,9 +55,23 @@ public abstract class AbstractASGService implements ASGService{
 	protected void fireObjectDeletedEvent(DataObject deleted){
 		for (IServiceListener listener : listeners){
 			try{
-				listener.documentCreated(deleted);
+				listener.documentDeleted(deleted);
 			}catch(Exception e){
 				log.warn("Caught uncaught exception by the listener "+listener+", fireObjectDeletedEvent("+deleted+")", e);
+			}
+		}
+	}
+
+    /**
+	 * Fires the import event. The method returns after all listeners have been notified. Exceptions from listeners are ignored (and logged).
+	 * @param imported the imported object.
+	 */
+	protected void fireObjectImportedEvent(DataObject imported){
+		for (IServiceListener listener : listeners){
+			try{
+				listener.documentImported(imported);
+			}catch(Exception e){
+				log.warn("Caught uncaught exception by the listener "+listener+", fireObjectImportedEvent("+imported+")", e);
 			}
 		}
 	}
