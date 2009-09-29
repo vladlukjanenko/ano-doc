@@ -86,8 +86,9 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendStatement("public static final String BEAN_VIEW_SELECTOR = "+quote("views"));
 		emptyline();
 		
+		appendStatement("private static Object serviceInstantiationLock = new Object()");
 		for (MetaModule m:modules)
-			appendStatement("private static "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceInstanceName(m));
+			appendStatement("private static volatile "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceInstanceName(m));
 
 		appendStatement("private static XMLUserManager userManager");
 		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
@@ -102,14 +103,9 @@ public class BaseActionGenerator extends AbstractGenerator {
 		clazz.addImport(Extension.class);
 		clazz.addImport(MetaFactoryException.class);
 		
+		
 		for (MetaModule m:modules){
 			clazz.addImport(ServiceGenerator.getInterfaceImport(m));
-			appendCommentLine(ModuleActionsGenerator.getServiceInstanceName(m)+" = "+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"()");
-			appendString("try{");
-			appendIncreasedStatement(ModuleActionsGenerator.getServiceInstanceName(m)+" = MetaFactory.get("+ServiceGenerator.getInterfaceName(m)+".class, Extension.EDITORINTERFACE)");
-			appendString("}catch(MetaFactoryException e){");
-			appendIncreasedStatement("staticlogger.fatal("+quote("Can't load editor instance of module service "+m.getName())+", e)");
-			appendString("}");
 		}
 
 		//init user manager
@@ -172,6 +168,21 @@ public class BaseActionGenerator extends AbstractGenerator {
 		for (MetaModule m:modules){
 			appendString("protected "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceGetterCall(m)+"{");
 			increaseIdent();
+			appendString("if ("+ModuleActionsGenerator.getServiceInstanceName(m)+"==null){");
+			increaseIdent();
+			appendString("synchronized(serviceInstantiationLock){");
+			increaseIdent();
+			appendString("if ("+ModuleActionsGenerator.getServiceInstanceName(m)+"==null){");
+			increaseIdent();
+			appendString("try{");
+			appendIncreasedStatement(ModuleActionsGenerator.getServiceInstanceName(m)+" = MetaFactory.get("+ServiceGenerator.getInterfaceName(m)+".class, Extension.EDITORINTERFACE)");
+			appendString("}catch(MetaFactoryException e){");
+			appendIncreasedStatement("log.fatal("+quote("Can't load editor instance of module service "+m.getName())+", e)");
+			appendString("}");
+			append(closeBlock(".. if null"));
+			append(closeBlock(".. synch"));
+			append(closeBlock(".. if"));
+			
 			appendStatement("return "+ModuleActionsGenerator.getServiceInstanceName(m));
 			append(closeBlock());
 			emptyline();
