@@ -283,6 +283,12 @@ public class AbstractGenerator{
 		return ret;
 	}
 
+	protected String closeBlock(String message){
+		decreaseIdent();
+		String ret = writeString("} //"+message);
+		return ret;
+	}
+
 	protected void appendMark(int markNumber){
 		
 //		String ret = "/* ***** MARK ";
