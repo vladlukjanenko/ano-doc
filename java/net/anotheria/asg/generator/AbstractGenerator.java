@@ -277,16 +277,16 @@ public class AbstractGenerator{
 		b.append(writeString("}"));
 	}
 	
+	@Deprecated
 	protected String closeBlock(){
 		decreaseIdent();
 		String ret = writeString("}");
 		return ret;
 	}
 
-	protected String closeBlock(String message){
+	protected void closeBlock(String message){
 		decreaseIdent();
-		String ret = writeString("} //"+message);
-		return ret;
+		appendString("} //"+message);
 	}
 
 	protected void appendMark(int markNumber){

@@ -162,7 +162,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		emptyline();
 
 		appendString("return anoDocExecute(mapping, af, req, res);");
-		append(closeBlock());
+		closeBlock("doExecute");
 
 		//generate service getter
 		for (MetaModule m:modules){
@@ -179,12 +179,12 @@ public class BaseActionGenerator extends AbstractGenerator {
 			appendString("}catch(MetaFactoryException e){");
 			appendIncreasedStatement("log.fatal("+quote("Can't load editor instance of module service "+m.getName())+", e)");
 			appendString("}");
-			append(closeBlock(".. if null"));
-			append(closeBlock(".. synch"));
-			append(closeBlock(".. if"));
+			closeBlock("... if null");
+			closeBlock("... synch");
+			closeBlock("... if");
 			
 			appendStatement("return "+ModuleActionsGenerator.getServiceInstanceName(m));
-			append(closeBlock());
+			closeBlock("end  "+ModuleActionsGenerator.getServiceGetterCall(m));
 			emptyline();
 		}
 		
