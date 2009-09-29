@@ -59,8 +59,6 @@ public class Module implements ICompositeDataObject, Serializable{
 	 * Returns the current logger. Creates one if needed.  
 	 */
 	protected Logger getLog(){
-		if (log==null)
-			log = Logger.getLogger(this.getClass());
 		return log;
 	}
 	
@@ -82,6 +80,7 @@ public class Module implements ICompositeDataObject, Serializable{
 		this.id = anId;
 		holders = new Hashtable<String,DataHolder>();
 		getLog();//ensuring that logger is initialized.
+		log = Logger.getLogger(this.getClass());
 	}
 	
 	/**
@@ -179,7 +178,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * Returns the String representation of this Module entity.
 	 */
-	public String toString(){
+	@Override public String toString(){
 		return "Module:"+getId()+DELIMITER+ownerId+DELIMITER+copyId;//+" holders:"+holders;
 	}
 	
@@ -191,7 +190,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * @see net.anotheria.anodoc.data.IStoreable#getKeys()
 	 */
-	public Enumeration<String> getKeys() {
+	@Override public Enumeration<String> getKeys() {
 		Enumeration<DataHolder> allObjects = holders.elements();
 		Vector<String> keys = new Vector<String>();
 		while(allObjects.hasMoreElements()){
@@ -204,7 +203,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * @see net.anotheria.anodoc.data.IStoreable#getObject(Object)
 	 */
-	public Object getObject(String key) {
+	@Override public Object getObject(String key) {
 		String myKey = key.substring(key.indexOf(IHelperConstants.DELIMITER)+1);
 		return holders.get(myKey);
 	}
@@ -212,7 +211,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	/**
 	 * @see net.anotheria.anodoc.data.IBasicStoreableObject#getStorageId()
 	 */
-	public String getStorageId() {
+	@Override public String getStorageId() {
 		return ""+id+DELIMITER+ownerId+DELIMITER+copyId;		
 	}
 	
