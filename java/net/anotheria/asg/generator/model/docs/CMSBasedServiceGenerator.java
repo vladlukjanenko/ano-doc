@@ -179,7 +179,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("@SuppressWarnings(\"unchecked\")");
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"(){");
 	        increaseIdent();
-	        appendStatement("List "+doc.getMultiple().toLowerCase()+" = "+getModuleGetterCall(module)+".get"+doc.getMultiple()+"()");
+	        appendStatement("List "+doc.getMultiple().toLowerCase()+" = new ArrayList()");
+            appendStatement(doc.getMultiple().toLowerCase()+".addAll("+getModuleGetterCall(module)+".get"+doc.getMultiple()+"())");
 	        appendStatement("return "+doc.getMultiple().toLowerCase());
 	        append(closeBlock());
 	        emptyline();
