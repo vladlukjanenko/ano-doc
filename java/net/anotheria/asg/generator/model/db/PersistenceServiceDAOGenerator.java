@@ -333,7 +333,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	    clazz.addImport("java.sql.SQLException");
 	    clazz.addImport("java.sql.Statement");
 	    clazz.addImport("org.apache.log4j.Logger");
-	    
+	    clazz.addImport("net.anotheria.db.config.JDBCConfigFactory");
+	    clazz.addImport("net.anotheria.db.config.JDBCConfig");
+
 	    for (MetaProperty p : properties){
 	    	if(p instanceof MetaListProperty)
 	    		clazz.addImport("net.anotheria.db.array." + ((MetaListProperty)p).getContainedProperty().toJavaObjectType() + "Array");
@@ -450,6 +452,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		    appendStatement("private AtomicLong lastId = new AtomicLong()");
 	    }
 	    appendStatement("private static final long START_ID = 0");
+	    appendStatement("private JDBCConfig dbConfig = JDBCConfigFactory.getJDBCConfig()");
 	    emptyline();
 	    
 	    //get last id method
@@ -664,7 +667,13 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         callLog = quote("create"+doc.getName()+"(")+"+con+"+quote(", ")+"+"+doc.getVariableName()+"+"+quote(")");
         appendComment("Creates a new "+doc.getName()+" object.\nReturns the created version.");
         openFun("public "+doc.getName()+" create"+doc.getName()+"(Connection con, "+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
-        generateFunctionStart("SQL_CREATE", callLog, true);
+        appendStatement("java.sql.SQLException throwable = null");
+        appendString("for (int recoveryAttempt = 1; recoveryAttempt <= dbConfig.getIdRecoveryAttempts(); recoveryAttempt++) {");
+        increaseIdent();
+        appendStatement("PreparedStatement ps = null");
+	    openTry();
+		appendStatement("con.setAutoCommit(false)");
+		appendStatement("ps = con.prepareStatement(createSQL(SQL_CREATE_1, SQL_CREATE_2))");
         appendStatement("long nextId = getLastId(con).incrementAndGet()");
         appendStatement("ps.setLong(1, nextId)");
         for (int i=0; i<properties.size(); i++){
@@ -677,16 +686,28 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         appendStatement("int rows = ps.executeUpdate()");
         appendString("if (rows!=1)");
         appendIncreasedStatement("throw new DAOException(\"Create failed, updated rows: \"+rows)");
-        
         copyResVarName = "new"+StringUtils.capitalize(doc.getVariableName());
         createCopyCall = VOGenerator.getDocumentImplName(doc)+" "+copyResVarName + " = new "+VOGenerator.getDocumentImplName(doc);
         createCopyCall += "(\"\"+nextId)";
         appendStatement(createCopyCall);
         appendStatement(copyResVarName+".copyAttributesFrom("+doc.getVariableName()+")");
-        
+        appendStatement("con.commit()");
         appendStatement("return "+copyResVarName);
-        generateFunctionEnd(callLog, true);
-        
+        decreaseIdent();
+		appendString("} catch (SQLException e) {");
+		increaseIdent();
+        appendStatement("getLastId(con).set(getMaxId(con,TABNAME))");
+        appendStatement("log.warn(\"Failed attempt\" +recoveryAttempt+ \" from \" +dbConfig.getIdRecoveryAttempts()+ \" to create new entry in \"+TABNAME+\" table\", e)");
+        appendStatement("throwable = e");
+        appendStatement("continue");
+		decreaseIdent();
+		appendString("} finally {");
+		increaseIdent();
+		appendStatement("finish(ps)");
+		append(closeBlock());
+        append(closeBlock());
+        appendStatement("log.error(\"All \"+ dbConfig.getIdRecoveryAttempts()+\" attempt of id rereading - Failed. \"+"+callLog+", throwable)");
+        appendStatement("throw new DAOSQLException(throwable)");
         append(closeBlock());
         emptyline();
 
@@ -696,7 +717,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         callLog = quote("create"+doc.getMultiple()+"(")+"+con+"+quote(", ")+"+list+"+quote(")");
         appendComment("Creates multiple new "+doc.getName()+" objects.\nReturns the created versions.");
         openFun("public "+listDecl+" create"+doc.getMultiple()+"(Connection con, "+listDecl+" list)"+throwsClause);
-        //append(generateFunctionStart("SQL_CREATE", callLog, true));
+        appendStatement("java.sql.SQLException throwable = null");
+        appendString("for (int recoveryAttempt = 1; recoveryAttempt <= dbConfig.getIdRecoveryAttempts(); recoveryAttempt++) {");
+        increaseIdent();
         appendStatement("PreparedStatement ps = null");
         appendString("try{");
         increaseIdent();
@@ -728,8 +751,21 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
         append(closeBlock());
         appendStatement("con.commit()");
         appendStatement("return ret");
-        generateFunctionEnd(callLog, true);
-        
+        decreaseIdent();
+        appendString("} catch (SQLException e) {");
+		increaseIdent();
+        appendStatement("getLastId(con).set(getMaxId(con,TABNAME))");
+        appendStatement("log.warn(\"Failed attempt\" +recoveryAttempt+ \" from \" +dbConfig.getIdRecoveryAttempts()+ \" to create new entries (list) in \"+TABNAME+\" table\", e)");
+        appendStatement("throwable = e");
+        appendStatement("continue");
+		decreaseIdent();
+		appendString("} finally {");
+		increaseIdent();
+		appendStatement("finish(ps)");
+		append(closeBlock());
+        append(closeBlock());
+        appendStatement("log.error(\"All \"+ dbConfig.getIdRecoveryAttempts()+\" attempt of id rereading - Failed. \"+"+callLog+", throwable)");
+        appendStatement("throw new DAOSQLException(throwable)");
         append(closeBlock());
         emptyline();
 
