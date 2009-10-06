@@ -822,6 +822,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		 return getElementName(doc, element) + "Editor";
 	}
 	
+	private String getToggleEditorButtonVarName(MetaDocument doc, MetaViewElement element){
+		 return "toggleEditor_" + getElementName(doc, element);
+	}
+	
 	private void generateRichTextEditors(MetaDocument doc, List<MetaViewElement> richTextElements){
 		
 		if(richTextElements.size() == 0){
@@ -838,7 +842,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/element/element-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/button/button-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");	
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/EditorHider.js")) + "></script>");
 		
 		appendString("<script type=\"text/javascript\">");
 		increaseIdent();
@@ -867,14 +872,31 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("animate: true, ");
 		appendString("handleSubmit: true ");
 		appendString("}; ");
-		appendString("//Now let's load the Editor.."); 
+		appendString("//Now let's load the Editors..."); 
 		for(MetaViewElement el: richTextElements){
 			appendString(getEditorVarName(doc, el) + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"_ID', myConfig);"); 
 			appendString(getEditorVarName(doc, el) + ".render(); ");
+			appendString("var _button = new YAHOO.widget.Button('"+getToggleEditorButtonVarName(doc, el)+"');");
+			appendString("_button.addClass('toggleEditor');");
+			appendString("var state = 'on';");
+			appendString("_button.on('click', function(ev) {");
+			increaseIdent();
+			appendString("Event.stopEvent(ev);");
+			appendString("if (state == 'on') {");
+			increaseIdent();
+			appendString("contentENEditor.hideEditor();");
+			appendString("state = 'off';");
+			decreaseIdent();
+			appendString("} else {");
+			increaseIdent();
+			appendString("contentENEditor.showEditor();");
+			appendString("state = 'on';");
+			decreaseIdent();
+			appendString("}");
+			decreaseIdent();
+			appendString("});");
 		}
-		appendString("Event.onDOMReady(function() {"); 
-		appendString("status = Dom.get('status');"); 
-		appendString("});");
+
 		decreaseIdent();
 		appendString("})();"); 
 		decreaseIdent();
@@ -1031,10 +1053,9 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private String getTextEditor(MetaFieldElement element, MetaProperty p){
 		String lang = getElementLanguage(element);
 		String ret ="";
-		ret += "<div class=\"yui-skin-sam\">";	
-		//FIXME: Editor hiding doesn't work in new yui library. Additional JS has to be written.
-//		if(element.isRich())
-//			ret += "<button id="+quote(p.getName(lang) + "Button")+" type=\"button\">Hide Editor</button>";
+		ret += "<div class=\"yui-skin-sam\">";
+		if(element.isRich())
+			ret += "<button id="+quote("toggleEditor_" + p.getName(lang))+" type=\"button\">Toggle Editor</button><br/>";
 		ret += "<textarea cols=\"80\" rows=\"15\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
 		ret += ">";
 		ret += "<bean:write filter=\"false\" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
