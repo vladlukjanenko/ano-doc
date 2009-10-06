@@ -854,7 +854,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		increaseIdent();
 		for(MetaViewElement el: richTextElements){
 //			appendString("if(isActiveEditor(" + getEditorVarName(doc, el) + "))");
-			appendIncreasedString(getEditorVarName(doc, el) + ".saveHTML();");
+			appendIncreasedString(getEditorVarName(doc, el) + ".saveHtmlIfShowed();");
 		}
 		decreaseIdent();
 		appendString("}");
