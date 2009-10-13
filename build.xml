@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="ano-doc" default="all" basedir=".">
+<project name="ano-doc" default="dist" basedir="."> <!-- before all -->
 	<import file="../build/basic-project.xml"/>	
 
 	<!-- 
