@@ -15,7 +15,7 @@ public class LongProperty extends Property{
      * Creates a new LongProperty with given name and value.
 	 */
 	public LongProperty(String name, long value){
-		this(name, new Long(value));
+		this(name, Long.valueOf(value));
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class LongProperty extends Property{
 	 * Sets the value of this property to the given value.
 	 */
 	public void setLong(long aValue){
-		setLong(new Long(aValue));
+		setLong(Long.valueOf(aValue));
 	}
 	
 	/**
@@ -71,7 +71,7 @@ public class LongProperty extends Property{
 		}
 		if (o instanceof String){
 			try{
-				super.setValue(new Long( (String)o));
+				super.setValue(Long.valueOf((String)o));
 				return;
 			}catch(NumberFormatException nfe){
 			}
