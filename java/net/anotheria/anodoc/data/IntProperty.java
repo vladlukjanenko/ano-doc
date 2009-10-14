@@ -15,7 +15,7 @@ public class IntProperty extends Property{
 	 * Creates a new IntProperty with given name and value.
 	 */
 	public IntProperty(String name, int value){
-		this(name, new Integer(value));
+		this(name, Integer.valueOf(value));
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public class IntProperty extends Property{
 	 * Sets the value of this property to the given int value.
 	 */
 	public void setInt(int aValue){
-		setInteger(new Integer(aValue));
+		setInteger(Integer.valueOf(aValue));
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class IntProperty extends Property{
 		}
 		if (o instanceof String){
 			try{
-				super.setValue(new Integer( (String)o));
+				super.setValue(Integer.valueOf((String)o));
 				return;
 			}catch(NumberFormatException nfe){
 			}
