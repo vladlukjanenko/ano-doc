@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.anotheria.anoprise.metafactory.Extension;
+import net.anotheria.anoprise.metafactory.MetaFactory;
+import net.anotheria.anoprise.metafactory.MetaFactoryException;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
@@ -14,9 +17,6 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.asg.metafactory.Extension;
-import net.anotheria.asg.metafactory.MetaFactory;
-import net.anotheria.asg.metafactory.MetaFactoryException;
 import net.anotheria.util.StringUtils;
 
 /**

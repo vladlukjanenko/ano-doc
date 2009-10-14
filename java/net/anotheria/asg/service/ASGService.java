@@ -1,7 +1,8 @@
 package net.anotheria.asg.service;
 
-import net.anotheria.asg.metafactory.Service;
+import net.anotheria.anoprise.metafactory.Service;
 import net.anotheria.asg.util.listener.IServiceListener;
+
 /**
  * Interface for the basic ASGService. 
  * @author lrosenberg

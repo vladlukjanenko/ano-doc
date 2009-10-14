@@ -18,6 +18,7 @@
         <dependency org="java.net" name="moskito-util" rev="latest" transitive="true" changing="true"/>
 
         <dependency org="anotheria.net" name="ano-util" rev="latest" transitive="true" changing="true"/>
+        <dependency org="anotheria.net" name="ano-prise" rev="latest" transitive="true" changing="true"/>
         <dependency org="org.json" name="json" rev="stable" transitive="false"/>
     </dependencies>
 </ivy-module>

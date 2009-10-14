@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="lib/json.jar"/>
 	<classpathentry kind="lib" path="lib/moskito-core.jar"/>
 	<classpathentry kind="lib" path="lib/moskito-util.jar"/>
+	<classpathentry kind="lib" path="lib/ano-prise.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -1,12 +1,12 @@
 package net.anotheria.asg.generator.model;
 
 
+import net.anotheria.anoprise.metafactory.ServiceFactory;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.metafactory.ServiceFactory;
 /**
  * Base class for service generators.
  * @author another
