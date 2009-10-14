@@ -15,7 +15,7 @@ public class BooleanProperty extends Property{
 	 * Creates a new BooleanProperty with given name and value. 
 	 */
 	public BooleanProperty(String name, boolean value){
-		this(name, new Boolean(value));
+		this(name, Boolean.valueOf(value));
 	}
 	
 	/**
@@ -43,7 +43,7 @@ public class BooleanProperty extends Property{
 	 * Sets the value of this property to the given boolean value.
 	 */
 	public void setboolean(boolean aValue){
-		setBoolean(new Boolean(aValue));
+		setBoolean(Boolean.valueOf(aValue));
 	}
 	
 	/**
@@ -63,7 +63,7 @@ public class BooleanProperty extends Property{
 		}
 		if (o instanceof String){
 			try{
-				super.setValue(new Boolean( (String)o));
+				super.setValue(Boolean.valueOf((String)o));
 				return;
 			}catch(NumberFormatException nfe){
 			}
