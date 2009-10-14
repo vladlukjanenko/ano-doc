@@ -96,6 +96,11 @@ public class MetaViewElement {
 	@Override public boolean equals(Object o){
 		return (o instanceof MetaViewElement) && ((MetaViewElement)o).getName().equals(getName());
 	}
+	
+	@Override public int hashCode() {
+		assert false : "hashCode not designed";
+		return 42; // any arbitrary constant will do 
+	}
 
 	public boolean isRich() {
 		return rich;
