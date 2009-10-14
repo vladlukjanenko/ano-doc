@@ -40,7 +40,7 @@ public class FileWriter {
 		}
 		if (path==null)
 			path = "";
-		if (path.length()>0 && !path.endsWith("/"));
+		if (path.length()>0 && !path.endsWith("/"))
 			path += "/";
 			
 		File fDir = new File(BASE_DIR+"/"+path);
