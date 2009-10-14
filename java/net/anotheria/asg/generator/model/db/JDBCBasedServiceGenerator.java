@@ -14,6 +14,7 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
+import net.anotheria.asg.generator.model.ServiceGenerator;
 
 /**
  * Generates a DB-Backed implementation of a module interface and the according factory.
@@ -186,6 +187,9 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        openTry();
 	        appendStatement("return pService.get"+doc.getName()+"(id)");
 	        decreaseIdent();
+	        clazz.addImport(JDBCPersistenceServiceGenerator.getItemNotFoundExceptionImport(context, doc, module));
+	        appendString("}catch("+JDBCPersistenceServiceGenerator.getItemNotFoundExceptionName(doc, module)+" e){");
+	        appendIncreasedStatement("throw new "+ServiceGenerator.getItemNotFoundExceptionName(doc, module)+"(id)");
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");

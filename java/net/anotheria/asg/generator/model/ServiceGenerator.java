@@ -68,6 +68,9 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		//timer.stopExecution(mod.getName()+"-Interface");
 		//timer.startExecution(mod.getName()+"-Exception");
 		ret.add(new FileEntry(generateException(mod)));
+		List<GeneratedClass> itemNotFoundExceptions = generateItemNotFoundExceptions(mod);
+		for (GeneratedClass c : itemNotFoundExceptions)
+			ret.add(new FileEntry(c));
 		//timer.stopExecution(mod.getName()+"-Exception");
 		
 		//add in memory genererator
@@ -145,6 +148,34 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		return GeneratorDataRegistry.getInstance().getContext().getPackageName(module)+".service";
 	}
 	
+	
+	private List<GeneratedClass> generateItemNotFoundExceptions(MetaModule module){
+		ArrayList<GeneratedClass> ret = new ArrayList<GeneratedClass>();
+		
+		for (MetaDocument doc : module.getDocuments()){
+			GeneratedClass clazz = new GeneratedClass();
+			startNewJob(clazz);
+			
+			clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getItemNotFoundExceptionName(doc,module), this));
+	 
+		    clazz.setPackageName(getPackageName(module));
+		    
+		    clazz.setClazzComment("Exception for gets over non existing id in "+getInterfaceName(module)+", document: "+doc.getName());
+		    //TODO FIXME
+		    //appendString("@SuppressWarnings(" + quote("serial") + ")");
+		    clazz.setName(getItemNotFoundExceptionName(doc, module));
+		    clazz.setParent(getExceptionName(module));
+		    
+		    startClassBody();
+		    appendString("public "+getItemNotFoundExceptionName(doc, module)+" (String id){" );
+		    appendIncreasedStatement("super("+quote("No "+doc.getName()+" found with id: ")+"+id)");
+		    appendString("}");
+		    ret.add(clazz);
+		}
+
+	    return ret;
+	}
+
 	/**
 	 * Generates the base exception class for a module.
 	 * @param module
@@ -223,7 +254,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    startClassBody();
 	    
 	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        MetaDocument doc = docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
 	        appendComment("Returns all "+doc.getMultiple()+" objects stored.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"()"+throwsClause);
@@ -251,7 +282,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	        appendStatement("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
 	        emptyline();
 	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
-	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
+	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+", "+getItemNotFoundExceptionImport(doc, module));
 	        emptyline();
 
 
@@ -359,6 +390,10 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    return getServiceName(m)+"Exception";
 	}
 
+	public static String getItemNotFoundExceptionName(MetaDocument doc, MetaModule m){
+	    return doc.getName()+"NotFoundIn"+getExceptionName(m);
+	}
+
 	/**
 	 * Returns the interface name for the service for the module. 
 	 * @param module
@@ -386,6 +421,10 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getExceptionName(m);
 	}
 	
+	public static String getItemNotFoundExceptionImport(MetaDocument doc, MetaModule m){
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getItemNotFoundExceptionName(doc, m);
+	}
+
 	/**
 	 * Returns the service name for this module.
 	 * @param m

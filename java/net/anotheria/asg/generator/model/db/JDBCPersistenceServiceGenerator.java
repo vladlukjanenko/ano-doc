@@ -25,6 +25,9 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		
+		List<GeneratedClass> itemNotFoundExceptions = generateItemNotFoundExceptions(mod);
+		for (GeneratedClass anExceptionClass : itemNotFoundExceptions)
+			ret.add(new FileEntry(anExceptionClass));
 		ret.add(new FileEntry(generateException(mod)));
 		ret.add(new FileEntry(generateInterface(mod)));
 		ret.add(new FileEntry(generateFactory(mod)));
@@ -68,6 +71,41 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		
 	}
 	
+	public static final String getItemNotFoundExceptionImport(Context c, MetaDocument doc, MetaModule m){
+		return getPackageName(c, m)+"."+getItemNotFoundExceptionName(doc,m);
+	}
+	
+	public static final String getItemNotFoundExceptionName(MetaDocument doc, MetaModule module){
+		return doc.getName()+"NotFoundIn"+getExceptionName(module);
+	}
+	
+	private List<GeneratedClass> generateItemNotFoundExceptions(MetaModule module){
+
+		ArrayList<GeneratedClass> ret = new ArrayList<GeneratedClass>();
+		
+		for (MetaDocument doc : module.getDocuments()){
+		
+			GeneratedClass clazz = new GeneratedClass();
+			startNewJob(clazz);
+			
+			clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module), this));
+		    
+		    clazz.setPackageName(getPackageName(module));
+		    
+		    clazz.setName(getItemNotFoundExceptionName(doc, module));
+		    clazz.setParent(getExceptionName(module));
+	
+		    startClassBody();
+		    appendString("public "+getItemNotFoundExceptionName(doc, module)+"(String id){");
+			appendIncreasedStatement("super("+quote("No item with id ")+"+id+"+quote(" found.")+")");
+			appendString("}");
+			ret.add(clazz);
+		}
+		
+		return ret;
+		
+	}
+
 	private GeneratedClass generateInterface(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
@@ -104,7 +142,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        appendStatement("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
 	        emptyline();
 	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
-	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
+	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+", "+getItemNotFoundExceptionName(doc, module));
 	        emptyline();
 	        appendComment("Imports a new "+doc.getName()+" object.\nReturns the imported version.");
 	        appendStatement("public "+doc.getName()+" import"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause);
@@ -284,6 +322,10 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	        openFun("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
 	        generateMethodStart(callLog);
 	        appendStatement("return "+getDAOVariableName(doc)+".get"+doc.getName()+"(c, id)");
+			decreaseIdent();
+			appendString("}catch("+PersistenceServiceDAOGenerator.getNoItemExceptionName(doc)+" e){");
+			appendIncreasedStatement("throw new "+getItemNotFoundExceptionName(doc, module)+"(id)");
+	        increaseIdent();
 	        generateMethodEnd(module, callLog);
 	        append(closeBlock());
 	        emptyline();
