@@ -16,6 +16,7 @@ import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.service.IModuleFactory;
 import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;
+import net.anotheria.util.IOUtils;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
@@ -182,23 +183,25 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		}
 		
 		
+		ObjectOutputStream oOut = null;
 		try{
-			ObjectOutputStream oOut = new ObjectOutputStream(new FileOutputStream(getFile(filename)));
+			oOut = new ObjectOutputStream(new FileOutputStream(getFile(filename)));
 			oOut.writeObject(toSave);
-			oOut.close();
 		}catch(Exception e){
 			if (log.isEnabledFor(Priority.ERROR)) {
 				log.error("save",e);
 			}
+		}finally{
+			IOUtils.closeIgnoringException(oOut);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	private void load(){
+		ObjectInputStream oIn = null;
 		try{
-			ObjectInputStream oIn = new ObjectInputStream(new FileInputStream(getFile(filename)));
+			oIn = new ObjectInputStream(new FileInputStream(getFile(filename)));
 			Hashtable convertedStorage = (Hashtable) oIn.readObject();
-			oIn.close();
 			
 			//now convert...
 			//System.err.println("Current storage ==="+filename+"===:");
@@ -230,6 +233,8 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 			if (log.isEnabledFor(Priority.ERROR)) {
 				log.error("load", e);
 			}
+		}finally{
+			IOUtils.closeIgnoringException(oIn);
 		}
 	}
 

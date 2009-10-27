@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import net.anotheria.util.IOUtils;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -47,26 +48,31 @@ public class FileWriter {
 		fDir.mkdirs();
 		File f = new File(BASE_DIR+"/"+path+fileName);
 		if (f.exists() && !override){
+			FileInputStream fIn = null;
 			try{
-				FileInputStream fIn = new FileInputStream(f);
+				fIn = new FileInputStream(f);
 				byte d[] = new byte[fIn.available()];
 				fIn.read(d);
-				fIn.close();
 				if (content.equals(new String(d))){
 					//System.out.println("Skipping "+f);
 					return;					
 				}
 					
-			}catch(IOException e){}
+			}catch(IOException e){
+			}finally{
+				IOUtils.closeIgnoringException(fIn);
+			}
 		}
 		System.out.println("writing "+f);
+		FileOutputStream fOut = null;
 		try{
 		
-			FileOutputStream fOut = new FileOutputStream(f);
+			fOut = new FileOutputStream(f);
 			fOut.write(content.getBytes());
-			fOut.close();
 		}catch(IOException e){
 			e.printStackTrace();
+		}finally{
+			IOUtils.closeIgnoringException(fOut);
 		}
 	}
 	
