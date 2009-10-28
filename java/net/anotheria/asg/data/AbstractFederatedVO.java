@@ -16,4 +16,8 @@ public abstract class AbstractFederatedVO implements DataObject{
 	
 	public abstract Object clone() throws CloneNotSupportedException;
 	
+	@Override public int hashCode(){
+		return getId().hashCode();
+	}
+
 }
