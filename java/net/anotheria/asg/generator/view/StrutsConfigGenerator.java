@@ -77,18 +77,46 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	 * Shortcut for the update deepcopy action (is it even supported?).
 	 */
 	public static final String ACTION_DEEPCOPY = "deepcopy";
+	/**
+	 * Prefix for 'add' element to container actions.
+	 */
 	public static final String ACTION_ADD 	 = "add";
+	/**
+	 * Shortcut for quickadd container element (by id) actions.
+	 */
 	public static final String ACTION_QUICK_ADD  = "quickAdd";
+	/**
+	 * Export actions.
+	 */
 	public static final String ACTION_EXPORT = "export";
+	/**
+	 * How query menu action.
+	 */
 	public static final String ACTION_SHOW_QUERIES = "showQueries";
+	/**
+	 * Execute query action.
+	 */
 	public static final String ACTION_EXECUTE_QUERY = "execQuery";
+	/**
+	 * Shortcut for show all incoming links action.
+	 */
 	public static final String ACTION_LINKS_TO_ME = "LinksToMe";
 	
-	
+	/**
+	 * Shortcut for move element in a container action.
+	 */
 	public static final String ACTION_MOVE = "move";
-	
+	/**
+	 * Constant for search action.
+	 */
 	public static final String ACTION_SEARCH = "search";
+	/**
+	 * Constant for copy from lang a to lang b action.
+	 */
 	public static final String ACTION_COPY_LANG ="copyLang";
+	/**
+	 * Constant for action switching multilingual support on and off.
+	 */
 	public static final String ACTION_SWITCH_MULTILANGUAGE_INSTANCE = "switchMultilang";
 	/**
 	 * Extension for csv generation.

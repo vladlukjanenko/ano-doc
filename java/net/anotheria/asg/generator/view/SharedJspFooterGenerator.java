@@ -8,7 +8,11 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
 public class SharedJspFooterGenerator extends AbstractJSPGenerator {
-    private static final String SEPARATOR = "\\\"\\\"";
+	
+	/**
+	 * A constant for quoting in the scriptlets.
+	 */
+    private static final String QUOTE = "\\\"\\\"";
 
     public FileEntry generate(List<MetaView> views , Context context) {
 		
@@ -39,7 +43,7 @@ public class SharedJspFooterGenerator extends AbstractJSPGenerator {
 			viewSwitcher += "<a href="+quote("<ano:tslink><bean:write name="+quote("v")+" property="+quote("link")+"/></ano:tslink>")+">";
 			viewSwitcher += "<bean:write name="+quote("v")+" property="+quote("caption")+"/>";
 			viewSwitcher += "</a>";
-			viewSwitcher += "<logic:notEqual name="+quote("ind")+" value="+quote("<%"+SEPARATOR+"+(listsize-1)%>")+">&nbsp;|&nbsp;</logic:notEqual>";
+			viewSwitcher += "<logic:notEqual name="+quote("ind")+" value="+quote("<%"+QUOTE+"+(listsize-1)%>")+">&nbsp;|&nbsp;</logic:notEqual>";
 			viewSwitcher += "</logic:iterate>";
 			viewSwitcher = "Views:&nbsp;" + viewSwitcher;
 			

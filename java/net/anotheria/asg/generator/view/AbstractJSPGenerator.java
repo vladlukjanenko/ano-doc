@@ -21,8 +21,13 @@ import net.anotheria.util.StringUtils;
  * @author lrosenberg
  */
 public abstract class AbstractJSPGenerator extends AbstractGenerator{
-	
+	/**
+	 * Captions for the Queries link in the footer.
+	 */
 	public static final String FOOTER_SELECTION_QUERIES = "Queries";
+	/**
+	 * Caption for the CMS link in the footer.
+	 */
 	public static final String FOOTER_SELECTION_CMS     = "CMS";
 
 	/*

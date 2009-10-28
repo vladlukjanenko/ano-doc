@@ -42,8 +42,13 @@ import net.anotheria.util.StringUtils;
  * @author another
  */
 public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator{
-	
+	/**
+	 * Currently generated section.
+	 */
 	private MetaSection currentSection;
+	/**
+	 * Currently generated dialog.
+	 */
 	private MetaDialog currentDialog;
 
 	/* (non-Javadoc)
