@@ -58,7 +58,7 @@ public abstract class Property
 	 * name=value.
 	 * 
 	 */
-	public String toString(){
+	@Override public String toString(){
 		return getPropertyType().getIndicator()+getName()+"="+value;
 	}
 	

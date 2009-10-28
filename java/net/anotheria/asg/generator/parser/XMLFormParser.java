@@ -109,8 +109,7 @@ public final class XMLFormParser {
 		int size = 80;
 		try{
 			size = Integer.parseInt(e.getAttributeValue("size"));
-			
-		}catch(Exception ignored){}
+		}catch(Exception ignored){ ; /* ignored*/}
 		MetaFormSingleField field = new MetaFormSingleField ("");
 		field.setType(type);
 		field.setSize(size);

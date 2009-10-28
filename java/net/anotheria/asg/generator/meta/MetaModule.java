@@ -161,6 +161,10 @@ public class MetaModule implements IGenerateable{
 		return o instanceof MetaModule ? 
 			((MetaModule)o).name.equals(name) : false;
 	}
+	
+	@Override public int hashCode(){
+		return name == null ? 42 : name.hashCode();
+	}
 
 	public List<String> getListeners() {
 		return listeners;

@@ -180,13 +180,13 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		startClassBody();
 		increaseIdent();
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
-			String langArray = "";
+			StringBuilder langArray = new StringBuilder();
 			for (String l : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 				if (langArray.length()>0 )
-					langArray += ",";
-				langArray += quote(l);
+					langArray.append(",");
+				langArray.append(quote(l));
 			}
-			appendStatement("public static final String[] LANGUAGES = new String[]{"+langArray+"}");
+			appendStatement("public static final String[] LANGUAGES = new String[]{",langArray.toString(),"}");
 		}
 
 		//generates generic to xml method

@@ -188,10 +188,10 @@ public class AbstractGenerator{
 	 * @return a string with "\t"s.
 	 */
 	private String getIdent(){
-		String ret = "";
+		StringBuilder ret = new StringBuilder();
 		for (int i=0; i<ident; i++)
-			ret += "\t";
-		return ret;
+			ret.append("\t");
+		return ret.toString();
 	}
 	
 	/**

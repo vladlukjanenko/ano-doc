@@ -101,22 +101,22 @@ public class Document extends DataHolder
 	public List<Property> getProperties(){
 		Collection<DataHolder> holders = dataStorage.values();
 		List<Property> ret = new ArrayList<Property>();
-		for (Iterator<DataHolder> it = holders.iterator(); it.hasNext(); ){
+		Iterator<DataHolder> it = holders.iterator();
+		while(it.hasNext()){
 			DataHolder h = it.next();
 			if (h instanceof Property){
 				ret.add((Property)h);
 			}
-			
 		}
 		return ret;
 	}
 	
 	/**
 	 * Returns the DocumentList contained in this Document under the given name. 
-	 * @see net.anotheria.anodoc.data.NoSuchDocumentListException 
+	 * @throws net.anotheria.anodoc.data.NoSuchDocumentListException 
 	 */
 	@SuppressWarnings("unchecked")
-	public <D extends Document>DocumentList<D> getDocumentList(String name) throws NoSuchDocumentListException{
+	public <D extends Document>DocumentList<D> getDocumentList(String name){
 		try{
 			DataHolder holder = getDataHolder(name);
 			if (holder instanceof DocumentList)
@@ -231,7 +231,9 @@ public class Document extends DataHolder
 	protected <D extends Document>DocumentList<D> getDocumentListAnyCase(String name) {
 		try{
 			return getDocumentList(name);
-		}catch(NoSuchDocumentListException e){};
+		}catch(NoSuchDocumentListException e){
+			
+		}
 		DocumentList<D> newList = createDocumentList(name);
 		putList(newList);
 		return newList;
