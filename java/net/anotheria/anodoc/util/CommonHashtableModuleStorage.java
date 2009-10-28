@@ -48,11 +48,16 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	 * The factory for modules and documents.
 	 */
 	private IModuleFactory factory;
+	/**
+	 * Configuration key for the storage dir.
+	 */
 	public String cfgKeyStorageDir;
 	
 	public static final String DEF_STORAGE_DIR = ".";
 	@Configure private String storageDir = DEF_STORAGE_DIR;
-	
+	/**
+	 * Logger.
+	 */
 	private static Logger log = Logger.getLogger(CommonHashtableModuleStorage.class);
 	
 	public CommonHashtableModuleStorage(String aFilename, IModuleFactory aFactory){

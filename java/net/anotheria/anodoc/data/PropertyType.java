@@ -33,7 +33,7 @@ public enum PropertyType {
 	 * Text. Same as String but with different editors.
 	 */
 	TEXT('T'),
-	/*
+	/**
 	 * Boolean.
 	 */
 	BOOLEAN('B');

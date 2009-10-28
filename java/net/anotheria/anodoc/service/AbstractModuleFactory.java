@@ -18,11 +18,16 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	
 	private final static long serialVersionUID=1580293076199614251L;
 	
-	private static Logger log;
+	/**
+	 * Logger.
+	 */
+	private Logger log;
+	
+	protected AbstractModuleFactory(){
+		log = Logger.getLogger(this.getClass()); 
+	}
+	
 	protected Logger getLog(){
-		if (log==null){
-			log = Logger.getLogger(this.getClass());
-		}
 		return log;
 	}
 	/**

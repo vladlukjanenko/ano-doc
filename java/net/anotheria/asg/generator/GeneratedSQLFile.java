@@ -2,8 +2,13 @@ package net.anotheria.asg.generator;
 
 public class GeneratedSQLFile extends GeneratedArtefact{
 
-	
+	/**
+	 * Body of the file.
+	 */
 	private StringBuilder body;
+	/**
+	 * Path to the generated artefact storage.
+	 */
 	private String path = "sql";
 	
 	

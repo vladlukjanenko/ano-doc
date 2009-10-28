@@ -3,16 +3,29 @@ package net.anotheria.asg.generator;
 
 public class GeneratedXMLFile extends GeneratedArtefact{
 
-	
+	/**
+	 * Body of the artefact.
+	 */
 	private StringBuilder body;
+	/**
+	 * Path to the generated file.
+	 */
 	private String path;
-	
+	/**
+	 * Encoding of the generated file.
+	 */
 	private String encoding;
 	
+	/**
+	 * Creates a new artefact.
+	 */
 	public GeneratedXMLFile(){
 		body = new StringBuilder();
 	}
 	
+	/**
+	 * Creates a new artefact.
+	 */
 	public GeneratedXMLFile(String aName, String anEncoding){
 		this();
 		setName(aName);

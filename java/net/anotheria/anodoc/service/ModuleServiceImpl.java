@@ -32,6 +32,9 @@ public class ModuleServiceImpl implements IModuleService{
 	 */
 	public static final String DEFAULT_COPY_ID = "singlecopy";
 
+	/**
+	 * Logger.
+	 */
 	private static Logger log = Logger.getLogger(ModuleServiceImpl.class);
 	 
 	/** 

@@ -13,23 +13,50 @@ import net.anotheria.asg.generator.meta.MetaModule;
  * @author another
  */
 public class Context {
+	/**
+	 * Name of the root package for the generated file.
+	 */
 	private String packageName;
+	/**
+	 * Owner of the application (used as db user name etc).
+	 */
 	private String owner;
+	/**
+	 * Configured application name.
+	 */
 	private String applicationName;
+	/**
+	 * Mapping for the cms servlet.
+	 */
 	private String servletMapping;
+	/**
+	 * Default encoding.
+	 */
 	private String encoding;
 	/**
 	 * Part of application url path between / and /, for example if you want the cms to be accessible under /xyz/cms/pagexShow the application url path is xyz. 
 	 */
 	private String applicationURLPath;
 	
+	/**
+	 * If true support for multilanguage is enabled.
+	 */
 	private boolean multilanguageSupport;
-	
+	/**
+	 * List of supported languages.
+	 */
 	private List<String> languages;
+	/**
+	 * Default language.
+	 */
 	private String defaultLanguage;
-	
+	/**
+	 * Additional generation options.
+	 */
 	private GenerationOptions options;
-	
+	/**
+	 * Special context parameters.
+	 */
 	private Map<String, ContextParameter> parameters;
 	
 	public Context(){

@@ -50,7 +50,9 @@ import net.anotheria.util.StringUtils;
  * @author another
  */
 public class ModuleActionsGenerator extends AbstractGenerator implements IGenerator {
-    
+    /**
+     * Generated view.
+     */
     private MetaView view;
 
     /**
@@ -58,6 +60,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
      */
     static final boolean USE_MULTIOP_ACTIONS = true;
     
+    /**
+     * Creates a new ModuleActionsGenerator.
+     * @param aView
+     */
     public ModuleActionsGenerator(MetaView aView){
         view = aView;
     }
@@ -2652,8 +2658,17 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return clazz;
 	}
 
+	/**
+	 * A helper generator object created for each generated document.
+	 */
 	class EnumerationPropertyGenerator{
+		/**
+		 * List of already generated properties (to avoid duplicated).
+		 */
 	    private List<String> generatedProperties;
+	    /**
+	     * Currently generated document.
+	     */
 	    MetaDocument doc;
 	    
 	    EnumerationPropertyGenerator(MetaDocument aDoc){

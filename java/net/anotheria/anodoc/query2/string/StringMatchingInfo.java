@@ -4,14 +4,28 @@ import net.anotheria.anodoc.query2.MatchingInfo;
 import net.anotheria.util.CharacterEntityCoder;
 
 public class StringMatchingInfo implements MatchingInfo{
+	/**
+	 * Part of the string prior to the matched part.
+	 */
 	private String pre;
+	/**
+	 * Part of the string past matched part.
+	 */
 	private String post;
+	/**
+	 * Matched part.
+	 */
 	private String match;
-	
+	/**
+	 * Creates a new StringMatchingInfo.
+	 */
 	public StringMatchingInfo(){
 		
 	}
 	
+	/**
+	 * Creates a new StringMatchingInfo.
+	 */
 	public StringMatchingInfo(String aPre, String aMatch, String aPost){
 		pre = aPre;
 		match = aMatch;

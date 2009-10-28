@@ -25,12 +25,25 @@ import net.anotheria.util.StringUtils;
  */
 public class VOGenerator extends AbstractDataObjectGenerator implements IGenerator{
 
+	/**
+	 * Constant for dao-created column name.
+	 */
 	public static final String DAO_CREATED = "daoCreated";
+	/**
+	 * Constant for dao-updaten column name.
+	 */
 	public static final String DAO_UPDATED = "daoUpdated";
-	
+	/**
+	 * The id property.
+	 */
 	MetaProperty id = new MetaProperty("id","string");
-	
+	/**
+	 * The dao created property (not included in document property set).
+	 */
 	MetaProperty daoCreated = new MetaProperty(DAO_CREATED, "long");
+	/**
+	 * The dao created property (not included in document property set).
+	 */
 	MetaProperty daoUpdated = new MetaProperty(DAO_UPDATED, "long");
 	
 	public List<FileEntry> generate(IGenerateable gdoc){

@@ -1,6 +1,9 @@
 package net.anotheria.asg.generator;
 
 public class GenerationJobManager {
+	/**
+	 * Currently executed job.
+	 */
 	private static ThreadLocal<GenerationJob> currentJob = new ThreadLocal<GenerationJob>(){
 		@Override
 		protected synchronized GenerationJob initialValue(){

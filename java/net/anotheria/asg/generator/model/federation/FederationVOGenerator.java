@@ -24,7 +24,13 @@ import net.anotheria.util.StringUtils;
 public class FederationVOGenerator extends AbstractDataObjectGenerator
 	implements IGenerator{
 
+	/**
+	 * Id property. Most documents do not include id properties, but its required by the application and has to be added here.
+	 */
 	private final MetaProperty id = new MetaProperty("id","string");
+	/**
+	 * Last update timestamp property.
+	 */
 	private final MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
 	
 	public List<FileEntry> generate(IGenerateable gdoc){

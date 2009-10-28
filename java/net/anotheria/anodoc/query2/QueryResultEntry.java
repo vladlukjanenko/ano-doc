@@ -3,9 +3,23 @@ package net.anotheria.anodoc.query2;
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Property;
 
+/**
+ * An entry in a query result list.
+ * @author lrosenberg
+ *
+ */
 public class QueryResultEntry {
+	/**
+	 * Link to the matched document.
+	 */
 	private Document matchedDocument;
+	/**
+	 * Link to the matched property.
+	 */
 	private Property matchedProperty;
+	/**
+	 * Info what matched and how.
+	 */
 	private MatchingInfo info;
 	public MatchingInfo getInfo() {
 		return info;
@@ -26,7 +40,7 @@ public class QueryResultEntry {
 		this.matchedProperty = matchedProperty;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "Doc: "+getMatchedDocument()+", prop: "+getMatchedProperty()+", matchinfo: "+getInfo();
 	}
 }

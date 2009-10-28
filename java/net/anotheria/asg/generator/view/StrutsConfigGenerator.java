@@ -28,18 +28,54 @@ import net.anotheria.util.StringUtils;
  * @author another
  */
 public class StrutsConfigGenerator extends AbstractGenerator implements IGenerator {
+	/**
+	 * Placeholder in the struts-config.xml where to place the mappings.
+	 */
 	public static final String MAPPINGS_PLACEHOLDER = "<insert_mappings/>";
+	/**
+	 * Placeholder in the struts-config.xml where to place the forms.
+	 */
 	public static final String FORMS_PLACEHOLDER    = "<insert_forms/>";
+	/**
+	 * Relative path to the template.
+	 */
 	public static final String TEMPLATE = "etc/templates/struts-config-template.xml";
-	
+	/**
+	 * Shortcut for the show action.
+	 */
 	public static final String ACTION_SHOW   = "show";
+	/**
+	 * Shortcut for the new document action.
+	 */
 	public static final String ACTION_NEW    = "new";
+	/**
+	 * Shortcut for the edit document action.
+	 */
 	public static final String ACTION_EDIT   = "edit";
+	/**
+	 * Shortcut for the create document action.
+	 */
 	public static final String ACTION_CREATE = "create";
+	/**
+	 * Shortcut for the update document action.
+	 */
 	public static final String ACTION_UPDATE = "update";
+	
+	/**
+	 * Shortcut for the delete document action.
+	 */
 	public static final String ACTION_DELETE = "delete";
+	/**
+	 * Shortcut for the show document's version info action.
+	 */
 	public static final String ACTION_VERSIONINFO = "versioninfo";
+	/**
+	 * Shortcut for the duplicate document action.
+	 */
 	public static final String ACTION_DUPLICATE = "duplicate";
+	/**
+	 * Shortcut for the update deepcopy action (is it even supported?).
+	 */
 	public static final String ACTION_DEEPCOPY = "deepcopy";
 	public static final String ACTION_ADD 	 = "add";
 	public static final String ACTION_QUICK_ADD  = "quickAdd";
@@ -54,8 +90,13 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	public static final String ACTION_SEARCH = "search";
 	public static final String ACTION_COPY_LANG ="copyLang";
 	public static final String ACTION_SWITCH_MULTILANGUAGE_INSTANCE = "switchMultilang";
-	
+	/**
+	 * Extension for csv generation.
+	 */
 	public static final String SUFFIX_CSV = ".csv";
+	/**
+	 * Extension for the xml generation.
+	 */
 	public static final String SUFFIX_XML = ".xml";
 	
 	/**

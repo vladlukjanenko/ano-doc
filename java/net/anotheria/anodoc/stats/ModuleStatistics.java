@@ -7,7 +7,7 @@ import net.anotheria.anodoc.data.NoSuchDocumentException;
 
 /**
  * This module stores statistical information internally collected by the 
- * bgldoc framework in order to calculate storage usage (quotas) and 
+ * ano-doc framework in order to calculate storage usage (quotas) and 
  * statistical values provided by the modules.
  */
 public class ModuleStatistics extends Module{

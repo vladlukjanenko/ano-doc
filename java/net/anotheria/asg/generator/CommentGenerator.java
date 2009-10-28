@@ -8,20 +8,49 @@ import java.util.List;
  * @author another
  */
 public class CommentGenerator extends AbstractGenerator{
-	
-	public static final String COPYRIGHT = "Copyright (C) 2005 - 2009 Anotheria.net, www.anotheria.net";
+	/**
+	 * Copyright string in the comments.
+	 */
+	public static final String COPYRIGHT = "Copyright (C) 2005 - 2010 Anotheria.net, www.anotheria.net";
 	public static final String RIGHTS    = "All Rights Reserved.";
 	
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final String NOTICE_1 = "Don't edit this code, if you aren't sure";
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final String NOTICE_2 = "that you do exactly know what you are doing!";
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final String NOTICE_3 = "It's better to invest time in the generator, as into the generated code.";
 
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final String LINE_PRE = "*** "; 
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final String LINE_POST = " ***";
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final int LINES_ADD_LENGTH = LINE_POST.length()+LINE_PRE.length();
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final String SEPARATOR = "*";
 	
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final String COMM_START = "/**";
+	/**
+	 * Constant for comments in generated code.
+	 */
 	public static final String COMM_END   = " */";
 	
 	/**

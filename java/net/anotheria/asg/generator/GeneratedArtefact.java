@@ -6,6 +6,9 @@ package net.anotheria.asg.generator;
  */
 public abstract class GeneratedArtefact {
 	
+	/**
+	 * Constant for line separator (CR + LF).
+	 */
 	public static final String CRLF = AbstractGenerator.CRLF;
 
 	/**
