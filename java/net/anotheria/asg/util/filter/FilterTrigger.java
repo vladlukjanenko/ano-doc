@@ -1,8 +1,22 @@
 package net.anotheria.asg.util.filter;
 
+/**
+ * Triggers which control a filter. For example letter A-Z for the DocumentName filter.
+ * @author another
+ *
+ */
 public class FilterTrigger implements Cloneable{
+	/**
+	 * Caption of the trigger.
+	 */
 	private String caption;
+	/**
+	 * Parameter assigned to this trigger.
+	 */
 	private String parameter;
+	/**
+	 * If true the trigger is currently selected (active).
+	 */
 	private boolean isSelected;
 	
 	public FilterTrigger(){
@@ -33,7 +47,7 @@ public class FilterTrigger implements Cloneable{
 		this.parameter = parameter;
 	}
 	
-	public String toString(){
+	@Override public String toString(){
 		return "( "+caption+", "+parameter+")";
 	}
 }

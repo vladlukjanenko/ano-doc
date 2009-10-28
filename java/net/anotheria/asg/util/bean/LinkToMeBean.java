@@ -4,11 +4,30 @@ import net.anotheria.anodoc.data.NoSuchPropertyException;
 import net.anotheria.asg.data.DataObject;
 import net.anotheria.util.StringUtils;
 
+/**
+ * A bean which represents an incoming link to a document (as a result of a query). 
+ * @author lrosenberg
+ */
 public class LinkToMeBean {
+	/**
+	 * The type of the linking document.
+	 */
 	private String targetDocumentType;
+	/**
+	 * The id of the linking document.
+	 */
 	private String targetDocumentId;
+	/**
+	 * A description of the linking document.
+	 */
 	private String targetDocumentDescription;
+	/**
+	 * The linking property.
+	 */
 	private String targetDocumentProperty;
+	/**
+	 * A link for the edit tool for the linking document.
+	 */
 	private String targetDocumentLink;
 	
 	public LinkToMeBean(){

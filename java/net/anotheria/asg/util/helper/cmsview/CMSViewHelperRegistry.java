@@ -6,8 +6,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Container for the view helpers.
+ * @author lrosenberg
+ *
+ */
 public class CMSViewHelperRegistry {
+	/**
+	 * A map with the helpers.
+	 */
 	private static Map<String, List<CMSViewHelper>> helperMap;
+	/**
+	 * An empty list as null object.
+	 */
 	private static ArrayList<CMSViewHelper> EMPTY_LIST = new ArrayList<CMSViewHelper>(0);
 	
 	static{

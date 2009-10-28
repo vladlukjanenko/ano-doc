@@ -1,7 +1,18 @@
 package net.anotheria.asg.util.bean;
 
+/**
+ * A link in the presentation of paging.
+ * @author another
+ *
+ */
 public class PagingLink {
+	/**
+	 * Link to a page.
+	 */
 	private String link;
+	/**
+	 * Caption of a page.
+	 */
 	private String caption;
 	
 	public PagingLink(String aLink, String aCaption){

@@ -4,9 +4,23 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaModule;
 
+/**
+ * A link to a target document.
+ * @author lrosenberg
+ *
+ */
 public class DirectLink {
+	/**
+	 * Source module.
+	 */
 	private MetaModule module;
+	/**
+	 * Source document.
+	 */
 	private MetaDocument document;
+	/**
+	 * Link in the source document.
+	 */
 	private MetaLink property;
 	
 	public DirectLink(){

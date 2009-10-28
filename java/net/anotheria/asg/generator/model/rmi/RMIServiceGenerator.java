@@ -16,11 +16,14 @@ import java.util.List;
 
 /**
  * Generates a RMI-Backed distribution of a module interface and the according factory.
- * @author another
+ * @author lrosenberg
  *
  */
 public class RMIServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
+	/**
+	 * Currently generated module.
+	 */
 	private MetaModule module;
 	
 	@Override public List<FileEntry> generate(IGenerateable gmodule){

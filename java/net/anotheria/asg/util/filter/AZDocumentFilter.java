@@ -8,6 +8,9 @@ import net.anotheria.asg.data.DataObject;
 
 public class AZDocumentFilter implements DocumentFilter{
 	
+	/**
+	 * List of filter triggeres (one for each letter).
+	 */
 	private static List<FilterTrigger> triggerer;
 	
 	static{
@@ -18,11 +21,11 @@ public class AZDocumentFilter implements DocumentFilter{
 		}
 	}
 
-	public List<FilterTrigger> getTriggerer(String storedFilterParameter) {
+	@Override public List<FilterTrigger> getTriggerer(String storedFilterParameter) {
 		return triggerer;
 	}
 
-	public boolean mayPass(DataObject document, String attributeName, String filterParameter) {
+	@Override public boolean mayPass(DataObject document, String attributeName, String filterParameter) {
 		if (filterParameter==null || filterParameter.length()==0)
 			return true;
 		String propertyValue = null;
@@ -36,9 +39,5 @@ public class AZDocumentFilter implements DocumentFilter{
 		}catch(Exception e){
 			return false;
 		}
-	}
-
-	public static void main(String a[]){
-		System.out.println(triggerer);
 	}
 }

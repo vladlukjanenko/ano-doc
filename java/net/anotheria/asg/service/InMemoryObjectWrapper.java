@@ -3,16 +3,34 @@ package net.anotheria.asg.service;
 import net.anotheria.asg.data.DataObject;
 
 public class InMemoryObjectWrapper <T extends DataObject> {
-	
+	/**
+	 * The wrapped object.
+	 */
 	private T t ;
 	
-	
+	/**
+	 * True if it's a newly created object.
+	 */
 	private boolean created;
+	/**
+	 * True if it's an updated object.
+	 */
 	private boolean updated;
+	/**
+	 * True if it's a deleted object.
+	 */
 	private boolean deleted;
-	
+	/**
+	 * Timestamp of object creation.
+	 */
 	private long createdTimestamp;
+	/**
+	 * Timestamp of object update.
+	 */
 	private long updatedTimestamp;
+	/**
+	 * Timestmap of object deletion.
+	 */
 	private long deletedTimestamp;
 	
 	public InMemoryObjectWrapper(T aT){

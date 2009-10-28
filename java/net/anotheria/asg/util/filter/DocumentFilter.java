@@ -4,6 +4,11 @@ import java.util.List;
 
 import net.anotheria.asg.data.DataObject;
 
+/**
+ * A filter which reduces the documents showed in the cms.
+ * @author another
+ *
+ */
 public interface DocumentFilter {
 	/**
 	 * Returns true if the document may pass the filtering defined by applying the filter parameter to the attribute
@@ -13,9 +18,14 @@ public interface DocumentFilter {
 	 * @param filterParameter
 	 * @return
 	 */
-	public boolean mayPass(DataObject document, String attributeName, String filterParameter);
+	boolean mayPass(DataObject document, String attributeName, String filterParameter);
 	
-	public List<FilterTrigger> getTriggerer(String storedFilterParameter);
+	/**
+	 * Returns the list of triggerers.
+	 * @param storedFilterParameter
+	 * @return
+	 */
+	List<FilterTrigger> getTriggerer(String storedFilterParameter);
 	
 	
 }
