@@ -66,4 +66,8 @@ public abstract class DataHolder implements Serializable, Cloneable{
 		return e;
 	}
 	
+	@Override public int hashCode(){
+		return getId().hashCode();
+	}
+
 }
