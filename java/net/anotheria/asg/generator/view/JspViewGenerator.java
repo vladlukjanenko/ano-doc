@@ -828,7 +828,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	}
 	
 	private String getToggleEditorButtonVarName(MetaDocument doc, MetaViewElement element){
-		 return "toggleEditor_" + getElementName(doc, element);
+		 return "toggleEditorButton_" + getElementName(doc, element);
 	}
 	
 	private void generateRichTextEditors(MetaDocument doc, List<MetaViewElement> richTextElements){
@@ -879,22 +879,24 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("}; ");
 		appendString("//Now let's load the Editors..."); 
 		for(MetaViewElement el: richTextElements){
-			appendString(getEditorVarName(doc, el) + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"_ID', myConfig);"); 
-			appendString(getEditorVarName(doc, el) + ".render(); ");
-			appendString("var _button = new YAHOO.widget.Button('"+getToggleEditorButtonVarName(doc, el)+"');");
-			appendString("_button.addClass('toggleEditor');");
+			String button = getToggleEditorButtonVarName(doc, el);
+			String editor = getEditorVarName(doc, el);
+			appendString(editor + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"_ID', myConfig);"); 
+			appendString(editor + ".render(); ");
+			appendString("var " + button +" = new YAHOO.widget.Button('"+button+"');");
+			appendString(button + ".addClass('toggleEditor');");
 			appendString("var state = 'on';");
-			appendString("_button.on('click', function(ev) {");
+			appendString(button + ".on('click', function(ev) {");
 			increaseIdent();
 			appendString("Event.stopEvent(ev);");
 			appendString("if (state == 'on') {");
 			increaseIdent();
-			appendString("contentENEditor.hideEditor();");
+			appendString(editor + ".hideEditor();");
 			appendString("state = 'off';");
 			decreaseIdent();
 			appendString("} else {");
 			increaseIdent();
-			appendString("contentENEditor.showEditor();");
+			appendString(editor + ".showEditor();");
 			appendString("state = 'on';");
 			decreaseIdent();
 			appendString("}");
@@ -1060,7 +1062,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		String ret ="";
 		ret += "<div class=\"yui-skin-sam\">";
 		if(element.isRich())
-			ret += "<button id="+quote("toggleEditor_" + p.getName(lang))+" type=\"button\">Toggle Editor</button><br/>";
+			ret += "<button id="+quote("toggleEditorButton_" + p.getName(lang))+" type=\"button\">Toggle Editor</button><br/>";
 		ret += "<textarea cols=\"80\" rows=\"15\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
 		ret += ">";
 		ret += "<bean:write filter=\"false\" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
