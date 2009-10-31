@@ -91,8 +91,9 @@ public class DocumentList<D extends Document> extends DataHolder implements ICom
 	/**
 	 * Returns document with given name, if it exists in the list.
 	 * Otherwise throws a NoSuchDocumentException.
+	 * @throws NoSuchDocumentException.
 	 */
-	public D getDocumentById(String id) throws NoSuchDocumentException{
+	public D getDocumentById(String id){
 		for (int i=0; i<list.size(); i++){
 			D doc = list.get(i);
 			if (doc.getId().equals(id))
