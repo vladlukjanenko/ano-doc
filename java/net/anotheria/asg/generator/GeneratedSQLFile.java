@@ -1,5 +1,9 @@
 package net.anotheria.asg.generator;
 
+/**
+ * Represents a generated SQL script.
+ * @author lrosenberg
+ */
 public class GeneratedSQLFile extends GeneratedArtefact{
 
 	/**

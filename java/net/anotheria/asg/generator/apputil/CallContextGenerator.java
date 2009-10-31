@@ -12,6 +12,11 @@ import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.util.StringUtils;
 
+/**
+ * Generater for the call context.
+ * @author lrosenberg
+ *
+ */
 public class CallContextGenerator extends AbstractGenerator implements IGenerator {
 
 	public List<FileEntry> generate(IGenerateable g) {
@@ -21,6 +26,10 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 		return ret;
 	}
 
+	/**
+	 * Generated the special call context class.
+	 * @return
+	 */
 	private FileEntry generateCallContext(){
 		
 		GeneratedClass clazz = new GeneratedClass();
@@ -46,6 +55,10 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 		
 	}
 	
+	/**
+	 * Generates a factory for the call context.
+	 * @return
+	 */
 	private FileEntry generateCallContextFactory(){
 		
 		GeneratedClass clazz = new GeneratedClass();

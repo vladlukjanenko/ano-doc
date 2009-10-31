@@ -1,6 +1,9 @@
 package net.anotheria.asg.generator;
 
-
+/**
+ * Represents a generated XML file.
+ * @author lrosenberg
+ */
 public class GeneratedXMLFile extends GeneratedArtefact{
 
 	/**
