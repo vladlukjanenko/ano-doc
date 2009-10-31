@@ -1061,7 +1061,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		increaseIdent();
 		appendString( doc.getVariableName()+" = "+DataFacadeGenerator.getDocumentFactoryName(doc)+".create"+doc.getName()+"();");
 		appendString( "create = true;");
-		append(closeBlock()); ;
+		append(closeBlock());
 		emptyline();
 		
 		appendStatement("String nextAction = req.getParameter("+quote("nextAction")+")");
@@ -1090,7 +1090,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						appendStatement("FileStorage.storeFilePermanently(req, holder.getFileName())");
 						appendStatement(doc.getVariableName()+"."+p.toSetter()+"(holder.getFileName())");
 						appendStatement("FileStorage.removeTemporaryFile(req)");
-						append(closeBlock()); ;
+						append(closeBlock());
 						continue;
 					}
 					if (! (p instanceof MetaContainerProperty)){
@@ -1121,7 +1121,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString( "else");
 	    appendIncreasedStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
 	    appendStatement("return null");
-		append(closeBlock()); ;
+		append(closeBlock());
 	}
 	
 	/**
@@ -1230,7 +1230,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+id)");
 		
 	    appendStatement("return null");
-		append(closeBlock()); ; //end doExecute
+		append(closeBlock()); //end doExecute
 	}
 
 	/**
@@ -1389,7 +1389,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						increaseIdent();
 						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+".getId(), "+targetDocument.getVariableName()+".getName() )");
 						appendStatement(listName,"Values.add(bean)");
-						append(closeBlock()); ;
+						append(closeBlock());
 
 					}
 
@@ -1465,7 +1465,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				appendString( "}");
 			}
 			appendStatement("return ret");
-			append(closeBlock()); ;
+			append(closeBlock());
 			
 			for (DirectLink l : backlinks){
 				if (l.getProperty().isMultilingual()){
@@ -1480,9 +1480,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						appendString( "for ("+l.getDocument().getName() +" doc : list ){");
 						increaseIdent();
 						appendStatement("ret.add(new LinkToMeBean(doc, "+quote(l.getProperty().getName())+"))");
-						append(closeBlock()); ;
+						append(closeBlock());
 						appendStatement("return ret");
-						append(closeBlock()); ;
+						append(closeBlock());
 					}
 				}else{
 					appendString( "private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId) throws "+ServiceGenerator.getExceptionImport(l.getModule())+"{");
@@ -2394,7 +2394,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("bean.setDescription("+EnumerationGenerator.getUtilsClassName(type)+".getName(value))");
 		}
 		appendStatement("beans.add(bean)");
-		append(closeBlock()); ;		
+		append(closeBlock());		
 		appendStatement("addBeanToRequest(req, "+quote("elements")+", beans)");
 //*/		
 		appendStatement("return mapping.findForward(", quote("success"), ")");
@@ -2669,7 +2669,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    /**
 	     * Currently generated document.
 	     */
-	    MetaDocument doc;
+	    private MetaDocument doc;
 	    
 	    EnumerationPropertyGenerator(MetaDocument aDoc){
 	        generatedProperties = new ArrayList<String>();
