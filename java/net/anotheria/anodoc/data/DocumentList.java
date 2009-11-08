@@ -155,7 +155,7 @@ public class DocumentList<D extends Document> extends DataHolder implements ICom
 	 * Returns the storage id of this list.
 	 * @see net.anotheria.anodoc.data.IBasicStoreableObject#getStorageId()
 	 */
-	public String getStorageId() {
+	@Override public String getStorageId() {
 		return IHelperConstants.IDENTIFIER_LIST+
 				IHelperConstants.DELIMITER+
 				getId();
@@ -164,7 +164,7 @@ public class DocumentList<D extends Document> extends DataHolder implements ICom
 	/**
 	 * Returns the String representation of this list. 
 	 */
-	public String toString(){
+	@Override public String toString(){
 		return "LST "+getId()+": "+list;
 	}
 	
@@ -179,7 +179,7 @@ public class DocumentList<D extends Document> extends DataHolder implements ICom
 	 * Returns the cumulative size of contained documents.
 	 * @see net.anotheria.anodoc.data.DataHolder#getSizeInBytes()
 	 */
-	public long getSizeInBytes() {
+	@Override public long getSizeInBytes() {
 		int sum = 0;
 		if (list==null)
 			return sum;
@@ -188,7 +188,7 @@ public class DocumentList<D extends Document> extends DataHolder implements ICom
 		return sum;
 	}
 	
-	public XMLNode toXMLNode(){
+	@Override public XMLNode toXMLNode(){
 		XMLNode root = new XMLNode("documentlist");
 		
 		root.addAttribute(new XMLAttribute("listId", getId()));
