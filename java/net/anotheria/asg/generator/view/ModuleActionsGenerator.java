@@ -157,6 +157,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    return "Base"+getActionSuffix(section);
 	}
 	
+	/**
+	 * Returns the right part of all action names tied to this section (like ***FooAction).
+	 * @param section
+	 * @return
+	 */
 	public static String getActionSuffix(MetaModuleSection section){
 	    return section.getDocument().getName()+"Action";
 	}
