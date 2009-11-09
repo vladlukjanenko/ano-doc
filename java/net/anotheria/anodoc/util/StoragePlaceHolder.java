@@ -1,8 +1,5 @@
 package net.anotheria.anodoc.util;
 
-import java.util.List;
-
-import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;

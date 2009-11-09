@@ -55,7 +55,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
 	public List<FileEntry> generate(IGenerateable g) {
-		
+		try{
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		MetaView view = (MetaView)g;
 		
@@ -100,6 +100,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			
 		}
 		return files;
+		}catch(NullPointerException e){
+			e.printStackTrace();
+			throw e;
+		}
 	}
 	
 	private String getTopMenuPage(){
@@ -500,10 +504,32 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		increaseIdent();
 		appendString("<title>"+dialog.getTitle()+"</title>");
 		generatePragmas(view);
+		//appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		//*** CMS2.0 START ***
+		
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/fonts/fonts-min.css")) + " />");
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/assets/skins/sam/skin.css")) + " />");
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/container/assets/skins/sam/container.css")) + " />");
 		appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/element/element-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/button/button-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");
+		
+//		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/animation/animation-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/datasource/datasource-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/autocomplete/autocomplete-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/dragdrop/dragdrop-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/EditorHider.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/ComboBox.js")) + "></script>");
+		//*** CMS2.0 FINISH ***
+		
 		decreaseIdent();
 		appendString("</head>");
-		appendString("<body>");
+		appendString("<body class=\"yui-skin-sam\">");
 		increaseIdent();		
 		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
@@ -577,19 +603,30 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
 
-		
-		List<MetaViewElement> richTextElements = new ArrayList<MetaViewElement>();
+		//*** CMS2.0 START ***
+		List<MetaViewElement> richTextElementsRegistry = new ArrayList<MetaViewElement>();
+		List<MetaViewElement> linkElementsRegistry = new ArrayList<MetaViewElement>();
+		//*** CMS2.0 FINISH ***
 		
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument()); 
 		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 
-			if(element.isRich()){
-				MetaProperty p = section.getDocument().getField(element.getName());
-				if(p.getType().equals("text"))
-						richTextElements.add(element);
+			
+			//*** CMS2.0 START ***
+			if(element instanceof MetaFieldElement){
+				MetaDocument doc = ((MetaModuleSection)currentSection).getDocument();
+				MetaProperty p = doc.getField(element.getName());
+				if(element.isRich())
+					if(p.getType().equals("text"))
+							richTextElementsRegistry.add(element);
+				
+				if(p.isLinked())
+					linkElementsRegistry.add(element);
 			}
+			//*** CMS2.0 FINISH ***
+			
 			
 			String lang = getElementLanguage(element);
 
@@ -720,7 +757,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("</body>");
 		decreaseIdent();
 		
-		generateRichTextEditors(section.getDocument(), richTextElements);
+		generateRichTextEditorJS(section.getDocument(), richTextElementsRegistry);
+		generateLinkElementEditorJS(section.getDocument(), linkElementsRegistry);
 		
 		decreaseIdent();
 		appendString("</html:html>");
@@ -831,7 +869,39 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		 return "toggleEditorButton_" + getElementName(doc, element);
 	}
 	
-	private void generateRichTextEditors(MetaDocument doc, List<MetaViewElement> richTextElements){
+	
+	//*** CMS2.0 START ***
+	private void generateLinkElementEditorJS(MetaDocument doc, List<MetaViewElement> linkElements){
+		appendString("<script type=\"text/javascript\">");
+		increaseIdent();
+		for(MetaViewElement el: linkElements){
+
+			//FIXME: here is assumed that links can't be multilanguage
+			String elName = getElementName(doc, el);
+			String elCapitalName = StringUtils.capitalize(elName);
+			String beanName = StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument());
+			
+			appendString("//Initializing items for " + elName);
+			appendString("var " +elName+ "Json = {items:[");
+			appendString("<logic:iterate id=\"item\" name="+quote(beanName)+" property=\""+elName+"Collection\" type=\"net.anotheria.webutils.bean.LabelValueBean\">");
+			increaseIdent();
+			appendString("{id:\"<bean:write name=\"item\" property=\"value\" filter=\"true\"/>\",name:\"<bean:write name=\"item\" property=\"label\" filter=\"true\"/>\"},");
+			//appendString("{id:\"${item.value}\",name:\"${item.label}\"},");
+			decreaseIdent();
+			appendString("</logic:iterate>");
+			appendString("]};");
+			appendString("var selection"+elCapitalName+"Json = {");
+			increaseIdent();
+			appendString("id:\"${"+beanName+"."+elName+"}\",name:\"${"+beanName+"."+elName+"CurrentValue}\"");
+			decreaseIdent();
+			appendString("};");
+			appendString("new YAHOO.anoweb.widget.ComboBox("+quote(elCapitalName)+",\""+elCapitalName+"Selector\","+elName+"Json,selection"+elCapitalName+"Json);");
+		}
+		decreaseIdent();
+		appendString("</script>");
+	}
+	
+	private void generateRichTextEditorJS(MetaDocument doc, List<MetaViewElement> richTextElements){
 		
 		if(richTextElements.size() == 0){
 			appendString("<script type=\"text/javascript\">");
@@ -841,6 +911,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			return;
 		}
 		
+		/*
 		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/assets/skins/sam/skin.css")) + " />");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container_core-min.js")) + "></script>");
@@ -849,6 +920,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/button/button-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/EditorHider.js")) + "></script>");
+		*/
 		
 		appendString("<script type=\"text/javascript\">");
 		increaseIdent();
@@ -911,6 +983,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		
 	}
+	//*** CMS2.0 FINISH ***
 	
 	private String getElementEditor(MetaDocument doc, MetaViewElement element){
 		if (element instanceof MetaEmptyElement)
@@ -945,12 +1018,19 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		String ret = "";
 		String lang = getElementLanguage(element); 
 		
+		/* CMS1.0
 		ret += "<html:select size=\"1\" property="+quote(p.getName(lang))+">";
 		ret += "<html:optionsCollection property="+quote(p.getName()+"Collection"+(lang==null ? "":lang))+" filter=\"false\"/>";
 		ret += "</html:select>";
 		ret += "&nbsp;";
 		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
-
+		 */
+		
+		//*** CMS2.0 START ***
+		ret += "<div id="+quote(StringUtils.capitalize(p.getName()))+" name="+quote(p.getName())+" class=\"selectBox\"></div><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
+		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+"name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
+		//*** CMS2.0 FINISH ***
+		
 		return ret;
 	}
 	

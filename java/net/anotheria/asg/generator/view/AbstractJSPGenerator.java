@@ -48,7 +48,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		ret += "%><%@ taglib uri=\"/tags/struts-html\" prefix=\"html\""+CRLF;
 		ret += "%><%@ taglib uri=\"/tags/struts-logic\" prefix=\"logic\""+CRLF;
 		ret += "%><%@ taglib uri=\"/WEB-INF/tld/anoweb.tld\" prefix=\"ano\""+CRLF;
-		ret += "%>"+CRLF;
+		ret += "%><%@ page isELIgnored =\"false\" %>"+CRLF;
 		return ret;
 	}
 	
