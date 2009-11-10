@@ -1034,6 +1034,20 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 	
+	private String getEnumerationEditor(MetaFieldElement element, MetaProperty p){
+		//for now we have only one link...
+		String ret = "";
+		String lang = getElementLanguage(element); 
+		
+		ret += "<html:select size=\"1\" property="+quote(p.getName(lang))+">";
+		ret += "<html:optionsCollection property="+quote(p.getName()+"Collection"+(lang==null ? "":lang))+" filter=\"false\"/>";
+		ret += "</html:select>";
+		ret += "&nbsp;";
+		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
+
+		return ret;
+	}
+	
 	private String getFieldEditor(MetaFieldElement element){
 		MetaDocument doc = ((MetaModuleSection)currentSection).getDocument();
 		MetaProperty p = doc.getField(element.getName());
@@ -1042,7 +1056,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			return getLinkEditor(element, p);
 			
 		if (p instanceof MetaEnumerationProperty){
-			return getLinkEditor(element, p);
+			return getEnumerationEditor(element, p);
 		}
 		
 		if (p instanceof MetaContainerProperty)
