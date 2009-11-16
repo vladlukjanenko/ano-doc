@@ -67,7 +67,7 @@ public class StringProperty extends Property{
 	}
 	
 	@Override protected Object cloneValue() {
-		return new String(getString());
+		return getString() != null? new String(getString()): null;
 	}
 	
 	@Override public PropertyType getPropertyType(){
