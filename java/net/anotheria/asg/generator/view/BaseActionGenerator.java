@@ -250,7 +250,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		append(closeBlock());
 		emptyline();
 */
-		appendString("private boolean isUserInRole(HttpServletRequest req, String ... roles){");
+		appendString("protected boolean isUserInRole(HttpServletRequest req, String ... roles){");
 		increaseIdent();
 		appendStatement("String userId = getUserId(req)");
 		appendString("if (userId==null)");

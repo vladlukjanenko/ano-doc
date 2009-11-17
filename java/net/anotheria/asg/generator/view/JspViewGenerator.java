@@ -14,14 +14,7 @@ import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
 import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
 import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
 import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaLink;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.util.DirectLink;
 import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
@@ -35,6 +28,7 @@ import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.asg.data.LockableObject;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -548,53 +542,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
 		decreaseIdent(); 
 		appendString("</tr>");
-		
-		// *** END MULILINGUAL COPY *** //
-		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()){
-			appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
-			appendString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
-			appendString("<tr>");
-			increaseIdent();
-			appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG)+"\">");
-			appendString("<input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>From&nbsp;");
-			appendString("<select name=\"pSrcLang\">");
-			for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-				appendString("<option value=\""+sl+"\">"+sl+"</option>"); 
-			}
-			appendString("</select>");
 
-			
-			appendString("To&nbsp;");
-			appendString("<select name=\"pDestLang\">");
-			for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-				appendString("<option value=\""+sl+"\">"+sl+"</option>");
-			}
-			appendString("</select>");
-			
-			appendString("&nbsp;");
-			appendString("<a href=\"#\" onclick=\"document.CopyLang.submit(); return false\">Copy</a>&nbsp;");
-			
-			appendString("</form></td>");
-			decreaseIdent(); 
-			appendString("</tr>");
-			appendString("<tr>");
-			increaseIdent();
-			appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
-			appendString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
-			appendString("&nbsp;Languages enabled.&nbsp;");
-			appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Disable</a>&nbsp;");
-			appendString("</form></td>");
-			appendString("</tr>");
-			appendString("</logic:notEqual>");
-			appendString("</logic:equal>");
-			appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
-			appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
-			appendString("<input type=\"hidden\" name=\"value\" value=\"false\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
-			appendString("&nbsp;Languages disabled.&nbsp;");
-			appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Enable</a>&nbsp;");
-			appendString("</form></td>");
-			appendString("</tr>");
-			appendString("</logic:equal>");
+		// *** END MULILINGUAL COPY *** //
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()) {
+			addMultilanguageOperations(section, colspan);
 		}
 		// *** END MULILINGUAL COPY *** //
 		appendString("</table>");
@@ -603,7 +554,14 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
 
-		//*** CMS2.0 START ***
+        if (StorageType.CMS.equals(((MetaModuleSection) currentSection).getDocument().getParentModule().getStorageType())) {
+            appendString("<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">");
+            appendString("<div> Current Document is Locked by <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/></b>");
+            appendString("<div> Locking time :  <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/></b>");
+            appendString("</logic:equal>");
+        }
+
+        //*** CMS2.0 START ***
 		List<MetaViewElement> richTextElementsRegistry = new ArrayList<MetaViewElement>();
 		List<MetaViewElement> linkElementsRegistry = new ArrayList<MetaViewElement>();
 		//*** CMS2.0 FINISH ***
@@ -767,7 +725,59 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		return jsp;
 	}
-	
+
+	/**
+	 * Creating entries in JSP for Multilanguage Support!!!
+	 * @param section
+	 * @param colspan
+	 */
+	private void addMultilanguageOperations(MetaModuleSection section, int colspan) {
+		appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
+		appendString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
+		appendString("<tr>");
+		increaseIdent();
+		appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG)+"\">");
+		appendString("<input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>From&nbsp;");
+		appendString("<select name=\"pSrcLang\">");
+		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+			appendString("<option value=\""+sl+"\">"+sl+"</option>");
+		}
+		appendString("</select>");
+
+
+		appendString("To&nbsp;");
+		appendString("<select name=\"pDestLang\">");
+		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+			appendString("<option value=\""+sl+"\">"+sl+"</option>");
+		}
+		appendString("</select>");
+
+		appendString("&nbsp;");
+		appendString("<a href=\"#\" onclick=\"document.CopyLang.submit(); return false\">Copy</a>&nbsp;");
+
+		appendString("</form></td>");
+		decreaseIdent();
+		appendString("</tr>");
+		appendString("<tr>");
+		increaseIdent();
+		appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+		appendString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+		appendString("&nbsp;Languages enabled.&nbsp;");
+		appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Disable</a>&nbsp;");
+		appendString("</form></td>");
+		appendString("</tr>");
+		appendString("</logic:notEqual>");
+		appendString("</logic:equal>");
+		appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
+		appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+		appendString("<input type=\"hidden\" name=\"value\" value=\"false\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+		appendString("&nbsp;Languages disabled.&nbsp;");
+		appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Enable</a>&nbsp;");
+		appendString("</form></td>");
+		appendString("</tr>");
+		appendString("</logic:equal>");
+	}
+
 	private GeneratedJSPFile generateLinksToDocument(MetaModuleSection section, MetaView view){
 
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
@@ -1393,10 +1403,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		increaseIdent();
 		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
 
-		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = elements.get(i);
-			appendString(generateElement(entryName, element));
-		}
+        for (int i = 0; i < elements.size(); i++) {
+            MetaViewElement element = elements.get(i);
+            appendString(generateElement(entryName, element,doc));
+        }
 
 		appendString("</tr>");
 		decreaseIdent();
@@ -1603,11 +1613,11 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return "<td width=\"1%\">&nbsp;</td>";
 	}
 
-	private String generateElement(String entryName, MetaViewElement element){
+	private String generateElement(String entryName, MetaViewElement element,MetaDocument doc){
 		if (element instanceof MetaFieldElement)
 			return getField(entryName, (MetaFieldElement)element);
 		if (element instanceof MetaFunctionElement)
-			return getFunction(entryName, (MetaFunctionElement)element);
+			return getFunction(entryName, (MetaFunctionElement)element,doc);
 		if (element instanceof MetaCustomFunctionElement)
 			return getCustomFunction(entryName, (MetaCustomFunctionElement)element);
 		
@@ -1636,7 +1646,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return ret;
 	}
 
-	private String getFunction(String entryName, MetaFunctionElement element){
+	private String getFunction(String entryName, MetaFunctionElement element, MetaDocument doc){
 		
 		if (element.getName().equals("version")){
 			return getVersionFunction(entryName, element);
@@ -1656,8 +1666,13 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		if (element.getName().equals("duplicate"))
 			return getDuplicateFunction(entryName, element);
 
-			
-		return "";
+        if (element.getName().equals("lock") && StorageType.CMS.equals(doc.getParentModule().getStorageType()))
+            return getLockFunction(entryName, element);
+        
+        if (element.getName().equals("unlock") && StorageType.CMS.equals(doc.getParentModule().getStorageType()))
+            return getUnLockFunction(entryName, element);
+
+        return "";
 		//return "<td><bean:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}
 	
@@ -1669,29 +1684,138 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	}
 
 	private String getFunctionEditor(MetaDocument doc, MetaFunctionElement element){
-		if (element.getName().equals("cancel")){
-			return "<a href="+quote(generateTimestampedLinkPath(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW)))+">&nbsp;&raquo&nbsp;Close&nbsp;</a>";
+		if (element.getName().equals("cancel")) {
+			return "<a href=" + quote(generateTimestampedLinkPath(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW))) + ">&nbsp;&raquo&nbsp;Close&nbsp;</a>";
 		}
-		
-		if (element.getName().equals("update")){
+		if (element.getName().equals("update")) {
 			return getUpdateAndCloseFunction(doc, element);
 		}
 
-		if (element.getName().equals("updateAndStay")){
+		if (element.getName().equals("updateAndStay")) {
 			return getUpdateAndStayFunction(doc, element);
 		}
-		if (element.getName().equals("updateAndClose")){
+		if (element.getName().equals("updateAndClose")) {
 			return getUpdateAndCloseFunction(doc, element);
 		}
-		
+
+		if (element.getName().equals("lock") && StorageType.CMS.equals(doc.getParentModule().getStorageType())) {
+			return getLockFunctionLink(doc, element);
+		}
+
+		if (element.getName().equals("unlock") && StorageType.CMS.equals(doc.getParentModule().getStorageType())) {
+			return getUnLockFunctionLink(doc, element);
+		}
+
+
 		return "";
 	}
-	
-	private String getUpdateAndStayFunction(MetaDocument doc, MetaFunctionElement element){
-		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>";
+
+	/**
+	 * Dialog unlock link.
+	 *
+	 * @param doc
+	 * @param element
+	 * @return
+	 */
+	private String getUnLockFunctionLink(MetaDocument doc, MetaFunctionElement element) {
+		String result = "<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
+		String path = StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_UNLOCK);
+		path += "?pId=<bean:write name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>";
+		path += "&nextAction=showEdit";
+		result += " \t<a href=" + quote("<ano:tslink>" + path + "</ano:tslink>") + "  onClick= "+quote("return confirm(' All unsaved data will be lost!!! Really unLock  "+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+" : <bean:write name="
+				+ quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>;');")+">&nbsp;&raquo&nbsp;UnLock&nbsp;</a>";
+		result += "</logic:equal>";
+		return result;
+	}
+
+	/**
+	 * Dialog Lock link.
+	 *
+	 * @param doc
+	 * @param element
+	 * @return
+	 */
+	private String getLockFunctionLink(MetaDocument doc, MetaFunctionElement element) {
+		String result = "<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
+		String path = StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_LOCK);
+		path += "?pId=<bean:write name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>";
+		path += "&nextAction=showEdit";
+		result += " \t<a href=" + quote("<ano:tslink>" + path + "</ano:tslink>") + "  onClick= "+quote("return confirm('All unsaved data will be lost!!!. Really lock  "+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+" with id : <bean:write name="
+				+ quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>;');")+">&nbsp;&raquo&nbsp;Lock&nbsp;</a>";
+		result += "</logic:equal>";
+		return result;
+	}
+
+	/**
+     * Lock link for List show!
+     */
+    private String getUnLockFunction(String entryName, MetaFunctionElement element) {
+        String path = StrutsConfigGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), StrutsConfigGenerator.ACTION_UNLOCK);
+        path += "?pId=<bean:write name=" + quote(entryName) + " property=\"plainId\"/>";
+        path+="&nextAction=showList";
+		String alt = "Locked by: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/>, time: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
+        String link = "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")
+				+ "onClick= "+quote("return confirm('"+alt+" Really unlock - Locked  "+((MetaModuleSection)currentSection).getDocument().getName()+" with id : <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getUnLockImage(alt)+"</a></td>";
+        String result  = "<logic:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">";
+        result+=link;
+        result+= "</logic:equal>";
+        return result;
+    }
+
+    /**
+     * UnLock link for List show!
+     */
+    private String getLockFunction(String entryName, MetaFunctionElement element) {
+        String path = StrutsConfigGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), StrutsConfigGenerator.ACTION_LOCK);
+        path += "?pId=<bean:write name=" + quote(entryName) + " property=\"plainId\"/>";
+        path+="&nextAction=showList";
+        String link =  "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+ "onClick="+quote("return confirm('Really lock "+
+				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getLockImage()+"</a></td>" ;
+        String result  = "<logic:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + ">";
+        result+=link;
+        result+= "</logic:equal>";
+        return result;
+    }
+
+    private String getUpdateAndStayFunction(MetaDocument doc, MetaFunctionElement element){
+		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+			//creating logic for hiding or showing current operation link in Locking CASE!!!!!
+			String result = "<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) +
+					" property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
+			result+="  <logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) +
+					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
+			result+="\t<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+					".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a> \n";
+			result+="  </logic:equal> \n";
+			result+="</logic:equal> \n";
+			result+="<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
+			result+="\t<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+					".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>\n";
+			result+="</logic:equal> \n";
+			return result;
+		}
+		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+				".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>";
 	}
 	private String getUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
-		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a>";
+		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+			//creating logic for hiding or showing current operation link in Locking CASE!!!!!
+			String result = "<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) +
+					" property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
+			result+="  <logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) +
+					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
+			result+="\t<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+					".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a> \n";
+			result+="  </logic:equal> \n";
+			result+="</logic:equal> \n";
+			result+="<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
+			result+="\t<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+					".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a> \n";
+			result+="</logic:equal> \n";
+			return result;
+		}
+		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+				".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a>";
 	}
 	
 	
@@ -1719,7 +1843,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private String getDeleteWithConfirmationFunction(String entryName, MetaFunctionElement element){
 		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_DELETE);
 		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
-		return "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+" onClick="+quote("return confirm('Really delete "+((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getDeleteImage()+"</a></td>" ;
+		return "<td><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+" onClick="+quote("return confirm('Really delete "+
+				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getDeleteImage()+"</a></td>" ;
 	}
 
 	private String getEditFunction(String entryName, MetaFunctionElement element){

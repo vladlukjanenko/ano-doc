@@ -10,12 +10,7 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
@@ -118,6 +113,14 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	 * Constant for action switching multilingual support on and off.
 	 */
 	public static final String ACTION_SWITCH_MULTILANGUAGE_INSTANCE = "switchMultilang";
+    /**
+     *  Constant for lock action.
+     */
+    public static final String ACTION_LOCK = "lock";
+    /**
+     *  Constant for unLock action.
+     */
+    public static final String ACTION_UNLOCK = "unLock";
 	/**
 	 * Extension for csv generation.
 	 */
@@ -126,7 +129,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	 * Extension for the xml generation.
 	 */
 	public static final String SUFFIX_XML = ".xml";
-	
+
+
 	/**
 	 * The view which is being generated.
 	 */
@@ -451,8 +455,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 				"success",
 				FileEntry.package2path(JspViewGenerator.getPackage( module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getLinksToMePageName(doc)+".jsp"
 				);
-		
-		
+
+
 		if (doc.getLinks().size()>0){
 			ret += generateActionMapping(
 					"/"+getPath(doc, ACTION_SHOW_QUERIES), 
@@ -525,6 +529,19 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
 			);
+
+         //lock && unlock actions
+		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+           ret+=generateActionMapping("/"+getPath(doc,ACTION_LOCK),
+                   ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
+                   "success",
+                   FileEntry.package2path(JspViewGenerator.getPackage(module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp");
+
+            ret+=generateActionMapping("/"+getPath(doc,ACTION_UNLOCK),
+                   ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
+                   "success",
+                   FileEntry.package2path(JspViewGenerator.getPackage(module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp");
+        }
 		
 		if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
 			ret += generateActionMapping(

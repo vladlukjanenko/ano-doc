@@ -32,14 +32,7 @@ import net.anotheria.asg.generator.forms.meta.MetaFormField;
 import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
 import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
 import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
-import net.anotheria.asg.generator.meta.ObjectType;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
 import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
@@ -391,11 +384,16 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		if (doc.isMultilingual()){
 			MetaProperty mlDisProp = doc.getField(multilingualInstanceDisabledElement.getName());
 			appendStatement("private "+mlDisProp.toJavaType()+" "+mlDisProp.getName());
+            emptyline();
 			generateFieldMethodsInDialog(multilingualInstanceDisabledElement, doc);
 		}
-			
-		
-		emptyline();
+        // add fields!!!! Lock!!!
+        generateAdditionalFields(doc,"locked","boolean","LockableObject \"locked\" property. For object Locking.");
+        generateAdditionalFields(doc,"lockerId","string","LockableObject \"lockerId\" property. For userName containing.");
+        generateAdditionalFields(doc,"lockingTime","string","LockableObject \"lockingTime\" property.");
+
+
+        emptyline();
 		
 		//generate encoding.
 		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
@@ -409,8 +407,26 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		  
 		return clazz;
 	}
-	
-	private GeneratedClass generateListItemSortType(MetaModuleSection section){
+
+    /**
+     * Actually allow us add fields  such Lock - etc.
+     * @param doc document itself
+     * @param fieldName name of field
+     * @param fieldType field type
+     * @param comment comment for the field
+     */
+    private void generateAdditionalFields(MetaDocument doc, String fieldName, String fieldType, String comment) {
+        if (doc.getParentModule().getStorageType().equals(StorageType.CMS)) {
+            MetaFieldElement fieldElement = new MetaFieldElement(fieldName);
+            MetaProperty maField = new MetaProperty(fieldElement.getName(),fieldType);
+            appendComment(comment);
+            appendStatement("private " + maField.toJavaType() + " " + maField.getName());
+            emptyline();
+            generateMethods(fieldElement,maField);
+        }
+    }
+
+    private GeneratedClass generateListItemSortType(MetaModuleSection section){
 		List<MetaViewElement> elements = section.getElements();
 		boolean containsComparable = false;
 		for (MetaViewElement element : elements){
@@ -589,6 +605,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 
 		clazz.setName(getListItemBeanName(section.getDocument()));
+
+        //section.getModule().
 		
 		startClassBody();
 		
@@ -638,8 +656,14 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				generateFunctionMethods((MetaFunctionElement)element);
 			
 		}
-		
-		if (containsComparable){
+
+        // add fields!!!! Lock!!!
+        generateAdditionalFields(doc, "locked", "boolean", "LockableObject \"locked\" property. For object Locking.");
+        generateAdditionalFields(doc, "lockerId", "string", "LockableObject \"lockerId\" property. For userName containing.");
+        generateAdditionalFields(doc, "lockingTime", "string", "LockableObject \"lockingTime\" property.");
+
+
+        if (containsComparable){
 			clazz.addImport("net.anotheria.util.sorter.IComparable");
 			clazz.addImport("net.anotheria.util.BasicComparable");
 			

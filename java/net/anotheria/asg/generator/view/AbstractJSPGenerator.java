@@ -344,6 +344,38 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return getImage("del",alt);
 	}
 
+    /**
+	 * Returns the tag for the lock image in the overview.
+	 * @return created image tag
+	 */
+    protected String getLockImage(){
+        return getLockImage("lock");
+    }
+    /**
+	 * Returns the tag for the lock image in the overview.
+	 * @return created image tag
+	 */
+    protected String getUnLockImage(){
+        return getUnLockImage("unlock");
+    }
+    /**
+     * Returns the tag for the lock image in the overview with the given alt tag. 
+     * @param alt actually alt - for the image tag
+     * @return created image tag
+     */
+    protected String getLockImage(String alt){
+        return getImage("lock",alt);
+    }
+
+    /**
+     * Returns the tag for the unLock image in the overview with the given alt tag. 
+     * @param alt actually alt for image tag
+     * @return created image tag
+     */
+    protected String getUnLockImage(String alt){
+       return getImage("unlock",alt);
+    }
+
 	/**
 	 * Returns the tag for the move to the top image in the list view with the given alt tag. 
 	 * @return

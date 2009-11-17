@@ -18,16 +18,7 @@ import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
 import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
 import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
 import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaGenericListProperty;
-import net.anotheria.asg.generator.meta.MetaGenericProperty;
-import net.anotheria.asg.generator.meta.MetaLink;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
@@ -42,6 +33,7 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.asg.data.LockableObject;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
@@ -225,6 +217,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	public static String getDuplicateActionName(MetaModuleSection section){
 		return "Duplicate"+getActionSuffix(section);
 	}
+
+    public static String getLockActionName(MetaModuleSection section) {
+        return "Lock"+getActionSuffix(section);
+    }
+
+    public static String getUnLockActionName(MetaModuleSection section) {
+        return "UnLock"+getActionSuffix(section);
+    }
 	
 	/**
 	 * Generates a cumulated action which bundles multiple view operation in one class to reduce the number of generated classes.
@@ -273,6 +273,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
+        final boolean cMSStorageType = StorageType.CMS.equals(doc.getParentModule().getStorageType());
 		
 		clazz.setName(getMultiOpDialogActionName(section));
 		clazz.setParent(getBaseActionName(section));
@@ -287,6 +288,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
+        if (cMSStorageType){
+            clazz.addImport("net.anotheria.asg.data.LockableObject");
+            clazz.addImport("net.anotheria.asg.util.helper.action.permissions.LockableObjectActionPermissionCheckHelper");
+        }
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual())
 			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
 
@@ -317,6 +322,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    	writePathResolveForMultiOpAction(doc, StrutsConfigGenerator.ACTION_COPY_LANG);
 	    	writePathResolveForMultiOpAction(doc, StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE);
 	    }
+        //Lock && Unlock!!!
+
+        if(cMSStorageType){
+            writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_LOCK);
+            writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_UNLOCK);
+        }
 	    
 	    appendStatement("throw new IllegalArgumentException("+quote("Unknown path: ")+"+path)");
 	    append(closeBlock());
@@ -335,11 +346,71 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    	generateSwitchMultilingualityActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE));
 	    	emptyline();
 	    }
+
+        if (cMSStorageType) {
+            //Actually Locking
+            generateLockManagementActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_LOCK),true);
+            emptyline();
+            //Actually Unlocking
+            generateLockManagementActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_UNLOCK),false);
+            emptyline();
+            generateRedirectPathMethod(section);
+        }
 	    
 	    return clazz;
 	}
-	
-	private void writePathResolveForMultiOpAction(MetaDocument doc,String action){
+
+    private void generateRedirectPathMethod(MetaModuleSection section) {
+        MetaDocument doc = section.getDocument();
+        appendComment("Simplest method for redirect url creation. nextAction == showEdit - going to 'editView', to 'listView' otherwise. ");
+        appendString("private String getRedirectUrl(HttpServletRequest req, "+doc.getName()+" item){");
+        increaseIdent();
+        appendStatement("String nextAction = req.getParameter("+quote("nextAction")+")");
+		appendString("if (nextAction == null || nextAction.length() == 0)");
+        appendIncreasedStatement("return "+getShowActionRedirect(doc));
+        appendString("else");
+        appendIncreasedString("return nextAction.equals(\"showEdit\") ? "+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+item.getId()");
+        appendIncreasedString("       : "+getShowActionRedirect(doc)+";"); 
+        append(closeBlock());
+    }
+
+
+    /**
+     * Generates Lock && Unlock Actions!!!
+     * @param section
+     * @param methodName
+     * @param isLock
+     */
+    private void generateLockManagementActionMethod(MetaModuleSection section, String methodName, boolean isLock) {
+       	MetaDocument doc = section.getDocument();
+		appendString(getExecuteDeclaration(methodName));
+		increaseIdent();
+		appendStatement("String id = getStringParameter(req, PARAM_ID)");
+		appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+        appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
+        appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName()+"Curr");
+        if (isLock) {
+            //Locking CASE
+            //Actually We does not Care - about admin role in Lock action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+            appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.lock.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+            appendIncreasedStatement("lockable.setLocked("+isLock+")");
+            appendIncreasedStatement("lockable.setLockerId(getUserId(req))");
+            appendIncreasedStatement("lockable.setLockingTime(System.currentTimeMillis())");
+        } else {
+            //Unlocking CASE
+            appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.unLock.checkExecutionPermisson(lockable.isLocked(),isUserInRole(req, \"admin\"),lockable.getLockerId(),getUserId(req))");
+            appendIncreasedStatement("lockable.setLocked("+isLock+")");
+            appendIncreasedStatement("lockable.setLockerId(\"\")");
+            appendIncreasedStatement("lockable.setLockingTime(0)");
+        }
+        appendIncreasedStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+"Curr)");
+        appendString("}");
+        appendStatement("res.sendRedirect(getRedirectUrl(req, "+doc.getVariableName()+"Curr))");
+	    appendStatement("return null");
+	    append(closeBlock());
+    }
+
+    private void writePathResolveForMultiOpAction(MetaDocument doc,String action){
 		String path = StrutsConfigGenerator.getPath(doc, action);
 		appendString("if (path.equals("+quote(path)+"))");
 		appendIncreasedStatement("return "+path+"(mapping, af, req, res)");
@@ -380,6 +451,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport("net.anotheria.util.slicer.Slice");
 		clazz.addImport("net.anotheria.util.slicer.Segment");
 		clazz.addImport("net.anotheria.asg.util.bean.PagingLink");
+        //LOckableObject import!!!
+        if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+           clazz.addImport("net.anotheria.asg.data.LockableObject");
+        }
 		
 		//check if we have to property definition files.
 		//check if we have decorators
@@ -518,7 +593,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("sortMethod = "+sortType+".name2method(sortMethodName)");
 			appendIncreasedStatement("sortParamSet = true");
 			appendString( "}catch(Exception ignored){}");
-			emptyline	    ();
+			emptyline();
 			appendString( "try{");
 			increaseIdent();
 			appendString( "sortOrder = getStringParameter(req, PARAM_SORT_ORDER).equals("+quote(ViewConstants.VALUE_SORT_ORDER_ASC)+") ? ");
@@ -693,7 +768,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 //				}
 			}
 		}
-		
+
+         //adding additional Lock properties
+        if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+            MetaProperty prop = new MetaProperty(LockableObject.INT_LOCK_PROPERTY_NAME,"boolean");
+            String propertyCopy = "bean."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").isLocked())";
+            appendStatement(propertyCopy);
+            prop =  new MetaProperty(LockableObject.INT_LOCKER_ID_PROPERTY_NAME,"string");
+            propertyCopy = "bean."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").getLockerId())";
+            appendStatement(propertyCopy);
+            prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,"string");
+            propertyCopy = "bean."+prop.toBeanSetter()+"(NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()))";
+            appendStatement(propertyCopy);
+        }
+
 		appendStatement("bean.setDocumentLastUpdateTimestamp(NumberUtils.makeISO8601TimestampString("+doc.getVariableName()+".getLastUpdateTimestamp()))");
 	    
 	    appendStatement("return bean");
@@ -1006,6 +1094,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	 * @return
 	 */
 	private GeneratedClass generateUpdateAction(MetaModuleSection section){
+        //TODO: Locking not supported Here! only in MultiOP!!!
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 		GeneratedClass clazz = new GeneratedClass();
@@ -1057,6 +1146,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//check if we have a form submission at all.
 		appendString( "if (!form.isFormSubmittedFlag())");
 		appendIncreasedStatement("throw new RuntimeException(\"Request broken!\")");
+        //additional permissions check For Locked Objects!!!!
+        if (StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())) {
+            //Actually We does not Care - about admin role in Update action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+            appendStatement("LockableObjectActionPermissionCheckHelper.update.checkExecutionPermisson(form.isLocked(),false,form.getLockerId(),getUserId(req))");
+        }
 		//if update, then first get the target object.
 		appendStatement("boolean create = false");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = null");
@@ -1172,6 +1266,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String value = getStringParameter(req, "+quote("value")+")");
 
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+        if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+            //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.multiLanguageSwitch.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendString("}");
+        }
 		appendStatement("((MultilingualObject)"+doc.getVariableName()+").setMultilingualDisabledInstance(Boolean.valueOf(value))");
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 	    appendStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+id)");
@@ -1230,6 +1331,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+            //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.copyLang.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendString("}");
+        }
 		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getCopyMethodName()+"(sourceLanguage, destLanguage)");
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 	    appendStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+id)");
@@ -1298,6 +1406,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
     			clazz.addImport(DataFacadeGenerator.getDocumentImport(l.getDocument()));
 	    	}
 	    }
+        //LockableObject import!!!
+        if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+           clazz.addImport("net.anotheria.asg.data.LockableObject");
+        }
 		
 		startClassBody();
 		
@@ -1330,7 +1442,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
 		appendStatement(ModuleBeanGenerator.getDialogBeanName(dialog, doc), " form = new ", ModuleBeanGenerator.getDialogBeanName(dialog, doc), "() ");	
 
-		appendStatement(doc.getName()," ",doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id);");
+		appendStatement(doc.getName()," ",doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
 		
 		//set field
 		for (int i=0; i<elements.size(); i++){
@@ -1358,6 +1470,19 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			String propertyCopy = "form."+p.toBeanSetter()+"(((MultilingualObject)"+doc.getVariableName()+").isMultilingualDisabledInstance())";
 			appendStatement(propertyCopy);
 		}
+
+        //adding additional Lock properties
+        if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+            MetaProperty prop = new MetaProperty(LockableObject.INT_LOCK_PROPERTY_NAME,"boolean");
+            String propertyCopy = "form."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").isLocked())";
+            appendStatement(propertyCopy);
+            prop =  new MetaProperty(LockableObject.INT_LOCKER_ID_PROPERTY_NAME,"string");
+            propertyCopy = "form."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").getLockerId())";
+            appendStatement(propertyCopy);
+            prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,"string");
+            propertyCopy = "form."+prop.toBeanSetter()+"(net.anotheria.util.NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()))";
+            appendStatement(propertyCopy);
+        }
 		
 		emptyline();
 		
@@ -1509,6 +1634,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private GeneratedClass generateDeleteAction(MetaModuleSection section){
+        //TODO: Locking not supported Here! only in MultiOP!!!
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 		GeneratedClass clazz = new GeneratedClass();
@@ -1532,6 +1658,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendString( getExecuteDeclaration(methodName));
 	    increaseIdent();
 	    appendStatement("String id = getStringParameter(req, PARAM_ID)");
+        if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+           appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+           appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
+           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
+            //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.delete.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendString("}"); 
+        }
 	    appendStatement(getServiceGetterCall(section.getModule())+".delete"+doc.getName()+"(id)");
 	    appendStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
 	    appendStatement("return null");
@@ -1857,6 +1991,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
+        if(StorageType.CMS.equals(section.getModule().getStorageType())){
+            clazz.addImport("net.anotheria.asg.data.LockableObject");
+            clazz.addImport("net.anotheria.asg.util.helper.action.permissions.LockableObjectActionPermissionCheckHelper");
+        }
 		if (containerProperty instanceof MetaListProperty){
 			MetaProperty containedProperty = ((MetaListProperty)containerProperty).getContainedProperty();
 			if(containedProperty.isLinked()){
@@ -1946,6 +2084,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private GeneratedClass generateListAddRowAction(MetaModuleSection section, MetaListProperty list){
+        //TODO: locking && unlocking currently supported via MultiOP  for container!!! ONLY
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 		GeneratedClass clazz = new GeneratedClass();
@@ -1974,7 +2113,15 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
-		
+
+        if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerListAddRow.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendString("}");
+        }
+
 		String call = "";
 		MetaProperty p = list.getContainedProperty();
 		String getter = "form."+p.toBeanGetter()+"()";
@@ -1989,6 +2136,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 	
 	private GeneratedClass generateListQuickAddAction(MetaModuleSection section, MetaListProperty list){
+           //TODO: locking && unlocking currently supported via MultiOP  for container!!! ONLY
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 
@@ -2022,6 +2170,15 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+
+         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerListQuickAdd.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendString("}");
+        }
+
 		appendStatement("String paramIdsToAdd = form.getQuickAddIds()");
 
 		emptyline();
@@ -2061,6 +2218,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
+         if(StorageType.CMS.equals(section.getModule().getStorageType())){
+            clazz.addImport("net.anotheria.asg.data.LockableObject");
+            clazz.addImport("net.anotheria.asg.util.helper.action.permissions.LockableObjectActionPermissionCheckHelper");
+        }
 		
 		clazz.setName(getContainerAddEntryActionName(doc, table));
 		clazz.setParent(getContainerShowActionName(doc, table));	
@@ -2072,7 +2233,15 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
-		
+
+        if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerTableAddAction.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendString("}");
+        }
+
 		String call = "";
 		List<MetaProperty> columns = table.getColumns();
 		for (int i =0; i<columns.size(); i++){
@@ -2090,6 +2259,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private GeneratedClass generateContainerDeleteEntryAction(MetaModuleSection section, MetaContainerProperty container){
+        //TODO: Locking && Unlocking support only included in MultiOPContainer generator!!!
 		if (USE_MULTIOP_ACTIONS)
 			return null;
 
@@ -2116,6 +2286,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
+         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+           appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+           appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
+           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
+            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerDelete.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendString("}");
+        }
 		appendStatement("int position = getIntParameter(req, "+quote("pPosition")+")"); 
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
@@ -2130,6 +2308,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private GeneratedClass generateContainerMoveEntryAction(MetaModuleSection section, MetaContainerProperty container){
+         //TODO: Locking && Unlocking support only included in MultiOPContainer generator!!!
 		if (!(container instanceof MetaListProperty)){
 			return null;
 		}
@@ -2179,6 +2358,15 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String direction = getStringParameter(req, "+quote("dir")+")");
 
 		appendStatement(doc.getName()+" "+doc.getVariableName() + " = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+
+         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+
+           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
+           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerMove.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendString("}");
+        }
 
 		appendString("if ("+quote("top")+".equalsIgnoreCase(direction))");
 		appendIncreasedStatement("moveTop("+doc.getVariableName()+", position)");
@@ -2663,7 +2851,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		return clazz;
 	}
 
-	/**
+    /**
 	 * A helper generator object created for each generated document.
 	 */
 	class EnumerationPropertyGenerator{

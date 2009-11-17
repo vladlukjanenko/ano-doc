@@ -1,13 +1,12 @@
 package net.anotheria.asg.data;
 
-import net.anotheria.anodoc.data.Document;
-import net.anotheria.anodoc.data.Property;
+import net.anotheria.anodoc.data.*;
 
 /**
  * Root object for all generated classes of type Document (instead of ano-doc Document used previously).
  * @author another
  */
-public abstract class AbstractASGDocument extends Document implements DataObject{
+public abstract class AbstractASGDocument extends Document implements DataObject, LockableObject{
 	
 	protected static final String INT_PROPERTY_MULTILINGUAL_DISABLED = "ml-disabled";
 	
@@ -46,5 +45,46 @@ public abstract class AbstractASGDocument extends Document implements DataObject
 	private String getInternalPropertyName(String name){
 		return "-asg-"+name+"-asg-";
 	}
-	
+
+    @Override
+    public boolean isLocked() {
+        try {
+            return ((BooleanProperty) getInternalProperty(INT_LOCK_PROPERTY_NAME)).getboolean();
+        } catch (NoSuchPropertyException e) {
+            return false;
+        }
+    }
+
+    @Override
+    public void setLocked(boolean aLock) {
+        setInternalProperty(new BooleanProperty(INT_LOCK_PROPERTY_NAME, aLock));
+    }
+
+    @Override
+    public String getLockerId() {
+        try {
+            return ((StringProperty) getInternalProperty(INT_LOCKER_ID_PROPERTY_NAME)).getString();
+        } catch (NoSuchPropertyException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public void setLockerId(String aLockerId) {
+        setInternalProperty(new StringProperty(INT_LOCKER_ID_PROPERTY_NAME, aLockerId));
+    }
+
+    @Override
+    public long getLockingTime() {
+        try {
+            return ((LongProperty) getInternalProperty(INT_LOCKING_TIME_PROPERTY_NAME)).getlong();
+        } catch (NoSuchPropertyException e) {
+            return 0;
+        }
+    }
+
+    @Override
+    public void setLockingTime(long aLockTime) {
+        setInternalProperty(new LongProperty(INT_LOCKING_TIME_PROPERTY_NAME, aLockTime));
+    }
 }
