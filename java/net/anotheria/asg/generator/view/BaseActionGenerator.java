@@ -92,6 +92,9 @@ public class BaseActionGenerator extends AbstractGenerator {
 
 		appendStatement("private static XMLUserManager userManager");
 		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
+		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
+		appendStatement("private static LockingConfig lockConfig;");
+
 
 		appendString("static{");
 		increaseIdent();
@@ -117,7 +120,15 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendIncreasedStatement("staticlogger.fatal("+quote("Can't init user manager")+", e)");
 		appendString("}");
 		//end init user manager
-
+		//initing Lock Config
+		emptyline();
+		appendComment("//initializing lockConfig");
+		appendString("try{");
+		appendIncreasedStatement("lockConfig = LockingConfig.getInstance()");
+		appendString("}catch(Exception e){");
+		appendIncreasedStatement("staticlogger.fatal("+quote("Can't init lockConfig")+", e)");
+		appendString("}");
+        // end initing Lock Config
 	
 		append(closeBlock());
 		emptyline();
@@ -224,7 +235,21 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendStatement("return path.startsWith("+quote("/")+") ? path.substring(1) : path");
 		append(closeBlock());
 		emptyline();
-		
+
+		//  ading  2  methods  actually -- for  LockConfig ussage....
+		appendString("protected long getLockingTimeout(){");
+		increaseIdent();
+		appendStatement("return lockConfig.getTimeout()");
+		append(closeBlock());
+		emptyline();
+
+		appendString("protected boolean isAutoLockingEnabled(){");
+		increaseIdent();
+		appendStatement("return lockConfig.isAutolocking()");
+		append(closeBlock());
+		emptyline();
+
+		//
 		appendString("private void checkAccessPermissions(HttpServletRequest req){");
 		increaseIdent();
 		appendStatement("List<String> requiredRoles = getRequiredRoles()");
@@ -307,7 +332,176 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendString("return bean;");
 		append(closeBlock());
 		emptyline();
+		emptyline();
+		emptyline();
+
+
+		//// Actually Section  for  Session working with  Session attribute -- Locking && unlocking!!!
+
+		appendComment("Actually Session Attribute name for holding collection of locked objects....");
+		appendStatement("private static final String LOCKED_OBJECTS_COLLECTION_SESSION_ATTRIBUTE_NAME = \"lokedDocumentsCollection\"");
+		clazz.addImport("java.util.Collection");
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("net.anotheria.asg.data.AbstractASGDocument");
+		clazz.addImport("java.io.Serializable");
+		emptyline();
+		emptyline();
+
+		appendComment("Adding attribute to the session list as <a>LockedDocumentAttribute</a>. for Locking && Unlocking functionality");
+		appendString("protected void addLockedAttribute(HttpServletRequest req, AbstractASGDocument doc) {");
+		increaseIdent();
+		appendStatement("List<LockedDocumentAttribute> attributes = getLockedAttributesList(req)");
+		appendStatement("LockedDocumentAttribute docAtt = new LockedDocumentAttribute(doc)");
+		appendString("if (!attributes.contains(docAtt)) {");
+		appendIncreasedStatement("attributes.add(docAtt)");
+		appendIncreasedStatement("refreshSessionLockedAtribute(req, attributes)");
+		appendString("}");
+		append(closeBlock());
+		emptyline();
+
+		appendComment("Putting attribute to the HttpSession.");
+        appendString("private void refreshSessionLockedAtribute(HttpServletRequest req, List<LockedDocumentAttribute> attributes) {");
+		increaseIdent();
+		appendStatement("req.getSession().setAttribute(LOCKED_OBJECTS_COLLECTION_SESSION_ATTRIBUTE_NAME, attributes)");
+        append(closeBlock());
+		emptyline();
+
+		appendComment("Removing attributes List<LockedDocumentAttribute> - from session.");
+		appendString("protected void removeLockedAttribute(HttpServletRequest req, AbstractASGDocument doc) {");
+		increaseIdent();
+		appendStatement("List<LockedDocumentAttribute> attributes = getLockedAttributesList(req)");
+		appendStatement("LockedDocumentAttribute docAtt = new LockedDocumentAttribute(doc)");
+		appendString("if (attributes.contains(docAtt)) {");
+		appendIncreasedStatement("attributes.remove(docAtt)");
+		appendIncreasedStatement("refreshSessionLockedAtribute(req, attributes)");
+		appendString("}");
+		append(closeBlock());
+		emptyline();
+
+		appendComment("Return true if current document represented as  <a>LockedDocumentAttribute</a>. in session attributes list.");
+		appendString("protected boolean containsLockedAttribute(HttpServletRequest req, AbstractASGDocument doc) {");
+		increaseIdent();
+		appendStatement("List<LockedDocumentAttribute> attributes = getLockedAttributesList(req)");
+		appendStatement("LockedDocumentAttribute docAtt = new LockedDocumentAttribute(doc)");
+	    appendStatement("return attributes.contains(docAtt)");
+		append(closeBlock());
+		emptyline();
+
+
+		appendComment("Getting attributes List<LockedDocumentAttribute> - from session.");
+        appendString("private List<LockedDocumentAttribute> getLockedAttributesList(HttpServletRequest req) {");
+		increaseIdent();
+		appendStatement("List<LockedDocumentAttribute> attributes = null");
+		appendStatement("Object sessionBean = req.getSession().getAttribute(LOCKED_OBJECTS_COLLECTION_SESSION_ATTRIBUTE_NAME)");
+	    appendString("if (sessionBean != null && sessionBean instanceof Collection){ ");
+		appendIncreasedStatement("//noinspection unchecked");
+		appendIncreasedStatement("attributes = (List<LockedDocumentAttribute>) sessionBean");
+		appendString("}");
+	    appendStatement("return attributes == null || attributes.isEmpty() ? new ArrayList<LockedDocumentAttribute>() : attributes");
+		append(closeBlock());
+		emptyline();
+		emptyline();
+
+		appendComment("Actually simplest been - which shoul hold information  about document ID  && Clazz.");
+		appendString("public static class LockedDocumentAttribute implements Serializable{");
+		emptyline();
+		increaseIdent();
+		appendComment("LockedDocumentAttribute \"docId\".");
+		appendStatement("private String docId");
+		emptyline();
+		appendComment("LockedDocumentAttribute \"documentClazz\".");
+		appendStatement("private Class documentClazz;");
+		emptyline();
+
+		appendComment("Public constructor.");
+		appendString("public LockedDocumentAttribute(AbstractASGDocument doc) {");
+		increaseIdent();
+		appendStatement("this.docId = doc.getId()");
+        appendStatement("this.documentClazz = doc.getClass()");
+		append(closeBlock());
+		emptyline();
+
+		appendString("public String getDocId() {");
+		increaseIdent();
+		appendStatement("return docId");
+		append(closeBlock());
+		emptyline();
+
+		appendString("public Class getDocumentClazz() {");
+		increaseIdent();
+		appendStatement("return documentClazz");
+		append(closeBlock());
+		emptyline();
+
+		appendString("public void setDocId(String aDocId) {");
+		increaseIdent();
+		appendStatement("this.docId = aDocId");
+		append(closeBlock());
+		emptyline();
+
+		appendString("public void setDocumentClazz(Class aDocumentClazz) {");
+		increaseIdent();
+		appendStatement("this.documentClazz = aDocumentClazz");
+		append(closeBlock());
+		emptyline();
+
+		appendString("public boolean equals(Object o) {");
+		increaseIdent();
+		appendStatement("return o!=null && (this == o || o instanceof LockedDocumentAttribute && ((LockedDocumentAttribute) o).getDocId().equals(getDocId()) && \n \t\t\t\t ((LockedDocumentAttribute) o).getDocumentClazz().equals(getDocumentClazz()))");
+		append(closeBlock());
+		emptyline();
+
+
+		appendString("public int hashCode() {");
+		increaseIdent();
+		appendStatement("int result = docId != null ? docId.hashCode() : 0");
+		appendStatement("final int mult = 31");
+		appendStatement("result = mult * result + (documentClazz != null ? documentClazz.hashCode() : 0)");
+		appendStatement("return result");
+		append(closeBlock());
+		emptyline();
+
+		appendString("public String toString() {");
+		increaseIdent();
+		appendStatement("final StringBuffer sb = new StringBuffer()");
+		appendStatement("sb.append(\"LockedDocumentAttribute\")");
+		appendStatement("sb.append(\"{docId='\").append(docId).append('\\'')");
+		appendStatement("sb.append(\", documentClazz=\").append(documentClazz)");
+		appendStatement("sb.append('}')");
+		appendStatement("return sb.toString()");
+		append(closeBlock());
+		emptyline();
+
+
+		emptyline();
+		append(closeBlock());
 
 		return clazz;
 	}
+
+
+	/*private void isUpdationAllowed(LockableObject lock, HttpServletRequest req) throws Exception {
+		//Actually - simplest Check! --  exception - if anything happens!!!!
+		DocumentLockingHelper.update.checkExecutionPermisson(lock, false, getUserId(req));
+		//Checking Lock TimeOut
+		if (isTimeoutReached(lock)) {
+			//unLockPageStyles(lock);
+			throw new RuntimeException("Document can't be updated! Due  tue   lock - timeout!!!");
+		}
+		//Checking document was  unlocked!
+		if (isUnlockedByAdmin(lock, req))
+			throw new RuntimeException("Document can't be updated! It was unlocked by admin!!!");
+
+	}
+
+	private boolean isTimeoutReached(LockableObject lock) {
+		//not clear!!!!!  really!!!!
+		return lock.isLocked() && lock.getLockingTime() + getLockingTimeout() <= System.currentTimeMillis();
+	}
+
+	private boolean isUnlockedByAdmin(LockableObject loc, HttpServletRequest req){
+		//checkSession Attribute!   if   exists  && object is Unlocked --  then throw an Exception!!
+		return false;
+	}*/
 }

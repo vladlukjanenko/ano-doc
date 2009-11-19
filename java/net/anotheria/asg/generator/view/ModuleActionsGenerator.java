@@ -290,7 +290,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
         if (cMSStorageType){
             clazz.addImport("net.anotheria.asg.data.LockableObject");
-            clazz.addImport("net.anotheria.asg.util.helper.action.permissions.LockableObjectActionPermissionCheckHelper");
+            clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
         }
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual())
 			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
@@ -392,18 +392,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         if (isLock) {
             //Locking CASE
             //Actually We does not Care - about admin role in Lock action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-            appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.lock.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
-            appendIncreasedStatement("lockable.setLocked("+isLock+")");
-            appendIncreasedStatement("lockable.setLockerId(getUserId(req))");
-            appendIncreasedStatement("lockable.setLockingTime(System.currentTimeMillis())");
+            appendIncreasedStatement("DocumentLockingHelper.lock.checkExecutionPermisson(lockable,false,getUserId(req))");
+            appendIncreasedStatement("lock" + doc.getMultiple() + "("+doc.getVariableName()+"Curr, req)");
         } else {
             //Unlocking CASE
-            appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.unLock.checkExecutionPermisson(lockable.isLocked(),isUserInRole(req, \"admin\"),lockable.getLockerId(),getUserId(req))");
-            appendIncreasedStatement("lockable.setLocked("+isLock+")");
-            appendIncreasedStatement("lockable.setLockerId(\"\")");
-            appendIncreasedStatement("lockable.setLockingTime(0)");
+            appendIncreasedStatement("DocumentLockingHelper.unLock.checkExecutionPermisson(lockable,isUserInRole(req, \"admin\"),getUserId(req))");
+            appendIncreasedStatement("unLock" + doc.getMultiple() + "("+doc.getVariableName()+"Curr, req)");
         }
-        appendIncreasedStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+"Curr)");
         appendString("}");
         appendStatement("res.sendRedirect(getRedirectUrl(req, "+doc.getVariableName()+"Curr))");
 	    appendStatement("return null");
@@ -642,9 +637,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
 		appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){");
 		increaseIdent();
+		//autoUnlocking!
+		if (StorageType.CMS.equals(doc.getParentModule().getStorageType())) {
+			appendStatement("check" + doc.getMultiple() + "(" + doc.getVariableName() + ", req)");
+		}
 		appendStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
 		appendStatement("beans.add(bean)");
-	    append(closeBlock());
+		append(closeBlock());
 	    emptyline();
 	    if (containsComparable){
 	    	appendStatement("beans = sorter.sort(beans, sortType)");
@@ -778,7 +777,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
             propertyCopy = "bean."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").getLockerId())";
             appendStatement(propertyCopy);
             prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,"string");
-            propertyCopy = "bean."+prop.toBeanSetter()+"(NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()))";
+            propertyCopy = "bean."+prop.toBeanSetter()+"(NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()) +" +
+					" \" automatic unlock expected AT : \" + NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout()))";
             appendStatement(propertyCopy);
         }
 
@@ -1070,6 +1070,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+		//autoUnlocking!
+		if (StorageType.CMS.equals(doc.getParentModule().getStorageType()))
+			appendStatement("check" + doc.getMultiple() + "(" + doc.getVariableName() + ", req)");
 		appendStatement("long timestamp = "+doc.getVariableName()+".getLastUpdateTimestamp()");
 		appendStatement("String lastUpdateDate = NumberUtils.makeDigitalDateStringLong(timestamp)");
 		appendStatement("lastUpdateDate += \" \"+NumberUtils.makeTimeString(timestamp)");
@@ -1146,11 +1149,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//check if we have a form submission at all.
 		appendString( "if (!form.isFormSubmittedFlag())");
 		appendIncreasedStatement("throw new RuntimeException(\"Request broken!\")");
-        //additional permissions check For Locked Objects!!!!
-        if (StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())) {
-            //Actually We does not Care - about admin role in Update action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-            appendStatement("LockableObjectActionPermissionCheckHelper.update.checkExecutionPermisson(form.isLocked(),false,form.getLockerId(),getUserId(req))");
-        }
 		//if update, then first get the target object.
 		appendStatement("boolean create = false");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = null");
@@ -1212,6 +1210,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//appendIncreasedStatement("System.out.println(\"creating\")");
 		appendIncreasedStatement("updatedCopy = "+getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+")");
 		appendString( "}else{");
+		 //additional permissions check For Locked Objects!!!!
+        if (StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())) {
+		    //This is SomeHow related  to Document Updation! SO next method should be invoked!
+           appendIncreasedStatement("canUpdate" + doc.getMultiple() +"("+doc.getVariableName()+", req)" );
+		   //autoUnlocking!
+		   appendIncreasedStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+        }
 		appendIncreasedStatement("updatedCopy = "+getServiceGetterCall(section.getModule())+".update"+doc.getName()+"( "+doc.getVariableName()+")");
 		//appendIncreasedStatement("System.out.println(\"updating\")");
 		appendString( "}");
@@ -1267,11 +1272,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
-           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
-            //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.multiLanguageSwitch.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
-           appendString("}");
+          // appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+          // appendStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+		  //This is SomeHow related  to Document Updation! SO next method should be invoked!
+           appendStatement("canUpdate" + doc.getMultiple() +"("+doc.getVariableName()+", req)" );
+		   //autoUnlocking!
+		   appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+          // appendString("}");
         }
 		appendStatement("((MultilingualObject)"+doc.getVariableName()+").setMultilingualDisabledInstance(Boolean.valueOf(value))");
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
@@ -1332,11 +1339,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
          if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
-           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
-            //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.copyLang.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
-           appendString("}");
+
+           //appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+		   //This is SomeHow related  to Document Updation! SO next method should be invoked!
+           appendStatement("canUpdate" + doc.getMultiple() +"("+doc.getVariableName()+", req)" );
+		   //autoUnlocking!
+		   appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+
         }
 		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getCopyMethodName()+"(sourceLanguage, destLanguage)");
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
@@ -1443,6 +1452,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(ModuleBeanGenerator.getDialogBeanName(dialog, doc), " form = new ", ModuleBeanGenerator.getDialogBeanName(dialog, doc), "() ");	
 
 		appendStatement(doc.getName()," ",doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
+        final boolean isCMS = StorageType.CMS.equals(doc.getParentModule().getStorageType());
+		if(isCMS){
+			//autoUnlocking!
+		    appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+			//autoLocking! - actually!
+			appendString("if("+doc.getVariableName()+" instanceof LockableObject && !((LockableObject)"+doc.getVariableName()+").isLocked() && isAutoLockingEnabled())");
+			appendIncreasedStatement("lock" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+		}
 		
 		//set field
 		for (int i=0; i<elements.size(); i++){
@@ -1472,7 +1489,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 
         //adding additional Lock properties
-        if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+
+		if(isCMS){
             MetaProperty prop = new MetaProperty(LockableObject.INT_LOCK_PROPERTY_NAME,"boolean");
             String propertyCopy = "form."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").isLocked())";
             appendStatement(propertyCopy);
@@ -1480,7 +1498,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
             propertyCopy = "form."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").getLockerId())";
             appendStatement(propertyCopy);
             prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,"string");
-            propertyCopy = "form."+prop.toBeanSetter()+"(net.anotheria.util.NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()))";
+		    propertyCopy = "form."+prop.toBeanSetter()+"(net.anotheria.util.NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()) +" +
+					" \" automatic unlock expected AT : \" + net.anotheria.util.NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout()))";
+
             appendStatement(propertyCopy);
         }
 		
@@ -1663,7 +1683,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
            appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
            appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
             //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.delete.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
+           appendIncreasedStatement("DocumentLockingHelper.delete.checkExecutionPermisson(lockable, false, getUserId(req))");
            appendString("}"); 
         }
 	    appendStatement(getServiceGetterCall(section.getModule())+".delete"+doc.getName()+"(id)");
@@ -1834,18 +1854,25 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	 * @return
 	 */
 	private GeneratedClass generateBaseAction(MetaModuleSection section){
-		
+		MetaDocument doc = section.getDocument();
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 
 	    clazz.setPackageName(getPackage(section.getModule()));
 	    clazz.setAbstractClass(true);
-	    
-	    
+
+		boolean isCMS = StorageType.CMS.equals(section.getModule().getStorageType());
+
 	    emptyline();
 	    clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action."+BaseViewActionGenerator.getViewActionName(view));
-	    emptyline();
-	    
+		if (isCMS) {
+			clazz.addImport("javax.servlet.http.HttpServletRequest");
+			clazz.addImport("net.anotheria.asg.data.AbstractASGDocument");
+			clazz.addImport("net.anotheria.asg.data.LockableObject");
+			clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
+			clazz.addImport("net.anotheria.asg.util.locking.exeption.LockingException");
+			clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
+		}
 	    clazz.setName(getBaseActionName(section));
 	    clazz.setParent(BaseViewActionGenerator.getViewActionName(view));
 
@@ -1855,6 +1882,86 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    increaseIdent();
 	    appendStatement("return "+quote(section.getTitle()));
 	    append(closeBlock());
+
+		//starting additional methods generation!!!!!! Actually Lock & Unlock!!! + state checker!!!
+
+		if (isCMS) {
+			appendComment("Executing locking. Actually.");
+			appendString("protected void lock" + doc.getMultiple() + "(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req) throws Exception{");
+			increaseIdent();
+			appendString("if("+doc.getVariableName()+" instanceof AbstractASGDocument){");
+			appendIncreasedStatement("AbstractASGDocument lock = (AbstractASGDocument)"+doc.getVariableName());
+			appendIncreasedStatement("lock.setLocked(true)");
+			appendIncreasedStatement("lock.setLockerId(getUserId(req))");
+			appendIncreasedStatement("lock.setLockingTime(System.currentTimeMillis())");
+			appendIncreasedStatement(getServiceGetterCall(section.getModule()) + ".update" + doc.getName() + "( " + doc.getVariableName() + ")");
+			//putting to cache!
+			appendIncreasedStatement("addLockedAttribute(req, lock)");
+			appendString("}");
+			append(closeBlock());
+
+			appendComment("Executing unlocking. Actually.");
+			appendString("protected void unLock" + doc.getMultiple() + "(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req) throws Exception{");
+			increaseIdent();
+			appendString("if("+doc.getVariableName()+" instanceof AbstractASGDocument){");
+			appendIncreasedStatement("AbstractASGDocument lock = (AbstractASGDocument)"+doc.getVariableName());
+			appendIncreasedStatement("lock.setLocked(false)");
+			appendIncreasedStatement("lock.setLockerId(\"\")");
+			appendIncreasedStatement("lock.setLockingTime(0)");
+			appendIncreasedStatement(getServiceGetterCall(section.getModule()) + ".update" + doc.getName() + "( " + doc.getVariableName() + ")");
+	        appendIncreasedStatement("removeLockedAttribute(req, lock)");
+			appendString("}");
+			append(closeBlock());
+
+			
+		    appendComment("Executing auto-unlocking check....");
+			appendString("protected void check" + doc.getMultiple() + "(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req) throws Exception{");
+			increaseIdent();
+			appendStatement("boolean shouldUnlock = "+doc.getVariableName()+ " instanceof AbstractASGDocument && \n \t \t \t \t ((AbstractASGDocument)"+doc.getVariableName()+
+					").isLocked() && \n \t \t \t \t ( System.currentTimeMillis() >= ((AbstractASGDocument)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout())");
+			appendString("if(shouldUnlock)");
+            appendIncreasedStatement("unLock"+ doc.getMultiple() + "(" +doc.getVariableName() + ", req)");
+			append(closeBlock());
+
+			appendComment("Checking UpdateCapability rights");
+			appendString("protected void canUpdate" + doc.getMultiple() + "(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req) throws Exception{");
+			increaseIdent();
+			appendString("if("+doc.getVariableName()+ " instanceof LockableObject ){");
+			appendString("//Actually - simplest Check! --  exception - if anything happens!!!!");
+			appendIncreasedStatement("DocumentLockingHelper.update.checkExecutionPermisson((LockableObject)"+doc.getVariableName()+", false, getUserId(req))");
+			appendString("}");
+			appendString("if (isTimeoutReached("+ doc.getVariableName() +")) {");
+			appendIncreasedStatement("check"+ doc.getMultiple() + "(" +doc.getVariableName() + ", req)");
+			appendIncreasedStatement("throw new LockingException(getUserId(req)+\" . Document can't be updated! Due to lock - timeout!!!\")");
+            appendString("}");
+			appendString("if (wasUnlockedByAdmin("+ doc.getVariableName() +", req)) {");
+			appendIncreasedStatement("throw new LockingException(getUserId(req)+\" . Document can't be updated! It was unlocked by user in 'admin' role!!!\")");
+            appendString("}");
+			append(closeBlock());
+
+			appendComment("");
+			appendString("private boolean isTimeoutReached("+doc.getName() +" "+ doc.getVariableName()+"){");
+            increaseIdent();
+			appendString("if ("+ doc.getVariableName()+" instanceof LockableObject) {");
+			appendIncreasedStatement("LockableObject lock = (LockableObject)"+ doc.getVariableName());
+			appendIncreasedStatement("return lock.isLocked() && lock.getLockingTime() + getLockingTimeout() <= System.currentTimeMillis()");
+            appendString("}");
+			appendStatement("return false");
+			append(closeBlock());
+
+			appendComment("");
+			appendString("private boolean wasUnlockedByAdmin("+doc.getName() +" "+ doc.getVariableName()+", HttpServletRequest req){");
+            increaseIdent();
+			appendString("if ("+ doc.getVariableName()+" instanceof AbstractASGDocument) {");
+			appendIncreasedStatement("AbstractASGDocument lock = (AbstractASGDocument)"+ doc.getVariableName());
+			appendIncreasedStatement("return !lock.isLocked() && containsLockedAttribute(req, lock)");
+            appendString("}");
+			appendStatement("return false");
+
+
+			append(closeBlock());
+			
+		}
 	    
 	    return clazz;
 	}
@@ -1993,7 +2100,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
         if(StorageType.CMS.equals(section.getModule().getStorageType())){
             clazz.addImport("net.anotheria.asg.data.LockableObject");
-            clazz.addImport("net.anotheria.asg.util.helper.action.permissions.LockableObjectActionPermissionCheckHelper");
+            clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
         }
 		if (containerProperty instanceof MetaListProperty){
 			MetaProperty containedProperty = ((MetaListProperty)containerProperty).getContainedProperty();
@@ -2115,11 +2222,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
 
         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
-           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
-            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerListAddRow.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
-           appendString("}");
+         //  appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+          // appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+		   //This is SomeHow related  to Document Updation! SO next method should be invoked!
+           appendStatement("canUpdate" + doc.getMultiple() +"("+doc.getVariableName()+", req)" );
+		   //autoUnlocking!
+		   appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+          // appendString("}");
         }
 
 		String call = "";
@@ -2172,11 +2281,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 
          if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
-           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
-            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerListQuickAdd.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
-           appendString("}");
+          /////// appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+          // appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+		   //This is SomeHow related  to Document Updation! SO next method should be invoked!
+           appendStatement("canUpdate" + doc.getMultiple() +"("+doc.getVariableName()+", req)" );
+		   //autoUnlocking!
+		   appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+          ///// appendString("}");
         }
 
 		appendStatement("String paramIdsToAdd = form.getQuickAddIds()");
@@ -2220,7 +2331,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
          if(StorageType.CMS.equals(section.getModule().getStorageType())){
             clazz.addImport("net.anotheria.asg.data.LockableObject");
-            clazz.addImport("net.anotheria.asg.util.helper.action.permissions.LockableObjectActionPermissionCheckHelper");
+            clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
         }
 		
 		clazz.setName(getContainerAddEntryActionName(doc, table));
@@ -2235,11 +2346,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 
         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
-           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
-            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerTableAddAction.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
-           appendString("}");
+          // appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+          // appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+			//This is SomeHow related  to Document Updation! SO next method should be invoked!
+           appendStatement("canUpdate" + doc.getMultiple() +"("+doc.getVariableName()+", req)" );
+		   //autoUnlocking!
+		   appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+          // appendString("}");
         }
 
 		String call = "";
@@ -2288,11 +2401,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
          if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
            appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
-           appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
-           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
-            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerDelete.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
-           appendString("}");
+           //appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
+           //appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
+		   //This is SomeHow related  to Document Updation! SO next method should be invoked!
+           appendStatement("canUpdate" + doc.getMultiple() +"("+doc.getVariableName()+"Curr, req)" );
+		   //autoUnlocking!
+		   appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+"Curr, req)");
+           //appendString("}");
         }
 		appendStatement("int position = getIntParameter(req, "+quote("pPosition")+")"); 
 		appendStatement(doc.getName()+" "+doc.getVariableName());
@@ -2360,12 +2475,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(doc.getName()+" "+doc.getVariableName() + " = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 
          if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-
-           appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
-           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
-            //Actually We does not Care - about admin role in containerDelete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("LockableObjectActionPermissionCheckHelper.containerMove.checkExecutionPermisson(lockable.isLocked(),false,lockable.getLockerId(),getUserId(req))");
-           appendString("}");
+         //  appendString("if("+doc.getVariableName()+" instanceof LockableObject){ ");
+          // appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName());
+		  //This is SomeHow related  to Document Updation! SO next method should be invoked!
+           appendStatement("canUpdate" + doc.getMultiple() +"("+doc.getVariableName()+", req)" );
+		   //autoUnlocking!
+		   appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+          // appendString("}");
         }
 
 		appendString("if ("+quote("top")+".equalsIgnoreCase(direction))");
@@ -2488,7 +2604,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString( getExecuteDeclaration(methodName));
 		increaseIdent();
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
-		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+			//autoUnlocking!
+		    appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+		}
 		emptyline();
 		
 		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(list)+"() ");
@@ -2622,6 +2742,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		increaseIdent();
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
+			//autoUnlocking!
+		    appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
+		}
 		emptyline();
 		
 		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(table)+"() ");
