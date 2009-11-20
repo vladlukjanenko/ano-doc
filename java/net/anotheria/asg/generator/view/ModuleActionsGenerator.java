@@ -1880,7 +1880,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    startClassBody();
 
 		if(isCMS)
-		appendStatement("private final Logger logger = Logger.getLogger(\"cms-lock-log\")");		
+		appendStatement("private final Logger logger = Logger.getLogger(\"cms-lock-log\")");
 	    //generate getTitle
 	    appendString( "public String getTitle(){");
 	    increaseIdent();
@@ -1899,7 +1899,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("lock.setLockerId(getUserId(req))");
 			appendIncreasedStatement("lock.setLockingTime(System.currentTimeMillis())");
 			appendIncreasedStatement(getServiceGetterCall(section.getModule()) + ".update" + doc.getName() + "( " + doc.getVariableName() + ")");
-			appendIncreasedStatement("logger.info("+quote("document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was unlocked by: ")+" + getUserId(req)"+")");
+			appendIncreasedStatement("logger.info("+quote("Lock-OPERATION, document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was locked by: ")+" + getUserId(req)"+")");
 			//putting to cache!
 			appendIncreasedStatement("addLockedAttribute(req, lock)");
 			appendString("}");
@@ -1914,10 +1914,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("lock.setLockerId(\"\")");
 			appendIncreasedStatement("lock.setLockingTime(0)");
 			appendIncreasedStatement(getServiceGetterCall(section.getModule()) + ".update" + doc.getName() + "( " + doc.getVariableName() + ")");
-			appendIncreasedString("if(!unlockByTimeoout){");
-			appendIncreasedStatement("   logger.info("+quote("document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was unlocked by: ")+" + getUserId(req) +"+quote("  with 'admin' role :")+" + isUserInRole(req, \"admin\") " +")");
-			appendIncreasedString("}else{");
-			appendIncreasedStatement("   logger.info("+quote("document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was unlocked by: timeOut")+")");
+			appendIncreasedString("if (!unlockByTimeoout){");
+			appendIncreasedStatement("   logger.info("+quote("UnLock-OPERATION, document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was unlocked by: ")+" + getUserId(req) +"+quote("  with 'admin' role :")+" + isUserInRole(req, \"admin\") " +")");
+			appendIncreasedString(" } else { ");
+			appendIncreasedStatement("   logger.info("+quote("UnLock-OPERATION, document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was unlocked by: timeOut")+")");
 			appendIncreasedString("}");
 	        appendIncreasedStatement("removeLockedAttribute(req, lock)");
 			appendString("}");
