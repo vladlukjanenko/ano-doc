@@ -390,15 +390,15 @@ public class BaseActionGenerator extends AbstractGenerator {
 
 
 		appendComment("Getting attributes List<LockedDocumentAttribute> - from session.");
-        appendString("private List<LockedDocumentAttribute> getLockedAttributesList(HttpServletRequest req) {");
+		appendString("@SuppressWarnings(\"unchecked\")");
+		appendString("private List<LockedDocumentAttribute> getLockedAttributesList(HttpServletRequest req) {");
 		increaseIdent();
 		appendStatement("List<LockedDocumentAttribute> attributes = null");
 		appendStatement("Object sessionBean = req.getSession().getAttribute(LOCKED_OBJECTS_COLLECTION_SESSION_ATTRIBUTE_NAME)");
-	    appendString("if (sessionBean != null && sessionBean instanceof Collection){ ");
-		appendIncreasedStatement("//noinspection unchecked");
+		appendString("if (sessionBean != null && sessionBean instanceof Collection<?>){ ");
 		appendIncreasedStatement("attributes = (List<LockedDocumentAttribute>) sessionBean");
 		appendString("}");
-	    appendStatement("return attributes == null || attributes.isEmpty() ? new ArrayList<LockedDocumentAttribute>() : attributes");
+	    appendStatement("return attributes == null ? new ArrayList<LockedDocumentAttribute>() : attributes");
 		append(closeBlock());
 		emptyline();
 		emptyline();
@@ -407,11 +407,13 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendString("public static class LockedDocumentAttribute implements Serializable{");
 		emptyline();
 		increaseIdent();
+		appendComment("SerialVersionUID UID.");
+		appendStatement("private static final long serialVersionUID = 1L");
 		appendComment("LockedDocumentAttribute \"docId\".");
 		appendStatement("private String docId");
 		emptyline();
 		appendComment("LockedDocumentAttribute \"documentClazz\".");
-		appendStatement("private Class documentClazz;");
+		appendStatement("private Class<? extends AbstractASGDocument> documentClazz");
 		emptyline();
 
 		appendComment("Public constructor.");
@@ -428,7 +430,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		append(closeBlock());
 		emptyline();
 
-		appendString("public Class getDocumentClazz() {");
+		appendString("public Class<? extends AbstractASGDocument> getDocumentClazz() {");
 		increaseIdent();
 		appendStatement("return documentClazz");
 		append(closeBlock());
@@ -440,7 +442,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		append(closeBlock());
 		emptyline();
 
-		appendString("public void setDocumentClazz(Class aDocumentClazz) {");
+		appendString("public void setDocumentClazz(Class<? extends AbstractASGDocument> aDocumentClazz) {");
 		increaseIdent();
 		appendStatement("this.documentClazz = aDocumentClazz");
 		append(closeBlock());
@@ -480,28 +482,4 @@ public class BaseActionGenerator extends AbstractGenerator {
 		return clazz;
 	}
 
-
-	/*private void isUpdationAllowed(LockableObject lock, HttpServletRequest req) throws Exception {
-		//Actually - simplest Check! --  exception - if anything happens!!!!
-		DocumentLockingHelper.update.checkExecutionPermisson(lock, false, getUserId(req));
-		//Checking Lock TimeOut
-		if (isTimeoutReached(lock)) {
-			//unLockPageStyles(lock);
-			throw new RuntimeException("Document can't be updated! Due  tue   lock - timeout!!!");
-		}
-		//Checking document was  unlocked!
-		if (isUnlockedByAdmin(lock, req))
-			throw new RuntimeException("Document can't be updated! It was unlocked by admin!!!");
-
-	}
-
-	private boolean isTimeoutReached(LockableObject lock) {
-		//not clear!!!!!  really!!!!
-		return lock.isLocked() && lock.getLockingTime() + getLockingTimeout() <= System.currentTimeMillis();
-	}
-
-	private boolean isUnlockedByAdmin(LockableObject loc, HttpServletRequest req){
-		//checkSession Attribute!   if   exists  && object is Unlocked --  then throw an Exception!!
-		return false;
-	}*/
 }

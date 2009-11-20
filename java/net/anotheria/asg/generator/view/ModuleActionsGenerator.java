@@ -397,7 +397,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         } else {
             //Unlocking CASE
             appendIncreasedStatement("DocumentLockingHelper.unLock.checkExecutionPermisson(lockable,isUserInRole(req, \"admin\"),getUserId(req))");
-            appendIncreasedStatement("unLock" + doc.getMultiple() + "("+doc.getVariableName()+"Curr, req)");
+            appendIncreasedStatement("unLock" + doc.getMultiple() + "("+doc.getVariableName()+"Curr, req, false)");
         }
         appendString("}");
         appendStatement("res.sendRedirect(getRedirectUrl(req, "+doc.getVariableName()+"Curr))");
@@ -1871,12 +1871,16 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			clazz.addImport("net.anotheria.asg.data.LockableObject");
 			clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
 			clazz.addImport("net.anotheria.asg.util.locking.exeption.LockingException");
+			clazz.addImport("org.apache.log4j.Logger");
 			clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		}
 	    clazz.setName(getBaseActionName(section));
 	    clazz.setParent(BaseViewActionGenerator.getViewActionName(view));
 
 	    startClassBody();
+
+		if(isCMS)
+		appendStatement("private final Logger logger = Logger.getLogger(\"cms-lock-log\")");		
 	    //generate getTitle
 	    appendString( "public String getTitle(){");
 	    increaseIdent();
@@ -1895,13 +1899,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("lock.setLockerId(getUserId(req))");
 			appendIncreasedStatement("lock.setLockingTime(System.currentTimeMillis())");
 			appendIncreasedStatement(getServiceGetterCall(section.getModule()) + ".update" + doc.getName() + "( " + doc.getVariableName() + ")");
+			appendIncreasedStatement("logger.info("+quote("document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was unlocked by: ")+" + getUserId(req)"+")");
 			//putting to cache!
 			appendIncreasedStatement("addLockedAttribute(req, lock)");
 			appendString("}");
 			append(closeBlock());
 
 			appendComment("Executing unlocking. Actually.");
-			appendString("protected void unLock" + doc.getMultiple() + "(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req) throws Exception{");
+			appendString("protected void unLock" + doc.getMultiple() + "(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req, boolean unlockByTimeoout) throws Exception{");
 			increaseIdent();
 			appendString("if("+doc.getVariableName()+" instanceof AbstractASGDocument){");
 			appendIncreasedStatement("AbstractASGDocument lock = (AbstractASGDocument)"+doc.getVariableName());
@@ -1909,6 +1914,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("lock.setLockerId(\"\")");
 			appendIncreasedStatement("lock.setLockingTime(0)");
 			appendIncreasedStatement(getServiceGetterCall(section.getModule()) + ".update" + doc.getName() + "( " + doc.getVariableName() + ")");
+			appendIncreasedString("if(!unlockByTimeoout){");
+			appendIncreasedStatement("   logger.info("+quote("document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was unlocked by: ")+" + getUserId(req) +"+quote("  with 'admin' role :")+" + isUserInRole(req, \"admin\") " +")");
+			appendIncreasedString("}else{");
+			appendIncreasedStatement("   logger.info("+quote("document with id : [") +"+"+doc.getVariableName()+".getId()+"+quote("] was unlocked by: timeOut")+")");
+			appendIncreasedString("}");
 	        appendIncreasedStatement("removeLockedAttribute(req, lock)");
 			appendString("}");
 			append(closeBlock());
@@ -1920,7 +1930,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("boolean shouldUnlock = "+doc.getVariableName()+ " instanceof AbstractASGDocument && \n \t \t \t \t ((AbstractASGDocument)"+doc.getVariableName()+
 					").isLocked() && \n \t \t \t \t ( System.currentTimeMillis() >= ((AbstractASGDocument)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout())");
 			appendString("if(shouldUnlock)");
-            appendIncreasedStatement("unLock"+ doc.getMultiple() + "(" +doc.getVariableName() + ", req)");
+            appendIncreasedStatement("unLock"+ doc.getMultiple() + "(" +doc.getVariableName() + ", req, true)");
 			append(closeBlock());
 
 			appendComment("Checking UpdateCapability rights");
@@ -1957,8 +1967,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("return !lock.isLocked() && containsLockedAttribute(req, lock)");
             appendString("}");
 			appendStatement("return false");
-
-
 			append(closeBlock());
 			
 		}
