@@ -6,6 +6,10 @@ import java.util.List;
 import net.anotheria.anodoc.data.NoSuchPropertyException;
 import net.anotheria.asg.data.DataObject;
 
+/**
+ * Expose documents filtering by first letter of document name
+ *
+ */
 public class AZDocumentFilter implements DocumentFilter{
 	
 	/**
