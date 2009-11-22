@@ -1,5 +1,6 @@
 package net.anotheria.asg.util.locking.config;
 
+import org.apache.log4j.Logger;
 import org.configureme.annotations.Configure;
 import org.configureme.annotations.ConfigureMe;
 import org.configureme.ConfigurationManager;
@@ -23,29 +24,13 @@ public class LockingConfig {
 	 */
 	@Configure
 	private long timeout;
-	/**
-	 * Instance itself.
-	 */
-	private static LockingConfig instance;
-	/**
-	 * Lock.
-	 */
-	private static final Object lock = new Object();
 
 	/**
 	 * Actualy getInstance method.
 	 * @return Instance of LockingConfig
 	 */
 	public static LockingConfig getInstance() {
-		if (instance != null)
-			return instance;
-		synchronized (lock) {
-			if (instance != null)
-				return instance;
-			instance = new LockingConfig();
-			ConfigurationManager.INSTANCE.configure(instance);
-			return instance;
-		}
+		return LockingConfigInstanceHolder.instance;
 	}
 
 	/**
@@ -70,5 +55,20 @@ public class LockingConfig {
 
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
+	}
+	
+	private static class LockingConfigInstanceHolder{
+		private static final LockingConfig instance = new LockingConfig();
+		static{
+			try{
+				ConfigurationManager.INSTANCE.configure(instance);
+			}catch(Exception e){
+				try{
+					Logger.getLogger(LockingConfig.class).warn("Couldn't configure LockingConfig, stick to defaults: "+instance);
+				}catch(Exception ignoredlockingexception){
+					//ignored
+				}
+			}
+		}
 	}
 }
