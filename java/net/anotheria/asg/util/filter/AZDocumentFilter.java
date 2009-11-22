@@ -8,7 +8,7 @@ import net.anotheria.asg.data.DataObject;
 
 /**
  * Expose documents filtering by first letter of document name
- *
+ * (TEST COMMIT)
  */
 public class AZDocumentFilter implements DocumentFilter{
 	
