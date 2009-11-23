@@ -4,7 +4,7 @@ import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.util.locking.exeption.LockingException;
 
 /**
- * Current Helper only  checks permission for action on LocableObject.
+ * Current Helper only  checks permission for action on LockableObject.
  * Actually should be used in CMS actions - as additional permission checker.
  *
  * @author: h3llka
@@ -42,7 +42,7 @@ public enum DocumentLockingHelper {
     create(),
     /**
      * Update action.
-     * If document is locked - only locker - can perorm current operation !!!
+     * If document is locked - only locker - can perform current operation !!!
      * Otherwise RuntimeException should be thrown.
      */
     update() {
@@ -54,7 +54,7 @@ public enum DocumentLockingHelper {
         }},
     /**
      * Delete action.
-     * If document is locked - only locker - can perorm current operation !!!
+     * If document is locked - only locker - can perform current operation !!!
      * Otherwise RuntimeException should be thrown.
      */
     delete() {
@@ -80,7 +80,7 @@ public enum DocumentLockingHelper {
 
     /**
      * Lock - action.
-     * Lock can't be performed on allready locked objects!
+     * Lock can't be performed on all ready locked objects!
      */
     lock() {
         @Override
@@ -149,7 +149,7 @@ public enum DocumentLockingHelper {
     /**
      * ContainerDelete action. Similar to Delete action - but actually used  for linked entries deletion.
      * In current case - Document updation  will be invoked!!!
-     * If document is locked - only locker - can perorm current operation !!!
+     * If document is locked - only locker - can perform current operation !!!
      * Otherwise RuntimeException should be thrown.
      */
     containerDelete() {
@@ -163,7 +163,7 @@ public enum DocumentLockingHelper {
     /**
      * ContainerMove action.
      * In current case - Document updation  will be invoked!!!
-     * If document is locked - only locker - can perorm current operation !!!
+     * If document is locked - only locker - can perform current operation !!!
      * Otherwise RuntimeException should be thrown.
      */
     containerMove() {
@@ -177,7 +177,7 @@ public enum DocumentLockingHelper {
     /**
      * ContainerListAddRow - action.
      * In current case - Document updation  will be invoked!!!
-     * If document is locked - only locker - can perorm current operation !!!
+     * If document is locked - only locker - can perform current operation !!!
      * Otherwise RuntimeException should be thrown.
      */
     containerListAddRow() {
@@ -192,7 +192,7 @@ public enum DocumentLockingHelper {
     /**
      * ContainerTableAddAction - action.
      * In current case - Document updation  will be invoked!!!
-     * If document is locked - only locker - can perorm current operation !!!
+     * If document is locked - only locker - can perform current operation !!!
      * Otherwise RuntimeException should be thrown.
      */
     containerTableAddAction() {
@@ -207,7 +207,7 @@ public enum DocumentLockingHelper {
     /**
      * ContainerListQuickAdd - action.
      * In current case - Document updation  will be invoked!!!
-     * If document is locked - only locker - can perorm current operation !!!
+     * If document is locked - only locker - can perform current operation !!!
      * Otherwise RuntimeException should be thrown.
      */
     containerListQuickAdd() {
@@ -221,7 +221,7 @@ public enum DocumentLockingHelper {
 
 
     /**
-     * Alows additional permissions check.
+     * Allows additional permissions check.
      * RuntimeException will be thrown if action can't be performed.
      *
      * @param document - actually LockableObject instance
