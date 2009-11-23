@@ -6,8 +6,9 @@ import org.configureme.annotations.ConfigureMe;
 import org.configureme.ConfigurationManager;
 
 /**
- * configuation for  Locking.
- * Actually   contains  autolocking property  and  timeout.
+ * Configuration for  Locking.
+ *
+ * Actually   contains  'autolocking' property  and  timeout.
  *
  * @author: h3llka
  */
@@ -26,7 +27,7 @@ public class LockingConfig {
 	private long timeout;
 
 	/**
-	 * Actualy getInstance method.
+	 * Actually getInstance method.
 	 * @return Instance of LockingConfig
 	 */
 	public static LockingConfig getInstance() {
@@ -34,7 +35,7 @@ public class LockingConfig {
 	}
 
 	/**
-	 * Private constructor - with defalts.
+	 * Private constructor - with defaults.
 	 */
 	private LockingConfig() {
 		this.autolocking = false;
