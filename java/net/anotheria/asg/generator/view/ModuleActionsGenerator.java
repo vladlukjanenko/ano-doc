@@ -391,12 +391,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName()+"Curr");
         if (isLock) {
             //Locking CASE
-            //Actually We does not Care - about admin role in Lock action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-            appendIncreasedStatement("DocumentLockingHelper.lock.checkExecutionPermisson(lockable,false,getUserId(req))");
+            //Actually We does not Care - about admin role in Lock action!  So checkExecutionPermission  2-nd parameter  can be anything!
+            appendIncreasedStatement("DocumentLockingHelper.lock.checkExecutionPermission(lockable,false,getUserId(req))");
             appendIncreasedStatement("lock" + doc.getMultiple() + "("+doc.getVariableName()+"Curr, req)");
         } else {
             //Unlocking CASE
-            appendIncreasedStatement("DocumentLockingHelper.unLock.checkExecutionPermisson(lockable,isUserInRole(req, \"admin\"),getUserId(req))");
+            appendIncreasedStatement("DocumentLockingHelper.unLock.checkExecutionPermission(lockable,isUserInRole(req, \"admin\"),getUserId(req))");
             appendIncreasedStatement("unLock" + doc.getMultiple() + "("+doc.getVariableName()+"Curr, req, false)");
         }
         appendString("}");
@@ -1682,8 +1682,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
            appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
            appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
            appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
-            //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermisson  2-nd parameter  can be anything!
-           appendIncreasedStatement("DocumentLockingHelper.delete.checkExecutionPermisson(lockable, false, getUserId(req))");
+            //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermission  2-nd parameter  can be anything!
+           appendIncreasedStatement("DocumentLockingHelper.delete.checkExecutionPermission(lockable, false, getUserId(req))");
            appendString("}"); 
         }
 	    appendStatement(getServiceGetterCall(section.getModule())+".delete"+doc.getName()+"(id)");
@@ -1938,7 +1938,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			increaseIdent();
 			appendString("if("+doc.getVariableName()+ " instanceof LockableObject ){");
 			appendString("//Actually - simplest Check! --  exception - if anything happens!!!!");
-			appendIncreasedStatement("DocumentLockingHelper.update.checkExecutionPermisson((LockableObject)"+doc.getVariableName()+", false, getUserId(req))");
+			appendIncreasedStatement("DocumentLockingHelper.update.checkExecutionPermission((LockableObject)"+doc.getVariableName()+", false, getUserId(req))");
 			appendString("}");
 			appendString("if (isTimeoutReached("+ doc.getVariableName() +")) {");
 			appendIncreasedStatement("check"+ doc.getMultiple() + "(" +doc.getVariableName() + ", req)");
