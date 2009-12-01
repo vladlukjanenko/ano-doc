@@ -48,7 +48,7 @@ public class JspMenuGenerator extends AbstractJSPGenerator {
 		appendString("<li class=\"menuItemSep\"><div>&nbsp;</div></li>");
 		appendString("<li><a href=\"\">Preferences</a></li>");
 		appendString("<li class=\"menuItemSep\"><div>&nbsp;</div></li>");
-		appendString("<li><a href=\"\">Logout</a></li>");
+		appendString("<li><a href=\"logout\">Logout</a></li>");
 		decreaseIdent();
 		appendString("</ul>");
 		decreaseIdent();

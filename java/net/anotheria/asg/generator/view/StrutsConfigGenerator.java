@@ -164,30 +164,6 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return files;
 	}
 	
-	public FileEntry generateSystemConfig() {
-		String pResultConfigFileContent = "";
-		try {
-			pResultConfigFileContent = IOUtils.readFileAtOnceAsString(Generator.getBaseDir() + TEMPLATE);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// mappings
-		String pMappings = generateActionMapping("/index", "net.anotheria.anosite.gen.shared.action.BaseIndexPageAction", "success",
-				"/net/anotheria/anosite/gen/shared/jsp/IndexPage.jsp");
-		pResultConfigFileContent = StringUtils.replaceOnce(pResultConfigFileContent, MAPPINGS_PLACEHOLDER, pMappings);
-
-		// forms
-		String pForms = "";
-		pResultConfigFileContent = StringUtils.replaceOnce(pResultConfigFileContent, FORMS_PLACEHOLDER, pForms);
-
-		// result file
-		FileEntry pResultConfigFile = new FileEntry("/etc/appdata", "struts-config-cms-system", pResultConfigFileContent);
-		pResultConfigFile.setType(".xml");
-
-		return pResultConfigFile;
-	}
-	
 	/**
 	 * Returns the name of the config file name for the given view.
 	 * @param view
