@@ -122,6 +122,10 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
      */
     public static final String ACTION_UNLOCK = "unLock";
 	/**
+     *  Constant for close action.
+     */
+    public static final String ACTION_CLOSE = "close";
+	/**
 	 * Extension for csv generation.
 	 */
 	public static final String SUFFIX_CSV = ".csv";
@@ -504,6 +508,13 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getEditActionName(section),
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
+			);
+
+		ret += generateActionMapping(
+			"/"+getPath(doc, ACTION_CLOSE), 
+			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
+			"success",
+			FileEntry.package2path(JspViewGenerator.getPackage(module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
 			);
 
          //lock && unlock actions

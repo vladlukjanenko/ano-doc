@@ -318,6 +318,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_DELETE);
 	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_DUPLICATE);
 	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_UPDATE);
+	    writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_CLOSE);
 	    if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual()){
 	    	writePathResolveForMultiOpAction(doc, StrutsConfigGenerator.ACTION_COPY_LANG);
 	    	writePathResolveForMultiOpAction(doc, StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE);
@@ -355,12 +356,36 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
             generateLockManagementActionMethod(section, StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_UNLOCK),false);
             emptyline();
             generateRedirectPathMethod(section);
+			emptyline();
         }
+		generateCloseAction(section, StrutsConfigGenerator.getPath(doc,StrutsConfigGenerator.ACTION_CLOSE));
+		emptyline();
 	    
 	    return clazz;
 	}
 
-    private void generateRedirectPathMethod(MetaModuleSection section) {
+	/**
+	 * Generate close action with unlock funcional
+	 *
+	 * @param section
+	 * @param methodName
+	 */
+	private void generateCloseAction(MetaModuleSection section, String methodName) {
+		MetaDocument doc = section.getDocument();
+		appendString(getExecuteDeclaration(methodName));
+		increaseIdent();
+		if (StorageType.CMS.equals(doc.getParentModule().getStorageType())) {
+			appendStatement("String id = getStringParameter(req, PARAM_ID)");
+			appendStatement(doc.getName() + " " + doc.getVariableName() + "Curr = " + getServiceGetterCall(section.getModule()) + ".get" + doc.getName() + "(id)");
+			appendString("if(" + doc.getVariableName() + "Curr instanceof LockableObject && ((LockableObject)" + doc.getVariableName() + "Curr).isLocked()) ");
+			appendIncreasedStatement("unLock" + doc.getMultiple() + "(" + doc.getVariableName() + "Curr, req, false)");
+		}
+		appendStatement("res.sendRedirect(" + getShowActionRedirect(doc) + ")");
+		appendStatement("return null");
+		append(closeBlock());
+	}
+
+	private void generateRedirectPathMethod(MetaModuleSection section) {
         MetaDocument doc = section.getDocument();
         appendComment("Simplest method for redirect url creation. nextAction == showEdit - going to 'editView', to 'listView' otherwise. ");
         appendString("private String getRedirectUrl(HttpServletRequest req, "+doc.getName()+" item){");
@@ -1217,15 +1242,31 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		   //autoUnlocking!
 		   appendIncreasedStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
         }
-		appendIncreasedStatement("updatedCopy = "+getServiceGetterCall(section.getModule())+".update"+doc.getName()+"( "+doc.getVariableName()+")");
+		appendIncreasedStatement("updatedCopy = "+getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
+
 		//appendIncreasedStatement("System.out.println(\"updating\")");
 		appendString( "}");
-		appendString( "if (nextAction.equalsIgnoreCase("+quote("stay")+"))");
+		appendString( "if (nextAction.equalsIgnoreCase("+quote("stay")+")){");
+
 	    appendIncreasedStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+updatedCopy.getId())");
-		appendString( "else");
+		appendString( "}else{");
+		if (StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())) {
+			//unlocking document
+			appendIncreasedStatement("unlockAfterUpdate("+doc.getVariableName()+", req)");
+		}
 	    appendIncreasedStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
+		appendString("}");
 	    appendStatement("return null");
 		append(closeBlock());
+
+		if (StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())) {
+			appendComment("Simply unlocks document after updation.");
+			appendString("private void unlockAfterUpdate(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req) throws Exception{");
+			increaseIdent();
+			appendString("if(((LockableObject)" + doc.getVariableName() + ").isLocked())");
+			appendIncreasedStatement("unLock" + doc.getMultiple() + "(" + doc.getVariableName() + ", req, false)");
+			append(closeBlock());
+		}
 	}
 	
 	/**

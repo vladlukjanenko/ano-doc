@@ -1685,7 +1685,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 
 	private String getFunctionEditor(MetaDocument doc, MetaFunctionElement element){
 		if (element.getName().equals("cancel")) {
-			return "<a href=" + quote(generateTimestampedLinkPath(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW))) + ">&nbsp;&raquo&nbsp;Close&nbsp;</a>";
+			String onClick = "return confirm('All unsaved data will be lost!!!. Document will be unlocked"; 
+			String cancel = StrutsConfigGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), StrutsConfigGenerator.ACTION_CLOSE);
+			cancel += "?pId=<bean:write name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>";
+			return "<a href=" + cancel + " onClick="+onClick+">&nbsp;&raquo&nbsp;Close&nbsp;</a>";
 		}
 		if (element.getName().equals("update")) {
 			return getUpdateAndCloseFunction(doc, element);
