@@ -14,6 +14,7 @@ import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.util.ArrayUtils;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -291,6 +292,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	protected String getCurrentYUIPath(String yuiName){
 		return getYUIPath(yuiName, GeneratorDataRegistry.getInstance().getContext());
 	}
+	
+	protected String getCurrentJavaScriptPath(String javaScript){
+		return getJavaScriptPath(javaScript, GeneratorDataRegistry.getInstance().getContext());
+	}
 
 	public static String getCSSPath(String stylesheetName, Context context){
 		return context.getApplicationURLPath()+"/css/"+stylesheetName;
@@ -300,6 +305,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		return context.getApplicationURLPath()+"/js/"+jsName;
 	}
 
+	public static String getJavaScriptPath(String javaScript, Context context){
+		return context.getApplicationURLPath()+"/js/"+javaScript;
+	}
+	
 	public static String getYUIPath(String yuiName, Context context){
 		return context.getApplicationURLPath()+"/yui/"+yuiName;
 	}
@@ -500,5 +509,126 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	
 	protected void closeTD(String additionalParams){
 		closeTag("td", additionalParams);
+	}
+	
+	
+	/**
+	 * Appends to generation output tag without body
+	 * @param tag tag name
+	 * @param id html id attribute
+	 * @param clazz html class attribute
+	 * @param attrs array of tag attributes
+	 */
+	protected void tag(String tag, String id, String clazz, TagAttribute... attrs){
+		attrs = ArrayUtils.mergeArrays(new TagAttribute[]{new TagAttribute("id", id), new TagAttribute("class", clazz)}, attrs);
+		tag(tag, attrs);
+	}
+
+	/**
+	 * Appends to generation output tag without body
+	 * @param tag tag name
+	 * @param clazz html class attribute
+	 * @param attrs array of tag attributes
+	 */
+	protected void tag(String tag, String clazz, TagAttribute... attrs){
+		attrs = ArrayUtils.mergeArrays(new TagAttribute[]{new TagAttribute("class", clazz)}, attrs);
+		tag(tag, attrs);
+	}
+	
+	/**
+	 * Appends to generation output tag without body
+	 * @param tag tag name
+	 * @param attrs array of tag attributes
+	 */
+	protected void tag(String tag, TagAttribute... attrs){
+		StringBuilder attrsStr = new StringBuilder();
+		for(TagAttribute attr:attrs)
+			attrsStr.append(' ' + attr.toString());
+		appendString("<"+tag, attrsStr.toString(), "/>");
+	}
+	
+	/**
+	 * Appends to generation output opening for tag
+	 * @param tag tag name
+	 * @param id html id attribute
+	 * @param clazz html class attribute
+	 * @param attrs array of tag attributes
+	 */
+	protected void tagOpen(String tag, String id, String clazz, TagAttribute... attrs){
+		attrs = ArrayUtils.mergeArrays(new TagAttribute[]{new TagAttribute("id", id), new TagAttribute("class", clazz)}, attrs);
+		tagOpen(tag, attrs);
+	}
+
+	/**
+	 * Appends to generation output opening for tag
+	 * @param tag tag name
+	 * @param clazz html class attribute
+	 * @param attrs array of tag attributes
+	 */
+	protected void tagOpen(String tag, String clazz, TagAttribute... attrs){
+		attrs = ArrayUtils.mergeArrays(new TagAttribute[]{new TagAttribute("class", clazz)}, attrs);
+		tagOpen(tag, attrs);
+	}
+	
+	/**
+	 * Appends to generation output opening for tag
+	 * @param tag tag name
+	 * @param attrs array of tag attributes
+	 */
+	protected void tagOpen(String tag, TagAttribute... attrs){
+		StringBuilder attrsStr = new StringBuilder();
+		for(TagAttribute attr:attrs)
+			attrsStr.append(' ' + attr.toString());
+		appendString("<"+tag, attrsStr.toString(), ">");
+		increaseIdent();
+	}
+	
+	
+	/**
+	 * Appends to generation output closing for tag
+	 * @param tag tag name
+	 */
+	protected void tagClose(String tag){
+		decreaseIdent();
+		appendString("</"+tag+">");
+	}
+	
+	/**
+	 * Appends to generation output script tag with type javascript
+	 */
+	protected void openJavaScript(){
+		tagOpen("script", new TagAttribute("type", "text/javascript"));
+	}
+	
+	/**
+	 * Appends to generation output script tag closing
+	 */
+	protected void closeJavaScript(){
+		tagClose("script");
+	}
+	
+	/**
+	 * HTML/JSP tag attribute object representation
+	 * @author denis
+	 *
+	 */
+	protected static class TagAttribute{
+		/**
+		 * attr name
+		 */
+		private String name;
+		/**
+		 * attr value
+		 */
+		private String value;
+		
+		public TagAttribute(String aName, String aValue) {
+			name = aName;
+			value = aValue;
+		}
+		
+		@Override public String toString(){
+			return name + "=" + '"' + value + '"'; 
+		}
 	}
 }

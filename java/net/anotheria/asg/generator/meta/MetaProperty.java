@@ -36,10 +36,14 @@ public class MetaProperty implements Cloneable{
 	 * @param aType
 	 */
 	public MetaProperty(String aName, String aType){
+		this(aName, aType, false);
+	}
+	
+	public MetaProperty(String aName, String aType, boolean aMultilingual){
 		name = aName;
 		type = aType;
 		metaType = TypeFactory.createType(aType);
-		multilingual = false;
+		multilingual = aMultilingual;
 		
 		if (name==null)
 			throw new IllegalArgumentException("name is null");
@@ -54,6 +58,7 @@ public class MetaProperty implements Cloneable{
 			throw new IllegalArgumentException("name is null");
 	}
 
+
 	/**
 	 * @return
 	 */
@@ -67,7 +72,7 @@ public class MetaProperty implements Cloneable{
 	 * @return
 	 */
 	public String getName(String language) {
-		return language == null ? getName() : name+StringUtils.capitalize(language);
+		return language == null || !isMultilingual()? getName() : name+StringUtils.capitalize(language);
 	}
 
 	public String getName(String addOn, String language) {

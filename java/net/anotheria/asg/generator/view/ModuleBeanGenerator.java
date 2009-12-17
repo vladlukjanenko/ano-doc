@@ -725,7 +725,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			tmpForSorting.setName(tmpForSorting.getName()+"ForSorting");
 			generateMethods(element, tmpForSorting);
 			//if this field has a decorator we have to generate string methods instaed of original methods.
-			p = new MetaProperty(p.getName(), "string");
+			p = new MetaProperty(p.getName(), "string", p.isMultilingual());
 		}
 		
 		generateMethods(element, p);

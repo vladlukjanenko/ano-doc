@@ -68,6 +68,7 @@ public final class XMLViewParser {
 			view.addSection(parseSection(sections.get(i)));
 		
 		view.setTitle(m.getAttributeValue("title"));
+		view.setCms20("2.0".equals(m.getAttributeValue("version")));
 		
 		String roles = m.getAttributeValue("requiredroles");
 		if (roles != null && roles.trim().length()!=0)

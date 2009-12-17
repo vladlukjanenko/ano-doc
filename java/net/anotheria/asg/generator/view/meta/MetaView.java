@@ -14,6 +14,12 @@ public class MetaView implements IGenerateable{
 	 * Name of the view.
 	 */
 	private String name;
+	
+	/**
+	 * Flag for cms 2.0 version
+	 */
+	private boolean cms20;
+	
 	//not used?
 	//private boolean passwordProtected;
 	/**
@@ -108,6 +114,14 @@ public class MetaView implements IGenerateable{
 
 	public void setRequiredRoles(List<String> requiredRoles) {
 		this.requiredRoles = requiredRoles;
+	}
+
+	public boolean isCms20() {
+		return cms20;
+	}
+
+	public void setCms20(boolean cms20) {
+		this.cms20 = cms20;
 	}
 
 }
