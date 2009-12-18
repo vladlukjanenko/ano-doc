@@ -1,9 +1,7 @@
 package net.anotheria.asg.generator.cms20.view;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.generator.FileEntry;
@@ -543,17 +541,11 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/autocomplete/autocomplete-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/dragdrop/dragdrop-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/button/button-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");
 		
-//		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/animation/animation-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/tabview/tabview-min.js")) + "></script>");
-		
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/EditorHider.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/ComboBox.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentJavaScriptPath("tiny_mce/tiny_mce.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/util/FormUtils.js")) + "></script>");
+		
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote("http://code.jquery.com/jquery-latest.js") + "></script>");
 		
 		//*** CMS2.0 FINISH ***
 		
@@ -605,20 +597,15 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument()); 
 		
-		
-		
-		
-		String defLanguage = GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage();
-		
 		tagOpen("div", dialog.getName(), "yui-navset");
 		if(multilangDialog) {
 			//** Generate LanguageTabs **//
 			
 			appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
-			tagOpen("ul", "yui-nav");
-			appendString("<li class=\"selected\"><a href=\"#LangALL\"><em>All</em></a></li>");
+			tagOpen("ul", "EditDialogNavigator", "yui-nav");
+			appendString("<li id=\"NavitemALL\" class=\"selected\"><a href=\"#LangALL\"><em>All</em></a></li>");
 			for (String lang : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-				tagOpen("li");
+				tagOpen("li",new TagAttribute("id", "Navitem" + lang));
 				appendString("<a href=\"#Lang"+lang+"\"><em>"+lang+"</em></a>");
 				tagClose("li");
 			}
@@ -643,8 +630,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			//*** CMS2.0 FINISH ***
 		}
 		
-		//** Generate LanguageTabs: for language ALL **//
-		tagOpen("div", "LangALL", "lang ALL");
+		//** Generate Editing Form**//
 		
 		appendString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
@@ -659,64 +645,23 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 				continue;
 			lineDark = !StringUtils.isEmpty(element.getName()) && element.getName().equals(elName)? lineDark: !lineDark;
 			String lang = getElementLanguage(element);
-			boolean monolangEl = !(element instanceof MultilingualFieldElement);
-			boolean deflangEl = !monolangEl && defLanguage.equals(lang);
+			boolean multilangEl = element instanceof MultilingualFieldElement;
 			
 			elName = element.getName();
-			tagOpen("div", "yui-gd " + (lineDark?"lineDark":"lineLight") + (!monolangEl && !deflangEl? " <bean:write name=\"multilang\"/>":""));
+			tagOpen("div", "yui-gd " + (lineDark?"lineDark":"lineLight"), new TagAttribute("lang", multilangEl? lang: null));
 			tagOpen("div", "yui-u first");
-			appendString((StringUtils.isEmpty(element.getName())?"&nbsp;": (section.getDocument().getField(element.getName()).getName(lang)) + (deflangEl?("<span class="+quote("defLanguageLabel <bean:write name=\"multilang\"/>")+">" + "_DEF" + "</span>"):"")));
+			appendString((StringUtils.isEmpty(element.getName())?"&nbsp;": (section.getDocument().getField(element.getName()).getName(lang))));
 			tagClose("div"/*yui-u first*/);
 			
 			tagOpen("div", "yui-u");
-			appendString(getElementEditor(section.getDocument(), element, "ALL"));
+			appendString(getElementEditor(section.getDocument(), element));
 			appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
 			tagClose("div"/*yui-u*/);
 			
 	    	tagClose("div"/*yui-gd*/);
 		}
 		appendString("</html:form>");
-		
-		tagClose("div"/*LangALL*/);
-		
-		//** Generate LanguageTabs: defined languages**//
-		if(multilangDialog){
-			//** Fills LanguageTabs with current language content **//
-			appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
-			//For each language
-			for (String lang : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-				tagOpen("div", "Lang" + lang, "lang " + lang);
-				lineDark = true;
-				//Generate Edit LanguageTab
-				for (MetaViewElement element: elements){
-					//HACK: exclude MetaList cause usually it contains MetaFunction Elements
-					if (element instanceof MetaListElement)
-						continue;
-					
-					if(element instanceof MultilingualFieldElement && !lang.equals(((MultilingualFieldElement)element).getLanguage()))
-						continue;
-					tagOpen("div", "yui-gd " + ((lineDark = !lineDark)?"lineDark":"lineLight"));
-			
-					tagOpen("div", "yui-u first");
-					
-					appendString(StringUtils.isEmpty(element.getName())?"&nbsp;": section.getDocument().getField(element.getName()).getName(lang));
-					tagClose("div"/*yui-u first*/);
-					
-					tagOpen("div", "yui-u");
-					appendString(getElementEditor(section.getDocument(), element, lang));
-					appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
-					tagClose("div"/*yui-u*/);
-	//				
-			    	tagClose("div"/*yui-gd*/);
-				}
-		    	tagClose("div"/*Lang*/);
-			}
-			appendString("</logic:equal>");
-		}
-		
 		tagClose("div"/*yui-content*/);	
-		
-		
 		tagClose("div"/*yui-navset*/);
 
 		//** And now generate Dialog Functions (create/close/update etc.) **//
@@ -725,12 +670,11 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			//HACK: exclude not MetaList cause usually it contains MetaFunction Elements
 			if(!(element instanceof MetaListElement))
 				continue;
-			appendString(getElementEditor(section.getDocument(), element, "ALL"));
+			appendString(getElementEditor(section.getDocument(), element));
 			appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
 		}
 		tagClose("div"/*Functions*/);
 		
-		//appendTagClose("div");
 		
 		
 		appendString("<br/>");
@@ -804,54 +748,57 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		appendString("</body>");
 		decreaseIdent();
 		
-		//generateRichTextEditorJS(section.getDocument(), richTextElementsRegistry, multilangDialog);
 		generateLinkElementEditorJS(section.getDocument(), linkElementsRegistry, multilangDialog);
 		
-		openJavaScript();
-		appendString("tinyMCE.init({");
-		increaseIdent();
-		appendString("mode : \"specific_textareas\",");
-		appendString("editor_selector : \"richTextEditor\",");
-		appendString("theme : \"advanced\"");
-		decreaseIdent();
-		appendString("});");
-		appendString("function handleSubmit(){};");
-		closeJavaScript();
 		
-		
-		if(multilangDialog){
-			//** Generate LanguageTabs JS **//
-			appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
+		//Generate RichtTextEditor JS
+		if(richTextElementsRegistry.size() > 0){
 			openJavaScript();
-			appendString("(function() {");
-			appendIncreasedString("var tabView = new YAHOO.widget.TabView("+quote(dialog.getName())+");");
-			appendString("})();");
-			//tinymce.dom.Event.add(document, 'init', ...) to be sure that multilanguage editors sync happens after editors initializations.
-			appendString("tinymce.dom.Event.add(document, 'init', function() {");
+			appendString("tinyMCE.init({");
 			increaseIdent();
-			appendString("var FormUtils = YAHOO.anoweb.util.FormUtils;");
-			//LanguageTabs input fields synchronization JS
-			for (MetaViewElement element: elements){
-				if (element instanceof MetaListElement || element instanceof MetaEmptyElement)
-					continue;		
-				
-				boolean multilangEl = element instanceof MultilingualFieldElement;
-				String elLang = getElementLanguage(element);
-				elName = element.getName() + (multilangEl? elLang : "");
-				
-				if(multilangEl){
-					appendString("FormUtils.reflectInputs(" + quote(elName + "_ALL") + ","+quote(elName + "_" + elLang)+", true);");
-					
-				}
-				else{	
-					Set<String> elementsToSync = new HashSet<String>();
-					for (String lang : GeneratorDataRegistry.getInstance().getContext().getLanguages())
-						elementsToSync.add(quote(elName + "_" + lang));
-					appendString("FormUtils.reflectInputs(" + quote(elName + "_ALL") + ","+elementsToSync+", true);");
-				}
-			}
+			appendString("mode : \"specific_textareas\",");
+			appendString("editor_selector : \"richTextEditor\",");
+			appendString("theme : \"advanced\"");
 			decreaseIdent();
 			appendString("});");
+			appendString("function handleSubmit(){};");
+			closeJavaScript();
+		}
+		
+		//Generate Languages Switching JS
+		if(multilangDialog){
+			appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
+			openJavaScript();
+
+			openFun("switchLanguageTab = function(lang)");
+			appendStatement("lang = lang || 'ALL';");
+			appendStatement("$(\"#EditDialogNavigator > .selected\").removeClass(\"selected\")");
+			appendStatement("$(\"#EditDialogNavigator > #Navitem\"+lang).addClass(\"selected\")");
+			appendStatement("switchLanguage(lang)");
+			closeBlock("switchLanguageTab");
+			
+			openFun("switchLanguage = function(lang){");
+			openFun("if(!lang || lang == 'ALL')");
+			appendStatement("$(\"[lang]\").show()");
+			appendStatement("return");
+			closeBlock("fi");
+			appendStatement("$(\"[lang=\"+lang+\"]\").show()");
+			appendStatement("$(\"[lang][lang!=\"+lang+\"]\").hide()");
+			closeBlock("switchLanguage");
+			
+			appendString("$(document).ready(function(){");
+			increaseIdent();
+			appendString("$(\"#NavitemALL\").click(function(){");
+			appendIncreasedStatement("switchLanguageTab(\"ALL\")");      
+			appendString("});");
+			for(String lang: GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+				appendString("$(\"#Navitem"+lang+"\").click(function(){");
+				appendIncreasedStatement("switchLanguageTab("+quote(lang)+")");      
+				appendString("});");
+			}
+			decreaseIdent();
+			appendString("});"); 
+			
 			closeJavaScript();
 			appendString("</logic:equal>");
 		}
@@ -1010,24 +957,17 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		return p.getName(lang);
 	}
 	
-	private String getEditorVarName(MetaDocument doc, MetaViewElement element){
-		 return getElementName(doc, element) + "Editor";
+	private String getElementID(MetaDocument doc, MetaViewElement element){
+		return getElementName(doc, element);
 	}
-	
-	private String getToggleEditorButtonVarName(MetaDocument doc, MetaViewElement element){
-		 return "toggleEditorButton_" + getElementName(doc, element);
-	}
-	
 	
 	//*** CMS2.0 START ***
 	private void generateLinkElementEditorJS(MetaDocument doc, List<MetaViewElement> linkElements, boolean multilangDialog){
 		appendString("<script type=\"text/javascript\">");
 		increaseIdent();
 		for(MetaViewElement el: linkElements){
-			MetaFieldElement field = (MetaFieldElement)el;
-			MetaProperty p = doc.getField(el.getName());
-			//FIXME: here is assumed that links can't be multilanguage
 			String elName = getElementName(doc, el);
+			String elId = getElementID(doc, el);
 			String elCapitalName = StringUtils.capitalize(elName);
 			String beanName = StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument());
 			
@@ -1045,111 +985,22 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			appendString("id:\"${"+beanName+"."+elName+"}\",name:\"${"+beanName+"."+elName+"CurrentValue}\"");
 			decreaseIdent();
 			appendString("};");
-			appendString("this."+getHtmlEditorID(field, p, "ALL")+" = new YAHOO.anoweb.widget.ComboBox("+quote(getHtmlEditorID(field, p, "ALL"))+",\""+elCapitalName+"SelectorALL\","+elName+"Json,selection"+elCapitalName+"Json);");
-			
-			if(multilangDialog){
-				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
-				for (String lang : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-					appendString("this."+getHtmlEditorID(field, p, lang)+" = new YAHOO.anoweb.widget.ComboBox("+quote(getHtmlEditorID(field, p, lang))+",\""+elCapitalName+"Selector"+lang+"\","+elName+"Json,selection"+elCapitalName+"Json);");
-				}
-				appendString("</logic:equal>");
-			}
+			appendString("this."+elId+" = new YAHOO.anoweb.widget.ComboBox("+quote(elId)+",\""+elCapitalName+"Selector\","+elName+"Json,selection"+elCapitalName+"Json);");
 
 		}
 		decreaseIdent();
 		appendString("</script>");
-	}
-	
-	private void generateRichTextEditorJS(MetaDocument doc, List<MetaViewElement> richTextElements, boolean multilangDialog){
-		
-		if(richTextElements.size() == 0){
-			appendString("<script type=\"text/javascript\">");
-			appendString("function handleSubmit(){");
-			appendString("	}");
-			appendString("</script>");
-			return;
-		}
-		
-		appendString("<script type=\"text/javascript\">");
-		increaseIdent();
-		for(MetaViewElement el: richTextElements){
-			appendStatement("var " + getEditorVarName(doc, el));
-		}
-		appendString("function handleSubmit(){");
-		increaseIdent();
-		for(MetaViewElement el: richTextElements){
-			MetaFieldElement field = (MetaFieldElement)el;
-			MetaProperty p = doc.getField(el.getName());
-			appendIncreasedString(getHtmlEditorID(field, p, "ALL") + ".saveHtmlIfShowed();");
-			if(multilangDialog){
-				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
-				for (String lang : GeneratorDataRegistry.getInstance().getContext().getLanguages())
-					appendIncreasedString(getHtmlEditorID(field, p, lang) + ".saveHtmlIfShowed();");
-				appendString("</logic:equal>");
-			}
-		}
-		decreaseIdent();
-		appendString("}");
-
-		appendString("(function() {");
-		increaseIdent();
-		appendString("var Dom = YAHOO.util.Dom,");
-		appendString("Event = YAHOO.util.Event,");
-		appendString("status = null;"); 
-		appendString("//The Editor config");
-		appendString("var myConfig = {");
-		appendString("width: '660px',"); 
-		appendString("height: '200px',"); 
-		appendString("dompath: false, ");
-		appendString("animate: true, ");
-		appendString("handleSubmit: true ");
-		appendString("}; ");
-		appendString("//Now let's load the Editors..."); 
-		for(MetaViewElement el: richTextElements){
-			MetaFieldElement field = (MetaFieldElement)el;
-			MetaProperty p = doc.getField(el.getName());
-			generateRichTextEditorFieldJS(doc, field, "ALL");
-			if(multilangDialog){
-				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
-				for (String lang : GeneratorDataRegistry.getInstance().getContext().getLanguages())
-					generateRichTextEditorFieldJS(doc, field, lang);
-				appendString("</logic:equal>");
-			}
-		}
-
-		decreaseIdent();
-		appendString("})();"); 
-		decreaseIdent();
-		appendString("</script>");
-		
-		
-	}
-	
-	private void generateRichTextEditorFieldJS(MetaDocument doc, MetaFieldElement editorFeild, String editLanguage){
-		MetaProperty p = doc.getField(editorFeild.getName());
-		String editor = getHtmlEditorID(editorFeild, p, editLanguage);
-		String button = editor + "ToggleButton";
-		appendString(editor + " = new YAHOO.widget.Editor("+quote(editor)+", myConfig);"); 
-		appendString(editor + ".render(); ");
-		appendString("YAHOO.util.Event.addListener("+quote(button)+",\"click\","+editor+".toggle,"+editor+",true)");
-//		appendString("var " + button +" = new YAHOO.widget.Button({id: "+quote(button)+", onclick:{fn:"+editor+".toggle}});");
-//		appendString(button + ".addClass('toggleEditor');");
-//		appendString(button + ".on('click', "+editor+".toggle);");
-//		appendString(button + ".subscribe(\"click\", function(){");
-//		appendString(editor+".toggle();");
-//		appendString("alert('Toggle');");
-//		appendString("},this,this);");
 	}
 	
 	//*** CMS2.0 FINISH ***
 	
-	private String getElementEditor(MetaDocument doc, MetaViewElement element, String editlanguage){
+	private String getElementEditor(MetaDocument doc, MetaViewElement element){
 		if (element instanceof MetaEmptyElement)
 			return "&nbsp;";
 		if (element instanceof MetaFieldElement)
-			return getFieldEditor((MetaFieldElement)element, editlanguage);
+			return getFieldEditor((MetaFieldElement)element);
 		if (element instanceof MetaListElement)
-			return getListEditor(doc, (MetaListElement)element, editlanguage);
+			return getListEditor(doc, (MetaListElement)element);
 		if (element instanceof MetaFunctionElement)
 			return getFunctionEditor(doc, (MetaFunctionElement)element);
 
@@ -1157,12 +1008,12 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			
 	}
 	
-	private String getListEditor(MetaDocument doc, MetaListElement element, String editlanguage){
+	private String getListEditor(MetaDocument doc, MetaListElement element){
 		String ret = "";
 		
 		List<MetaViewElement> elements = element.getElements();
 		for (int i=0; i<elements.size(); i++){
-			ret += getElementEditor(doc, elements.get(i), editlanguage);
+			ret += getElementEditor(doc, elements.get(i));
 			if (i<elements.size()-1)
 				ret += "&nbsp;";
 		}
@@ -1171,7 +1022,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		return ret;
 	}
 	
-	private String getLinkEditor(MetaFieldElement element, MetaProperty p, String editLanguage){
+	private String getLinkEditor(MetaFieldElement element, MetaProperty p){
 		//for now we have only one link...
 		String ret = "";
 		String lang = getElementLanguage(element); 
@@ -1185,20 +1036,20 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		 */
 		
 		//*** CMS2.0 START ***
-		ret += "<div id="+getHtmlEditorID(element, p, editLanguage)+" name="+quote(p.getName())+" class=\"selectBox\"></div><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector"+editLanguage+"\"></div>";
+		ret += "<div id="+p.getName(lang)+" name="+quote(p.getName())+" class=\"selectBox\"></div><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
 		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+"name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
 		//*** CMS2.0 FINISH ***
 		
 		return ret;
 	}
 	
-	private String getEnumerationEditor(MetaFieldElement element, MetaProperty p, String editLanguage){
+	private String getEnumerationEditor(MetaFieldElement element, MetaProperty p){
 		//for now we have only one link...
 		String lang = getElementLanguage(element); 
 		String beanName = StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument());
 		String quotedBeanName = quote(beanName);
 		String ret = "";
-		String elId = quote(getHtmlEditorID(element, p, editLanguage));
+		String elId = quote(p.getName(lang));
 		ret += "<select id="+elId+" name="+quote(p.getName(lang))+">";
 		ret += "<logic:iterate id='el' name="+quotedBeanName+" property="+quote(p.getName()+"Collection"+(lang==null ? "":lang))+" type=\"net.anotheria.webutils.bean.LabelValueBean\">";
 		ret += "<option value="+quote("${el.value}")+" ${"+beanName + "." + element.getName() + "==el.value?\"selected='selected'\":\"\"}>";
@@ -1218,15 +1069,15 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		return ret;
 	}
 	
-	private String getFieldEditor(MetaFieldElement element, String editlanguage){
+	private String getFieldEditor(MetaFieldElement element){
 		MetaDocument doc = ((MetaModuleSection)currentSection).getDocument();
 		MetaProperty p = doc.getField(element.getName());
 		
 		if (p.isLinked())
-			return getLinkEditor(element, p, editlanguage);
+			return getLinkEditor(element, p);
 			
 		if (p instanceof MetaEnumerationProperty){
-			return getEnumerationEditor(element, p, editlanguage);
+			return getEnumerationEditor(element, p);
 		}
 		
 		if (p instanceof MetaContainerProperty)
@@ -1237,31 +1088,31 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		}
 		
 		if (p.getType().equals("string")){
-			return getStringEditor(element, p, editlanguage);
+			return getStringEditor(element, p);
 		}
 		
 		if (p.getType().equals("int")){
-			return getStringEditor(element, p, editlanguage);
+			return getStringEditor(element, p);
 		}
 
 		if (p.getType().equals("double")){
-			return getStringEditor(element, p, editlanguage);
+			return getStringEditor(element, p);
 		}
 
 		if (p.getType().equals("float")){
-			return getStringEditor(element, p, editlanguage);
+			return getStringEditor(element, p);
 		}
 
 		if (p.getType().equals("long")){
-			return getStringEditor(element, p, editlanguage);
+			return getStringEditor(element, p);
 		}
 
 		if (p.getType().equals("text")){
-			return getTextEditor(element, p, editlanguage);
+			return getTextEditor(element, p);
 		}
 		
 		if (p.getType().equals("boolean")){
-			return getBooleanEditor(element, p, editlanguage);
+			return getBooleanEditor(element, p);
 		}
 		
 		
@@ -1303,14 +1154,14 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		return ret;
 	}
 
-	private String getStringEditor(MetaFieldElement element, MetaProperty p, String editLanguage){
-		return getHtmlInputEditor(element, p, editLanguage, "text");
+	private String getStringEditor(MetaFieldElement element, MetaProperty p){
+		return getHtmlInputEditor(element, p, "text");
 	}
 	
-	private String getHtmlInputEditor(MetaFieldElement element, MetaProperty p, String editLanguage, String inputType){
+	private String getHtmlInputEditor(MetaFieldElement element, MetaProperty p, String inputType){
 		String beanName = quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()));
 		String elName = quote(p.getName(getElementLanguage(element)));
-		String elId = quote(getHtmlEditorID(element, p, editLanguage));
+		String elId = elName;
 		
 		
 		String ret ="";
@@ -1330,9 +1181,9 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		return ret;
 	}
 
-	private String getTextEditor(MetaFieldElement element, MetaProperty p, String editLanguage){
+	private String getTextEditor(MetaFieldElement element, MetaProperty p){
 		String lang = getElementLanguage(element);
-		String editorId = getHtmlEditorID(element, p, editLanguage);
+		String editorId = p.getName(lang);
 		String quotedEditorId = quote(editorId);
 		String ret ="";
 		ret += "<div class=\"yui-skin-sam\">";
@@ -1346,13 +1197,8 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		return ret;
 	}
 
-	private String getHtmlEditorID(MetaFieldElement element, MetaProperty p, String editLanguage){
-		String lang = getElementLanguage(element);
-		return p.getName(lang) + "_" + editLanguage;
-	}
-	
-	private String getBooleanEditor(MetaFieldElement element, MetaProperty p, String editlanguage){
-		return getHtmlInputEditor(element, p, editlanguage, "checkbox");
+	private String getBooleanEditor(MetaFieldElement element, MetaProperty p){
+		return getHtmlInputEditor(element, p, "checkbox");
 	}
 	
 	private GeneratedJSPFile generateCSVExport(MetaModuleSection section, MetaView view){
@@ -1957,17 +1803,17 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 					" property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
 			result+="  <logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
-			result+="\t<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a> \n";
 			result+="  </logic:equal> \n";
 			result+="</logic:equal> \n";
 			result+="<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-			result+="\t<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>\n";
 			result+="</logic:equal> \n";
 			return result;
 		}
-		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+		return "<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndStay&nbsp;</a>";
 	}
 	private String getUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
@@ -1977,17 +1823,17 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 					" property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
 			result+="  <logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
-			result+="\t<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a> \n";
 			result+="  </logic:equal> \n";
 			result+="</logic:equal> \n";
 			result+="<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-			result+="\t<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a> \n";
 			result+="</logic:equal> \n";
 			return result;
 		}
-		return "<a href=\"#\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+		return "<a href=\"#\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\">&nbsp;&raquo&nbsp;<bean:write name=\"save.label.prefix\"/>AndClose&nbsp;</a>";
 	}
 	

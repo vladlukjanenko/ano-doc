@@ -628,7 +628,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		}
 		
 		@Override public String toString(){
-			return name + "=" + '"' + value + '"'; 
+			return StringUtils.isEmpty(value)? name: name + "=" + '"' + value + '"'; 
 		}
 	}
 }
