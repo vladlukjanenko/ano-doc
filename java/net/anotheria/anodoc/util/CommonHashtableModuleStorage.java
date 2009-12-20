@@ -263,9 +263,6 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	}
 
 
-	/* (non-Javadoc)
-	 * @see de.friendscout.vincent.services.config.IConfigurable#setProperty(java.lang.String, java.lang.String)
-	 */
 	public void setStorageDir(String value){
 		storageDir = value;			
 	}
