@@ -1,20 +1,3 @@
-/* ------------------------------------------------------------------------- *
-$Source: /work/cvs/ano-doc/java/net/anotheria/asg/generator/forms/meta/MetaForm.java,v $
-$Author: lrosenberg $
-$Date: 2006/12/28 22:22:04 $
-$Revision: 1.4 $
-
-
-Copyright 2004-2005 by FriendScout24 GmbH, Munich, Germany.
-All rights reserved.
-
-This software is the confidential and proprietary information
-of FriendScout24 GmbH. ("Confidential Information").  You
-shall not disclose such Confidential Information and shall use
-it only in accordance with the terms of the license agreement
-you entered into with FriendScout24 GmbH.
-See www.friendscout24.de for details.
-** ------------------------------------------------------------------------- */
 package net.anotheria.asg.generator.forms.meta;
 
 import java.util.ArrayList;
