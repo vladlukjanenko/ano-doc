@@ -546,6 +546,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentJavaScriptPath("tiny_mce/tiny_mce.js")) + "></script>");
 		
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote("http://code.jquery.com/jquery-latest.js") + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentJavaScriptPath("jquery/plugins/jquery.cookie.js")) + "></script>");
 		
 		//*** CMS2.0 FINISH ***
 		
@@ -751,19 +752,6 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		generateLinkElementEditorJS(section.getDocument(), linkElementsRegistry, multilangDialog);
 		
 		
-		//Generate RichtTextEditor JS
-		if(richTextElementsRegistry.size() > 0){
-			openJavaScript();
-			appendString("tinyMCE.init({");
-			increaseIdent();
-			appendString("mode : \"specific_textareas\",");
-			appendString("editor_selector : \"richTextEditor\",");
-			appendString("theme : \"advanced\"");
-			decreaseIdent();
-			appendString("});");
-			appendString("function handleSubmit(){};");
-			closeJavaScript();
-		}
 		
 		//Generate Languages Switching JS
 		if(multilangDialog){
@@ -775,6 +763,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			appendStatement("$(\"#EditDialogNavigator > .selected\").removeClass(\"selected\")");
 			appendStatement("$(\"#EditDialogNavigator > #Navitem\"+lang).addClass(\"selected\")");
 			appendStatement("switchLanguage(lang)");
+			appendStatement("$.cookie(\"lang\", lang)");
 			closeBlock("switchLanguageTab");
 			
 			openFun("switchLanguage = function(lang){");
@@ -796,11 +785,28 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 				appendIncreasedStatement("switchLanguageTab("+quote(lang)+")");      
 				appendString("});");
 			}
+			appendStatement("switchLanguageTab($.cookie(\"lang\"))");
 			decreaseIdent();
 			appendString("});"); 
 			
 			closeJavaScript();
 			appendString("</logic:equal>");
+		}
+
+		//Generate RichtTextEditor JS
+		if(richTextElementsRegistry.size() > 0){
+			openJavaScript();
+			appendString("tinyMCE.init({");
+			increaseIdent();
+			appendString("mode : \"specific_textareas\",");
+			appendString("editor_selector : \"richTextEditor\",");
+			appendString("theme : \"advanced\",");
+			appendString("width : \"600\",");
+			appendString("height : \"400\"");
+			decreaseIdent();
+			appendString("});");
+			appendString("function handleSubmit(){};");
+			closeJavaScript();
 		}
 		
 		decreaseIdent();
@@ -1189,7 +1195,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		ret += "<div class=\"yui-skin-sam\">";
 //		if(element.isRich())
 //			ret += "<button id="+quote(editorId + "ToggleButton")+" type=\"button\">Toggle Editor</button><br/>";
-		ret += "<textarea cols=\"80\" rows=\"15\" id="+quotedEditorId+" name="+quote(p.getName(lang)) + " class=" + quote(element.isRich()? "richTextEditor": "textEditor");
+		ret += "<textarea id="+quotedEditorId+" name="+quote(p.getName(lang)) + " class=" + quote(element.isRich()? "richTextEditor": "textEditor");
 		ret += ">";
 		ret += "<bean:write filter=\"false\" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
 		ret += "</textarea>";
