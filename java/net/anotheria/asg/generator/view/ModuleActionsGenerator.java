@@ -1,23 +1,8 @@
 package net.anotheria.asg.generator.view;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.forms.meta.MetaFormField;
-import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
+import net.anotheria.asg.data.LockableObject;
+import net.anotheria.asg.generator.*;
+import net.anotheria.asg.generator.forms.meta.*;
 import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
@@ -25,17 +10,14 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.types.EnumerationGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 import net.anotheria.asg.generator.util.DirectLink;
-import net.anotheria.asg.generator.view.meta.MetaDecorator;
-import net.anotheria.asg.generator.view.meta.MetaDialog;
-import net.anotheria.asg.generator.view.meta.MetaFieldElement;
-import net.anotheria.asg.generator.view.meta.MetaFilter;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
-import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
-import net.anotheria.asg.data.LockableObject;
+import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This generator generate module-based actions like delete, create, edit, new, update, show and so on.
@@ -376,8 +358,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		increaseIdent();
 		if (StorageType.CMS.equals(doc.getParentModule().getStorageType())) {
 			appendStatement("String id = getStringParameter(req, PARAM_ID)");
-			appendStatement(doc.getName() + " " + doc.getVariableName() + "Curr = " + getServiceGetterCall(section.getModule()) + ".get" + doc.getName() + "(id)");
-			appendString("if(" + doc.getVariableName() + "Curr instanceof LockableObject && ((LockableObject)" + doc.getVariableName() + "Curr).isLocked()) ");
+			appendStatement(doc.getName() + " " + doc.getVariableName() + "Curr = id != null && !id.equals(\"\") ? " + getServiceGetterCall(section.getModule()) + ".get" + doc.getName() + "(id) : null");
+			appendString("if("+ doc.getVariableName() +"Curr != null && " + doc.getVariableName() + "Curr instanceof LockableObject && ((LockableObject)" + doc.getVariableName() + "Curr).isLocked()) ");
 			appendIncreasedStatement("unLock" + doc.getMultiple() + "(" + doc.getVariableName() + "Curr, req, false)");
 		}
 		appendStatement("res.sendRedirect(" + getShowActionRedirect(doc) + ")");
@@ -391,7 +373,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         appendString("private String getRedirectUrl(HttpServletRequest req, "+doc.getName()+" item){");
         increaseIdent();
         appendStatement("String nextAction = req.getParameter("+quote("nextAction")+")");
-		appendString("if (nextAction == null || nextAction.length() == 0)");
+		appendString("if (item==null || nextAction == null || nextAction.length() == 0)");
         appendIncreasedStatement("return "+getShowActionRedirect(doc));
         appendString("else");
         appendIncreasedString("return nextAction.equals(\"showEdit\") ? "+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+item.getId()");
@@ -411,8 +393,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
-		appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
-        appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
+		appendStatement(doc.getName() + " " + doc.getVariableName() + "Curr = id != null && !id.equals(\"\") ? " + getServiceGetterCall(section.getModule()) + ".get" + doc.getName() + "(id) : null");
+        appendString("if("+ doc.getVariableName() +"Curr != null && "+doc.getVariableName()+"Curr instanceof LockableObject){ ");
         appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName()+"Curr");
         if (isLock) {
             //Locking CASE
