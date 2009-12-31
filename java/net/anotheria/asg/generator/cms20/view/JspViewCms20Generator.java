@@ -800,9 +800,14 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			increaseIdent();
 			appendString("mode : \"specific_textareas\",");
 			appendString("editor_selector : \"richTextEditor\",");
+			appendString("plugins : \"safari,table,fullscreen\",");
 			appendString("theme : \"advanced\",");
+			appendString("theme_advanced_buttons1 : \"bold,italic,underline,strikethrough,|,sub,sup,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect,|,forecolor,backcolor,|,removeformat\",");
+			appendString("theme_advanced_buttons2 : \"bullist,numlist,|,outdent,indent,|,link,unlink,image,|,tablecontrols,|,visualaid,charmap\",");
+			appendString("theme_advanced_buttons3 : \"undo,redo,|,cleanup,code,|,fullscreen,help\",");
+			appendString("theme_advanced_resizing : true,");
 			appendString("width : \"600\",");
-			appendString("height : \"400\"");
+			appendString("height : \"400\"");			
 			decreaseIdent();
 			appendString("});");
 			appendString("function handleSubmit(){};");
