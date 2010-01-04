@@ -1,35 +1,15 @@
 package net.anotheria.asg.generator.view;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedJSPFile;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.forms.meta.MetaFormField;
-import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
+import net.anotheria.asg.data.LockableObject;
+import net.anotheria.asg.generator.*;
+import net.anotheria.asg.generator.forms.meta.*;
 import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.util.DirectLink;
-import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
-import net.anotheria.asg.generator.view.meta.MetaDialog;
-import net.anotheria.asg.generator.view.meta.MetaEmptyElement;
-import net.anotheria.asg.generator.view.meta.MetaFieldElement;
-import net.anotheria.asg.generator.view.meta.MetaFilter;
-import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
-import net.anotheria.asg.generator.view.meta.MetaListElement;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaSection;
-import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
-import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
-import net.anotheria.asg.data.LockableObject;
+import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generates the jsps for the edit view.
@@ -77,7 +57,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			List<MetaDialog> dialogs = section.getDialogs();
 			for (int d=0; d<dialogs.size(); d++){
 				MetaDialog dialog = dialogs.get(d);
-				
+				                                                              
 				files.add(new FileEntry( generateDialog(dialog, section, view)));
 			}
 			
@@ -1068,9 +1048,17 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		if (p instanceof MetaEnumerationProperty){
 			return getEnumerationEditor(element, p);
 		}
-		
-		if (p instanceof MetaContainerProperty)
+
+		if (p instanceof MetaListProperty
+				&& ((MetaListProperty) p).getContainedProperty() instanceof MetaEnumerationProperty) {
+			return getEnumerationEditor(element, ((MetaListProperty) p).getContainedProperty());
+		}
+
+		if (p instanceof MetaContainerProperty) {
 			return getContainerLinkEditor(element, (MetaContainerProperty)p);
+		}
+		
+
 		
 		if (p.getType().equals("image")){
 			return getImageEditor(element, p);
@@ -1337,9 +1325,9 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<tr>");
 		increaseIdent();
 		appendString("<td align=\"right\" colspan=\""+(colspan)+"\"><div style=\"white-space:nowrap; height:2em; line-height:2em\">");
-		increaseIdent();
+	increaseIdent();
 		appendString("<logic:iterate name="+quote("paginglinks")+" scope="+quote("request")+" id="+quote("link")+" type="+quote("net.anotheria.asg.util.bean.PagingLink")+">");
-		increaseIdent();
+	increaseIdent();
 		appendString("&nbsp;");
 		appendString("<logic:equal name="+quote("link")+" property="+quote("linked")+" value="+quote("true")+">");
 		appendIncreasedString("<a href=\"?pageNumber=<bean:write name="+quote("link")+" property="+quote("link")+"/>\"><bean:write name="+quote("link")+" property="+quote("caption")+"/></a>");

@@ -1,49 +1,16 @@
 package net.anotheria.asg.generator.cms20.view;
 
+import net.anotheria.asg.data.LockableObject;
+import net.anotheria.asg.generator.*;
+import net.anotheria.asg.generator.forms.meta.*;
+import net.anotheria.asg.generator.meta.*;
+import net.anotheria.asg.generator.util.DirectLink;
+import net.anotheria.asg.generator.view.*;
+import net.anotheria.asg.generator.view.meta.*;
+import net.anotheria.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import net.anotheria.asg.data.LockableObject;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedJSPFile;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.forms.meta.MetaFormField;
-import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaLink;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
-import net.anotheria.asg.generator.meta.StorageType;
-import net.anotheria.asg.generator.util.DirectLink;
-import net.anotheria.asg.generator.view.AbstractJSPGenerator;
-import net.anotheria.asg.generator.view.JspMenuGenerator;
-import net.anotheria.asg.generator.view.ModuleActionsGenerator;
-import net.anotheria.asg.generator.view.ModuleBeanGenerator;
-import net.anotheria.asg.generator.view.StrutsConfigGenerator;
-import net.anotheria.asg.generator.view.ViewConstants;
-import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
-import net.anotheria.asg.generator.view.meta.MetaDialog;
-import net.anotheria.asg.generator.view.meta.MetaEmptyElement;
-import net.anotheria.asg.generator.view.meta.MetaFieldElement;
-import net.anotheria.asg.generator.view.meta.MetaFilter;
-import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
-import net.anotheria.asg.generator.view.meta.MetaListElement;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaSection;
-import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
-import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
-import net.anotheria.util.StringUtils;
 
 /**
  * Generates the jsps for the edit view.
@@ -1089,6 +1056,11 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			
 		if (p instanceof MetaEnumerationProperty){
 			return getEnumerationEditor(element, p);
+		}
+
+		if (p instanceof MetaListProperty
+				&& ((MetaListProperty) p).getContainedProperty() instanceof MetaEnumerationProperty) {
+			return getEnumerationEditor(element, ((MetaListProperty) p).getContainedProperty());
 		}
 		
 		if (p instanceof MetaContainerProperty)
