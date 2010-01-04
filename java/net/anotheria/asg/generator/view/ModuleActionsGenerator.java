@@ -7,7 +7,7 @@ import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
-import net.anotheria.asg.generator.types.EnumerationGenerator;
+import net.anotheria.asg.generator.types.EnumTypeGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 import net.anotheria.asg.generator.util.DirectLink;
 import net.anotheria.asg.generator.view.meta.*;
@@ -470,7 +470,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				if (p instanceof MetaEnumerationProperty){
 					MetaEnumerationProperty enumeration = (MetaEnumerationProperty)p;
 					EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(enumeration.getEnumeration());
-					clazz.addImport(EnumerationGenerator.getUtilsImport(type));
+					clazz.addImport(EnumTypeGenerator.getEnumImport(type));
 				}
 				
 				MetaDecorator d = field.getDecorator();
@@ -755,7 +755,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					if (p instanceof MetaEnumerationProperty){
 						MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
 						EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-						value = EnumerationGenerator.getUtilsClassName(type)+".getName("+doc.getVariableName()+".get"+p.getAccesserName()+"())"; 
+						value = EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name("+doc.getVariableName()+".get"+p.getAccesserName()+"())";
 					}else {
 						value = doc.getVariableName()+".get"+p.getAccesserName(lang)+"()";
 						if (element.getDecorator()!=null){
@@ -828,7 +828,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				if (p instanceof MetaEnumerationProperty){
 					MetaEnumerationProperty enumeration = (MetaEnumerationProperty)p;
 					EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(enumeration.getEnumeration());
-					clazz.addImport(EnumerationGenerator.getUtilsImport(type));
+					clazz.addImport(EnumTypeGenerator.getEnumImport(type));
 				}
 				
 			}
@@ -1423,7 +1423,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				if (p instanceof MetaEnumerationProperty){
 					MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
 					EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-					clazz.addImport(EnumerationGenerator.getUtilsImport(type));
+					clazz.addImport(EnumTypeGenerator.getEnumImport(type));
 				}
 			}
 		}
@@ -1773,12 +1773,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
 	    
 		//check if we have to import list.
-		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = elements.get(i);
-			if (element instanceof MetaFieldElement){
-				MetaFieldElement field = (MetaFieldElement)element;
+		for (MetaViewElement element : elements) {
+			if (element instanceof MetaFieldElement) {
+				MetaFieldElement field = (MetaFieldElement) element;
 				MetaProperty p = doc.getField(field.getName());
-				if (p.isLinked() || p instanceof MetaEnumerationProperty){
+				if (p.isLinked() || p instanceof MetaEnumerationProperty) {
 					clazz.addImport("java.util.List");
 					clazz.addImport("java.util.ArrayList");
 					clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
@@ -1788,19 +1787,18 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		//check if we have to property definition files.
 //		HashMap<String, MetaEnumerationProperty> importedEnumerations = new HashMap<String, MetaEnumerationProperty>();
-		
-		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = (MetaViewElement)elements.get(i);
-			if (element instanceof MetaFieldElement){
-				MetaFieldElement field = (MetaFieldElement)element;
-				MetaProperty p = doc.getField(field.getName());
-				if (p instanceof MetaEnumerationProperty){
-					MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
-					EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-					clazz.addImport(EnumerationGenerator.getUtilsImport(type));
-				}
-			}
-		}
+
+        for (MetaViewElement element : elements) {
+            if (element instanceof MetaFieldElement) {
+                MetaFieldElement field = (MetaFieldElement) element;
+                MetaProperty p = doc.getField(field.getName());
+                if (p instanceof MetaEnumerationProperty) {
+                    MetaEnumerationProperty mep = (MetaEnumerationProperty) p;
+                    EnumerationType type = (EnumerationType) GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
+                    clazz.addImport(EnumTypeGenerator.getEnumImport(type));
+                }
+            }
+        }
 		
 
 		clazz.setName(getNewActionName(section));
@@ -1815,47 +1813,46 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("form.setId("+quote("")+")");
 		
 		Set<String> linkTargets = new HashSet<String>();
-		
-		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = (MetaViewElement)elements.get(i);
-			if (element instanceof MetaFieldElement){
-				MetaFieldElement field = (MetaFieldElement)element;
-				MetaProperty p = doc.getField(field.getName());
-				if (p.isLinked()){
-					MetaLink link = (MetaLink)p;
 
-					MetaModule targetModule = link.isRelative() ? 
-							doc.getParentModule() : 
+		for (MetaViewElement element : elements) {
+			if (element instanceof MetaFieldElement) {
+				MetaFieldElement field = (MetaFieldElement) element;
+				MetaProperty p = doc.getField(field.getName());
+				if (p.isLinked()) {
+					MetaLink link = (MetaLink) p;
+
+					MetaModule targetModule = link.isRelative() ?
+							doc.getParentModule() :
 							GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
-					String tDocName = link.getTargetDocumentName(); 
+					String tDocName = link.getTargetDocumentName();
 					MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
 					String listName = targetDocument.getMultiple().toLowerCase();
 					emptyline();
-					
-					if (linkTargets.contains(link.getLinkTarget())){
-						appendString( "//link "+link.getName()+" to "+link.getLinkTarget()+" reuses collection.");
-					}else{
-						appendString( "//link "+link.getName()+" to "+link.getLinkTarget());
-						appendStatement("List<"+DataFacadeGenerator.getDocumentImport(targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
-						appendStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
-						appendStatement(listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
-						appendString( "for ("+(DataFacadeGenerator.getDocumentImport(targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
+
+					if (linkTargets.contains(link.getLinkTarget())) {
+						appendString("//link " + link.getName() + " to " + link.getLinkTarget() + " reuses collection.");
+					} else {
+						appendString("//link " + link.getName() + " to " + link.getLinkTarget());
+						appendStatement("List<" + DataFacadeGenerator.getDocumentImport(targetDocument) + "> " + listName + " = " + getServiceGetterCall(targetModule) + ".get" + targetDocument.getMultiple() + "()");
+						appendStatement("List<LabelValueBean> " + listName + "Values = new ArrayList<LabelValueBean>(" + listName + ".size()+1)");
+						appendStatement(listName + "Values.add(new LabelValueBean(" + quote("") + ", \"-----\"))");
+						appendString("for (" + (DataFacadeGenerator.getDocumentImport(targetDocument)) + " " + targetDocument.getVariableName() + " : " + listName + "){");
 						increaseIdent();
-						
-						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+".getId(), "+targetDocument.getVariableName()+".getName() )");
-						appendStatement(listName+"Values.add(bean)");
+
+						appendStatement("LabelValueBean bean = new LabelValueBean(" + targetDocument.getVariableName() + ".getId(), " + targetDocument.getVariableName() + ".getName() )");
+						appendStatement(listName + "Values.add(bean)");
 						append(closeBlock());
 					}
-					
+
 					String lang = getElementLanguage(element);
-					appendStatement("form."+p.toBeanSetter()+"Collection"+(lang==null ? "" : lang)+"("+listName+"Values"+")");
+					appendStatement("form." + p.toBeanSetter() + "Collection" + (lang == null ? "" : lang) + "(" + listName + "Values" + ")");
 					linkTargets.add(link.getLinkTarget());
 				}//...end if (p.isLinked())
 
-				if (p instanceof MetaEnumerationProperty){
-					enumPropGen.generateEnumerationPropertyHandling((MetaEnumerationProperty)p, false);
+				if (p instanceof MetaEnumerationProperty) {
+					enumPropGen.generateEnumerationPropertyHandling((MetaEnumerationProperty) p, false);
 				}
-				
+
 			}
 		}
 
@@ -2154,7 +2151,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			if(containedProperty instanceof MetaEnumerationProperty){
 				clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
 				EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) containedProperty).getEnumeration());
-				clazz.addImport(EnumerationGenerator.getUtilsImport(type));
+				clazz.addImport(EnumTypeGenerator.getEnumImport(type));
 			}
 		}
 		
@@ -2685,12 +2682,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			String arrName = type.getName()+"_values";
 		    String listName = arrName+"List";
 		    appendString("//enumeration "+type.getName());
-		    appendStatement("int[] "+arrName+" = " +EnumerationGenerator.getUtilsClassName(type)+"."+type.getName().toUpperCase()+"_VALUES");
+		    appendStatement("int[] "+arrName+" = " +EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() +"Values()");
 		    appendStatement("List<LabelValueBean> "+listName+"Values"+" = new ArrayList<LabelValueBean>("+arrName+".length)");
 		    appendString("for (int i=0; i<"+arrName+".length; i++){");
 		    increaseIdent();
 		
-		    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+EnumerationGenerator.getUtilsClassName(type)+".getName("+arrName+"[i]))");
+		    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name("+arrName+"[i]))");
 		    appendStatement(listName+"Values"+".add(bean)");
 		    append(closeBlock());
 		    appendStatement("form."+list.getContainedProperty().toBeanSetter()+"Collection("+listName+"Values"+")");
@@ -2735,7 +2732,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		if(list.getContainedProperty() instanceof MetaEnumerationProperty){
 			EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) list.getContainedProperty()).getEnumeration());
-			appendStatement("bean.setDescription("+EnumerationGenerator.getUtilsClassName(type)+".getName(value))");
+			appendStatement("bean.setDescription("+EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name(value))");
 		}
 		appendStatement("beans.add(bean)");
 		append(closeBlock());		
@@ -3031,12 +3028,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		    String listName = arrName+"List";
 			if (generatedProperties.indexOf(arrName)==-1){
 			    appendString("//enumeration "+type.getName());
-			    appendStatement("int[] "+arrName+" = " +EnumerationGenerator.getUtilsClassName(type)+"."+type.getName().toUpperCase()+"_VALUES");
+			    appendStatement("int[] "+arrName+" = " + EnumTypeGenerator.getEnumClassName(type) + ".get" + type.getName() + "Values()");
 			    appendStatement("List<LabelValueBean> "+listName+" = new ArrayList<LabelValueBean>("+arrName+".length)");
 			    appendString("for (int i=0; i<"+arrName+".length; i++){");
 			    increaseIdent();
 			
-			    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+EnumerationGenerator.getUtilsClassName(type)+".getName("+arrName+"[i]))");
+			    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+ EnumTypeGenerator.getEnumClassName(type) + ".get" + type.getName() + "Name("+arrName+"[i]))");
 			    appendStatement(listName+".add(bean)");
 			    append(closeBlock());
 			    generatedProperties.add(arrName);
@@ -3045,7 +3042,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 			appendStatement("form."+mep.toBeanSetter()+"Collection("+listName+")");
 			if (editMode)
-				appendStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumerationGenerator.getUtilsClassName(type)+".getName("+doc.getVariableName()+"."+mep.toGetter()+"()))");
+				appendStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name("+doc.getVariableName()+"."+mep.toGetter()+"()))");
 	    }
 	}
 	

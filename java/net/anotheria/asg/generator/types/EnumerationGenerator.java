@@ -1,24 +1,18 @@
 package net.anotheria.asg.generator.types;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.TypeOfClass;
+import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * TODO please remined another to comment this class
+ * TODO please remind another to comment this class
  * @author another
  */
 public class EnumerationGenerator extends AbstractGenerator implements IGenerator{
+    private final static EnumTypeGenerator enumTypeGenerator = new EnumTypeGenerator();
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
@@ -28,19 +22,19 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		ret.add(new FileEntry(generateDefinition(type)));		
 		ret.add(new FileEntry(generateUtils(type)));		
-
+		ret.addAll(enumTypeGenerator.generate(type));
 		return ret;
 	}
 	
-	public static final String getDefinitionClassName(EnumerationType type){
+	public static String getDefinitionClassName(EnumerationType type){
 		return "I"+type.getName()+"Definition";
 	}
 	
-	public static final String getUtilsClassName(EnumerationType type){
+	public static String getUtilsClassName(EnumerationType type){
 		return type.getName()+"Utils";
 	}
 
-	public static final String getUtilsImport(EnumerationType type){
+	public static String getUtilsImport(EnumerationType type){
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext())+"."+getUtilsClassName(type);
 	}
 
@@ -78,20 +72,18 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 		emptyline();
 		
 		appendString("public static final int "+type.getName().toUpperCase()+"_VALUES[] = {");
-		for (int i=0; i<values.size(); i++){
-			String v = values.get(i);
-			appendIncreasedString(v+",");
-		}
+        for (String v : values) {
+            appendIncreasedString(v + ",");
+        }
 		
 		appendString("};");
 		emptyline();
 		
 		
 		appendString("public static final String "+type.getName().toUpperCase()+"_NAMES[] = {");
-		for (int i=0; i<values.size(); i++){
-			String v = values.get(i);
-			appendIncreasedString(v+"_NAME,");
-		}
+        for (String v : values) {
+            appendIncreasedString(v + "_NAME,");
+        }
 		
 		appendString("};");
 		return clazz;
@@ -120,11 +112,10 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 		appendString("switch(value){");
 		increaseIdent();
 		List<String> values = type.getValues();
-		for (int i=0; i<values.size(); i++){
-			String v = values.get(i);
-			appendString("case "+v+":");
-			appendIncreasedStatement("return "+v+"_NAME");
-		}
+        for (String v : values) {
+            appendString("case " + v + ":");
+            appendIncreasedStatement("return " + v + "_NAME");
+        }
 		appendString("default:");
 		appendIncreasedStatement("return \"Unknown: \"+value");
 			
@@ -133,11 +124,10 @@ public class EnumerationGenerator extends AbstractGenerator implements IGenerato
 
 		appendString("public static int getValue(String name){");
 		increaseIdent();
-		for (int i=0; i<values.size(); i++){
-			String v = values.get(i);
-			appendString("if( "+v+"_NAME.equals(name))");
-			appendIncreasedStatement("return "+v);
-		}
+        for (String v : values) {
+            appendString("if( " + v + "_NAME.equals(name))");
+            appendIncreasedStatement("return " + v);
+        }
 		appendIncreasedStatement("return 0");
 			
 		append(closeBlock());//getValue(...)

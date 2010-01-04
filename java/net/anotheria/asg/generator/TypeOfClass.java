@@ -8,6 +8,10 @@ public enum TypeOfClass {
 	 * A generated java class.
 	 */
 	CLASS,
+    /**
+	 * A generated java enum.
+	 */
+	ENUM,
 	/**
 	 * A generated java interface.
 	 */
