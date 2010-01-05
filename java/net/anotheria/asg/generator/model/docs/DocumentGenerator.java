@@ -1,24 +1,13 @@
 package net.anotheria.asg.generator.model.docs;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaGenericListProperty;
-import net.anotheria.asg.generator.meta.MetaGenericProperty;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.*;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This generator generates an ano-doc framework based implementation of the data object interface previously generated
@@ -473,14 +462,22 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		
 		
 //		appendStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
+		if (c instanceof MetaEnumerationProperty) {
+			appendString("if (!getListPropertyAnyCase(" + list.toNameConstant() + ").getList().contains(new " + accesserType + "Property(" + quote("") + " + " + c.getName() + ", " + c.getName() + ")))");
+		}
+		appendString("{");
+		increaseIdent();
 		appendStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
-		append(closeBlock());
+		decreaseIdent();
+		appendString("}");
+		decreaseIdent();
+		appendString("}");
 		emptyline();
 		
 		
 		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
-		appendStatement("getListProperty("+list.toNameConstant()+").remove(index)"); 
+		appendStatement("getListProperty("+list.toNameConstant()+").remove(index)");
 		append(closeBlock());
 		emptyline();
 		

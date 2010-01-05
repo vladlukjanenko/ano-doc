@@ -1058,11 +1058,6 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			return getEnumerationEditor(element, p);
 		}
 
-		if (p instanceof MetaListProperty
-				&& ((MetaListProperty) p).getContainedProperty() instanceof MetaEnumerationProperty) {
-			return getEnumerationEditor(element, ((MetaListProperty) p).getContainedProperty());
-		}
-		
 		if (p instanceof MetaContainerProperty)
 			return getContainerLinkEditor(element, (MetaContainerProperty)p);
 		

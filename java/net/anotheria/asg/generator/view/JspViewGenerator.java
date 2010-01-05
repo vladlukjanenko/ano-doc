@@ -57,10 +57,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			List<MetaDialog> dialogs = section.getDialogs();
 			for (int d=0; d<dialogs.size(); d++){
 				MetaDialog dialog = dialogs.get(d);
-				                                                              
+				
 				files.add(new FileEntry( generateDialog(dialog, section, view)));
 			}
-			
+
 			MetaDocument doc = section.getDocument();
 			for (int p=0; p<doc.getProperties().size(); p++){
 				MetaProperty pp = doc.getProperties().get(p);
@@ -1048,12 +1048,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		if (p instanceof MetaEnumerationProperty){
 			return getEnumerationEditor(element, p);
 		}
-
-		if (p instanceof MetaListProperty
-				&& ((MetaListProperty) p).getContainedProperty() instanceof MetaEnumerationProperty) {
-			return getEnumerationEditor(element, ((MetaListProperty) p).getContainedProperty());
-		}
-
+		
 		if (p instanceof MetaContainerProperty) {
 			return getContainerLinkEditor(element, (MetaContainerProperty)p);
 		}

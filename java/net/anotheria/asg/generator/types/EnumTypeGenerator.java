@@ -59,22 +59,6 @@ public class EnumTypeGenerator extends AbstractGenerator implements IGenerator {
 		appendStatement(stringBuilder.toString());
 		emptyline();
 
-		appendStatement("private final static int[] " + type.getName().toUpperCase() + "_VALUES_LIST = new int[values().length]");
-		emptyline();
-
-
-		appendString("static {");
-		increaseIdent();
-		appendStatement("int valIndex = 0");
-		appendString("for (" + type.getName() + "Enum e : values()) {");
-		increaseIdent();
-		appendStatement(type.getName().toUpperCase() + "_VALUES_LIST[valIndex++] = e.getValue()");
-		decreaseIdent();
-		appendString("}");
-		decreaseIdent();
-		appendString("}");
-		emptyline();
-
 		appendStatement("private final int value");
 		emptyline();
 
@@ -85,31 +69,12 @@ public class EnumTypeGenerator extends AbstractGenerator implements IGenerator {
 		appendString("}");
 		emptyline();
 
-		appendCommentLine("");
-		appendCommentLine("get enum value field");
-		appendCommentLine("");
-		appendCommentLine("@return int field");
-		appendCommentLine("");
 		appendString("public int getValue() {");
 		increaseIdent();
 		appendStatement("return value");
 		decreaseIdent();
 		appendString("}");
 		emptyline();
-
-		
-		appendCommentLine("");
-		appendCommentLine("get enum type values converted to int array");
-		appendCommentLine("");
-		appendCommentLine("@return enum names list");
-		appendCommentLine("");
-		appendString("public static int[] get" + type.getName() + "Values() {");
-		increaseIdent();
-		appendStatement("return " + type.getName().toUpperCase() + "_VALUES_LIST");
-		decreaseIdent();
-		appendString("}");
-		emptyline();
-
 
 		appendString("public static String get" + type.getName() + "Name(int value) {");
 		increaseIdent();
@@ -126,30 +91,7 @@ public class EnumTypeGenerator extends AbstractGenerator implements IGenerator {
 		decreaseIdent();
 		appendString("}");
 		emptyline();
-
-		appendString("public static int get" + type.getName() + "Value(String name) {");
-		increaseIdent();
-		appendString("if (name == null || name.isEmpty()) {");
-		increaseIdent();
-		appendStatement("throw new IllegalArgumentException(\"Name argument null or empty\")");
-		decreaseIdent();
-		appendString("}");
-
-		appendString("try {");
-		increaseIdent();
-		appendStatement("final " + type.getName() + "Enum e = valueOf(name)");
-		appendStatement("return e.getValue()");
-		decreaseIdent();
-		appendString("} catch (EnumConstantNotPresentException e) {");
-		increaseIdent();
-		appendStatement("return UNKNOWN.value");
-		decreaseIdent();
-		appendString("}");
-		decreaseIdent();
-		appendString("}");
-		emptyline();
-
-
+		
 		return clazz;
 	}
 

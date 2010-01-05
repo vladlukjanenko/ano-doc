@@ -2682,12 +2682,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			String arrName = type.getName()+"_values";
 		    String listName = arrName+"List";
 		    appendString("//enumeration "+type.getName());
-		    appendStatement("int[] "+arrName+" = " +EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() +"Values()");
+		    appendStatement(EnumTypeGenerator.getEnumClassName(type) + "[] " + arrName + " = "+ EnumTypeGenerator.getEnumClassName(type) +".values()");
 		    appendStatement("List<LabelValueBean> "+listName+"Values"+" = new ArrayList<LabelValueBean>("+arrName+".length)");
-		    appendString("for (int i=0; i<"+arrName+".length; i++){");
+		    appendString("for ("+EnumTypeGenerator.getEnumClassName(type)+" element : " + arrName + ") {");
 		    increaseIdent();
 		
-		    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name("+arrName+"[i]))");
+		    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+" + "element.getValue(), element.name())");
 		    appendStatement(listName+"Values"+".add(bean)");
 		    append(closeBlock());
 		    appendStatement("form."+list.getContainedProperty().toBeanSetter()+"Collection("+listName+"Values"+")");
@@ -3028,19 +3028,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		    String listName = arrName+"List";
 			if (generatedProperties.indexOf(arrName)==-1){
 			    appendString("//enumeration "+type.getName());
-			    appendStatement("int[] "+arrName+" = " + EnumTypeGenerator.getEnumClassName(type) + ".get" + type.getName() + "Values()");
-			    appendStatement("List<LabelValueBean> "+listName+" = new ArrayList<LabelValueBean>("+arrName+".length)");
-			    appendString("for (int i=0; i<"+arrName+".length; i++){");
-			    increaseIdent();
-			
-			    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+"+arrName+"[i], "+ EnumTypeGenerator.getEnumClassName(type) + ".get" + type.getName() + "Name("+arrName+"[i]))");
-			    appendStatement(listName+".add(bean)");
+				appendStatement(EnumTypeGenerator.getEnumClassName(type) + "[] " + arrName + " = "+ EnumTypeGenerator.getEnumClassName(type) +".values()");
+				appendStatement("List<LabelValueBean> "+listName+"Values"+" = new ArrayList<LabelValueBean>("+arrName+".length)");
+				appendString("for ("+EnumTypeGenerator.getEnumClassName(type)+" element : " + arrName + ") {");
+				increaseIdent();
+
+				appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+" + "element.getValue(), element.name())");
+				appendStatement(listName+"Values.add(bean)");
+
 			    append(closeBlock());
 			    generatedProperties.add(arrName);
 			}else{
 				appendString("//enumeration "+type.getName()+" already prepared.");
 			}
-			appendStatement("form."+mep.toBeanSetter()+"Collection("+listName+")");
+			appendStatement("form."+mep.toBeanSetter()+"Collection("+listName + "Values)");
 			if (editMode)
 				appendStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name("+doc.getVariableName()+"."+mep.toGetter()+"()))");
 	    }
