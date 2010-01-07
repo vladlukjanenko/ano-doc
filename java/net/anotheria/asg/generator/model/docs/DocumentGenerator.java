@@ -462,23 +462,19 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		
 		
 //		appendStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+c.toJavaType()+"Property("+c.getName()+", "+c.getName()+"))");
-		if (c instanceof MetaEnumerationProperty) {
-			appendString("if (!getListPropertyAnyCase(" + list.toNameConstant() + ").getList().contains(new " + accesserType + "Property(" + quote("") + " + " + c.getName() + ", " + c.getName() + ")))");
-		}
-		appendString("{");
-		increaseIdent();
+		if (c instanceof MetaEnumerationProperty) 
+			openFun("if (!getListPropertyAnyCase(" + list.toNameConstant() + ").getList().contains(new " + accesserType + "Property(" + quote("") + " + " + c.getName() + ", " + c.getName() + ")))");
 		appendStatement("getListPropertyAnyCase("+list.toNameConstant()+").add(new "+accesserType+"Property("+quote("")+" + "+c.getName()+", "+c.getName()+"))");
-		decreaseIdent();
-		appendString("}");
-		decreaseIdent();
-		appendString("}");
+		if (c instanceof MetaEnumerationProperty)
+			closeBlock("if");
+		closeBlock("method");
 		emptyline();
 		
 		
 		appendString("public void "+getContainerEntryDeleterName(list)+"(int index){");
 		increaseIdent();
 		appendStatement("getListProperty("+list.toNameConstant()+").remove(index)");
-		append(closeBlock());
+		closeBlock("method");
 		emptyline();
 		
 		appendString("public void "+getContainerEntrySwapperName(list)+"(int index1, int index2){");
@@ -492,7 +488,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 		appendStatement("tmp2 = (("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index2)).get"+accesserType+"()");
 		appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index1)).set"+accesserType+"(tmp2)");
 		appendStatement("(("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index2)).set"+accesserType+"(tmp1)");
-		append(closeBlock());
+		closeBlock("method");
 		emptyline();
 
 		appendString("public "+c.toJavaType()+ " "+getListElementGetterName(list)+"(int index){");
@@ -501,7 +497,7 @@ public class DocumentGenerator extends AbstractDataObjectGenerator implements IG
 //		appendStatement("return p.get"+c.toJavaType()+"()");
 		appendStatement(accesserType+"Property p = ("+accesserType+"Property"+")getList("+list.toNameConstant()+").get(index)");
 		appendStatement("return p.get"+accesserType+"()");
-		append(closeBlock());
+		closeBlock("method");
 		emptyline();
 
 	}
