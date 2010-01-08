@@ -453,6 +453,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport("net.anotheria.util.slicer.Slice");
 		clazz.addImport("net.anotheria.util.slicer.Segment");
 		clazz.addImport("net.anotheria.asg.util.bean.PagingLink");
+		clazz.addImport("net.anotheria.asg.exception.ConstantNotFoundException");
         //LOckableObject import!!!
         if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
            clazz.addImport("net.anotheria.asg.data.LockableObject");
@@ -718,7 +719,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 	    
 	    // BEAN creation function
-	    appendString( "protected "+ModuleBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+"){");
+	    appendString( "protected "+ModuleBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+") throws ConstantNotFoundException {");
 	    increaseIdent();
 	    appendStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = new "+ModuleBeanGenerator.getListItemBeanName(doc)+"()");
 	    //set the properties.
@@ -755,7 +756,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					if (p instanceof MetaEnumerationProperty){
 						MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
 						EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-						value = EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name("+doc.getVariableName()+".get"+p.getAccesserName()+"())";
+						value = EnumTypeGenerator.getEnumClassName(type)+".getConstantByValue("+doc.getVariableName()+".get"+p.getAccesserName()+"()).name()";
 					}else {
 						value = doc.getVariableName()+".get"+p.getAccesserName(lang)+"()";
 						if (element.getDecorator()!=null){
@@ -2732,7 +2733,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		if(list.getContainedProperty() instanceof MetaEnumerationProperty){
 			EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) list.getContainedProperty()).getEnumeration());
-			appendStatement("bean.setDescription("+EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name(value))");
+			appendStatement("bean.setDescription("+EnumTypeGenerator.getEnumClassName(type)+".getConstantByValue(value).name())");
 		}
 		appendStatement("beans.add(bean)");
 		append(closeBlock());		
@@ -3043,7 +3044,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 			appendStatement("form."+mep.toBeanSetter()+"Collection("+listName + "Values)");
 			if (editMode)
-				appendStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumTypeGenerator.getEnumClassName(type)+".get" + type.getName() + "Name("+doc.getVariableName()+"."+mep.toGetter()+"()))");
+				appendStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumTypeGenerator.getEnumClassName(type)+".getConstantByValue("+doc.getVariableName()+"."+mep.toGetter()+"()).name())");
 	    }
 	}
 	

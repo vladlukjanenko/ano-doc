@@ -37,8 +37,7 @@ public class EnumTypeGenerator extends AbstractGenerator implements IGenerator {
 		final GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		clazz.setPackageName(getPackageName());
-		clazz.addImport("java.util.ArrayList");
-		clazz.addImport("java.util.List");
+		clazz.addImport("net.anotheria.asg.exception.ConstantNotFoundException");
 
 		clazz.setType(TypeOfClass.ENUM);
 
@@ -47,7 +46,7 @@ public class EnumTypeGenerator extends AbstractGenerator implements IGenerator {
 		startClassBody();
 
 		final List<String> values = type.getValues();
-		final StringBuilder stringBuilder = new StringBuilder("UNKNOWN(0)," + CRLF + "\t");
+		final StringBuilder stringBuilder = new StringBuilder();
 		for (int i = 0; i < values.size(); i++) {
 			String v = values.get(i).toUpperCase();
 			int index = i + 1;
@@ -76,18 +75,18 @@ public class EnumTypeGenerator extends AbstractGenerator implements IGenerator {
 		appendString("}");
 		emptyline();
 
-		appendString("public static String get" + type.getName() + "Name(int value) {");
+		appendString("public static " + getEnumClassName(type) + " getConstantByValue(int value) throws ConstantNotFoundException {");
 		increaseIdent();
 		appendString("for (" + type.getName() + "Enum e : values()) {");
 		increaseIdent();
 		appendString("if (e.getValue() == value) {");
 		increaseIdent();
-		appendStatement("return e.name()");
+		appendStatement("return e");
 		decreaseIdent();
 		appendString("}");
 		decreaseIdent();
 		appendString("}");
-		appendStatement("return UNKNOWN.name()");
+		appendStatement("throw new ConstantNotFoundException(\"Enum value not found by value \" + value)");
 		decreaseIdent();
 		appendString("}");
 		emptyline();
