@@ -9,10 +9,9 @@ import net.anotheria.util.IOUtils;
 import net.anotheria.util.StringUtils;
 
 /**
- * @author lrosenberg
+ * Utility for writing code to files.
+ * @author lrosenberg.
  *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class FileWriter {
 	
