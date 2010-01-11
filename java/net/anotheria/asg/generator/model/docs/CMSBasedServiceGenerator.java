@@ -583,18 +583,19 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
 	    	appendStatement("return ret");
-
 	    	append(closeBlock());
-	    	emptyline();
 
-	    	appendStatement("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages){");
-	    	increaseIdent();
-	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
-	    	appendStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()");
-	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
-	    	appendString("for ("+d.getName()+" object : list)");
-	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
-	    	appendStatement("return ret");
+		    if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+		    	emptyline();
+		    	appendStatement("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages){");
+		    	increaseIdent();
+		    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
+		    	appendStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()");
+		    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
+		    	appendString("for ("+d.getName()+" object : list)");
+		    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
+		    	appendStatement("return ret");
+		    }
 
 	    	append(closeBlock());
 	    	emptyline();
