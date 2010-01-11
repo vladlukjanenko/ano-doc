@@ -358,8 +358,10 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 		appendStatement("public XMLNode exportToXML()"+throwsClause);
 		emptyline();
 	    
-		appendComment("creates an xml element with all contained data but only selected languages in multilingual attributes");
-		appendStatement("public XMLNode exportToXML(String[] languages)"+throwsClause);
+	    if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+	    	appendComment("creates an xml element with all contained data but only selected languages in multilingual attributes");
+	    	appendStatement("public XMLNode exportToXML(String[] languages)"+throwsClause);
+	    }
 
 	    return clazz;
 	}
