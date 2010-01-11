@@ -1,11 +1,14 @@
 package net.anotheria.asg.exception;
 
 /**
- * Base class for all exceptions thrown by generated code at runtime.
- * @author another
- *
+ * Exception thrown by getConstantByXXX methods of generated Enum types if no enum's
+ * constant with such property found.
  */
 public class ConstantNotFoundException extends ASGRuntimeException{
+	/**
+	 * Serial version ID
+	 */
+	private static final long serialVersionUID = 5536478059904917632L;
 	/**
 	 * Creates a new exception with a message.
 	 * @param message
