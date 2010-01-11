@@ -190,7 +190,11 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		}
 
 		//generates generic to xml method
-		appendString("private static XMLNode _toXML("+doc.getName()+" object, String[] languages){");
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+			appendString("private static XMLNode _toXML("+doc.getName()+" object, String[] languages){");
+		}else{
+			appendString("private static XMLNode _toXML("+doc.getName()+" object){");
+		}
 		increaseIdent();
 		appendStatement("XMLNode ret = new XMLNode("+quote(doc.getName())+")");
 		appendStatement("ret.addAttribute(new XMLAttribute("+quote("id")+", object.getId()))");
@@ -204,30 +208,38 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		}
         emptyline();
         
-        appendString("if(object instanceof MultilingualObject){");
-        increaseIdent();
-        appendStatement("MultilingualObject multilangDoc = (MultilingualObject) object");
-        appendStatement("ret.addChildNode(XMLHelper.createXMLNodeForBooleanValue("+quote("multilingualDisabled")+", null,multilangDoc.isMultilingualDisabledInstance()))");
-        append(closeBlock());
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+	        appendString("if(object instanceof MultilingualObject){");
+	        increaseIdent();
+	        appendStatement("MultilingualObject multilangDoc = (MultilingualObject) object");
+	        appendStatement("ret.addChildNode(XMLHelper.createXMLNodeForBooleanValue("+quote("multilingualDisabled")+", null, multilangDoc.isMultilingualDisabledInstance()))");
+	        append(closeBlock());
+		}
 		appendStatement("return ret");
 		append(closeBlock());
 		emptyline();
 		
 		appendString("public static XMLNode toXML("+doc.getName()+" object){");
 		increaseIdent();
-		appendStatement("return _toXML(object, LANGUAGES)");
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+			appendStatement("return _toXML(object, LANGUAGES)");
+		}else{
+			appendStatement("return _toXML(object)");
+		}
 		append(closeBlock());
 		emptyline();
 
-		//generates toXML method for a single language
-		appendString("public static XMLNode toXML("+doc.getName()+" object, String... languages){");
-		increaseIdent();
-		
-		appendString("if (languages==null || languages.length==0)");
-		appendIncreasedStatement("return toXML(object)");
-		appendStatement("return _toXML(object, languages)");
-		append(closeBlock());
-		emptyline();
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+			//generates toXML method for a single language
+			appendString("public static XMLNode toXML("+doc.getName()+" object, String... languages){");
+			increaseIdent();
+			
+			appendString("if (languages==null || languages.length==0)");
+			appendIncreasedStatement("return toXML(object)");
+			appendStatement("return _toXML(object, languages)");
+			append(closeBlock());
+			emptyline();
+		}
 		
 
 		appendString("public static "+doc.getName()+" fromXML(XMLNode node){");
