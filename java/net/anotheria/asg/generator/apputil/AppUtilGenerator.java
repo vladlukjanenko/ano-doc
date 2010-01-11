@@ -19,7 +19,7 @@ public class AppUtilGenerator extends AbstractAnoDocGenerator{
 	public void generate(List<MetaModule> modules){
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		files.addAll(new CallContextGenerator().generate(null));
-		files.addAll(new XMLExporterGenerator().generate(modules, context));
+		files.addAll(new XMLExporterGenerator().generate(modules));
 		files.addAll(new XMLImporterGenerator().generate(modules, context));
 		files.addAll(new LanguageUtilsGenerator().generate(modules, context));
 		files.addAll(new Log4JConfigurationGenerator().generate(null));

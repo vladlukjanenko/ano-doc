@@ -10,16 +10,17 @@ import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.util.StringUtils;
 
-public class XMLExporterGenerator extends AbstractGenerator{
+public class XMLExporterGenerator extends AbstractGenerator {
 	
-	public List<FileEntry> generate(List<MetaModule> modules, Context context){
+	public List<FileEntry> generate(List<MetaModule> modules){
 		List<FileEntry> entries = new ArrayList<FileEntry>();
 		
-		entries.add(new FileEntry(generateExporter(modules, context)));
+		entries.add(new FileEntry(generateExporter(modules)));
 		
 		return entries;
 		
@@ -29,8 +30,9 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		return StringUtils.capitalize(context.getApplicationName())+"XMLExporter";
 	}
 	
-	private GeneratedClass generateExporter(List<MetaModule> modules, Context context){
+	private GeneratedClass generateExporter(List<MetaModule> modules){
 
+		Context context = GeneratorDataRegistry.getInstance().getContext();
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
@@ -66,6 +68,9 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		appendStatement("private static AtomicLong exp = new AtomicLong()");
 		appendStatement("private static String[] LANGUAGES = null");
 
+		String LANGUAGES = GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() ?
+				"LANGUAGES" : "";
+		
 		appendString("static {");
 		increaseIdent();
 		appendStatement(ConfiguratorGenerator.getConfiguratorClassName()+".configure()");
@@ -81,7 +86,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 		increaseIdent();
 		appendStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>()");
 		for (MetaModule m : modules){
-			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
+			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML("+LANGUAGES+"))");
 		}
 		appendStatement("return createExport(nodes)");
 		append(closeBlock());
@@ -109,7 +114,7 @@ public class XMLExporterGenerator extends AbstractGenerator{
 			appendString("public static XMLTree create"+m.getName()+"XMLExport() throws ASGRuntimeException{");
 			increaseIdent();
 			appendStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>(1)");
-			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML(LANGUAGES))");
+			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML("+LANGUAGES+"))");
 			appendStatement("return createExport(nodes)");
 			append(closeBlock());
 			emptyline();
