@@ -584,9 +584,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
 	    	appendStatement("return ret");
 	    	append(closeBlock());
+	    	emptyline();
 
 		    if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
-		    	emptyline();
 		    	appendStatement("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages){");
 		    	increaseIdent();
 		    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
@@ -595,10 +595,10 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		    	appendString("for ("+d.getName()+" object : list)");
 		    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
 		    	appendStatement("return ret");
+		    	append(closeBlock());
+		    	emptyline();
 		    }
 
-	    	append(closeBlock());
-	    	emptyline();
 	    }
 
 
