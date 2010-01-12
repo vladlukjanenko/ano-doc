@@ -86,7 +86,8 @@ public class XMLExporterGenerator extends AbstractGenerator {
 		increaseIdent();
 		appendStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>()");
 		for (MetaModule m : modules){
-			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML("+LANGUAGES+"))");
+			String langParam = (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && m.isContainsAnyMultilingualDocs())? LANGUAGES:""; 
+			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML("+langParam+"))");
 		}
 		appendStatement("return createExport(nodes)");
 		append(closeBlock());
@@ -114,7 +115,8 @@ public class XMLExporterGenerator extends AbstractGenerator {
 			appendString("public static XMLTree create"+m.getName()+"XMLExport() throws ASGRuntimeException{");
 			increaseIdent();
 			appendStatement("ArrayList<XMLNode> nodes = new ArrayList<XMLNode>(1)");
-			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML("+LANGUAGES+"))");
+			String langParam = (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && m.isContainsAnyMultilingualDocs())? LANGUAGES:"";
+			appendStatement("nodes.add("+ServiceGenerator.getFactoryName(m)+".create"+ServiceGenerator.getServiceName(m)+"().exportToXML("+langParam+"))");
 			appendStatement("return createExport(nodes)");
 			append(closeBlock());
 			emptyline();

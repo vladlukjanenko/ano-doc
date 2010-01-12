@@ -48,7 +48,7 @@ public class MetaModule implements IGenerateable{
 	 * Generation options which can enable or disable generation of some artefacts.
 	 */
 	private GenerationOptions moduleOptions;
-	 
+		 
 	/**
 	 * Creates a new empty module.
 	 */
@@ -225,5 +225,11 @@ public class MetaModule implements IGenerateable{
 		moduleOptions = someModuleOptions;
 	}
 	
-	
+	public boolean isContainsAnyMultilingualDocs(){
+		for(MetaDocument doc:documents)
+			if (GeneratorDataRegistry.hasLanguageCopyMethods(doc))
+				return true;
+		
+		return false; 
+	}
 }

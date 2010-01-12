@@ -338,12 +338,14 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
     			""
     			);
 	    
-        writeInterfaceFun(
-        		"creates an xml element with all contained data.", 
-    			"XMLNode", 
-    			"exportToXML", 
-    			"String[] languages"
-    			);
+        if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+	        writeInterfaceFun(
+	        		"creates an xml element with all contained data.", 
+	    			"XMLNode", 
+	    			"exportToXML", 
+	    			"String[] languages"
+	    			);
+        }
         
 	    return clazz;
 	}
@@ -834,15 +836,17 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    		"",
 	    		null
 	    		);
-	    		
-	    writeStubFun(
-	    		"creates an xml element with all contained data in selected languages",
-	    		"XMLNode",
-	    		"exportToXML",
-	    		"String[] languages",
-	    		"languages",
-	    		null
-	    		);
+	    
+	    if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+		    writeStubFun(
+		    		"creates an xml element with all contained data in selected languages",
+		    		"XMLNode",
+		    		"exportToXML",
+		    		"String[] languages",
+		    		"languages",
+		    		null
+		    		);
+	    }
 		
 	    ////********** //////
 	    appendString("public void addServiceListener(IServiceListener listener){");
@@ -1124,15 +1128,17 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    		"",
 	    		null
 	    		);
-	    		
-	    writeSkeletonFun(
-	    		"creates an xml element with all contained data.",
-	    		"XMLNode",
-	    		"exportToXML",
-	    		"String languages[]",
-	    		"languages",
-	    		null
-	    		);
+	    
+	    if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+		    writeSkeletonFun(
+		    		"creates an xml element with all contained data.",
+		    		"XMLNode",
+		    		"exportToXML",
+		    		"String languages[]",
+		    		"languages",
+		    		null
+		    		);
+	    }
 	    
 	    appendString("public byte[] getEcho(byte[] echoRequest){");
 		appendIncreasedStatement("return echoRequest");

@@ -481,17 +481,18 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    append(closeBlock());
 	    emptyline();
 	    
-	    appendString("@Override public XMLNode exportToXML(String[] languages){");
-	    increaseIdent();
-	    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
-	    emptyline();
-	    for (MetaDocument d : docs){
-	    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML(languages))");
+	    if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
+		    appendString("@Override public XMLNode exportToXML(String[] languages){");
+		    increaseIdent();
+		    appendStatement("XMLNode ret = new XMLNode("+quote(module.getName())+")");
+		    emptyline();
+		    for (MetaDocument d : docs){
+		    	appendStatement("ret.addChildNode(export"+d.getMultiple()+"ToXML(languages))");
+		    }
+		    emptyline();
+		    appendStatement("return ret");
+		    append(closeBlock());
 	    }
-	    emptyline();
-	    appendStatement("return ret");
-	    append(closeBlock());
-
 	    
 	    return clazz;
 	}
