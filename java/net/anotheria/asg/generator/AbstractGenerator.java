@@ -129,6 +129,17 @@ public class AbstractGenerator{
 		increaseIdent();
 	}
 
+	protected void appendCatch(Class<? extends Throwable> exceptionClazz){
+		((GeneratedClass)getCurrentJob()).addImport(exceptionClazz);
+		appendCatch(exceptionClazz.getName());
+	}
+	
+	protected void appendCatch(String exceptionName){
+		decreaseIdent();
+		appendString("} catch (", exceptionName, " e) {");
+		increaseIdent();
+	}
+	
 	protected void openFun(String s){
 		if (!s.endsWith("{"))
 			s+=" {";

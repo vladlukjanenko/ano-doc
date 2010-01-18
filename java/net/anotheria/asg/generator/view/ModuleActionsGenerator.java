@@ -1,6 +1,7 @@
 package net.anotheria.asg.generator.view;
 
 import net.anotheria.asg.data.LockableObject;
+import net.anotheria.asg.exception.ConstantNotFoundException;
 import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.forms.meta.*;
 import net.anotheria.asg.generator.meta.*;
@@ -719,7 +720,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 	    
 	    // BEAN creation function
-	    appendString( "protected "+ModuleBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+") throws ConstantNotFoundException {");
+	    appendString( "protected "+ModuleBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+") {");
 	    increaseIdent();
 	    appendStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = new "+ModuleBeanGenerator.getListItemBeanName(doc)+"()");
 	    //set the properties.
@@ -752,12 +753,17 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 //					}
 //					appendStatement("bean."+p.toBeanSetter(lang)+"("+value+")");
 //				}else{
-					String value = "";
 					if (p instanceof MetaEnumerationProperty){
 						MetaEnumerationProperty mep = (MetaEnumerationProperty)p;
 						EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
-						value = EnumTypeGenerator.getEnumClassName(type)+".getConstantByValue("+doc.getVariableName()+".get"+p.getAccesserName()+"()).name()";
+						openTry();
+						appendStatement("bean."+p.toBeanSetter(lang)+"("+EnumTypeGenerator.getEnumClassName(type)+".getConstantByValue("+doc.getVariableName()+".get"+p.getAccesserName()+"()).name())");
+						appendCatch(ConstantNotFoundException.class);
+						appendStatement("bean."+p.toBeanSetter(lang)+"("+quote("-----")+")");
+						closeBlock("try");
+						
 					}else {
+						String value = "";
 						value = doc.getVariableName()+".get"+p.getAccesserName(lang)+"()";
 						if (element.getDecorator()!=null){
 							MetaProperty tmp = null; 
@@ -770,8 +776,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 							MetaDecorator d = element.getDecorator();
 							value = getDecoratorVariableName(element)+".decorate("+doc.getVariableName()+", "+quote(p.getName()+(lang==null?"":"_"+lang))+", "+quote(d.getRule())+")";
 						}
+						appendStatement("bean."+p.toBeanSetter(lang)+"("+value+")");
 					}
-					appendStatement("bean."+p.toBeanSetter(lang)+"("+value+")");
 //				}
 			}
 		}
@@ -3043,8 +3049,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				appendString("//enumeration "+type.getName()+" already prepared.");
 			}
 			appendStatement("form."+mep.toBeanSetter()+"Collection("+listName + "Values)");
-			if (editMode)
+			if (editMode){
+				openTry();
 				appendStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumTypeGenerator.getEnumClassName(type)+".getConstantByValue("+doc.getVariableName()+"."+mep.toGetter()+"()).name())");
+				appendCatch(ConstantNotFoundException.class);
+				closeBlock("try");
+			}
 	    }
 	}
 	
