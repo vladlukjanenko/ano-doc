@@ -924,6 +924,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("whereClause += p.getName()+p.getComparator()+statement");
 		append(closeBlock());
 		appendStatement("SQL += whereClause");
+		appendStatement("SQL += SQL_LIMIT_1 + SQL_OFFSET_1");
 		appendStatement("ps = con.prepareStatement(SQL)");
 		appendStatement("int propertyPosition = 0");
 		appendString("for (QueryProperty property: properties){");
@@ -932,7 +933,6 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("continue");
 		appendStatement("setProperty(++propertyPosition, ps, property)");
 		append(closeBlock());
-		appendStatement("SQL += SQL_LIMIT_1 + SQL_OFFSET_1");
 		appendStatement("int pLimit = aSegment.getElementsPerSlice()");
 		appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
 		appendStatement("ps.setInt(++propertyPosition, pLimit)");
