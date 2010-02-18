@@ -33,12 +33,20 @@ public class ContainsStringQuery implements DocumentQuery {
 	/**
 	 * Any character constant
 	 */
-	public static final String ANY_CHAR_EXPRESSION = "_";
+	public static final String ANY_CHAR_EXPRESSION = "?";
+	/**
+	 * Any character regular expression for replace()
+	 */
+	public static final String ANY_CHAR_REG_EXPRESSION = "\\?";
 
 	/**
 	 * Any string constant
 	 */
-	public static final String ANY_STRING_EXPRESSION = "%";
+	public static final String ANY_STRING_EXPRESSION = "*";
+	/**
+	 * Any string regular expression for replace()
+	 */
+	public static final String ANY_STRING_REG_EXPRESSION = "\\*";
 
 	/**
 	 * Search criteria
@@ -64,18 +72,18 @@ public class ContainsStringQuery implements DocumentQuery {
 		criteria = aCriteria;
 
 		// Set criteriaRegEx
-		String criteriaRegEx = aCriteria.replaceAll(ANY_CHAR_EXPRESSION, ".").replaceAll(ANY_STRING_EXPRESSION, ".*");
+		String criteriaRegEx = aCriteria.replaceAll(ANY_CHAR_REG_EXPRESSION, ".").replaceAll(ANY_STRING_REG_EXPRESSION, ".*");
 
 		// remove start end final ANY_STRING_EXPRESSIONs from criteria
 		// to determine criteriaMatchRegEx
-		String criteriaMatchRegEx = aCriteria.replaceAll(ANY_CHAR_EXPRESSION, ".");
+		String criteriaMatchRegEx = aCriteria.replaceAll(ANY_CHAR_REG_EXPRESSION, ".");
 		if (criteriaMatchRegEx.startsWith(ANY_STRING_EXPRESSION)) {
 			criteriaMatchRegEx = criteriaMatchRegEx.substring(ANY_STRING_EXPRESSION.length());
 		}
 		if (criteriaMatchRegEx.endsWith(ANY_STRING_EXPRESSION)) {
 			criteriaMatchRegEx = criteriaMatchRegEx.substring(0, criteriaMatchRegEx.length() - ANY_STRING_EXPRESSION.length());
 		}
-		criteriaMatchRegEx = criteriaMatchRegEx.replaceAll(ANY_STRING_EXPRESSION, ".*");
+		criteriaMatchRegEx = criteriaMatchRegEx.replaceAll(ANY_STRING_REG_EXPRESSION, ".*");
 
 		// Compile patterns
 		try {

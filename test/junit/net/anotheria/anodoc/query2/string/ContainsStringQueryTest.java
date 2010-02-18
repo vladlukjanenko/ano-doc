@@ -71,7 +71,7 @@ public class ContainsStringQueryTest {
 		List<QueryResultEntry> result = instance.match((DataObject) dataObject);
 		assertTrue(result.size() == 0);
 
-		criteria = "%Anotheria%";
+		criteria = ContainsStringQuery.ANY_STRING_EXPRESSION + "Anotheria" + ContainsStringQuery.ANY_STRING_EXPRESSION;
 		instance = new ContainsStringQuery(criteria);
 		result = instance.match((DataObject) dataObject);
 		assertTrue(result.size() == 1);
@@ -89,7 +89,7 @@ public class ContainsStringQueryTest {
 		assertEquals(matchingInfo.getMatch(), "2010");
 		assertEquals(matchingInfo.getPost(), "");
 
-		criteria = "20%"; // search by id
+		criteria = "20" + ContainsStringQuery.ANY_STRING_EXPRESSION; // search by id
 		instance = new ContainsStringQuery(criteria);
 		result = instance.match((DataObject) dataObject);
 		assertTrue(result.size() == 1);
@@ -98,7 +98,9 @@ public class ContainsStringQueryTest {
 		assertEquals(matchingInfo.getMatch(), "20");
 		assertEquals(matchingInfo.getPost(), "10");
 
-		criteria = "%Ano%ria%";
+		criteria = ContainsStringQuery.ANY_STRING_EXPRESSION 
+		+ "Ano" + ContainsStringQuery.ANY_STRING_EXPRESSION
+		+ "ria" + ContainsStringQuery.ANY_STRING_EXPRESSION;
 		instance = new ContainsStringQuery(criteria);
 		result = instance.match((DataObject) dataObject);
 		assertTrue(result.size() == 1);
@@ -107,7 +109,9 @@ public class ContainsStringQueryTest {
 		assertEquals(matchingInfo.getMatch(), "Anotheria");
 		assertEquals(matchingInfo.getPost(), " software");
 
-		criteria = "%Ano__eria%";
+		criteria = ContainsStringQuery.ANY_STRING_EXPRESSION + "Ano"
+		+ ContainsStringQuery.ANY_CHAR_EXPRESSION + ContainsStringQuery.ANY_STRING_EXPRESSION 
+		+ "eria" + ContainsStringQuery.ANY_STRING_EXPRESSION;
 		instance = new ContainsStringQuery(criteria);
 		result = instance.match((DataObject) dataObject);
 		assertTrue(result.size() == 1);
@@ -116,7 +120,7 @@ public class ContainsStringQueryTest {
 		assertEquals(matchingInfo.getMatch(), "Anotheria");
 		assertEquals(matchingInfo.getPost(), " software");
 
-		criteria = "This%";
+		criteria = "This" + ContainsStringQuery.ANY_STRING_EXPRESSION;
 		instance = new ContainsStringQuery(criteria);
 		result = instance.match((DataObject) dataObject);
 		assertTrue(result.size() == 1);
@@ -125,7 +129,7 @@ public class ContainsStringQueryTest {
 		assertEquals(matchingInfo.getMatch(), "This");
 		assertEquals(matchingInfo.getPost(), " is Anotheria software");
 
-		criteria = "%software";
+		criteria = ContainsStringQuery.ANY_STRING_EXPRESSION + "software";
 		instance = new ContainsStringQuery(criteria);
 		result = instance.match((DataObject) dataObject);
 		assertTrue(result.size() == 1);
