@@ -28,7 +28,8 @@ public class ContainsStringQuery implements DocumentQuery {
 	/**
 	 * Logger.
 	 */
-	private static final Logger log = Logger.getLogger(ContainsStringQuery.class.getName());
+	private static final Logger log = Logger
+			.getLogger(ContainsStringQuery.class.getName());
 
 	/**
 	 * Any character constant
@@ -66,34 +67,44 @@ public class ContainsStringQuery implements DocumentQuery {
 	 * ContainsStringQuery constructor.
 	 * 
 	 * @param aCriteria
-	 *            is expression, that supports {@link ANY_CHAR_EXPRESSION} and {@link ANY_STRING_EXPRESSION} characters
+	 *            is expression, that supports {@link ANY_CHAR_EXPRESSION} and
+	 *            {@link ANY_STRING_EXPRESSION} characters
 	 */
 	public ContainsStringQuery(String aCriteria) {
 		criteria = aCriteria;
 
 		// Set criteriaRegEx
-		String criteriaRegEx = aCriteria.replaceAll(ANY_CHAR_REG_EXPRESSION, ".").replaceAll(ANY_STRING_REG_EXPRESSION, ".*");
+		String criteriaRegEx = aCriteria.replaceAll(ANY_CHAR_REG_EXPRESSION,
+				".").replaceAll(ANY_STRING_REG_EXPRESSION, ".*");
 
 		// remove start end final ANY_STRING_EXPRESSIONs from criteria
 		// to determine criteriaMatchRegEx
-		String criteriaMatchRegEx = aCriteria.replaceAll(ANY_CHAR_REG_EXPRESSION, ".");
+		String criteriaMatchRegEx = aCriteria.replaceAll(
+				ANY_CHAR_REG_EXPRESSION, ".");
 		if (criteriaMatchRegEx.startsWith(ANY_STRING_EXPRESSION)) {
-			criteriaMatchRegEx = criteriaMatchRegEx.substring(ANY_STRING_EXPRESSION.length());
+			criteriaMatchRegEx = criteriaMatchRegEx
+					.substring(ANY_STRING_EXPRESSION.length());
 		}
 		if (criteriaMatchRegEx.endsWith(ANY_STRING_EXPRESSION)) {
-			criteriaMatchRegEx = criteriaMatchRegEx.substring(0, criteriaMatchRegEx.length() - ANY_STRING_EXPRESSION.length());
+			criteriaMatchRegEx = criteriaMatchRegEx.substring(0,
+					criteriaMatchRegEx.length()
+							- ANY_STRING_EXPRESSION.length());
 		}
-		criteriaMatchRegEx = criteriaMatchRegEx.replaceAll(ANY_STRING_REG_EXPRESSION, ".*");
+		criteriaMatchRegEx = criteriaMatchRegEx.replaceAll(
+				ANY_STRING_REG_EXPRESSION, ".*");
 
 		// Compile patterns
 		try {
-			criteriaRegExPattern = Pattern.compile(criteriaRegEx, Pattern.CASE_INSENSITIVE);
-			criteriaMatchRegExPattern = Pattern.compile(criteriaMatchRegEx, Pattern.CASE_INSENSITIVE);
+			criteriaRegExPattern = Pattern.compile(criteriaRegEx,
+					Pattern.CASE_INSENSITIVE);
+			criteriaMatchRegExPattern = Pattern.compile(criteriaMatchRegEx,
+					Pattern.CASE_INSENSITIVE);
 		} catch (PatternSyntaxException e) {
 			log.warn("PatternSyntaxException: " + e.getMessage());
 			// Try to set regExPattern simply equals to aCriteria
 			try {
-				criteriaRegExPattern = Pattern.compile(aCriteria, Pattern.CASE_INSENSITIVE);
+				criteriaRegExPattern = Pattern.compile(aCriteria,
+						Pattern.CASE_INSENSITIVE);
 				criteriaMatchRegExPattern = criteriaRegExPattern;
 			} catch (PatternSyntaxException e1) {
 				log.warn("PatternSyntaxException: " + e.getMessage());
@@ -110,7 +121,8 @@ public class ContainsStringQuery implements DocumentQuery {
 	public List<QueryResultEntry> match(DataObject obj) {
 		List<QueryResultEntry> ret = new ArrayList<QueryResultEntry>();
 
-		if (!(obj instanceof Document) || (criteriaRegExPattern == null) || (criteriaMatchRegExPattern == null)) {
+		if (!(obj instanceof Document) || (criteriaRegExPattern == null)
+				|| (criteriaMatchRegExPattern == null)) {
 			return ret;
 		}
 
@@ -119,7 +131,8 @@ public class ContainsStringQuery implements DocumentQuery {
 		List<Property> properties = doc.getProperties();
 
 		// search in id
-		tempEntry = getMatchQueryResultEntry(new StringProperty("id", doc.getId()), doc);
+		tempEntry = getMatchQueryResultEntry(new StringProperty("id", doc
+				.getId()), doc);
 		if (tempEntry != null) {
 			ret.add(tempEntry);
 		}
@@ -139,46 +152,78 @@ public class ContainsStringQuery implements DocumentQuery {
 	}
 
 	/**
-	 * Returns QueryResultEntry for given matchedProperty if it matches with {@link criteria}.
+	 * Returns QueryResultEntry for given matchedProperty if it matches with
+	 * {@link criteria}.
 	 * 
 	 * @param matchedProperty
 	 *            property
 	 * @param matchedDocument
 	 *            document
 	 */
-	private QueryResultEntry getMatchQueryResultEntry(StringProperty matchedProperty, Document matchedDocument) {
+	private QueryResultEntry getMatchQueryResultEntry(
+			StringProperty matchedProperty, Document matchedDocument) {
 		QueryResultEntry retEntry = null;
 
 		if (matchedProperty != null) {
-			String value = matchedProperty.getValue().toString();
-			String pre;
-			String match;
-			String post;
-			Matcher matchMatcher;
 
-			// Check is value matches to pattern
-			if (value != null && criteriaRegExPattern.matcher(value).matches()) {
+			Object valueObj = matchedProperty.getValue();
 
-				retEntry = new QueryResultEntry();
-				retEntry.setMatchedDocument(matchedDocument);
-				retEntry.setMatchedProperty(matchedProperty);
+			if (valueObj != null) {
+				
+				String value = valueObj.toString();
+				String pre;
+				String match;
+				String post;
+				Matcher matchMatcher;
 
-				// find pre-match-post parts
-				matchMatcher = criteriaMatchRegExPattern.matcher(value);
-				if (matchMatcher.find()) {
-					pre = value.substring(0, matchMatcher.start());
-					match = matchMatcher.group();
-					post = value.substring(matchMatcher.end());
-				} else {
-					pre = "";
-					match = value;
-					post = "";
-				}
+				// if( value!= null ){
+				//				
+				//				
+				// String encodedCriteria;
+				// try {
+				// encodedCriteria = new String(criteria.getBytes(),"CP1251");
+				// } catch (UnsupportedEncodingException e) {
+				//					
+				// log.warn("UnsupportedEncodingException: " + e.getMessage() +
+				// ". Criteria will not be encoded into " + "UTF-8");
+				// encodedCriteria = criteria;
+				// }
+				//								
+				// log.info("criteria: " + criteria + " encoded: " +
+				// encodedCriteria + " property: " + matchedProperty.getId() +
+				// " value: " + value);
+				// System.out.println("criteria: " + criteria + " encoded: " +
+				// encodedCriteria + " property: " + matchedProperty.getId() +
+				// " value: " + value);
+				//				
+				// }
 
-				StringMatchingInfo info = new StringMatchingInfo(pre, match, post);
-				retEntry.setInfo(info);
-			}
-		}
+				// Check is value matches to pattern
+				if (value != null
+						&& criteriaRegExPattern.matcher(value).matches()) {
+
+					retEntry = new QueryResultEntry();
+					retEntry.setMatchedDocument(matchedDocument);
+					retEntry.setMatchedProperty(matchedProperty);
+
+					// find pre-match-post parts
+					matchMatcher = criteriaMatchRegExPattern.matcher(value);
+					if (matchMatcher.find()) {
+						pre = value.substring(0, matchMatcher.start());
+						match = matchMatcher.group();
+						post = value.substring(matchMatcher.end());
+					} else {
+						pre = "";
+						match = value;
+						post = "";
+					}
+
+					StringMatchingInfo info = new StringMatchingInfo(pre,
+							match, post);
+					retEntry.setInfo(info);
+				} // if value
+			} // if valueObj
+		} // if matchedProperty
 
 		return retEntry;
 	}
