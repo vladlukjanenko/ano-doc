@@ -8,7 +8,7 @@
     </publications>
     <dependencies>
         <dependency org="org.apache" name="log4j" rev="stable" transitive="false"/>
-        <dependency org="org.apache" name="xalan" rev="stable" transitive="false"/>
+        <!--<dependency org="org.apache" name="xalan" rev="stable" transitive="false"/>-->
         <dependency org="org.apache" name="ant" rev="stable" transitive="false"/>
 
         <dependency org="org.jdom" name="jdom" rev="stable" transitive="false"/>
@@ -20,5 +20,7 @@
         <dependency org="anotheria.net" name="ano-util" rev="latest" transitive="true" changing="true"/>
         <dependency org="anotheria.net" name="ano-prise" rev="latest" transitive="true" changing="true"/>
         <dependency org="org.json" name="json" rev="stable" transitive="false"/>
+
+        <dependency org="org.apache" name="xalan" rev="latest" transitive="false"/>
     </dependencies>
 </ivy-module>
