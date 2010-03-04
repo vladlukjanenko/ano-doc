@@ -714,6 +714,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    	appendStatement("addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\"\"))");
 	    }
 	    
+	    // User settings
+		appendCommentLine(" Add user settings beans");
+	    appendStatement("addUserSettingsBeansToRequest(req)");
+	    
 	    appendStatement("return mapping.findForward(\"success\")");
 	    append(closeBlock());
 	    emptyline();
@@ -1599,6 +1603,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+doc.getVariableName()+".getObjectInfo().toString())");
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Update")+")");
+	    // User settings
+		appendCommentLine(" Add user settings beans");
+	    appendStatement("addUserSettingsBeansToRequest(req)");
 		
 		//add field descriptions ...
 		appendStatement("String fieldDescription = null");

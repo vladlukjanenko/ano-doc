@@ -64,7 +64,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
 		clazz.addImport("org.apache.struts.action.ActionForm");
 		clazz.addImport("org.apache.struts.action.ActionForward");
-		clazz.addImport("org.apache.struts.action.ActionMapping");
+		clazz.addImport("org.apache.struts.action.ActionMapping");		
 
 		clazz.setAbstractClass(true);
 		clazz.setParent("BaseAction");
@@ -321,6 +321,57 @@ public class BaseActionGenerator extends AbstractGenerator {
 		appendStatement("prepareViewSelection(req)");
 		append(closeBlock());
 		emptyline();
+		
+		appendComment("Get current application supported languages wrapper method.");
+		clazz.addImport("net.anotheria.anosite.gen.shared.service." + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName()) + "LanguageUtils");
+		appendString("public static List<String> getSupportedLanguages() {");
+		increaseIdent();
+		appendStatement("return " + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())
+				+ "LanguageUtils.getSupportedLanguages()");
+		append(closeBlock());
+		emptyline();
+		
+		appendComment("Add user settings beans to specifyed request.");
+		clazz.addImport("net.anotheria.anosite.gen.usersettings.data.LanguageFilteringSettings");
+		clazz.addImport("net.anotheria.anosite.gen.usersettings.data.LanguageFilteringSettingsFactory");				
+		appendString("protected void addUserSettingsBeansToRequest(HttpServletRequest req) {");
+		increaseIdent();
+		appendStatement("String userId = getUserId(req)");
+		appendStatement("LanguageFilteringSettings languageFilteringSettings = getLanguageFilteringSettingsByUserId(userId)");
+		appendString("if(languageFilteringSettings == null) {");
+		increaseIdent();
+		appendCommentLine("generate default languageFilteringSettings");
+		appendStatement("languageFilteringSettings = LanguageFilteringSettingsFactory.createLanguageFilteringSettings()");
+		appendStatement("languageFilteringSettings.setUserId(userId)");
+		appendStatement("languageFilteringSettings.setLanguageFilteringEnabled(false)");
+		appendStatement("languageFilteringSettings.setDisplayedLanguages(getSupportedLanguages())");
+		appendStatement("log.debug(\"default user languageFilteringSettings was generated for user: \" + userId )");
+		append(closeBlock());
+		appendStatement("addBeanToRequest(req, \"languageFilteringSettings\", languageFilteringSettings )");
+		append(closeBlock());
+		emptyline();		
+		appendComment("Get User LanguageFilteringSettings."
+				+ "\n@param userId User Id."
+				+ "\n@return LanguageFilteringSettings. null if there are no settings yet for userId or another Exception happened.");
+		clazz.addImport("net.anotheria.anosite.gen.usersettings.service.UserSettingsServiceException");
+		appendString("protected LanguageFilteringSettings getLanguageFilteringSettingsByUserId(String userId) {");
+		increaseIdent();
+		appendStatement("LanguageFilteringSettings retlanguageFilteringSettings = null");
+		appendStatement("List<LanguageFilteringSettings> list = null");
+		appendString("try {");
+		increaseIdent();		
+		appendIncreasedStatement("list = getUserSettingsService().getLanguageFilteringSettingssByProperty(LanguageFilteringSettings.PROP_USER_ID, userId)");
+		appendString("} catch (UserSettingsServiceException e) {");
+		appendIncreasedStatement("log.warn(\"Exception when trying to get LanguageFilteringSettings by userId\",e)");
+		appendString("}");
+		appendString("if(list!=null && list.size()>0) {");		
+		appendIncreasedStatement("retlanguageFilteringSettings = list.get(0)");
+		appendString("}");		
+		appendStatement("return retlanguageFilteringSettings");
+		append(closeBlock());
+		emptyline();
+	
+		
 
 		appendString("private MenuItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();
@@ -446,7 +497,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		increaseIdent();
 		appendStatement("this.documentClazz = aDocumentClazz");
 		append(closeBlock());
-		emptyline();
+		emptyline();				
 
 		appendString("public boolean equals(Object o) {");
 		increaseIdent();

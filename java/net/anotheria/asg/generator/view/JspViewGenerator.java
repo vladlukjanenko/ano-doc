@@ -16,6 +16,11 @@ import java.util.List;
  * @author another
  */
 public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator{
+	
+	/**
+	 * userSettingsActionName
+	 */		
+	final String userSettingsEditActionName = "userSettingsEdit";
 	/**
 	 * Currently generated section.
 	 */
@@ -138,6 +143,19 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		throw new RuntimeException("Unsupported container: "+p);
 	}
 	
+	/**
+	 * Generates user settings JSP imports 
+	 * @return
+	 */
+	private String getUserSettingsJSPImports(){
+		String ret = "";
+		ret += "<%@page import=\"net.anotheria.anosite.gen.usersettings.data.LanguageFilteringSettings\"%>" + CRLF;
+		ret += "<%@page import=\"java.net.URLEncoder\"%>" + CRLF;
+		ret += "<%@page import=\"org.apache.commons.lang.ArrayUtils\"%>" + CRLF;
+		
+		return ret;
+	}
+	
 	private GeneratedJSPFile generateListPage(MetaModuleSection section, MetaDocument doc, MetaListProperty list){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
@@ -152,6 +170,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		MetaProperty p = list.getContainedProperty();
 
 		append(getBaseJSPHeader());
+		
 		
 		appendString("<html:html>");
 		increaseIdent();
@@ -471,6 +490,10 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		currentDialog = dialog;
 		
 		append(getBaseJSPHeader());
+		append(getUserSettingsJSPImports());
+		
+		// Language filtering settings
+		generateProcessLanguageFilteringSettings();
 		
 		appendString("<html:html>");
 		increaseIdent();
@@ -522,6 +545,15 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
 		decreaseIdent(); 
 		appendString("</tr>");
+		
+		// Language filtering settings
+		appendString("<tr>");
+		appendString("<td align=\""+("center")+"\">");
+		increaseIdent();
+		generateLanguageFilteringSettingsViewComponentForDialog(dialog,section);
+		decreaseIdent();
+		appendString("</td>");
+		appendString("</tr>");
 
 		// *** END MULILINGUAL COPY *** //
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()) {
@@ -529,7 +561,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		}
 		// *** END MULILINGUAL COPY *** //
 		appendString("</table>");
-		appendString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		
+		appendString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		 
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
@@ -598,7 +630,14 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			if (lang!=null)
 				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
 
-			appendString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
+			// Language Filtering Settings
+			String displayLanguageCheck = "";			
+			if(element instanceof MultilingualFieldElement) {
+				MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
+				displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";						
+			}
+			
+			appendString("<tr " + displayLanguageCheck + " class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
 			increaseIdent();
 			appendString("<td align=\"right\" width=\"35%\">");
 			increaseIdent();
@@ -1130,7 +1169,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		String ret ="";
 		String lang = getElementLanguage(element); 
 		
-		ret += "<input type=\"text\" name="+quote(p.getName(lang));
+		ret += "<input name="+quote(p.getName(lang));
 		//ret += "<html:text filter=\"false\" property="+quote(element.getName());
 		ret += " value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang));
 		ret += "/>\"";
@@ -1147,6 +1186,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 	private String getTextEditor(MetaFieldElement element, MetaProperty p){
 		String lang = getElementLanguage(element);
 		String ret ="";
+		
 		ret += "<div class=\"yui-skin-sam\">";
 		if(element.isRich())
 			ret += "<button id="+quote("toggleEditorButton_" + p.getName(lang))+" type=\"button\">Toggle Editor</button><br/>";
@@ -1232,8 +1272,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<?xml version=\"1.0\" encoding="+quote(getContext().getEncoding())+"?>");
 		appendString("<"+doc.getMultiple()+">");
 		appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+">");
-		increaseIdent();
 		appendString("<"+doc.getName()+">");
+		increaseIdent();
 		increaseIdent();
 		List<MetaViewElement> elements = section.getElements();
 		for (int i=0; i<elements.size(); i++){
@@ -1256,8 +1296,65 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("</"+doc.getMultiple()+">");
 		return jsp;
 	}
+	
+	
+	private void generateProcessLanguageFilteringSettings() {
+		// Language filtering settings
+		appendString("<!-- Process languageFilterringSettings -->");
+		appendString("<logic:equal name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");
+		increaseIdent();
+		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+			appendString("<bean:define id=\"display" + sl + "\" value='<%= ((LanguageFilteringSettings) request.getAttribute(\"languageFilteringSettings\")).getDisplayedLanguages().contains(\"" + sl + "\") ? \"true\" : \"false\" %>'/>");
+		}
+		decreaseIdent();
+		appendString("</logic:equal>");
+		appendString("<logic:notEqual name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");
+		increaseIdent();
+		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+			appendString("<bean:define id=\"display" + sl + "\" value='true'/>");
+		}
+		decreaseIdent();
+		appendString("</logic:notEqual>");
+	}
 
+	private void generateLanguageFilteringSettingsViewComponent(MetaModuleSection section) {
+		
+		appendString("<a href=\""+userSettingsEditActionName+"?referrer=<%= URLEncoder.encode(" + quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW)) + " + ((request.getQueryString() != null) ? (\"?\" + request.getQueryString()) : \"\")," + quote(getContext().getEncoding()) +") %>\">Displayed languages:</a> [");		
+		appendString("<logic:equal name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");
+		increaseIdent();
+		appendString("<logic:iterate id=\"lang\" name=\"languageFilteringSettings\" property=\"displayedLanguages\" >");
+		appendString("&nbsp;<bean:write name=\"lang\"/>");
+		appendString("</logic:iterate>");
+		decreaseIdent();
+		appendString("</logic:equal>");						
+		appendString("<logic:notEqual name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");		
+		appendIncreasedString("ALL");		
+		appendString("</logic:notEqual>");	
+		appendString("]");
+		
+	}
+	
+	private void generateLanguageFilteringSettingsViewComponentForDialog(MetaDialog dialog, MetaModuleSection section) {
+		
+		
+	appendString("<a href=\""+userSettingsEditActionName+"?referrer=<%= URLEncoder.encode(" + quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_EDIT)) + " + ((request.getQueryString() != null) ? (\"?\" + request.getQueryString()) : \"\")," + quote(getContext().getEncoding()) +") %>\""
+			+" onclick=\"if ( confirm('Do you want to save changes before edit settings?')) {document."+StrutsConfigGenerator.getDialogFormName(dialog, ((MetaModuleSection)section).getDocument())+".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(dialog, ((MetaModuleSection)section).getDocument())+".submit(); }\" >Displayed languages:</a> [");		
+		appendString("<logic:equal name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");
+		increaseIdent();
+		appendString("<logic:iterate id=\"lang\" name=\"languageFilteringSettings\" property=\"displayedLanguages\" >");
+		appendString("&nbsp;<bean:write name=\"lang\"/>");
+		appendString("</logic:iterate>");
+		decreaseIdent();
+		appendString("</logic:equal>");						
+		appendString("<logic:notEqual name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");		
+		appendIncreasedString("ALL");		
+		appendString("</logic:notEqual>");	
+		appendString("]");
+		
+	}
+	
 	private GeneratedJSPFile generateShowPage(MetaModuleSection section, MetaView view){
+		
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
@@ -1265,11 +1362,15 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		jsp.setPackage(GeneratorDataRegistry.getInstance().getContext().getJspPackageName(section.getModule()));
 		
 		ident = 0;
-		append(getBaseJSPHeader());
+		append(getBaseJSPHeader());		
+		append(getUserSettingsJSPImports());
 		
 		currentSection = section;
 		MetaDocument doc = section.getDocument();
-
+		// Language filtering settings
+		generateProcessLanguageFilteringSettings();
+		
+		
 		appendString("<html>");
 		increaseIdent();
 		appendString("<head>");
@@ -1303,6 +1404,15 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<td colspan=\""+(2)+"\">"+
 		"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_XML))+">XML</a>&nbsp;"+
 		"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_CSV))+">CSV</a></td>");
+		
+		// Language filtering settings
+		appendString("<td align=\""+("center")+"\">");
+		increaseIdent();
+		generateLanguageFilteringSettingsViewComponent(section);
+		decreaseIdent();
+		appendString("</td>");
+				
+		
 		String searchForm = "<form name="+quote("Search")+" action="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_SEARCH))+" style=\"margin:0px;padding:0px;border:0px\" target=\"_blank\">";
 		String searchFormContent = "<input type="+quote("text")+" name="+quote("criteria")+" size="+quote(10)+"/>";
 		searchFormContent += "&nbsp;&nbsp;";
@@ -1576,7 +1686,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		return "";
 	}
 	
-	private String generateFieldHeader(MetaFieldElement element){
+	private String generateFieldHeader(MetaFieldElement element){		
 		String name = element instanceof MultilingualFieldElement ? element.getVariableName() : element.getName();
 		String header =  StringUtils.capitalize(name);
 		if (element.isComparable()){
@@ -1588,7 +1698,13 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 			header += "&nbsp;<logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+"><a href="+quote(generateTimestampedLinkPath(actionAZ))+">A</a></logic:notEqual><logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+"><strong>A</strong></logic:equal>";
 			header += "&nbsp;<logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+"><a href="+quote(generateTimestampedLinkPath(actionZA))+">Z</a></logic:notEqual><logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+"><strong>Z</strong></logic:equal>";
 		}
-		return "<td>"+header+"</td>";
+		String displayLanguageCheck = "";
+		if(element instanceof MultilingualFieldElement) {
+			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
+			displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";			
+		}
+		
+		return "<td " + displayLanguageCheck + ">"+header+"</td>";
 	}
 	
 	private String generateFunctionHeader(MetaFunctionElement element){
@@ -1611,7 +1727,14 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		if (((MetaModuleSection)currentSection).getDocument().getField(element.getName()).getType().equals("image") && element.getDecorator()==null)
 			return generateImage(entryName, element);
 		String elementName = element instanceof MultilingualFieldElement ? element.getVariableName() : element.getName();
-		return "<td><bean:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
+		
+		String displayLanguageCheck = "";
+		if(element instanceof MultilingualFieldElement) {
+			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
+			displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";			
+		}
+		
+		return "<td " + displayLanguageCheck + "><bean:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
 		//return "<td><bean:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}
 	
