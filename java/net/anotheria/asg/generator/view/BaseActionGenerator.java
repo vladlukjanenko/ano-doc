@@ -331,48 +331,15 @@ public class BaseActionGenerator extends AbstractGenerator {
 		append(closeBlock());
 		emptyline();
 		
-		appendComment("Add user settings beans to specifyed request.");
-		clazz.addImport("net.anotheria.anosite.gen.usersettings.data.LanguageFilteringSettings");
-		clazz.addImport("net.anotheria.anosite.gen.usersettings.data.LanguageFilteringSettingsFactory");				
+		appendComment("Add user settings beans to specified request.");
+		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsManager");		
 		appendString("protected void addUserSettingsBeansToRequest(HttpServletRequest req) {");
 		increaseIdent();
-		appendStatement("String userId = getUserId(req)");
-		appendStatement("LanguageFilteringSettings languageFilteringSettings = getLanguageFilteringSettingsByUserId(userId)");
-		appendString("if(languageFilteringSettings == null) {");
-		increaseIdent();
-		appendCommentLine("generate default languageFilteringSettings");
-		appendStatement("languageFilteringSettings = LanguageFilteringSettingsFactory.createLanguageFilteringSettings()");
-		appendStatement("languageFilteringSettings.setUserId(userId)");
-		appendStatement("languageFilteringSettings.setLanguageFilteringEnabled(false)");
-		appendStatement("languageFilteringSettings.setDisplayedLanguages(getSupportedLanguages())");
-		appendStatement("log.debug(\"default user languageFilteringSettings was generated for user: \" + userId )");
-		append(closeBlock());
-		appendStatement("addBeanToRequest(req, \"languageFilteringSettings\", languageFilteringSettings )");
+		appendStatement("addBeanToRequest(req, \"userSettings\", UserSettingsManager.loadFromCookies(req) )");		
 		append(closeBlock());
 		emptyline();		
-		appendComment("Get User LanguageFilteringSettings."
-				+ "\n@param userId User Id."
-				+ "\n@return LanguageFilteringSettings. null if there are no settings yet for userId or another Exception happened.");
-		clazz.addImport("net.anotheria.anosite.gen.usersettings.service.UserSettingsServiceException");
-		appendString("protected LanguageFilteringSettings getLanguageFilteringSettingsByUserId(String userId) {");
-		increaseIdent();
-		appendStatement("LanguageFilteringSettings retlanguageFilteringSettings = null");
-		appendStatement("List<LanguageFilteringSettings> list = null");
-		appendString("try {");
-		increaseIdent();		
-		appendIncreasedStatement("list = getUserSettingsService().getLanguageFilteringSettingssByProperty(LanguageFilteringSettings.PROP_USER_ID, userId)");
-		appendString("} catch (UserSettingsServiceException e) {");
-		appendIncreasedStatement("log.warn(\"Exception when trying to get LanguageFilteringSettings by userId\",e)");
-		appendString("}");
-		appendString("if(list!=null && list.size()>0) {");		
-		appendIncreasedStatement("retlanguageFilteringSettings = list.get(0)");
-		appendString("}");		
-		appendStatement("return retlanguageFilteringSettings");
-		append(closeBlock());
-		emptyline();
-	
 		
-
+		
 		appendString("private MenuItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();
 		appendString("MenuItemBean bean = new MenuItemBean();");

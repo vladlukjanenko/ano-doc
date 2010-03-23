@@ -7,6 +7,7 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.Generator;
+import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.IOUtils;
 import net.anotheria.util.StringUtils;
@@ -70,9 +71,10 @@ public class WebXMLGenerator extends AbstractGenerator {
 		ret += writeString("<param-value>");
 		ret += writeIncreasedString("/WEB-INF/appdata/struts-config.xml,");
 		for (MetaView view : views){
-			ret += writeIncreasedString("/WEB-INF/appdata/"+StrutsConfigGenerator.getConfigFileName(view)+".xml");
-			
+			ret += writeIncreasedString("/WEB-INF/appdata/"+StrutsConfigGenerator.getConfigFileName(view)+".xml");			
 		}
+		// Inject UserSettings Struts Config
+		ret += writeIncreasedString("/WEB-INF/appdata/"+StrutsConfigGenerator.getConfigFileName(MetaModule.USER_SETTINGS.getName())+".xml");
 		ret += writeString("</param-value>");
 		decreaseIdent();
 		ret += writeString("</init-param>");

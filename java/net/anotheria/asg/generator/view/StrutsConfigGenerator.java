@@ -1,7 +1,11 @@
 package net.anotheria.asg.generator.view;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.xalan.xsltc.runtime.Hashtable;
 
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
@@ -133,7 +137,19 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	 * Extension for the xml generation.
 	 */
 	public static final String SUFFIX_XML = ".xml";
-
+	/**
+	 * Default referrer forward is the name of forward action,
+	 * that will be used from EditUserSettings page as "last page before edit user settings"
+	 * if referrer can not be received manually from request property
+	 */
+	public static final String USER_SETTINGS_DEFAULT_REFERRER_FORWARD_NAME = "defaultReferrer";
+	/**
+	 * Default referrer path.
+	 * @see {@link USER_SETTINGS_DEFAULT_REFERRER_FORWARD_NAME}
+	 */
+	public static final String USER_SETTINGS_DEFAULT_REFERRER_FORWARD_PATH = "index";
+	
+	
 
 	/**
 	 * The view which is being generated.
@@ -169,12 +185,51 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	}
 	
 	/**
+	 * UserSettings struts configuration generator
+	 */
+	public List<FileEntry> generateUserSettingsStrutsConfig() {
+		List<FileEntry> files = new ArrayList<FileEntry>();
+		
+		// Load template
+		String file = "";
+		try{
+			file = IOUtils.readFileAtOnceAsString(Generator.getBaseDir()+TEMPLATE);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		// Mappings
+		String mappings = generateUserSettingsMappings();		
+		String fileContent = StringUtils.replaceOnce(file, MAPPINGS_PLACEHOLDER, mappings);
+		
+		// Forms
+		String forms = generateUserSettingsForms();
+		fileContent = StringUtils.replaceOnce(fileContent, FORMS_PLACEHOLDER, forms); 
+	
+		FileEntry entry = new FileEntry("/etc/appdata", getConfigFileName(MetaModule.USER_SETTINGS.getName()) , fileContent);
+		
+		entry.setType(".xml");
+		files.add(entry);
+		
+		return files;
+	}
+	
+	/**
 	 * Returns the name of the config file name for the given view.
 	 * @param view
 	 * @return
 	 */
 	public static final String getConfigFileName(MetaView view){
 		return "struts-config-"+view.getName().toLowerCase();
+	}
+	
+	/**
+	 * Returns the name of the config file name for the given view name.
+	 * @param viewName
+	 * @return
+	 */
+	public static final String getConfigFileName(String viewName){
+		return "struts-config-" + viewName.toLowerCase();
 	}
 	
 	/**
@@ -208,6 +263,24 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		}
 		
 		decreaseIdent();
+		decreaseIdent();
+		return ret;
+	}
+	
+	/**
+	 * UserSettings forms generator.
+	 */
+	private String generateUserSettingsForms(){
+		increaseIdent();
+		increaseIdent();
+		String ret = "";
+		
+		ret += writeString("<form-bean name="+quote("EditUserSettingsForm"));
+	    increaseIdent();
+	    ret += writeString("type="+quote(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.EditUserSettingsForm")+"/>");	    
+	    decreaseIdent();
+		
+	    decreaseIdent();
 		decreaseIdent();
 		return ret;
 	}
@@ -250,6 +323,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return ret;
 	}
 	
+	
+	
 	private String generateMappings(MetaView view){
 		increaseIdent();
 		increaseIdent();
@@ -270,6 +345,45 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 				}
 			}
 		}
+		
+		decreaseIdent();
+		decreaseIdent();
+		
+		return ret;
+	}
+	
+	/**
+	 * UserSettings mappings generator
+	 */
+	private String generateUserSettingsMappings(){
+		increaseIdent();
+		increaseIdent();
+		String ret = "";
+
+		ret += writeEmptyline();
+		ret += writeString("<!-- Generating mapping for " + MetaModule.USER_SETTINGS.getName() + " -->");
+		ret += writeEmptyline();
+		
+		// Edit Action
+		Map<String,String> editForwards = new LinkedHashMap<String, String>();
+		editForwards.put("success","/net/anotheria/anosite/gen/usersettings/jsp/EditUserSettingsDialog.jsp");
+		editForwards.put(USER_SETTINGS_DEFAULT_REFERRER_FORWARD_NAME,USER_SETTINGS_DEFAULT_REFERRER_FORWARD_PATH);		
+		ret += generateActionMapping(
+			"/userSettingsEdit", 
+			GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".action.EditUserSettingsAction",
+			editForwards
+			);
+		
+		
+		// Update Action
+		ret += generateActionMapping(
+			"/userSettingsUpdate", 
+			GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".action.EditUserSettingsDialogAction",
+			null,
+			null,
+			"EditUserSettingsDialog.jsp",
+			"EditUserSettingsForm"
+			);
 		
 		decreaseIdent();
 		decreaseIdent();
@@ -564,8 +678,8 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	 * Creates an action mapping.
 	 * @param path the path 
 	 * @param type type of the redirect.
-	 * @param forwardName
-	 * @param forwardPath
+	 * @param forwardName Optional. If it is null, forward will not be generated for the action
+	 * @param forwardPath Optional. If it is null, forward will not be generated for the action
 	 * @param input
 	 * @param form
 	 * @return
@@ -583,7 +697,10 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		ret += writeString("type="+quote(type));
 		ret += writeString("input="+quote(input));
 		ret += writeString("scope="+quote(scope)+">");
-		ret += writeString(" <forward name="+quote(forwardName)+" path="+quote(forwardPath)+"/>");
+		if(forwardName != null && forwardPath != null)
+		{
+			ret += writeString(" <forward name="+quote(forwardName)+" path="+quote(forwardPath)+"/>");
+		}
 		decreaseIdent();
 		ret += writeString("</action>");
 		return ret;
@@ -593,12 +710,35 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		return generateActionMapping(path, type, "request", forwardName, forwardPath);
 	}
 	
-
+	
 	private String generateActionMapping(String path, String type, String scope, String forwardName, String forwardPath){
 		String ret = "";
 		ret += writeString("<action path="+quote(path)+" type="+quote(type)+" scope="+quote(scope)+">");
-		ret += writeIncreasedString("<forward name="+quote(forwardName)+" path="+quote(forwardPath)+"/>");
+		if(forwardName != null && forwardPath != null) {
+			ret += writeIncreasedString("<forward name="+quote(forwardName)+" path="+quote(forwardPath)+"/>");
+		}
 		ret += writeString("</action>");
+		return ret;
+	}
+	
+	/**
+	 * Generates action mapping with few forwards
+	 * @param forwards Optional. If it is null, forwards will not be generated for the action
+	 */
+	private String generateActionMapping(String path, String type, Map<String,String> forwards){
+		return generateActionMapping(path, type, "request", forwards);
+	}
+	
+	
+	private String generateActionMapping(String path, String type, String scope, Map<String,String> forwards){
+		String ret = "";
+		ret += writeString("<action path="+quote(path)+" type="+quote(type)+" scope="+quote(scope)+">");
+		if (forwards != null) {
+			for( Map.Entry<String, String> forwardEntry : forwards.entrySet()) {
+				ret += writeIncreasedString("<forward name="+quote(forwardEntry.getKey())+" path="+quote(forwardEntry.getValue())+"/>");
+			}
+		}		
+		ret += writeString("</action>");		
 		return ret;
 	}
 

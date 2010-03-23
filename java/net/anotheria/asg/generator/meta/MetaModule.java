@@ -20,6 +20,11 @@ public class MetaModule implements IGenerateable{
 	 */
 	public static final MetaModule SHARED = new MetaModule("Shared");
 	
+	/**
+	 * This is a predefined module used to generate package and class names for user settings stuff.
+	 */
+	public static final MetaModule USER_SETTINGS = new MetaModule("UserSettings");
+	
 
 	/**
 	 * Unique name of the module. Each module has a name which is used whenever someone refers to it.

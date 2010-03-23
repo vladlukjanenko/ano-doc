@@ -35,6 +35,11 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		files.add(new SharedJspFooterGenerator().generate(views, context));
 		files.add(new JspMenuGenerator().generate(views, context));
 		files.addAll(new WebXMLGenerator().generate(views, context));
+		// UserSettings
+		files.addAll(new UserSettingsBeansGenerator().generate());
+		files.addAll(new UserSettingsActionsGenerator().generate());		
+		files.add(new UserSettingsJspGenerator().generate());
+		
 		timer.stopExecution("common");
 		
 		timer.startExecution("views");
@@ -69,6 +74,11 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 			
 			timer.stopExecution("view-"+view.getName());
 		}
+		// UserSettings
+		timer.startExecution("UserSettings-StrutsConfig");
+		files.addAll(new StrutsConfigGenerator().generateUserSettingsStrutsConfig());
+		timer.stopExecution("UserSettings-StrutsConfig");
+		
 		timer.stopExecution("views");
 		
 		writeFiles(files);

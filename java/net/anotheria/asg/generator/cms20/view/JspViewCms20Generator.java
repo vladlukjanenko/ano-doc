@@ -20,7 +20,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 	/**
 	 * userSettingsActionName
 	 */		
-	final String userSettingsEditActionName = "userSettingsEdit";
+	private final String userSettingsEditActionName = "userSettingsEdit";
 	/**
 	 * Currently generated section.
 	 */
@@ -140,7 +140,9 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 	 */
 	private String getUserSettingsJSPImports(){
 		String ret = "";
-		ret += "<%@page import=\"net.anotheria.anosite.gen.usersettings.data.LanguageFilteringSettings\"%>" + CRLF;
+		ret += "<%@page import=" 
+			+ quote(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsBean")
+			+ "%>" + CRLF;
 		ret += "<%@page import=\"java.net.URLEncoder\"%>" + CRLF;
 		ret += "<%@page import=\"org.apache.commons.lang.ArrayUtils\"%>" + CRLF;
 		
@@ -502,7 +504,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			appendString("</logic:equal>");
 		}
 		
-		// Language filtering settings
+		// UserSettings
 		generateProcessLanguageFilteringSettings();
 		
 		appendString("<html:html>");
@@ -1312,15 +1314,15 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 	
 	private void generateProcessLanguageFilteringSettings() {
 		// Language filtering settings
-		appendString("<!-- Process languageFilterringSettings -->");
-		appendString("<logic:equal name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");
+		appendString("<!-- Process language filterring settings -->");
+		appendString("<logic:equal name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");
 		increaseIdent();
 		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-			appendString("<bean:define id=\"display" + sl + "\" value='<%= ((LanguageFilteringSettings) request.getAttribute(\"languageFilteringSettings\")).getDisplayedLanguages().contains(\"" + sl + "\") ? \"true\" : \"false\" %>'/>");
+			appendString("<bean:define id=\"display" + sl + "\" value='<%= ((UserSettingsBean) request.getAttribute(\"userSettings\")).getDisplayedLanguages().contains(\"" + sl + "\") ? \"true\" : \"false\" %>'/>");
 		}
 		decreaseIdent();
 		appendString("</logic:equal>");
-		appendString("<logic:notEqual name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");
+		appendString("<logic:notEqual name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");
 		increaseIdent();
 		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 			appendString("<bean:define id=\"display" + sl + "\" value='true'/>");
@@ -1332,14 +1334,14 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 	private void generateLanguageFilteringSettingsViewComponent(MetaModuleSection section) {
 		
 		appendString("<a href=\""+userSettingsEditActionName+"?referrer=<%= URLEncoder.encode(" + quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW)) + " + ((request.getQueryString() != null) ? (\"?\" + request.getQueryString()) : \"\")," + quote(getContext().getEncoding()) +") %>\">Displayed languages:</a> [");		
-		appendString("<logic:equal name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");
+		appendString("<logic:equal name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");
 		increaseIdent();
-		appendString("<logic:iterate id=\"lang\" name=\"languageFilteringSettings\" property=\"displayedLanguages\" >");
+		appendString("<logic:iterate id=\"lang\" name=\"userSettings\" property=\"displayedLanguages\" >");
 		appendString("&nbsp;<bean:write name=\"lang\"/>");
 		appendString("</logic:iterate>");
 		decreaseIdent();
 		appendString("</logic:equal>");						
-		appendString("<logic:notEqual name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");		
+		appendString("<logic:notEqual name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");		
 		appendIncreasedString("ALL");		
 		appendString("</logic:notEqual>");	
 		appendString("]");
@@ -1348,17 +1350,16 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 	
 	private void generateLanguageFilteringSettingsViewComponentForDialog(MetaDialog dialog, MetaModuleSection section) {
 		
-		
-	appendString("<a href=\""+userSettingsEditActionName+"?referrer=<%= URLEncoder.encode(" + quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_EDIT)) + " + ((request.getQueryString() != null) ? (\"?\" + request.getQueryString()) : \"\")," + quote(getContext().getEncoding()) +") %>\""
+		appendString("<a href=\""+userSettingsEditActionName+"?referrer=<%= URLEncoder.encode(" + quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_EDIT)) + " + ((request.getQueryString() != null) ? (\"?\" + request.getQueryString()) : \"\")," + quote(getContext().getEncoding()) +") %>\""
 			+" onclick=\"if ( confirm('Do you want to save changes before edit settings?')) {document."+StrutsConfigGenerator.getDialogFormName(dialog, ((MetaModuleSection)section).getDocument())+".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(dialog, ((MetaModuleSection)section).getDocument())+".submit(); }\" >Displayed languages:</a> [");		
-		appendString("<logic:equal name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");
+		appendString("<logic:equal name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");
 		increaseIdent();
-		appendString("<logic:iterate id=\"lang\" name=\"languageFilteringSettings\" property=\"displayedLanguages\" >");
+		appendString("<logic:iterate id=\"lang\" name=\"userSettings\" property=\"displayedLanguages\" >");
 		appendString("&nbsp;<bean:write name=\"lang\"/>");
 		appendString("</logic:iterate>");
 		decreaseIdent();
 		appendString("</logic:equal>");						
-		appendString("<logic:notEqual name=\"languageFilteringSettings\" property=\"languageFilteringEnabled\" value=\"true\">");		
+		appendString("<logic:notEqual name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");		
 		appendIncreasedString("ALL");		
 		appendString("</logic:notEqual>");	
 		appendString("]");
