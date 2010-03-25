@@ -1874,7 +1874,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Create")+")");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
-
+		
+	    // User settings
+		appendCommentLine(" Add user settings beans");
+	    appendStatement("addUserSettingsBeansToRequest(req)");
 
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());
