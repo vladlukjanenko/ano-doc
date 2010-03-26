@@ -10,6 +10,7 @@ import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.util.StringUtils;
 
 /**
@@ -32,6 +33,8 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 	 */
 	private FileEntry generateCallContext(){
 		
+		Context context = GeneratorDataRegistry.getInstance().getContext();
+		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
@@ -39,16 +42,25 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 		
 		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
 		clazz.addImport("java.io.Serializable");
+		clazz.addImport("java.util.List");
+		clazz.addImport(context.getServicePackageName(MetaModule.SHARED) + "." + LanguageUtilsGenerator.getCopierClassName(context));
 		
-		clazz.setName(getCallContextName(GeneratorDataRegistry.getInstance().getContext()));
+		clazz.setName(getCallContextName(context));
 		clazz.setParent("CallContext");
 		clazz.addInterface("Serializable");
 
 		startClassBody();
+		
 		appendString("public String getDefaultLanguage(){");
 		increaseIdent();
-		appendStatement("return "+quote(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage()));
+		appendStatement("return "+quote(context.getDefaultLanguage()));
 		append(closeBlock());
+				
+		appendString("public List<String> getSupportedLanguages(){");
+		increaseIdent();				
+		appendStatement("return " + LanguageUtilsGenerator.getCopierClassName(context) + ".getSupportedLanguages()");
+		append(closeBlock());
+		
 		
 		return new FileEntry(clazz);
 		

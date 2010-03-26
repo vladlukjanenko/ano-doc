@@ -1474,7 +1474,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 			appendString("<% String filterParameter"+i+" = (String) request.getAttribute(\"currentFilterParameter"+i+"\");");
 			appendString("if (filterParameter"+i+"==null)");
 			appendIncreasedString("filterParameter"+i+" = \"\";%>");
-			appendString("<tr class=\"lineCaptions\"><td colspan="+quote(colspan)+">Filter <strong>"+StringUtils.capitalize(f.getFieldName())+":</strong>&nbsp;");
+			appendString("<tr class=\"lineCaptions\"><td colspan="+quote(colspan)+">"+StringUtils.capitalize(f.getName())+" Filter <strong>"+StringUtils.capitalize(f.getFieldName())+":</strong>&nbsp;");
 			increaseIdent();
 			appendString("<logic:iterate name="+quote(ModuleActionsGenerator.getFilterVariableName(f))+" id="+quote("triggerer")+" type="+quote("net.anotheria.asg.util.filter.FilterTrigger")+">");
 			increaseIdent();
