@@ -52,21 +52,18 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 	 */
 	public MissingAnyTranslationFilter() {
 		try {									
-			supportedLanguages = ContextManager.getCallContext().getSupportedLanguages();
-			defaultLanguage = ContextManager.getCallContext().getDefaultLanguage();
+			this.defaultLanguage = ContextManager.getCallContext().getDefaultLanguage();
+			this.setSupportedLanguages( ContextManager.getCallContext().getSupportedLanguages() );			
 		} catch(Exception e) {
-			supportedLanguages = new ArrayList<String>();
-			supportedLanguages.add("EN");
-			defaultLanguage = "EN";
 			log.warn("CallContext can not be getted by ContextManager. Setting default language and supported languages to EN",e);
 			
+			this.setDefaultLanguage("EN");
+			List<String> defaultSupportedLanguages = new ArrayList<String>();
+			defaultSupportedLanguages.add("EN");
+			this.setSupportedLanguages(defaultSupportedLanguages);
+						
 		}
-		
-		triggerer = new ArrayList<FilterTrigger>();
-		triggerer.add(new FilterTrigger("All",""));		
-		for(String language : supportedLanguages) {
-			triggerer.add(new FilterTrigger(language.equals(defaultLanguage) ? (language + "*") : language,language));
-		}
+			
 	}
 	
 	/**
@@ -75,14 +72,8 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 	 * @param defaultLanguage
 	 */
 	public MissingAnyTranslationFilter(List<String> supportedLanguages, String defaultLanguage) {
-		this.setSupportedLanguages(supportedLanguages);
 		this.setDefaultLanguage(defaultLanguage);
-		triggerer = new ArrayList<FilterTrigger>();
-		triggerer.add(new FilterTrigger("All",""));
-		for(String language : supportedLanguages) {
-			triggerer.add(new FilterTrigger(language.equals(defaultLanguage) ? (language + "*") : language,language));
-		}
-		
+		this.setSupportedLanguages(supportedLanguages);								
 	}
 	
 	@Override public List<FilterTrigger> getTriggerer(String storedFilterParameter) {
@@ -107,15 +98,22 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 			
 			List<Property> propertys = ((Document)document).getProperties();								
 			String defaultLanguagePropertyValue;
+			boolean languageIsDefault = filterParameter.equals(defaultLanguage);
+			String propertyName;
+			int charIdx;
 			
 			// Check property value and default language property value
 			for (Property property : propertys) {
-				if (property.getId().endsWith("_" + filterParameter)) {						
+				propertyName = property.getId();
+				
+				charIdx = propertyName.indexOf('_');				
+				if (charIdx != -1 
+					&& propertyName.equals( propertyName.substring(0,charIdx + 1) + filterParameter )) {						
 					
 					if (property.getValue() == null || property.getValue().toString().isEmpty()) {
 						
 						// First empty value was founded
-						if (filterParameter.equals(defaultLanguage)) {
+						if (languageIsDefault) {
 							// Pass empty default language value if given language equals to default
 							mayPass = true;
 							break;
@@ -145,12 +143,20 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 	}
 	
 	
+	/*
+	 * Set supported languages. Method update triggers.
+	 * NOTE: Default language will not be included into triggers.
+	 */
 	public void setSupportedLanguages(List<String> supportedLanguages) {
 		this.supportedLanguages = supportedLanguages;
 		triggerer = new ArrayList<FilterTrigger>();
 		triggerer.add(new FilterTrigger("All",""));
 		for(String language : supportedLanguages) {
-			triggerer.add(new FilterTrigger(language,language));
+			if(!language.equals(defaultLanguage)) {
+				// add all non-default languages
+				triggerer.add(new FilterTrigger(language,language));
+			}
+			// triggerer.add(new FilterTrigger(language.equals(defaultLanguage) ? (language + "*") : language,language));
 		}
 	}
 

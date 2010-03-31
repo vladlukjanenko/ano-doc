@@ -47,20 +47,15 @@ public class MissingTranslationFilter implements DocumentFilter{
 	 */
 	public MissingTranslationFilter() {
 		try {									
-			supportedLanguages = ContextManager.getCallContext().getSupportedLanguages();
-			defaultLanguage = ContextManager.getCallContext().getDefaultLanguage();
+			this.setSupportedLanguages( ContextManager.getCallContext().getSupportedLanguages() );
+			this.defaultLanguage = ContextManager.getCallContext().getDefaultLanguage();
 		} catch(Exception e) {
-			supportedLanguages = new ArrayList<String>();
-			supportedLanguages.add("EN");
-			defaultLanguage = "EN";
 			log.warn("CallContext can not be getted by ContextManager. Setting default language and supported languages to EN",e);
 			
-		}
-		
-		triggerer = new ArrayList<FilterTrigger>();
-		triggerer.add(new FilterTrigger("All",""));		
-		for(String language : supportedLanguages) {
-			triggerer.add(new FilterTrigger(language.equals(defaultLanguage) ? (language + "*") : language,language));
+			List<String> defaultSupportedLanguages = new ArrayList<String>();
+			defaultSupportedLanguages.add("EN");
+			this.setSupportedLanguages(defaultSupportedLanguages);
+			this.setDefaultLanguage("EN");			
 		}
 	}
 	
@@ -71,13 +66,7 @@ public class MissingTranslationFilter implements DocumentFilter{
 	 */
 	public MissingTranslationFilter(List<String> supportedLanguages, String defaultLanguage) {
 		this.setSupportedLanguages(supportedLanguages);
-		this.setDefaultLanguage(defaultLanguage);
-		triggerer = new ArrayList<FilterTrigger>();
-		triggerer.add(new FilterTrigger("All",""));
-		for(String language : supportedLanguages) {
-			triggerer.add(new FilterTrigger(language.equals(defaultLanguage) ? (language + "*") : language,language));
-		}
-		
+		this.setDefaultLanguage(defaultLanguage);				
 	}
 	
 	@Override public List<FilterTrigger> getTriggerer(String storedFilterParameter) {
@@ -116,13 +105,20 @@ public class MissingTranslationFilter implements DocumentFilter{
 		return mayPass;
 	}
 	
-	
+	/*
+	 * Set supported languages. Method update triggers.
+	 * NOTE: Default language will not be included into triggers.
+	 */
 	public void setSupportedLanguages(List<String> supportedLanguages) {
 		this.supportedLanguages = supportedLanguages;
 		triggerer = new ArrayList<FilterTrigger>();
 		triggerer.add(new FilterTrigger("All",""));
 		for(String language : supportedLanguages) {
-			triggerer.add(new FilterTrigger(language,language));
+			if(!language.equals(defaultLanguage)) {
+				// add all non-default languages
+				triggerer.add(new FilterTrigger(language,language));
+			}
+			// triggerer.add(new FilterTrigger(language.equals(defaultLanguage) ? (language + "*") : language,language));
 		}
 	}
 

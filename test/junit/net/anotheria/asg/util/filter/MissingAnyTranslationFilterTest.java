@@ -4,10 +4,13 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import net.anotheria.asg.data.AbstractASGDocument;
 
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class MissingAnyTranslationFilterTest {
@@ -21,6 +24,7 @@ public class MissingAnyTranslationFilterTest {
 		supportedLanguages.add("DE");
 		supportedLanguages.add("UA");
 		supportedLanguages.add("RU");
+		supportedLanguages.add("UA_RU");
 		
 		filter = new MissingAnyTranslationFilter(supportedLanguages, "RU");	
 		
@@ -39,7 +43,7 @@ public class MissingAnyTranslationFilterTest {
 		
 	}
 	
-	@Test
+	@Test	
 	public void testMayPass() {
 		
 		AbstractASGDocument document = new AbstractASGDocument("123") {
@@ -108,19 +112,56 @@ public class MissingAnyTranslationFilterTest {
 		document.setString("name_EN", "");
 		document.setString("title_RU", "NotEmpty");
 		document.setString("title_EN", "");
-		assertTrue(filter.mayPass(document, null, ""));
+		assertTrue(filter.mayPass(document, null, "EN"));
 		
 		document.setString("name_RU", "NotEmpty");
 		document.setString("name_EN", "NotEmptyt");
 		document.setString("title_RU", "NotEmpty");
 		document.setString("title_EN", "");
-		assertTrue(filter.mayPass(document, null, ""));
+		assertTrue(filter.mayPass(document, null, "EN"));
 		
+		// Check if "property_YY_LL" not pass without "property_LL" 
+		document.setString("name_RU", "NotEmpty");
+		document.setString("name_EN", "NotEmptyt");
+		document.setString("title_RU", "NotEmpty");	
+		document.setString("title_EN", "NotEmpty");		
+		document.setString("title_UA_RU", "");
+		assertTrue(filter.mayPass(document, null, "UA_RU"));
+		assertFalse(filter.mayPass(document, null, "RU"));
 		
+		document.setString("title_RU", "");				
+		document.setString("t_RU", ""); // short name check
+		document.setString("title_UA_RU", "NotEmpty");
+		assertFalse(filter.mayPass(document, null, "UA_RU"));
+		assertTrue(filter.mayPass(document, null, "RU"));
 				
+	}
+	
+	@Test
+	@Ignore("RegEx not used")
+	public void testRegExFunctionalityTest() {
 		
+		Pattern pattern;
 		
+		pattern = Pattern.compile(".*_RU"); 
+		assertTrue(pattern.matcher("title_RU").matches());
+		assertTrue(pattern.matcher("title_UA_RU").matches());
+		
+		pattern = Pattern.compile("[^_]?"); 	
+		assertTrue(pattern.matcher("N").matches());
+		assertTrue(pattern.matcher("").matches());
+		assertFalse(pattern.matcher("_").matches());
+		
+		pattern = Pattern.compile("([^_]..)"); 	
+		assertTrue(pattern.matcher("abc").matches());		
+		assertFalse(pattern.matcher("_bc").matches());
+		
+		pattern = Pattern.compile(".*([^_]..)_RU"); 
+		//assertTrue(pattern.matcher("e_RU").matches()); not matches		
+		assertTrue(pattern.matcher("title_RU").matches());
+		assertFalse(pattern.matcher("title_UA_RU").matches());
 		
 	}
 
 }
+
