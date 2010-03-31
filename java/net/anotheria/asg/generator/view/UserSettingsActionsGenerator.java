@@ -46,6 +46,9 @@ public class UserSettingsActionsGenerator extends AbstractGenerator {
 
 		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".action");
 		
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
 		emptyline();
@@ -68,6 +71,12 @@ public class UserSettingsActionsGenerator extends AbstractGenerator {
 		appendStatement("public static final String FORWARD_REFERRER = \"defaultReferrer\"");
 		emptyline();
 		
+		// Overwrite getRequiredRoles() to any roles
+		appendStatement("private static final List<String> MY_ROLES = new ArrayList<String>()");
+		appendString("protected List<String> getRequiredRoles(){");
+		appendIncreasedStatement("return MY_ROLES");
+		appendString("}");
+		emptyline();
 		
 		appendString("public ActionForward anoDocExecute(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
@@ -145,6 +154,8 @@ public class UserSettingsActionsGenerator extends AbstractGenerator {
 
 		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".action");
 
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
 		clazz.addImport("java.util.Arrays");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
@@ -162,6 +173,13 @@ public class UserSettingsActionsGenerator extends AbstractGenerator {
 		clazz.setName(getEditUserSettingsDialogActionName());
 
 		startClassBody();
+		
+		// Overwrite getRequiredRoles() to any roles
+		appendStatement("private static final List<String> MY_ROLES = new ArrayList<String>()");
+		appendString("protected List<String> getRequiredRoles(){");
+		appendIncreasedStatement("return MY_ROLES");
+		appendString("}");
+		emptyline();
 		
 		appendString("public ActionForward anoDocExecute(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
