@@ -1234,27 +1234,29 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		MetaDocument doc = section.getDocument();
 
 		String entryName = doc.getName().toLowerCase();
-		List<MetaViewElement> elements = section.getElements();
+		List<MetaViewElement> elements = createMultilingualList(section.getElements(),doc);
 
 		String headerLine = "";
-		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = (MetaViewElement)elements.get(i);
-			String tag = generateTag(element);
+		for (MetaViewElement element : elements){
+			String lang = getElementLanguage(element);
+			boolean multilangEl = element instanceof MultilingualFieldElement;
+			String tag = multilangEl && lang != null ? doc.getField(element.getName()).getName(lang) : generateTag(element);
 			if (tag==null)
 				continue;
 			headerLine += tag+";";
 		}
 		appendString(headerLine);
 
-		appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+"><%--");
+		appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase()+ModuleActionsGenerator.exportCSVSufix)+" type="+quote(GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc)+"."+doc.getName())+" id="+quote(entryName)+"><%--");
 		String bodyLine = "--%>";
 
-		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = (MetaViewElement)elements.get(i);
-			String tag = generateTag(element);
+		for (MetaViewElement element : elements) {
+			String lang = getElementLanguage(element);
+			boolean multilangEl = element instanceof MultilingualFieldElement;
+			String tag = multilangEl && lang != null ? doc.getField(element.getName()).getName(lang) : generateTag(element);
 			if (tag==null)
 				continue;
-			bodyLine += "<bean:write filter=\"false\" name="+quote(entryName)+" property=\""+element.getName()+"\"/>;";
+			bodyLine += "<bean:write filter=\"false\" name=" + quote(entryName) + " property=\"" + tag + "\"/>;";
 		}
 		appendString(bodyLine);
 		appendString("</logic:iterate>");
@@ -1285,30 +1287,7 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 		String entryName = doc.getName().toLowerCase();
 
 		appendString("<?xml version=\"1.0\" encoding="+quote(getContext().getEncoding())+"?>");
-		appendString("<"+doc.getMultiple()+">");
-		appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+">");
-		increaseIdent();
-		appendString("<"+doc.getName()+">");
-		increaseIdent();
-		List<MetaViewElement> elements = section.getElements();
-		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = (MetaViewElement)elements.get(i);
-			String tag = generateTag(element);
-			if (tag==null)
-				continue;
-			String line = "<"+tag+">";
-			if (((MetaModuleSection)currentSection).getDocument().getField(element.getName()).getType().equals("image"))
-				line += "image";
-			else
-				line += "<bean:write filter=\"false\" name="+quote(entryName)+" property=\""+element.getName()+"\"/>";
-			line += "</"+tag+">";
-			appendString(line);
-		}
-		decreaseIdent();
-		appendString("</"+doc.getName()+">");
-		decreaseIdent();
-		appendString("</logic:iterate>");
-		appendString("</"+doc.getMultiple()+">");
+		appendString("<ano-xml:xml_write name="+quote(doc.getMultiple().toLowerCase()+ModuleActionsGenerator.exportXMLSufix)+"/>");
 		return jsp;
 	}
 	

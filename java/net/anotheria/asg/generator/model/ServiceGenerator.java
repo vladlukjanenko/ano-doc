@@ -1,18 +1,7 @@
 package net.anotheria.asg.generator.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.exception.ASGRuntimeException;
-import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.CommentGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.TypeOfClass;
+import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
@@ -26,6 +15,9 @@ import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
 import net.anotheria.asg.generator.model.rmi.RMIServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.sorter.SortType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controls different sub generators for generation of the service layer. Generates factories and interfaces.
@@ -344,7 +336,14 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 				emptyline();
 				containsAnyMultilingualDocs = true;
 			}
-			
+
+			appendComment("creates an xml element with selected contained data");
+			appendStatement("public XMLNode export"+doc.getMultiple()+"ToXML(List<"+doc.getName()+"> list"+doc.getMultiple()+") "+throwsClause);
+			if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()) {
+				appendComment("creates an xml element with selected contained data but only selected languages in multilingual attributes");
+				appendStatement("public XMLNode export"+doc.getMultiple()+"ToXML(String[] languages,List<"+doc.getName()+"> list"+doc.getMultiple()+")" + throwsClause);
+	    }
+
 			//this method checks whether a document with the given document set exists or no.
 	    }
 	    
@@ -356,6 +355,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	    
 		appendComment("creates an xml element with all contained data.");
 		appendStatement("public XMLNode exportToXML()"+throwsClause);
+		
 		emptyline();
 	    
 	    if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){

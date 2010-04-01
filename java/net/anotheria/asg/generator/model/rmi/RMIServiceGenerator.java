@@ -320,7 +320,24 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	        			);
 				containsAnyMultilingualDocs = true;
 			}
-	    }
+
+			writeInterfaceFun(
+					"Creates an xml element with selected contained data.",
+					"XMLNode",
+					"export"+doc.getMultiple()+"ToXML",
+					"List<"+doc.getName()+"> list"
+			);
+
+			if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()) {
+				writeInterfaceFun(
+						"Creates an xml element with selected contained data.",
+						"XMLNode",
+						"export"+doc.getMultiple()+"ToXML",
+						"String[] languages, List<"+doc.getName()+"> list"
+				);
+			}
+
+		}
 	    
 	    if (containsAnyMultilingualDocs){
 	        writeInterfaceFun(
@@ -814,6 +831,26 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 				containsAnyMultilingualDocs = true;
 			}
+
+			writeStubFun(
+					"Creates an xml element with all contained data.",
+					"XMLNode",
+					"export"+doc.getMultiple()+"ToXML",
+					"List<"+doc.getName()+"> list"+doc.getMultiple(),
+					"list"+doc.getMultiple(),
+					null
+			);
+
+			if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()) {
+				writeStubFun(
+						"Creates an xml element with all contained data in selected languages",
+						"XMLNode",
+						"export"+doc.getMultiple()+"ToXML",
+						"String[] languages, List<"+doc.getName()+"> list"+doc.getMultiple(),
+						"languages, list"+doc.getMultiple(),
+						null
+				);
+			}
 	    }
 	    
 	    if (containsAnyMultilingualDocs){
@@ -864,7 +901,8 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("}");
 	    return clazz;
 	}
-	
+
+
 	/**
 	 * Generates the rmi skeleton.
 	 * @param module
@@ -1106,6 +1144,25 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 				containsAnyMultilingualDocs = true;
 			}
+
+			writeExportSkeletonFun(
+					"creates an xml element with selected contained data.",
+					"XMLNode",
+					"export" + doc.getMultiple() + "ToXML",
+					"List<" + doc.getName() + "> list"+doc.getMultiple(),
+					"list"+doc.getMultiple()
+			);
+
+			if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()) {
+				writeExportSkeletonFun(
+						"creates an xml element with selected contained data.",
+						"XMLNode",
+						"export" + doc.getMultiple() + "ToXML",
+						"String languages[] languages ,List<" + doc.getName() + ">, list"+doc.getMultiple(),
+						"languages, list"+doc.getMultiple()
+				);
+			}
+
 	    }
 	    
 	    if (containsAnyMultilingualDocs){
@@ -1236,6 +1293,46 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         append(closeBlock());
 	    emptyline();
 
+	}
+
+	/**
+	 * Writes Export Sceleton function.
+	 * @param comment comment
+	 * @param returnType return type
+	 * @param funName function name
+	 * @param parametersFull params with param type
+	 * @param parametersStripped params name
+	 */
+	private void writeExportSkeletonFun(String comment, String returnType, String funName, String parametersFull, String parametersStripped) {
+		appendComment(comment);
+		appendString("public ", (returnType.length() > 0 ? returnType + " " : "void "), funName, "(" + parametersFull + ") throws " + getExceptionName(module) + "{");
+		increaseIdent();
+		openTry();
+		appendStatement((returnType.length() > 0 ? "return " : ""), "service.", funName, "(", parametersStripped, ")");
+		decreaseIdent();
+		appendString("} catch (Throwable unexpectedError){");
+		appendIncreasedStatement("String errorMessage = ", quote(funName + "()"));
+		appendIncreasedStatement("log.error(errorMessage, unexpectedError)");
+		appendIncreasedStatement("throw new " + ServiceGenerator.getExceptionName(module) + "(errorMessage, unexpectedError)");
+
+		appendString("}");
+		append(closeBlock());
+		emptyline();
+		//version with callcontext
+		appendComment(comment);
+		appendString("public ", (returnType.length() > 0 ? returnType + " " : "void "), funName, "(CallContext callContext", (parametersStripped != null && parametersStripped.length() > 0 ? ", " : ""), parametersFull, ")" + " throws " + getExceptionName(module) + "{");
+		increaseIdent();
+		openTry();
+		appendStatement("ContextManager.setCallContext(callContext)");
+		appendStatement((returnType.length() > 0 ? "return " : ""), "service.", funName, "(", parametersStripped, ")");
+		decreaseIdent();
+		appendString("} catch (Throwable unexpectedError){");
+		appendIncreasedStatement("String errorMessage = ", quote(funName + "()"));
+		appendIncreasedStatement("log.error(errorMessage, unexpectedError)");
+		appendIncreasedStatement("throw new " + ServiceGenerator.getExceptionName(module) + "(errorMessage, unexpectedError)");
+		appendString("}");
+		append(closeBlock());
+		emptyline();
 	}
 
 	@Override protected String getMoskitoSubsystem(){

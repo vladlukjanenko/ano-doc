@@ -1,12 +1,6 @@
 package net.anotheria.asg.generator.view;
 
-import java.util.List;
-
-import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.GeneratedJSPFile;
-import net.anotheria.asg.generator.Generator;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
@@ -16,6 +10,8 @@ import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.ArrayUtils;
 import net.anotheria.util.StringUtils;
+
+import java.util.List;
 
 /**
  * Generator for the JSP files used for generations of the view jsps. 
@@ -66,6 +62,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		ret += "%><%@ taglib uri=\"/WEB-INF/tld/struts-html.tld\" prefix=\"html\""+CRLF;
 		ret += "%><%@ taglib uri=\"/WEB-INF/tld/struts-logic.tld\" prefix=\"logic\""+CRLF;
 		ret += "%><%@ taglib uri=\"/WEB-INF/tld/anoweb.tld\" prefix=\"ano\""+CRLF;
+		ret += "%><%@ taglib uri=\"/WEB-INF/tld/ano-tags-xml.tld\" prefix=\"ano-xml\""+CRLF;
 		ret += "%>";
 		return ret;
 	}

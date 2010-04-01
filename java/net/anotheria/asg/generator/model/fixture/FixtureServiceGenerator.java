@@ -1,19 +1,6 @@
 package net.anotheria.asg.generator.model.fixture;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import net.anotheria.asg.generator.CommentGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GenerationOptions;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
@@ -26,6 +13,12 @@ import net.anotheria.asg.service.BaseFixtureService;
 import net.anotheria.asg.service.IFixtureService;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FixtureServiceGenerator  extends AbstractServiceGenerator implements IGenerator{
 	
@@ -422,7 +415,18 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    	append(closeBlock());
 	    	append(closeBlock());
 	    	emptyline();
-	    	
+
+			appendString("public XMLNode export"+d.getMultiple()+"ToXML(List<"+d.getName()+"> list){");
+	    	increaseIdent();
+	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
+	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
+	    	appendString("for ("+d.getName()+" object : list)");
+	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
+	    	appendStatement("return ret");
+	    	append(closeBlock());
+	    	emptyline();
+
+
 	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(String languages[]){");
 	    	increaseIdent();
 	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
@@ -439,6 +443,16 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 	    	increaseIdent();
 	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
 	    	append(closeBlock());
+	    	append(closeBlock());
+	    	emptyline();
+
+			appendString("public XMLNode export"+d.getMultiple()+"ToXML(String languages[], List<"+d.getName()+"> list){");
+	    	increaseIdent();
+	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
+	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
+	    	appendString("for ("+d.getName()+" object : list)");
+	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
+	    	appendStatement("return ret");
 	    	append(closeBlock());
 	    	emptyline();
 

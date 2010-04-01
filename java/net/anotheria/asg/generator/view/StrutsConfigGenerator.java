@@ -521,13 +521,13 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 		
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_EXPORT+SUFFIX_CSV), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getShowActionName(section),
+			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getExportActionName(section),
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getExportAsCSVPageName(doc)+".jsp"
 			);
 		ret += generateActionMapping(
 			"/"+getPath(doc, ACTION_EXPORT+SUFFIX_XML), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getShowActionName(section),
+			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getExportActionName(section),
 			"success",
 			FileEntry.package2path(JspViewGenerator.getPackage(module)).substring(FileEntry.package2path(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getExportAsXMLPageName(doc)+".jsp"
 			);

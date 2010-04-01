@@ -1,16 +1,6 @@
 package net.anotheria.asg.generator.model.inmemory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.CommentGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GenerationOptions;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
@@ -18,6 +8,9 @@ import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.service.InMemoryService;
 import net.anotheria.util.ExecutionTimer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generates an inmemory implementation of a module interface and the according factory.
@@ -580,7 +573,7 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	increaseIdent();
 	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
 	    	
-	    	appendStatement("try{");
+	    	appendIncreasedString("try{");
 	    	increaseIdent();
 	    	appendStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()");
 	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
@@ -595,12 +588,22 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	append(closeBlock());
 	    	emptyline();
 
+			appendString("public XMLNode export"+d.getMultiple()+"ToXML(List<"+d.getName()+"> list){");
+	    	increaseIdent();
+	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
+	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
+	    	appendString("for ("+d.getName()+" object : list)");
+	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
+	    	appendStatement("return ret");
+	    	append(closeBlock());
+	    	emptyline();
+
 	    
 	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages){");
 	    	increaseIdent();
 	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
 	    	
-	    	appendStatement("try{");
+	    	appendIncreasedString("try{");
 	    	increaseIdent();
 	    	appendStatement("List<"+d.getName()+"> list = get"+d.getMultiple()+"()");
 	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
@@ -613,6 +616,17 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
 	    	append(closeBlock());
 	    	append(closeBlock());
+	    	emptyline();
+
+			appendString("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages, List<"+d.getName()+"> list){");
+	    	increaseIdent();
+	    	appendStatement("XMLNode ret = new XMLNode("+quote(d.getMultiple())+")");
+	    	appendStatement("ret.addAttribute(new XMLAttribute("+quote("count")+", list.size()))");
+	    	appendString("for ("+d.getName()+" object : list)");
+	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
+	    	appendStatement("return ret");
+	    	append(closeBlock());
+	    	
 	    	emptyline();
 }
 	    

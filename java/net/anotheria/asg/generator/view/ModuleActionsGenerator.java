@@ -34,8 +34,16 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
      * If true multiop actions are generated instead of one-action for each link.
      */
     static final boolean USE_MULTIOP_ACTIONS = true;
-    
-    /**
+	/**
+	 *  Sufix for export XML - bean.
+	 */
+	public static final String exportXMLSufix = "XML";
+	/**
+	 *   Sufix for export CSV - bean.
+	 */
+	public static final String exportCSVSufix = "CSV";
+
+	/**
      * Creates a new ModuleActionsGenerator.
      * @param aView
      */
@@ -63,7 +71,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		files.add(new FileEntry(generateDeleteAction(section)));
 		files.add(new FileEntry(generateDuplicateAction(section)));
 		files.add(new FileEntry(generateVersionInfoAction(section)));
-		
+		files.add(new FileEntry(generateExportAction(section)));
+
 		timer.stopExecution(section.getModule().getName()+"-view");
 		try{
 			if (section.getDialogs().size()>0){
@@ -122,7 +131,262 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			
 		return files;
 	}
-	
+
+	/**
+	 * Generates standalone export actions!
+	 * Should differs from simple List actions due to decorator ussages! - etc!
+	 *
+	 * @param section
+	 * @return GeneratedArtefact entity
+	 */
+	private GeneratedArtefact generateExportAction(MetaModuleSection section) {
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		MetaDocument doc = section.getDocument();
+		List<MetaViewElement> elements = section.getElements();
+
+		boolean containsComparable = section.containsComparable();
+
+		clazz.setPackageName(getPackage(section.getModule()));
+
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("net.anotheria.asg.util.filter.DocumentFilter");
+		clazz.addImport("net.anotheria.util.xml.XMLNode");
+		addStandardActionImports(clazz);
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
+		clazz.addImport(DataFacadeGenerator.getSortTypeImport(doc));
+
+		clazz.addImport("net.anotheria.util.slicer.Slicer");
+		clazz.addImport("net.anotheria.util.slicer.Slice");
+		clazz.addImport("net.anotheria.util.slicer.Segment");
+		clazz.addImport("net.anotheria.asg.util.bean.PagingLink");
+
+
+
+		for (MetaViewElement element : elements) {
+			if (element instanceof MetaFieldElement) {
+				MetaFieldElement field = (MetaFieldElement) element;
+				MetaProperty p = doc.getField(field.getName());
+				if (p instanceof MetaEnumerationProperty) {
+					MetaEnumerationProperty enumeration = (MetaEnumerationProperty) p;
+					EnumerationType type = (EnumerationType) GeneratorDataRegistry.getInstance().getType(enumeration.getEnumeration());
+					clazz.addImport(EnumTypeGenerator.getEnumImport(type));
+				}
+			}
+		}
+
+		clazz.setName(getExportActionName(section));
+		clazz.setParent(getBaseActionName(section));
+		startClassBody();
+
+		//generate session attributes constants
+		appendStatement("public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+", quote(doc.getName()));
+		appendStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+", quote(doc.getName()));
+		appendStatement("private static final List<String> ITEMS_ON_PAGE_SELECTOR = java.util.Arrays.asList(new String[]{\"5\",\"10\",\"20\",\"25\",\"50\",\"100\",\"500\",\"1000\"})");
+
+
+		if (containsComparable) {
+			clazz.addImport("net.anotheria.util.sorter.Sorter");
+			clazz.addImport("net.anotheria.util.sorter.QuickSorter");
+			clazz.addImport(ModuleBeanGenerator.getListItemBeanSortTypeImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+
+			appendStatement("private Sorter<"+doc.getName()+ "> sorter");
+			emptyline();
+		}
+		if (section.getFilters().size() > 0) {
+			for (MetaFilter f : section.getFilters()) {
+				appendStatement("private DocumentFilter " + getFilterVariableName(f));
+			}
+			emptyline();
+		}
+
+
+		appendString("public " + getExportActionName(section) + "(){");
+		increaseIdent();
+		appendStatement("super()");
+		if (containsComparable)
+			appendStatement("sorter = new QuickSorter<" + doc.getName() + ">()");
+
+		//add filters
+		if (section.getFilters().size() > 0) {
+			appendString("try{ ");
+			increaseIdent();
+			for (MetaFilter f : section.getFilters()) {
+				appendStatement(getFilterVariableName(f), " = (DocumentFilter) Class.forName(", quote(f.getClassName()), ").newInstance()");
+			}
+			decreaseIdent();
+			appendString("} catch(Exception e){");
+			appendIncreasedStatement("log.fatal(\"Couldn't instantiate filter:\", e)");
+			appendString("}");
+		}
+		append(closeBlock());
+
+
+		appendString(getExecuteDeclaration());
+		increaseIdent();
+
+		if (section.getFilters().size() > 0) {
+			for (int i = 0; i < section.getFilters().size(); i++) {
+				//FIX: Is never used
+//	    		MetaFilter f = section.getFilters().get(i);
+				String filterParameterName = "filterParameter" + i;
+				//hacky, only one filter at time allowed. otherwise, we must submit the filter name.
+				appendStatement("String filterParameter" + i + " = " + quote(""));
+				appendString("try{ ");
+				appendIncreasedStatement(filterParameterName + " = getStringParameter(req, " + quote("pFilter" + i) + ")");
+				appendIncreasedStatement("addBeanToSession(req, SA_FILTER+" + quote(i) + ", " + filterParameterName + ")");
+				appendString("}catch(Exception ignored){");
+				increaseIdent();
+				appendCommentLine("no filter parameter given, tring to check in the session.");
+				appendStatement(filterParameterName + " = (String)getBeanFromSession(req, SA_FILTER+" + quote(i) + ")");
+				appendString("if (" + filterParameterName + "==null)");
+				appendIncreasedStatement(filterParameterName + " = " + quote(""));
+				append(closeBlock());
+				appendStatement("req.setAttribute(" + quote("currentFilterParameter" + i) + ", " + filterParameterName + ")");
+				emptyline();
+			}
+		}
+
+		//check if its sortable.
+		if (containsComparable) {
+			String sortType = ModuleBeanGenerator.getListItemBeanSortTypeName(doc);
+			appendStatement("int sortMethod = " + sortType + ".SORT_BY_DEFAULT");
+			appendStatement("boolean sortOrder = " + sortType + ".ASC");
+			appendStatement("boolean sortParamSet = false");
+			emptyline();
+			appendString("try{");
+			appendIncreasedStatement("sortMethod = getIntParameter(req, PARAM_SORT_TYPE)");
+			appendIncreasedStatement("sortParamSet = true");
+			appendString("}catch(Exception ignored){}");
+			emptyline();
+			appendString("try{");
+			appendIncreasedStatement("String sortMethodName = getStringParameter(req, PARAM_SORT_TYPE_NAME)");
+			appendIncreasedStatement("sortMethod = " + sortType + ".name2method(sortMethodName)");
+			appendIncreasedStatement("sortParamSet = true");
+			appendString("}catch(Exception ignored){}");
+			emptyline();
+			appendString("try{");
+			increaseIdent();
+			appendString("sortOrder = getStringParameter(req, PARAM_SORT_ORDER).equals(" + quote(ViewConstants.VALUE_SORT_ORDER_ASC) + ") ? ");
+			appendIncreasedStatement("" + sortType + ".ASC : " + sortType + ".DESC");
+			decreaseIdent();
+			appendString("}catch(Exception ignored){}");
+			emptyline();
+			String docSortType = doc.getName() + "SortType";
+			appendStatement(sortType +" sessionSortType  = null");
+			appendStatement(docSortType + " sortType = null");
+			appendString("if (sortParamSet){");
+			increaseIdent();
+			appendStatement("sessionSortType = new " + sortType + "(sortMethod, sortOrder)");
+			appendStatement("sortType = new " +docSortType + "(sortMethod, sortOrder)");
+			appendStatement("addBeanToSession(req, SA_SORT_TYPE, sessionSortType)");
+			decreaseIdent();
+			appendString("}else{");
+			increaseIdent();
+			appendStatement("sessionSortType = (" + sortType + ")getBeanFromSession(req, SA_SORT_TYPE)");
+			appendStatement("sortType = sessionSortType == null ? new " + docSortType + "(sortMethod, sortOrder) : new " +docSortType+"(sessionSortType.getSortBy(), sessionSortType.getSortOrder())");
+			appendStatement("sessionSortType = sessionSortType == null ? new " + sortType + "(sortMethod, sortOrder) : sessionSortType");
+			append(closeBlock());
+			appendStatement("req.setAttribute(" + quote("currentSortCode") + ", sessionSortType.getMethodAndOrderCode())");
+			emptyline();
+		}
+
+		String listName = doc.getMultiple().toLowerCase();
+		if (section.getFilters().size() > 0) {
+			String unfilteredListName = "_unfiltered_" + listName;
+			//change this if more than one filter can be triggered at once.
+			appendStatement("List<" + doc.getName() + "> " + unfilteredListName + " = " + getServiceGetterCall(section.getModule()) + ".get" + doc.getMultiple() + "()");
+			appendStatement("List<" + doc.getName() + "> " + listName + " = new ArrayList<" + doc.getName() + ">()");
+			appendString("for ("+ doc.getName() +" element : "+unfilteredListName+" ){");
+			increaseIdent();
+			appendStatement("boolean mayPass = true");
+			for (int i = 0; i < section.getFilters().size(); i++) {
+				MetaFilter activeFilter = section.getFilters().get(i);
+				String filterVarName = getFilterVariableName(activeFilter);
+				appendStatement("mayPass = mayPass && (" + filterVarName + ".mayPass( element, " + quote(activeFilter.getFieldName()) + ", filterParameter" + i + "))");
+
+			}
+			appendString("if (mayPass)");
+			append(writeIncreasedStatement(listName + ".add(element)"));
+			append(closeBlock());
+		} else {
+			appendStatement("List<" + doc.getName() + "> " + listName + " = " + getServiceGetterCall(section.getModule()) + ".get" + doc.getMultiple() + "()");
+		}
+
+		if (containsComparable) {
+			appendStatement(listName + " = sorter.sort(" + listName + ", sortType)");
+		}
+		emptyline();
+
+		//paging start
+		appendCommentLine("paging");
+		appendStatement("int pageNumber = 1");
+		appendString("try{");
+		appendIncreasedStatement("pageNumber = Integer.parseInt(req.getParameter(" + quote("pageNumber") + "))");
+		appendString("}catch(Exception ignored){}");
+		appendStatement("Integer lastItemsOnPage = (Integer)req.getSession().getAttribute(\"currentItemsOnPage\")");
+		appendStatement("int itemsOnPage = lastItemsOnPage == null ? 20 : lastItemsOnPage");
+		appendString("try{");
+		appendIncreasedStatement("itemsOnPage = Integer.parseInt(req.getParameter(" + quote("itemsOnPage") + "))");
+		appendString("}catch(Exception ignored){}");
+		appendStatement("Slice<" + doc.getName() + "> slice = Slicer.slice(new Segment(pageNumber, itemsOnPage), "+listName+")");
+		appendStatement(listName+"= slice.getSliceData()");
+		emptyline();
+
+		appendStatement("XMLNode beans = " + getServiceGetterCall(section.getModule()) + ".export" + doc.getMultiple() + "ToXML(" + listName + ")");
+		appendCommentLine("prepare paging links");
+		appendStatement("ArrayList<PagingLink> pagingLinks = new ArrayList<PagingLink>()");
+		appendStatement("pagingLinks.add(new PagingLink(slice.isFirstSlice() ? null : \"1\", \"|<<\"))");
+		appendStatement("pagingLinks.add(new PagingLink(slice.hasPrevSlice() ? \"\"+(slice.getCurrentSlice()-1) : null, \"<<\"))");
+
+		appendString("for (int i=1; i<slice.getCurrentSlice(); i++){");
+		increaseIdent();
+		appendString("if (slice.getCurrentSlice()-i<=7)");
+		appendIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))");
+		append(closeBlock());
+
+		appendStatement("pagingLinks.add(new PagingLink(null, \"Page \"+(slice.getCurrentSlice()+\" of \"+slice.getTotalNumberOfSlices())))");
+
+		appendString("for (int i=slice.getCurrentSlice()+1; i<=slice.getTotalNumberOfSlices(); i++){");
+		increaseIdent();
+		appendString("if (i-slice.getCurrentSlice()<=7)");
+		appendIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))");
+		append(closeBlock());
+
+
+		appendStatement("pagingLinks.add(new PagingLink(slice.hasNextSlice() ?  \"\"+(slice.getCurrentSlice()+1) : null, \">>\"))");
+		appendStatement("pagingLinks.add(new PagingLink(slice.isLastSlice() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))");
+		appendCommentLine(" paging links end");
+
+		appendStatement("req.setAttribute(" + quote("paginglinks") + ", pagingLinks)");
+		appendStatement("req.setAttribute(" + quote("currentpage") + ", pageNumber)");
+		appendStatement("req.setAttribute(" + quote("currentItemsOnPage") + ", itemsOnPage)");
+		appendStatement("req.getSession().setAttribute(" + quote("currentItemsOnPage") + ", itemsOnPage)");
+		appendStatement("req.setAttribute(" + quote("PagingSelector") + ", ITEMS_ON_PAGE_SELECTOR)");
+		emptyline();
+		//paging end
+		appendComment("for XML node - page");
+		appendStatement("addBeanToRequest(req, " + quote(listName+ exportXMLSufix) + ", beans)");
+		appendComment("for CSV - page");
+		appendStatement("addBeanToRequest(req, " + quote(listName+ exportCSVSufix) + ", "+listName+")");
+		//add filters
+		for (MetaFilter f : section.getFilters()) {
+			appendStatement("addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\"\"))");
+		}
+
+		// User settings
+		appendCommentLine(" Add user settings beans");
+		appendStatement("addUserSettingsBeansToRequest(req)");
+
+		appendStatement("return mapping.findForward(\"success\")");
+		append(closeBlock());
+		emptyline();
+
+
+		return clazz;
+	}
+
 	/**
 	 * Returns the name of the base action for the given section.
 	 * @param section
@@ -132,6 +396,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    return "Base"+getActionSuffix(section);
 	}
 	
+
 	/**
 	 * Returns the right part of all action names tied to this section (like ***FooAction).
 	 * @param section
@@ -153,6 +418,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    return "Show"+section.getDocument().getMultiple()+"Action";
 	}
 	
+	public static String getExportActionName(MetaModuleSection section){
+		return "Export"+section.getDocument().getMultiple()+"Action";
+	}
+
 	public static String getSearchActionName(MetaModuleSection section){
 	    return "Search"+section.getDocument().getMultiple()+"Action";
 	}
