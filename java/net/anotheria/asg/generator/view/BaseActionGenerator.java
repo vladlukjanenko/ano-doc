@@ -8,7 +8,6 @@ import java.util.List;
 import net.anotheria.anoprise.metafactory.Extension;
 import net.anotheria.anoprise.metafactory.MetaFactory;
 import net.anotheria.anoprise.metafactory.MetaFactoryException;
-import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -23,7 +22,7 @@ import net.anotheria.util.StringUtils;
  * Generator class for the base action for a generator.
  * @author lrosenberg
  */
-public class BaseActionGenerator extends AbstractGenerator {
+public class BaseActionGenerator extends AbstractActionGenerator {
 
 	/**
 	 * Generates all artefacts for this action.
@@ -33,15 +32,6 @@ public class BaseActionGenerator extends AbstractGenerator {
 	 */
 	public FileEntry generate(List<MetaView> views) {
 		return new FileEntry(generateBaseAction(views));
-	}
-	
-	/**
-	 * Returns the base action name for the application.
-	 * @param context
-	 * @return
-	 */
-	public static String getBaseActionName(){
-		return "Base"+StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())+"Action";
 	}
 	
 	/**
@@ -55,7 +45,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action");
+		clazz.setPackageName(getSharedActionPackageName());
 
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
 		
@@ -323,7 +313,7 @@ public class BaseActionGenerator extends AbstractGenerator {
 		emptyline();
 		
 		appendComment("Get current application supported languages wrapper method.");
-		clazz.addImport("net.anotheria.anosite.gen.shared.service." + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName()) + "LanguageUtils");
+		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(MetaModule.SHARED) + "." + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName()) + "LanguageUtils");
 		appendString("public static List<String> getSupportedLanguages() {");
 		increaseIdent();
 		appendStatement("return " + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())

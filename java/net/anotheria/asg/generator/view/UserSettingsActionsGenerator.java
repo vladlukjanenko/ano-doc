@@ -1,22 +1,19 @@
 package net.anotheria.asg.generator.view;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.view.meta.MetaView;
 
 /**
  * Generator class for the UserSettings actions in cms.
  * 
  * @author vkazhdan
  */
-public class UserSettingsActionsGenerator extends AbstractGenerator {
+public class UserSettingsActionsGenerator extends AbstractActionGenerator {
 
 	public List<FileEntry> generate() {
 		
@@ -44,7 +41,7 @@ public class UserSettingsActionsGenerator extends AbstractGenerator {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 
-		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".action");
+		clazz.setPackageName(getSharedActionPackageName());
 		
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
@@ -56,13 +53,13 @@ public class UserSettingsActionsGenerator extends AbstractGenerator {
 		clazz.addImport("org.apache.struts.action.ActionForward");
 		clazz.addImport("org.apache.struts.action.ActionMapping");
 		
-		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".action.BaseActionsAction");
+		clazz.addImport(getBaseActionClassName());
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.EditUserSettingsForm");
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsBean");
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsManager");
 		
 		
-		clazz.setParent("BaseActionsAction");
+		clazz.setParent(getBaseActionName());
 		clazz.setName(getEditUserSettingsActionName());
 
 		startClassBody();
@@ -164,12 +161,12 @@ public class UserSettingsActionsGenerator extends AbstractGenerator {
 		clazz.addImport("org.apache.struts.action.ActionForward");
 		clazz.addImport("org.apache.struts.action.ActionMapping");
 		
-		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".action.BaseActionsAction");
+		clazz.addImport(getBaseActionClassName());
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.EditUserSettingsForm");
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsBean");
 		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsManager");
 		
-		clazz.setParent("BaseActionsAction");
+		clazz.setParent(getBaseActionName());
 		clazz.setName(getEditUserSettingsDialogActionName());
 
 		startClassBody();
