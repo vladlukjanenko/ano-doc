@@ -41,7 +41,7 @@ public class UserSettingsActionsGenerator extends AbstractActionGenerator {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 
-		clazz.setPackageName(getSharedActionPackageName());
+		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".action");
 		
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
