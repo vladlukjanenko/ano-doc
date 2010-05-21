@@ -1381,9 +1381,11 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		
 		appendString("<tr>");
 		increaseIdent();
+		//actually  - currentPage  parameter ! - for export paging!!!
+		String pageNumberParam = "?pageNumber=<bean:write name="+quote("currentpage")+" scope="+quote("request")+"/>";
 		appendString("<td colspan=\""+(2)+"\">"+
-		"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_XML))+">XML</a>&nbsp;"+
-		"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_CSV))+">CSV</a></td>");
+		"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_XML)+pageNumberParam)+">XML</a>&nbsp;"+
+		"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_CSV)+pageNumberParam)+">CSV</a></td>");
 		
 		// Language filtering settings
 		appendString("<td align=\""+("center")+"\">");
@@ -1493,8 +1495,8 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		appendString("<tr class=\"lineCaptions\">");
 		increaseIdent();
 		appendString("<td colspan="+quote(colspan)+" align="+quote("right")+
-			"><a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_XML))+">XML</a>&nbsp;"+
-			"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_CSV))+">CSV</a></td>");
+			"><a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_XML)+pageNumberParam)+">XML</a>&nbsp;"+
+			"<a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_CSV)+pageNumberParam)+">CSV</a></td>");
 		decreaseIdent();
 		appendString("</tr>");
 		
