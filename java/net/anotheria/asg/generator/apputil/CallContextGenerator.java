@@ -42,8 +42,7 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 		
 		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
 		clazz.addImport("java.io.Serializable");
-		clazz.addImport("java.util.List");
-		clazz.addImport(context.getServicePackageName(MetaModule.SHARED) + "." + LanguageUtilsGenerator.getCopierClassName(context));
+		clazz.addImport("java.util.List");		
 		
 		clazz.setName(getCallContextName(context));
 		clazz.setParent("CallContext");
@@ -51,14 +50,21 @@ public class CallContextGenerator extends AbstractGenerator implements IGenerato
 
 		startClassBody();
 		
-		appendString("public String getDefaultLanguage(){");
+		appendString("public String getDefaultLanguage() {");
 		increaseIdent();
 		appendStatement("return "+quote(context.getDefaultLanguage()));
 		append(closeBlock());
 				
-		appendString("public List<String> getSupportedLanguages(){");
-		increaseIdent();				
-		appendStatement("return " + LanguageUtilsGenerator.getCopierClassName(context) + ".getSupportedLanguages()");
+		appendString("public List<String> getSupportedLanguages() {");
+		increaseIdent();
+		// Process multilanguage support
+		if (context.areLanguagesSupported()) {
+			clazz.addImport(context.getServicePackageName(MetaModule.SHARED) + "." + LanguageUtilsGenerator.getCopierClassName(context));
+			appendStatement("return " + LanguageUtilsGenerator.getCopierClassName(context) + ".getSupportedLanguages()");
+		} else {
+			clazz.addImport("java.util.ArrayList");
+			appendStatement("return new ArrayList<String>()");
+		}
 		append(closeBlock());
 		
 		

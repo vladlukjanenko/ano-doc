@@ -313,11 +313,16 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		emptyline();
 		
 		appendComment("Get current application supported languages wrapper method.");
-		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(MetaModule.SHARED) + "." + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName()) + "LanguageUtils");
 		appendString("public static List<String> getSupportedLanguages() {");
 		increaseIdent();
-		appendStatement("return " + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())
-				+ "LanguageUtils.getSupportedLanguages()");
+		// Process multilanguage support
+		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()) {
+			clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(MetaModule.SHARED) + "." + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName()) + "LanguageUtils");
+			appendStatement("return " + StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())
+					+ "LanguageUtils.getSupportedLanguages()");			
+		} else {
+			appendStatement("return new ArrayList<String>()");
+		}			
 		append(closeBlock());
 		emptyline();
 		
