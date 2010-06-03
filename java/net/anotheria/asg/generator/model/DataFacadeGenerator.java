@@ -26,7 +26,12 @@ import net.anotheria.util.StringUtils;
  */
 public class DataFacadeGenerator extends AbstractDataObjectGenerator implements IGenerator{
 
-	public static final String PROPERTY_DECLARATION = "public static final String ";	
+	public static final String PROPERTY_DECLARATION = "public static final String ";
+	
+	/**
+	 * The id property.
+	 */
+	private final MetaProperty id = new MetaProperty("id","string");
 	
 	public List<FileEntry> generate(IGenerateable gdoc){
 		MetaDocument doc = (MetaDocument)gdoc;
@@ -400,6 +405,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 	
 	private void generatePropertyConstants(MetaDocument doc){
+		_generatePropertyConstant(id);
 		_generatePropertyConstants(doc.getProperties());
 		_generatePropertyConstants(doc.getLinks());
 	}

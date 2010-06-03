@@ -405,6 +405,10 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 		increaseIdent();
 		List <MetaProperty>properties = new ArrayList<MetaProperty>(doc.getProperties());
 		properties.addAll(doc.getLinks());
+		// Generate getter for ID property
+		appendString("if ("+id.toNameConstant()+".equals(propertyName))");
+		appendIncreasedStatement("return get"+id.getAccesserName()+"()");
+		// Generate getters for other properties 
 		for (MetaProperty p : properties){
 			appendString("if ("+p.toNameConstant()+".equals(propertyName))");
 			appendIncreasedStatement("return get"+p.getAccesserName()+"()");
