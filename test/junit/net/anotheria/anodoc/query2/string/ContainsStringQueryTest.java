@@ -3,69 +3,23 @@ package net.anotheria.anodoc.query2.string;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
-import net.anotheria.anodoc.data.Document;
-import net.anotheria.anodoc.data.Property;
 import net.anotheria.anodoc.data.StringProperty;
 import net.anotheria.anodoc.query2.QueryResultEntry;
 import net.anotheria.asg.data.DataObject;
-import net.anotheria.asg.data.ObjectInfo;
 
 import org.junit.Test;
 
 public class ContainsStringQueryTest {
 
-	private class DocumentStub extends Document implements DataObject {
-
-		private static final long serialVersionUID = -1050732326635139652L;
-
-		private List<Property> properties = new ArrayList<Property>();
-
-		public DocumentStub(String id) {
-			super(id);
-		}
-
-		public void addProperty(String name, String value) {
-			properties.add(new StringProperty(name, value));
-		}
-
-		@Override
-		public List<Property> getProperties() {
-			return properties;
-		}
-
-		@Override
-		public String getDefinedName() {
-			return null;
-		}
-
-		@Override
-		public String getDefinedParentName() {
-			return null;
-		}
-
-		@Override
-		public String getFootprint() {
-			return null;
-		}
-
-		@Override
-		public ObjectInfo getObjectInfo() {
-			return null;
-		}
-
-	}
-
 	@Test
 	public void testMatch() {
 
-		DocumentStub dataObject;
+		DataObjectAdapter dataObject;
 
-		dataObject = new DocumentStub("2010");
-		dataObject.addProperty("testProperty", "This is Anotheria software");
+		dataObject = new DataObjectAdapter("2010");
+		dataObject.putProperty(new StringProperty("testProperty", "This is Anotheria software"));
 
 		String criteria = "Anotheria";
 		ContainsStringQuery instance = new ContainsStringQuery(criteria);
