@@ -52,7 +52,7 @@ public class SimpleContainsStringQueryTest {
 		result = query.match(doc);
 		assertEquals(0, result.size());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property4"));
+		query = new SimpleContainsStringQuery(criteria, Arrays.asList("property4"));
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -60,7 +60,7 @@ public class SimpleContainsStringQueryTest {
 		assertEquals("", info.getPre());
 		assertEquals(" Develment", info.getPost());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property5"));
+		query = new SimpleContainsStringQuery(criteria, Arrays.asList("property5"));
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -68,7 +68,7 @@ public class SimpleContainsStringQueryTest {
 		assertEquals("This is ", info.getPre());
 		assertEquals("", info.getPost());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property6"));
+		query = new SimpleContainsStringQuery(criteria, Arrays.asList("property6"));
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();

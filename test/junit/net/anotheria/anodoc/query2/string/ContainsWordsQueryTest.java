@@ -2,7 +2,6 @@ package net.anotheria.anodoc.query2.string;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
 import java.util.List;
 
 import net.anotheria.anodoc.data.StringProperty;
@@ -31,7 +30,7 @@ public class ContainsWordsQueryTest {
 		List<QueryResultEntry> result = query.match(doc);
 		assertEquals(5, result.size());
 		
-		query = new SimpleContainsStringQuery(criteria, Arrays.asList("property1"));
+		query = new ContainsWordsQuery(criteria, "property1");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		StringMatchingInfo info = (StringMatchingInfo) result.get(0).getInfo();
@@ -39,7 +38,7 @@ public class ContainsWordsQueryTest {
 		assertEquals("This is ", info.getPre());
 		assertEquals(" software", info.getPost());
 		
-		query = new SimpleContainsStringQuery(criteria, Arrays.asList("property2"));
+		query = new ContainsWordsQuery(criteria, "property2");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -47,11 +46,11 @@ public class ContainsWordsQueryTest {
 		assertEquals("ooooooooooooooooooooooooooooooooooooong ", info.getPre());
 		assertEquals(" soooooooooooooooooooooooooooooooooooooo", info.getPost());
 		
-		query = new SimpleContainsStringQuery(criteria, Arrays.asList("property3"));
+		query = new ContainsWordsQuery(criteria, "property3");
 		result = query.match(doc);
 		assertEquals(0, result.size());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property4"));
+		query = new ContainsWordsQuery(criteria, "property4");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -59,7 +58,7 @@ public class ContainsWordsQueryTest {
 		assertEquals("", info.getPre());
 		assertEquals(" Develment", info.getPost());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property5"));
+		query = new ContainsWordsQuery(criteria, "property5");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -67,7 +66,7 @@ public class ContainsWordsQueryTest {
 		assertEquals("This is ", info.getPre());
 		assertEquals("", info.getPost());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property6"));
+		query = new ContainsWordsQuery(criteria, "property6");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -94,7 +93,7 @@ public class ContainsWordsQueryTest {
 		List<QueryResultEntry> result = query.match(doc);
 		assertEquals(5, result.size());
 
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property1"));
+		query = new ContainsWordsQuery(criteria, "property1");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		StringMatchingInfo info = (StringMatchingInfo) result.get(0).getInfo();
@@ -102,7 +101,7 @@ public class ContainsWordsQueryTest {
 		assertEquals("This is ", info.getPre());
 		assertEquals(" Develment", info.getPost());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property2"));
+		query = new ContainsWordsQuery(criteria, "property2");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -110,11 +109,11 @@ public class ContainsWordsQueryTest {
 		assertEquals("sssssssssssssssssssssssssssssssssssssss ", info.getPre());
 		assertEquals(" Deeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeevelm", info.getPost());
 //		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property3"));
+		query = new ContainsWordsQuery(criteria, "property3");
 		result = query.match(doc);
 		assertEquals(0, result.size());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property4"));
+		query = new ContainsWordsQuery(criteria, "property4");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -122,7 +121,7 @@ public class ContainsWordsQueryTest {
 		assertEquals("", info.getPre());
 		assertEquals(" Develment", info.getPost());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property5"));
+		query = new ContainsWordsQuery(criteria, "property5");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();
@@ -130,7 +129,7 @@ public class ContainsWordsQueryTest {
 		assertEquals("This is ", info.getPre());
 		assertEquals("", info.getPost());
 		
-		query = new ContainsWordsQuery(criteria, Arrays.asList("property6"));
+		query = new ContainsWordsQuery(criteria, "property6");
 		result = query.match(doc);
 		assertEquals(1, result.size());
 		info = (StringMatchingInfo) result.get(0).getInfo();

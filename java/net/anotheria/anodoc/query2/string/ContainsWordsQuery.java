@@ -2,7 +2,6 @@ package net.anotheria.anodoc.query2.string;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -21,16 +20,18 @@ public class ContainsWordsQuery implements DocumentQuery{
 
 	private String[] criteria;
 	private Set<String> propertiesToSearch = Collections.emptySet();
-	private static final Set<String> emptyProperties = Collections.emptySet();
 	
 	public ContainsWordsQuery(String aCriteria){
-		this(aCriteria, null);
+		this(aCriteria, new String[]{});
 	}
 	
-	public ContainsWordsQuery(String aCriteria, Collection<String> aPropertiesToSearch){
+	public ContainsWordsQuery(String aCriteria, String... aPropertiesToSearch){
 		criteria = StringUtils.tokenize(aCriteria.toLowerCase(),' ');
-		propertiesToSearch = aPropertiesToSearch != null? new HashSet<String>(aPropertiesToSearch): emptyProperties;
+		propertiesToSearch = new HashSet<String>();
+		for(String prop: aPropertiesToSearch)
+			propertiesToSearch.add(prop);
 	}
+	
   
 	public List<QueryResultEntry> match(DataObject obj) {
 		List<QueryResultEntry> ret = new ArrayList<QueryResultEntry>();
@@ -51,7 +52,6 @@ public class ContainsWordsQuery implements DocumentQuery{
 			for(String c:criteria){
 				int i = value.toLowerCase().indexOf(c);
 				if(i == -1){
-					System.out.println("Criteria " + c + " not found!");
 					preIndex = -1;
 					postIndex = -1;
 					break;
@@ -63,10 +63,6 @@ public class ContainsWordsQuery implements DocumentQuery{
 			//If property doesn't contains criteria then check next property 
 			if (postIndex ==-1)
 				continue;
-			System.out.println("PreIndex: " + preIndex);
-			System.out.println("PostIndex: " + postIndex);
-			
-			System.out.println("");
 			
 			QueryResultEntry e = new QueryResultEntry();
 			e.setMatchedDocument(doc);
@@ -91,5 +87,4 @@ public class ContainsWordsQuery implements DocumentQuery{
 		return "ContainsAllQuery [criteria=" + Arrays.toString(criteria) + ", propertiesToSearch=" + propertiesToSearch + "]";
 	}
 	
-
 }
