@@ -30,8 +30,8 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		
 		//MAF Filter and Mapping generation
-		files.addAll(new CMSFilterGenerator().generate());
-		files.addAll(new CMSMappingsConfiguratorGenerator().generate(views));
+//		files.addAll(new CMSFilterGenerator().generate());
+//		files.addAll(new CMSMappingsConfiguratorGenerator().generate(views));
 		
 		//hack, works only with one view.
 		files.add(new BaseActionGenerator().generate(views));
