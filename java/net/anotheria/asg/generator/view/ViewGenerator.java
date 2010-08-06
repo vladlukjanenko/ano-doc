@@ -28,6 +28,11 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		timer.startExecution("common");
 		List<FileEntry> files = new ArrayList<FileEntry>();
 		Context context = GeneratorDataRegistry.getInstance().getContext();
+		
+		//MAF Filter and Mapping generation
+		files.addAll(new CMSFilterGenerator().generate());
+		files.addAll(new CMSMappingsConfiguratorGenerator().generate(views));
+		
 		//hack, works only with one view.
 		files.add(new BaseActionGenerator().generate(views));
 		files.add(new IndexPageActionGenerator().generate(views));

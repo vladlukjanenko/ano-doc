@@ -149,8 +149,6 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	 */
 	public static final String USER_SETTINGS_DEFAULT_REFERRER_FORWARD_PATH = "index";
 	
-	
-
 	/**
 	 * The view which is being generated.
 	 */
