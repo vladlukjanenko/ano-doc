@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.exception.ConstantNotFoundException;
 import net.anotheria.asg.generator.AbstractGenerator;
@@ -437,11 +435,11 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}
 
 	public static String getShowQueryActionName(MetaModuleSection section){
-		return "Show"+section.getDocument().getMultiple()+"QueriesAction";
+		return "Show"+section.getDocument().getMultiple()+"QueriesMafAction";
 	}
 
 	public static String getExecuteQueryActionName(MetaModuleSection section){
-		return "Execute"+section.getDocument().getMultiple()+"QueriesAction";
+		return "Execute"+section.getDocument().getMultiple()+"QueriesMafAction";
 	}
 
 	public static String getEditActionName(MetaModuleSection section){
@@ -725,6 +723,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    clazz.addImport("net.anotheria.asg.util.decorators.IAttributeDecorator");
 	    clazz.addImport("net.anotheria.asg.util.filter.DocumentFilter");
 	    clazz.addImport("net.anotheria.util.NumberUtils");
+	    clazz.addImport("net.anotheria.anoplass.api.util.paging.PagingControl");
 	    addStandardActionImports(clazz);
 	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	    clazz.addImport(ModuleBeanGenerator.getListItemBeanImport(GeneratorDataRegistry.getInstance().getContext(), doc));
@@ -732,8 +731,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.addImport("net.anotheria.util.slicer.Slicer");
 		clazz.addImport("net.anotheria.util.slicer.Slice");
 		clazz.addImport("net.anotheria.util.slicer.Segment");
-		clazz.addImport("net.anotheria.asg.util.bean.PagingLink");
-		clazz.addImport("net.anotheria.asg.exception.ConstantNotFoundException");
         //LOckableObject import!!!
         if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
            clazz.addImport("net.anotheria.asg.data.LockableObject");
@@ -773,6 +770,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    appendStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+", quote(doc.getName()));
 	    appendStatement("private static final List<String> ITEMS_ON_PAGE_SELECTOR = java.util.Arrays.asList(new String[]{\"5\",\"10\",\"20\",\"25\",\"50\",\"100\",\"500\",\"1000\"})");
 	    
+	    appendStatement("private static Logger log = Logger.getLogger("+getShowActionName(section)+".class)");
+	    
 	    boolean containsDecorators = neededDecorators.size() >0;
 	    
 		if (containsComparable){
@@ -801,7 +800,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			emptyline();
 		}
 		
-		appendStatement("private final Logger log = Logger.getLogger(\"cms-lock-log\")");
 		
 		appendString( "public "+getShowActionName(section)+"(){");
 		increaseIdent();
@@ -955,35 +953,16 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    appendStatement("beans = slice.getSliceData()");
 	    emptyline();
 	    
-	    appendCommentLine("prepare paging links");
-	    appendStatement("ArrayList<PagingLink> pagingLinks = new ArrayList<PagingLink>()");
-		appendStatement("pagingLinks.add(new PagingLink(slice.isFirstSlice() ? null : \"1\", \"|<<\"))");
-		appendStatement("pagingLinks.add(new PagingLink(slice.hasPrevSlice() ? \"\"+(slice.getCurrentSlice()-1) : null, \"<<\"))");
-		
-		appendString( "for (int i=1; i<slice.getCurrentSlice(); i++){");
-		increaseIdent();
-		appendString( "if (slice.getCurrentSlice()-i<=7)");
-		appendIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))");
-	    append(closeBlock());
-		
-		appendStatement("pagingLinks.add(new PagingLink(null, \"Page \"+(slice.getCurrentSlice()+\" of \"+slice.getTotalNumberOfSlices())))");
-		
-		appendString( "for (int i=slice.getCurrentSlice()+1; i<=slice.getTotalNumberOfSlices(); i++){");
-		increaseIdent();
-		appendString( "if (i-slice.getCurrentSlice()<=7)");
-		appendIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))");
-	    append(closeBlock());
-		
-		
-		appendStatement("pagingLinks.add(new PagingLink(slice.hasNextSlice() ?  \"\"+(slice.getCurrentSlice()+1) : null, \">>\"))");
-		appendStatement("pagingLinks.add(new PagingLink(slice.isLastSlice() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))");
-	    appendCommentLine(" paging links end");
+	    appendCommentLine("prepare paging control");
+	    appendStatement("PagingControl pagingControl = new PagingControl(slice.getCurrentSlice(), slice.getElementsPerSlice(), slice.getTotalNumberOfItems())");
+	    appendCommentLine("end paging control");
 	    
-	    appendStatement("req.setAttribute("+quote("paginglinks")+", pagingLinks)");
+	    appendStatement("req.setAttribute("+quote("pagingControl")+", pagingControl)");
 	    appendStatement("req.setAttribute("+quote("currentpage")+", pageNumber)");
 	    appendStatement("req.setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)");
 	    appendStatement("req.getSession().setAttribute("+quote("currentItemsOnPage")+", itemsOnPage)");
 	    appendStatement("req.setAttribute("+quote("PagingSelector")+", ITEMS_ON_PAGE_SELECTOR)");
+	    
 	    emptyline();
 	    //paging end
 	    
