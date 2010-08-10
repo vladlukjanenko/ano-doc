@@ -21,7 +21,7 @@ import net.anotheria.util.StringUtils;
  * This generator generates the base action for a view.
  * @author another
  */
-public class BaseViewActionGenerator extends AbstractGenerator {
+public class BaseViewMafActionGenerator extends AbstractGenerator {
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
@@ -33,7 +33,7 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 	}
 	
 	public static String getViewActionName(MetaView view){
-		return "Base"+StringUtils.capitalize(view.getName())+"Action";
+		return "Base"+StringUtils.capitalize(view.getName())+"MafAction";
 	}
 	
 	public GeneratedClass generateViewAction(MetaView view){
@@ -58,26 +58,33 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 		clazz.addImport("java.util.ArrayList");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
-		clazz.addImport("net.anotheria.maf.action.ActionMapping;");
+		clazz.addImport("net.anotheria.maf.action.ActionMapping");
 		clazz.addImport("net.anotheria.maf.bean.FormBean");
-		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean;");
+		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");
 
 		clazz.setAbstractClass(true);
+		clazz.setParent(BaseMafActionGenerator.getBaseMafActionName());
+		clazz.setGeneric("T extends FormBean");
 		clazz.setName(getViewActionName(view));
-		clazz.setParent(BaseActionGenerator.getBaseActionName());
-
+		
 		startClassBody();
 
-		appendStatement("public static final String BEAN_MENU = "+quote("menu"));
-		appendStatement("public static final String BEAN_QUERIES_MENU = "+quote("queriesMenu"));
+		appendStatement("public static final String BEAN_MAIN_NAVIGATION = "+quote("mainNavigation"));
+		appendStatement("public static final String BEAN_QUERIES_NAVIGATION = "+quote("queriesNavigation"));
 		emptyline();
 		
 		appendString("protected abstract String getTitle();");
 		emptyline();
 		
-		appendString("protected void init(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
+		appendString("@Override");
+		appendString("protected String getActiveMainNavi() {");
+		appendIncreasedStatement("return \"Content\"");
+		append(closeBlock());
+		emptyline();
+		
+		appendString("public void preProcess(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
-		appendStatement("super.init(mapping, af, req, res)");
+		appendStatement("super.preProcess(mapping, req, res)");
 		appendStatement("prepareMenu(req)");
 		append(closeBlock());
 		emptyline();
@@ -98,19 +105,28 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 					
 		appendString("private void prepareMenu(HttpServletRequest req){");
 		increaseIdent();
-		appendStatement("List<MenuItemBean> menu = new ArrayList<MenuItemBean>()");
-		for (int i=0; i<sections.size(); i++){
-			MetaSection section = (MetaSection)sections.get(i);
-			if (section instanceof MetaModuleSection)
-				appendStatement("menu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)section).getDocument(), StrutsConfigGenerator.ACTION_SHOW))+"))");
-			if (section instanceof MetaCustomSection)
-				appendStatement("menu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(((MetaCustomSection)section).getPath())+"))");
-					
-		}
-		appendStatement("addBeanToRequest(req, BEAN_MENU, menu)");
-		
+			appendStatement("List<NavigationItemBean> navigation = getMainNavigation(req)");
+			appendString("for(NavigationItemBean naviItem: navigation){");
+			increaseIdent();
+				appendString("if(naviItem.isActive()){");
+				increaseIdent();
+				appendStatement("List<NavigationItemBean> subNavi = new ArrayList<NavigationItemBean>()");
+				appendStatement("naviItem.setSubNavi(subNavi)");
+					for (int i=0; i<sections.size(); i++){
+						MetaSection section = (MetaSection)sections.get(i);
+						if (section instanceof MetaModuleSection)
+							appendStatement("subNavi.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)section).getDocument(), StrutsConfigGenerator.ACTION_SHOW))+"))");
+						if (section instanceof MetaCustomSection)
+							appendStatement("subNavi.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(((MetaCustomSection)section).getPath())+"))");
+								
+					}
+				append(closeBlock());
+			append(closeBlock());
+			
+		appendStatement("addBeanToRequest(req, BEAN_MAIN_NAVIGATION, navigation)");
 		emptyline();
-		appendStatement("List<MenuItemBean> queriesMenu = new ArrayList<MenuItemBean>()");
+		
+		appendStatement("List<NavigationItemBean> queriesMenu = new ArrayList<NavigationItemBean>()");
 		for (int i=0; i<sections.size(); i++){
 			MetaSection section = (MetaSection)sections.get(i);
 			if (section instanceof MetaModuleSection){
@@ -120,29 +136,21 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 				}
 			}
 		}
-		appendStatement("addBeanToRequest(req, BEAN_QUERIES_MENU, queriesMenu)");
+		appendStatement("addBeanToRequest(req, BEAN_QUERIES_NAVIGATION, queriesMenu)");
 		
 		
 		append(closeBlock());
 		emptyline();
 
-		appendString("private MenuItemBean makeMenuItemBean(String title, String link){");
+		appendString("private NavigationItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();
-		appendString("MenuItemBean bean = new MenuItemBean();");
+		appendString("NavigationItemBean bean = new NavigationItemBean();");
 		appendString("bean.setCaption(title);");
 		appendString("bean.setLink(link);");
-		appendString("if (title.equals(getTitle())){");
-		increaseIdent();
-		appendString("bean.setActive(true);");
-		appendString("bean.setStyle(\"menuTitleSelected\");");
-		decreaseIdent();
-		appendString("}else{");
-		increaseIdent();
-		appendString("bean.setActive(false);");
-		appendString("bean.setStyle(\"menuTitle\");");
-		append(closeBlock());		
+		appendString("bean.setActive(title.equals(getTitle()));");
 		appendString("return bean;");
-		append(closeBlock());
+		decreaseIdent();
+		append(closeBlock());		
 		emptyline();
 
 		//security...

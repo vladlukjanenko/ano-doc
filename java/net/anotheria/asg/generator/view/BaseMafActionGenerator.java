@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import net.anotheria.anoprise.metafactory.Extension;
 import net.anotheria.anoprise.metafactory.MetaFactory;
 import net.anotheria.anoprise.metafactory.MetaFactoryException;
@@ -22,7 +24,7 @@ import net.anotheria.util.StringUtils;
  * Generator class for the base action for a generator.
  * @author lrosenberg
  */
-public class BaseActionGenerator extends AbstractActionGenerator {
+public class BaseMafActionGenerator extends AbstractActionGenerator {
 
 	/**
 	 * Generates all artefacts for this action.
@@ -52,13 +54,14 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		clazz.addImport("net.anotheria.webutils.actions.*");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
-		clazz.addImport("org.apache.struts.action.ActionForm");
-		clazz.addImport("org.apache.struts.action.ActionForward");
-		clazz.addImport("org.apache.struts.action.ActionMapping");		
+		clazz.addImport("net.anotheria.maf.action.ActionForward");
+		clazz.addImport("net.anotheria.maf.action.ActionMapping");
+		clazz.addImport("net.anotheria.maf.bean.FormBean");		
 
 		clazz.setAbstractClass(true);
-		clazz.setParent("BaseAction");
-		clazz.setName(getBaseActionName());
+		clazz.setParent("BaseMafAction");
+		clazz.setGeneric("T extends FormBean");
+		clazz.setName(getBaseMafActionName());
 
 		startClassBody();
 		
@@ -84,13 +87,11 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
 		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
 		appendStatement("private static LockingConfig lockConfig;");
-		appendStatement("Logger log = Logger.getLogger("+getBaseActionName()+".class)");
-
+		appendStatement("private static Logger log = Logger.getLogger("+getBaseActionName()+".class)");
+		clazz.addImport("org.apache.log4j.Logger");
 
 		appendString("static{");
 		increaseIdent();
-		
-		clazz.addImport("org.apache.log4j.Logger");
 		
 		clazz.addImport(MetaFactory.class);
 		clazz.addImport(Extension.class);
@@ -112,59 +113,43 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		//end init user manager
 		//initing Lock Config
 		emptyline();
-		appendComment("//initializing lockConfig");
+		appendComment("initializing lockConfig");
 		appendString("try{");
 		appendIncreasedStatement("lockConfig = LockingConfig.getInstance()");
 		appendString("}catch(Exception e){");
-		appendIncreasedStatement("staticlogger.fatal("+quote("Can't init lockConfig")+", e)");
+		appendIncreasedStatement("log.fatal("+quote("Can't init lockConfig")+", e)");
 		appendString("}");
         // end initing Lock Config
 	
 		append(closeBlock());
 		emptyline();
 		
-		appendString("public abstract ActionForward anoDocExecute(");
-		increaseIdent();
-		appendString("ActionMapping mapping,");
-		appendString("ActionForm af,");
-		appendString("HttpServletRequest req,");
-		appendString("HttpServletResponse res)");
-		appendString("throws Exception;");
-		decreaseIdent();
+		appendString("public abstract ActionForward anoDocExecute(ActionMapping mapping, T formBean, HttpServletRequest req, HttpServletResponse res) throws Exception;");
 		emptyline();
-
-		appendString("public ActionForward doExecute(");
-		increaseIdent();
-		increaseIdent();
-		appendString("ActionMapping mapping,");
-		appendString("ActionForm af,");
-		appendString("HttpServletRequest req,");
-		appendString("HttpServletResponse res)");
-		appendString("throws Exception{");
-		decreaseIdent();
+		appendString("@Override");
+		appendString("public ActionForward execute(ActionMapping mapping, FormBean formBean, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		appendString("if (isAuthorizationRequired()){");
-		increaseIdent();
-		appendStatement("boolean authorized = checkAuthorization(req)");
-		appendString("if (!authorized){");
-		increaseIdent();
-		appendStatement("String queryString = req.getQueryString()");
-		appendString("if (queryString!=null)");
-		appendIncreasedStatement("queryString = \"?\"+queryString");
-		appendString("else");
-		appendIncreasedStatement("queryString = \"\"");
-		appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, \""+GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"\"+req.getPathInfo()+queryString)");
-		appendStatement("String redUrl = "+quote(GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"/login"));
-		appendStatement("res.sendRedirect(redUrl)");
-		appendStatement("return null");					
-		append(closeBlock());	
-		append(closeBlock());
-		
-		appendStatement("checkAccessPermissions(req)");
+			increaseIdent();
+				appendStatement("boolean authorized = checkAuthorization(req)");
+				appendString("if (!authorized){");
+				increaseIdent();
+					appendStatement("String queryString = req.getQueryString()");
+					appendString("if (queryString != null)");
+					appendIncreasedStatement("queryString = \"?\"+queryString");
+					appendString("else");
+					appendIncreasedStatement("queryString = \"\"");
+					appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, \""+GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"\"+req.getPathInfo()+queryString)");
+					appendStatement("String redUrl = "+quote(GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"/login"));
+					appendStatement("res.sendRedirect(redUrl)");
+					appendStatement("return null");		
+				append(closeBlock());
+			append(closeBlock());
+			appendStatement("checkAccessPermissions(req)");
 		emptyline();
 
-		appendString("return anoDocExecute(mapping, af, req, res);");
+		appendString("return anoDocExecute(mapping, (T) formBean, req, res);");
 		closeBlock("doExecute");
-
+		emptyline();
 		//generate service getter
 		for (MetaModule m:modules){
 			appendString("protected "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceGetterCall(m)+"{");
@@ -301,7 +286,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 				appendStatement(statement);
 			}
 		}
-		appendStatement("return menu)");
+		appendStatement("return menu");
 		append(closeBlock());
 		emptyline();
 

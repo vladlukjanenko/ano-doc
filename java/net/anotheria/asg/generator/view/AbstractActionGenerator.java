@@ -14,6 +14,10 @@ public class AbstractActionGenerator extends AbstractGenerator{
 	 */
 	protected static String getBaseActionName(){
 		return "Base"+StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())+"Action";
+	}
+	
+	protected static String getBaseMafActionName(){
+		return "Base"+StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())+"MafAction";
 	}	
 	
 	

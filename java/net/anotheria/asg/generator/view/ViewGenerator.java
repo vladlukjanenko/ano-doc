@@ -35,6 +35,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		
 		//hack, works only with one view.
 		files.add(new BaseActionGenerator().generate(views));
+		files.add(new BaseMafActionGenerator().generate(views));
 		files.add(new IndexPageActionGenerator().generate(views));
 		files.add(new IndexPageJspGenerator().generate(context));
 		files.add(new SharedJspFooterGenerator().generate(views, context));
@@ -55,6 +56,10 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 			timer.startExecution("v-"+view.getName()+"-BaseViewAction");
 			files.add(new BaseViewActionGenerator().generate(view));
 			timer.stopExecution("v-"+view.getName()+"-BaseViewAction");
+			
+			timer.startExecution("v-"+view.getName()+"-BaseViewMafAction");
+			files.add(new BaseViewMafActionGenerator().generate(view));
+			timer.stopExecution("v-"+view.getName()+"-BaseViewMafAction");
 			
 			timer.startExecution("v-"+view.getName()+"-View");
 			files.addAll(generateView(path, view));
