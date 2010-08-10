@@ -1909,7 +1909,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 					appendIncreasedStatement("ret.addAll("+methodName+"(documentId))");	
 				}
 				appendString( "}catch(Exception ignored){");
-				appendIncreasedStatement("log.warn(\""+methodName+"(\"+documentId+\")\", ignored)");
+				//check!!!
+				//				appendIncreasedStatement("log.warn(\""+methodName+"(\"+documentId+\")\", ignored)");
 				appendString( "}");
 			}
 			appendStatement("return ret");
