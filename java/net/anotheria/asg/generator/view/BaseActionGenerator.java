@@ -84,13 +84,13 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
 		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
 		appendStatement("private static LockingConfig lockConfig;");
-		appendStatement("Logger log = Logger.getLogger("+getBaseActionName()+".class)");
 
 
 		appendString("static{");
 		increaseIdent();
 		
 		clazz.addImport("org.apache.log4j.Logger");
+		appendStatement("Logger staticlogger = Logger.getLogger("+getBaseActionName()+".class)");
 		
 		clazz.addImport(MetaFactory.class);
 		clazz.addImport(Extension.class);
@@ -107,7 +107,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("try{");
 		appendIncreasedStatement("userManager = XMLUserManager.getInstance()");
 		appendString("}catch(Exception e){");
-		appendIncreasedStatement("log.fatal("+quote("Can't init user manager")+", e)");
+		appendIncreasedStatement("staticlogger.fatal("+quote("Can't init user manager")+", e)");
 		appendString("}");
 		//end init user manager
 		//initing Lock Config
@@ -279,10 +279,10 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		append(closeBlock());
 
 		
-		appendString("protected List<NavigationItemBean> getMainNavigation(HttpServletRequest req) {");
+		appendString("private void prepareViewSelection(HttpServletRequest req){");
 		increaseIdent();
-		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");
-		appendStatement("List<NavigationItemBean> menu = new ArrayList<NavigationItemBean>();");
+		clazz.addImport("net.anotheria.webutils.bean.MenuItemBean");
+		appendStatement("List<MenuItemBean> menu = new ArrayList<MenuItemBean>()");
 		for (int i=0; i<views.size(); i++){
 			MetaView view = views.get(i);
 			MetaSection first = view.getSections().get(0);
@@ -301,11 +301,15 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 				appendStatement(statement);
 			}
 		}
-		appendStatement("return menu)");
+		appendStatement("addBeanToRequest(req, BEAN_VIEW_SELECTOR, menu)");
 		append(closeBlock());
 		emptyline();
 
-		appendString("protected abstract String getActiveMainNavi();");
+		appendString("protected void init(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
+		increaseIdent();
+		appendStatement("super.init(mapping, af, req, res)");
+		appendStatement("prepareViewSelection(req)");
+		append(closeBlock());
 		emptyline();
 		
 		appendComment("Get current application supported languages wrapper method.");
@@ -331,12 +335,13 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		emptyline();		
 		
 		
-		appendString("private NavigationItemBean makeMenuItemBean(String title, String link){");
+		appendString("private MenuItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();
-		appendString("NavigationItemBean bean = new NavigationItemBean();");
+		appendString("MenuItemBean bean = new MenuItemBean();");
 		appendString("bean.setCaption(title);");
 		appendString("bean.setLink(link);");
-		appendString("bean.setActive(getActiveMainNavi().equals(title));");
+		appendString("bean.setActive(true);");
+		appendString("bean.setStyle(\"menuTitle\");");
 		appendString("return bean;");
 		append(closeBlock());
 		emptyline();
