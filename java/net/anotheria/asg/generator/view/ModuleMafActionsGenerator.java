@@ -1,24 +1,55 @@
 package net.anotheria.asg.generator.view;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.exception.ConstantNotFoundException;
-import net.anotheria.asg.generator.*;
-import net.anotheria.asg.generator.forms.meta.*;
-import net.anotheria.asg.generator.meta.*;
+import net.anotheria.asg.generator.AbstractGenerator;
+import net.anotheria.asg.generator.Context;
+import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedArtefact;
+import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.IGenerateable;
+import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.forms.meta.MetaForm;
+import net.anotheria.asg.generator.forms.meta.MetaFormField;
+import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
+import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
+import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
+import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
+import net.anotheria.asg.generator.meta.MetaContainerProperty;
+import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
+import net.anotheria.asg.generator.meta.MetaGenericListProperty;
+import net.anotheria.asg.generator.meta.MetaGenericProperty;
+import net.anotheria.asg.generator.meta.MetaLink;
+import net.anotheria.asg.generator.meta.MetaListProperty;
+import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.types.EnumTypeGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 import net.anotheria.asg.generator.util.DirectLink;
-import net.anotheria.asg.generator.view.meta.*;
+import net.anotheria.asg.generator.view.meta.MetaDecorator;
+import net.anotheria.asg.generator.view.meta.MetaDialog;
+import net.anotheria.asg.generator.view.meta.MetaFieldElement;
+import net.anotheria.asg.generator.view.meta.MetaFilter;
+import net.anotheria.asg.generator.view.meta.MetaModuleSection;
+import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.asg.generator.view.meta.MetaViewElement;
+import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This generator generate module-based actions like delete, create, edit, new, update, show and so on.
@@ -161,6 +192,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.addImport("net.anotheria.util.slicer.Slice");
 		clazz.addImport("net.anotheria.util.slicer.Segment");
 		clazz.addImport("net.anotheria.asg.util.bean.PagingLink");
+		clazz.addImport("org.apache.log4j.Logger");
+		
 
 
 
@@ -184,8 +217,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendStatement("public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+", quote(doc.getName()));
 		appendStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+", quote(doc.getName()));
 		appendStatement("private static final List<String> ITEMS_ON_PAGE_SELECTOR = java.util.Arrays.asList(new String[]{\"5\",\"10\",\"20\",\"25\",\"50\",\"100\",\"500\",\"1000\"})");
-
-
+		appendStatement("private static final Logger log = Logger.getLogger("+getExportActionName(section)+".class)");
+		
 		if (containsComparable) {
 			clazz.addImport("net.anotheria.util.sorter.Sorter");
 			clazz.addImport("net.anotheria.util.sorter.QuickSorter");
@@ -335,31 +368,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		emptyline();
 
 		appendStatement("XMLNode beans = " + getServiceGetterCall(section.getModule()) + ".export" + doc.getMultiple() + "ToXML(" + listName + ")");
-		appendCommentLine("prepare paging links");
-		appendStatement("ArrayList<PagingLink> pagingLinks = new ArrayList<PagingLink>()");
-		appendStatement("pagingLinks.add(new PagingLink(slice.isFirstSlice() ? null : \"1\", \"|<<\"))");
-		appendStatement("pagingLinks.add(new PagingLink(slice.hasPrevSlice() ? \"\"+(slice.getCurrentSlice()-1) : null, \"<<\"))");
-
-		appendString("for (int i=1; i<slice.getCurrentSlice(); i++){");
-		increaseIdent();
-		appendString("if (slice.getCurrentSlice()-i<=7)");
-		appendIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))");
-		append(closeBlock());
-
-		appendStatement("pagingLinks.add(new PagingLink(null, \"Page \"+(slice.getCurrentSlice()+\" of \"+slice.getTotalNumberOfSlices())))");
-
-		appendString("for (int i=slice.getCurrentSlice()+1; i<=slice.getTotalNumberOfSlices(); i++){");
-		increaseIdent();
-		appendString("if (i-slice.getCurrentSlice()<=7)");
-		appendIncreasedStatement("pagingLinks.add(new PagingLink(\"\"+i,\"\"+i))");
-		append(closeBlock());
-
-
-		appendStatement("pagingLinks.add(new PagingLink(slice.hasNextSlice() ?  \"\"+(slice.getCurrentSlice()+1) : null, \">>\"))");
-		appendStatement("pagingLinks.add(new PagingLink(slice.isLastSlice() ? null : \"\"+slice.getTotalNumberOfSlices(), \">>|\"))");
-		appendCommentLine(" paging links end");
-
-		appendStatement("req.setAttribute(" + quote("paginglinks") + ", pagingLinks)");
+		emptyline();
+		
 		appendStatement("req.setAttribute(" + quote("currentpage") + ", pageNumber)");
 		appendStatement("req.setAttribute(" + quote("currentItemsOnPage") + ", itemsOnPage)");
 		appendStatement("req.getSession().setAttribute(" + quote("currentItemsOnPage") + ", itemsOnPage)");
@@ -403,11 +413,11 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	 * @return
 	 */
 	public static String getActionSuffix(MetaModuleSection section){
-	    return section.getDocument().getName()+"Action";
+	    return section.getDocument().getName()+"MafAction";
 	}
 	
 	public static String getMultiOpActionName(MetaModuleSection section){
-	    return "MultiOp"+section.getDocument().getMultiple()+"Action";
+	    return "MultiOp"+section.getDocument().getMultiple()+"MafAction";
 	}
 
 	public static String getMultiOpDialogActionName(MetaModuleSection section){
@@ -415,11 +425,11 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}
 
 	public static String getShowActionName(MetaModuleSection section){
-	    return "Show"+section.getDocument().getMultiple()+"Action";
+	    return "Show"+section.getDocument().getMultiple()+"MafAction";
 	}
 	
 	public static String getExportActionName(MetaModuleSection section){
-		return "Export"+section.getDocument().getMultiple()+"Action";
+		return "Export"+section.getDocument().getMultiple()+"MafAction";
 	}
 
 	public static String getSearchActionName(MetaModuleSection section){
@@ -701,8 +711,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	 */
 	private GeneratedClass generateShowAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
-		startNewJob(clazz)
-		;
+		startNewJob(clazz);
+		
 	    MetaDocument doc = section.getDocument();
 		List<MetaViewElement> elements = section.getElements();
 	    
@@ -728,6 +738,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
         if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
            clazz.addImport("net.anotheria.asg.data.LockableObject");
         }
+        
+        clazz.addImport("org.apache.log4j.Logger");
 		
 		//check if we have to property definition files.
 		//check if we have decorators
@@ -788,7 +800,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			}
 			emptyline();
 		}
-			
+		
+		appendStatement("private final Logger log = Logger.getLogger(\"cms-lock-log\")");
 		
 		appendString( "public "+getShowActionName(section)+"(){");
 		increaseIdent();
@@ -2173,15 +2186,18 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action."+BaseViewActionGenerator.getViewActionName(view));
 		if (isCMS) {
 			clazz.addImport("javax.servlet.http.HttpServletRequest");
+			clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 			clazz.addImport("net.anotheria.asg.data.AbstractASGDocument");
 			clazz.addImport("net.anotheria.asg.data.LockableObject");
-			clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
 			clazz.addImport("net.anotheria.asg.util.locking.exeption.LockingException");
+			clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
 			clazz.addImport("org.apache.log4j.Logger");
-			clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
+			clazz.addImport("net.anotheria.maf.bean.FormBean");
+			
 		}
-	    clazz.setName(getBaseActionName(section));
-	    clazz.setParent(BaseViewActionGenerator.getViewActionName(view));
+		clazz.setGeneric("T extends FormBean");
+		clazz.setName(getBaseActionName(section));
+	    clazz.setParent(BaseViewMafActionGenerator.getViewActionName(view));
 
 	    startClassBody();
 
@@ -2334,7 +2350,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    String ret = "";
 	    ret += "public ActionForward "+(methodName == null ? "anoDocExecute" : methodName ) + "(";
 		ret += "ActionMapping mapping, ";
-		ret += "ActionForm af, ";
+		ret += "FormBean af, ";
 		ret += "HttpServletRequest req, ";
 		ret += "HttpServletResponse res) ";
 		ret += "throws Exception{";
@@ -2358,9 +2374,9 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	private void addStandardActionImports(GeneratedClass clazz){
 	    clazz.addImport("javax.servlet.http.HttpServletRequest");
 	    clazz.addImport("javax.servlet.http.HttpServletResponse");
-	    clazz.addImport("org.apache.struts.action.ActionForm");
-	    clazz.addImport("org.apache.struts.action.ActionForward");
-	    clazz.addImport("org.apache.struts.action.ActionMapping");
+	    clazz.addImport("net.anotheria.maf.action.ActionForward");
+	    clazz.addImport("net.anotheria.maf.action.ActionMapping");
+	    clazz.addImport("net.anotheria.maf.bean.FormBean");
 	}
 	
 
@@ -2368,7 +2384,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	// TABLE
 	
 	public static String getContainerMultiOpActionName(MetaDocument doc, MetaContainerProperty property){
-		return "MultiOp"+doc.getMultiple()+StringUtils.capitalize(property.getName())+"Action";
+		return "MultiOp"+doc.getMultiple()+StringUtils.capitalize(property.getName())+"MafAction";
 	}
 
 	public static String getContainerShowActionName(MetaDocument doc, MetaContainerProperty property){
@@ -2412,10 +2428,10 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
-        if(StorageType.CMS.equals(section.getModule().getStorageType())){
-            clazz.addImport("net.anotheria.asg.data.LockableObject");
-            clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
-        }
+//        if(StorageType.CMS.equals(section.getModule().getStorageType())){
+//            clazz.addImport("net.anotheria.asg.data.LockableObject");
+//            clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
+//        }
 		if (containerProperty instanceof MetaListProperty){
 			MetaProperty containedProperty = ((MetaListProperty)containerProperty).getContainedProperty();
 			if(containedProperty.isLinked()){
@@ -2907,12 +2923,21 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.setParent(getBaseActionName(section));
 
 		startClassBody();
+		
+	
 		generateListShowActionMethod(section, list, null);
 		
 		return clazz;
 	}	
 
 	private void generateListShowActionMethod(MetaModuleSection section, MetaListProperty list, String methodName){
+		appendString("@Override");
+		appendString("public ActionForward execute(ActionMapping mapping, @Form(EditBoxFB.class) FormBean formBean, HttpServletRequest req, HttpServletResponse res) throws Exception{");
+		increaseIdent();
+		appendStatement("return super.execute(mapping, formBean, req, res)");
+		append(closeBlock());
+		emptyline();
+		
 		MetaDocument doc = section.getDocument();
 
 		appendString( getExecuteDeclaration(methodName));

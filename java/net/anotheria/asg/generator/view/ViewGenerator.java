@@ -124,6 +124,9 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		List<FileEntry> ret = new ArrayList<FileEntry>();
 		ret.addAll(new ModuleBeanGenerator().generate(section));
 	    ret.addAll(new ModuleActionsGenerator(view).generate(section));
+	    
+	    ret.addAll(new ModuleMafBeanGenerator().generate(section));
+	    ret.addAll(new ModuleMafActionsGenerator(view).generate(section));
 	    return ret;
 	}
 
