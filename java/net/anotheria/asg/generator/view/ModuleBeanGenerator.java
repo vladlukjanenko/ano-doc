@@ -40,7 +40,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	
 	public static final String FIELD_ML_DISABLED = "multilingualInstanceDisabled";
 
-
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */

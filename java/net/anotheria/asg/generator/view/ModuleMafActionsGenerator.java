@@ -2882,6 +2882,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("import net.anotheria.anosite.gen.aswebdata.bean.EditBoxFB");
+		clazz.addImport("import net.anotheria.maf.bean.annotations.Form");
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
@@ -2896,6 +2898,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			clazz.addImport(DataFacadeGenerator.getDocumentImport(targetDocument));
 			clazz.addImport(DataFacadeGenerator.getSortTypeImport(targetDocument));
 			clazz.addImport("net.anotheria.anodoc.data.NoSuchDocumentException");
+			
 
 		}
 
