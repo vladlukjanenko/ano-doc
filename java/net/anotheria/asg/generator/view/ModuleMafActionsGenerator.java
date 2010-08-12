@@ -419,7 +419,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}
 
 	public static String getMultiOpDialogActionName(MetaModuleSection section){
-	    return "MultiOpDialog"+section.getDocument().getMultiple()+"Action";
+	    return "MultiOpDialog"+section.getDocument().getMultiple()+"MafAction";
 	}
 
 	public static String getShowActionName(MetaModuleSection section){
@@ -507,6 +507,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.setParent(getBaseActionName(section));
 
 		startClassBody();
+		
 		appendString( getExecuteDeclaration(null));
 	    increaseIdent();
 	    appendStatement("String path = stripPath(mapping.getPath())");
@@ -530,15 +531,15 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	private GeneratedClass generateMultiOpDialogAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint(ModuleMafActionsGenerator.class + ".generateMultiOpDialogAction");
 		
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
         final boolean cMSStorageType = StorageType.CMS.equals(doc.getParentModule().getStorageType());
 		
 		clazz.setName(getMultiOpDialogActionName(section));
-		clazz.setParent(getBaseActionName(section));
+		clazz.setParent(getBaseActionName(section), ModuleMafBeanGenerator.getDialogBeanName(dialog, doc));
 		clazz.setPackageName(getPackage(section.getModule()));
-	    
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		
 	    //write imports...
@@ -572,6 +573,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    emptyline();
 
 	    startClassBody();
+	    generateExecuteMethod(clazz, dialog, doc);
 		appendString( getExecuteDeclaration(null));
 	    increaseIdent();
 	    appendStatement("String path = stripPath(mapping.getPath())");
@@ -622,6 +624,19 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		emptyline();
 	    
 	    return clazz;
+	}
+	
+	private void generateExecuteMethod(GeneratedClass clazz, MetaDialog dialog, MetaDocument document){
+		String formBeanName = ModuleMafBeanGenerator.getDialogBeanName(dialog, document);
+		clazz.addImport("net.anotheria.anosite.gen.aswebdata.bean."+formBeanName);
+		clazz.addImport("net.anotheria.maf.bean.annotations.Form");
+//		clazz.addImport(clazz);
+		appendString("@Override");
+		appendString("public ActionForward execute(ActionMapping mapping, @Form("+formBeanName+".class) FormBean formBean, HttpServletRequest req, HttpServletResponse res) throws Exception{");
+		increaseIdent();
+		appendStatement("return super.execute(mapping, formBean, req, res)");
+		closeBlock("execute");
+		emptyline();
 	}
 
 	/**
@@ -2173,12 +2188,13 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
 			clazz.addImport("org.apache.log4j.Logger");
 			clazz.addImport("net.anotheria.maf.bean.FormBean");
+			clazz.addImport("net.anotheria.anosite.gen.shared.action.BaseContentMafAction");
 			
 		}
 		clazz.setGeneric("T extends FormBean");
 		clazz.setName(getBaseActionName(section));
-	    clazz.setParent(BaseViewMafActionGenerator.getViewActionName(view));
-
+	    clazz.setParent(BaseViewMafActionGenerator.getViewActionName(view), "T");
+	    
 	    startClassBody();
 
 		if(isCMS)
@@ -2327,10 +2343,14 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	 * @return
 	 */
 	private String getExecuteDeclaration(String methodName){
+		return getExecuteDeclaration(methodName, "FormBean");
+	}
+	
+	private String getExecuteDeclaration(String methodName, String formBeanName){
 	    String ret = "";
 	    ret += "public ActionForward "+(methodName == null ? "anoDocExecute" : methodName ) + "(";
 		ret += "ActionMapping mapping, ";
-		ret += "FormBean af, ";
+		ret += formBeanName + " af, ";
 		ret += "HttpServletRequest req, ";
 		ret += "HttpServletResponse res) ";
 		ret += "throws Exception{";
@@ -2397,6 +2417,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
+		appendGenerationPoint(ModuleMafActionsGenerator.class + ".generateContainerMultiOpAction");
+		
 		MetaDocument doc = section.getDocument();
 
 	    clazz.setPackageName(getPackage(section.getModule()));
@@ -2442,6 +2464,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.setName(getContainerMultiOpActionName(doc, containerProperty));
 		clazz.setParent(getBaseActionName(section));
 		startClassBody();
+		
 	    appendString( getExecuteDeclaration(null));
 	    increaseIdent();
 	    appendStatement("String path = stripPath(mapping.getPath())");
@@ -2882,8 +2905,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
-		clazz.addImport("import net.anotheria.anosite.gen.aswebdata.bean.EditBoxFB");
-		clazz.addImport("import net.anotheria.maf.bean.annotations.Form");
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
@@ -2906,7 +2927,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.setParent(getBaseActionName(section));
 
 		startClassBody();
-		
 	
 		generateListShowActionMethod(section, list, null);
 		
@@ -2914,13 +2934,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}	
 
 	private void generateListShowActionMethod(MetaModuleSection section, MetaListProperty list, String methodName){
-		appendString("@Override");
-		appendString("public ActionForward execute(ActionMapping mapping, @Form(EditBoxFB.class) FormBean formBean, HttpServletRequest req, HttpServletResponse res) throws Exception{");
-		increaseIdent();
-		appendStatement("return super.execute(mapping, formBean, req, res)");
-		append(closeBlock());
-		emptyline();
-		
 		MetaDocument doc = section.getDocument();
 
 		appendString( getExecuteDeclaration(methodName));

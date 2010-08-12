@@ -53,13 +53,14 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 			MetaView view = views.get(i);
 			timer.startExecution("view-"+view.getName());
 
+			timer.startExecution("v-"+view.getName()+"-BaseViewMafAction");
+			files.add(new BaseViewMafActionGenerator().generate(view));
+			timer.stopExecution("v-"+view.getName()+"-BaseViewMafAction");
+
 			timer.startExecution("v-"+view.getName()+"-BaseViewAction");
 			files.add(new BaseViewActionGenerator().generate(view));
 			timer.stopExecution("v-"+view.getName()+"-BaseViewAction");
 			
-			timer.startExecution("v-"+view.getName()+"-BaseViewMafAction");
-			files.add(new BaseViewMafActionGenerator().generate(view));
-			timer.stopExecution("v-"+view.getName()+"-BaseViewMafAction");
 			
 			timer.startExecution("v-"+view.getName()+"-View");
 			files.addAll(generateView(path, view));
@@ -125,7 +126,6 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		ret.addAll(new ModuleMafBeanGenerator().generate(section));
 		ret.addAll(new ModuleMafActionsGenerator(view).generate(section));
 		ret.addAll(new ModuleBeanGenerator().generate(section));
-		ret.addAll(new ModuleMafBeanGenerator().generate(section));
 	    ret.addAll(new ModuleActionsGenerator(view).generate(section));
 	    
 	    return ret;

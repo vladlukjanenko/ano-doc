@@ -137,12 +137,6 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
         generateAdditionalFields(doc,"lockerId","string","LockableObject \"lockerId\" property. For userName containing.");
         generateAdditionalFields(doc,"lockingTime","string","LockableObject \"lockingTime\" property.");
         
-
-		appendString("@Override");
-		appendString("public String toString() {");
-		appendIncreasedStatement("return \"EditBoxFB [id=\" + id + \", name=\" + name + \", type=\" + type + \", handler=\" + handler + \"]\"");
-		append(closeBlock());
-
         emptyline();
 		
 		return clazz;

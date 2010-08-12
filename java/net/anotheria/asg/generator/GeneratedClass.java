@@ -28,7 +28,7 @@ public class GeneratedClass extends GeneratedArtefact{
 	/**
 	 * The name of the parent class for 'extends' keyword.
 	 */
-	private String parent;
+	private ClassDef parent;
 	
 	/**
 	 * The generic of the class
@@ -115,8 +115,8 @@ public class GeneratedClass extends GeneratedArtefact{
 		if(!StringUtils.isEmpty(getGeneric()))
 			nameDeclaration += " <" + getGeneric() + ">";
 		
-		if (getParent()!=null && getParent().length()>0)
-			nameDeclaration += " extends "+getParent();
+		if (getParent()!=null)
+			nameDeclaration += " extends "+getParent().getNameWithGeneric();
 		if (interfaces!=null && interfaces.size()>0){
 			nameDeclaration += " implements ";
 			for (int i=0; i<interfaces.size(); i++){
@@ -219,7 +219,7 @@ public class GeneratedClass extends GeneratedArtefact{
 	 * Returns the parent of the class.
 	 * @return
 	 */
-	public String getParent() {
+	public ClassDef getParent() {
 		return parent;
 	}
 	
@@ -234,9 +234,13 @@ public class GeneratedClass extends GeneratedArtefact{
 	}
 
 	public void setParent(String aParent) {
-		parent = aParent;
+		parent = new ClassDef(aParent);
 	}
-
+	
+	public void setParent(String aParent, String aGeneric) {
+		parent = new ClassDef(aParent, aGeneric);
+	}
+	
 	public String getPackageName() {
 		return packageName;
 	}
@@ -293,6 +297,44 @@ public class GeneratedClass extends GeneratedArtefact{
 
 	public void setGeneric(String generic) {
 		this.generic = generic;
+	}
+	
+	public static class ClassDef{
+		private String name;
+		private String generic;
+		
+		public ClassDef(String aName){
+			name = aName;
+		}
+		
+		public ClassDef(String aName, String aGeneric){
+			name = aName;
+			generic = aGeneric;
+		}
+				
+		public String getName() {
+			return name;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getGeneric() {
+			return generic;
+		}
+		public void setGeneric(String generic) {
+			this.generic = generic;
+		}
+		
+		public String getNameWithGeneric(){
+			return name + (StringUtils.isEmpty(generic)? "": "<" + generic + ">"); 
+		}
+		
+		@Override
+		public String toString(){
+			return getName();
+		}
+		
+		
 	}
 
 }

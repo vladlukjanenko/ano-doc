@@ -338,6 +338,11 @@ public class AbstractGenerator{
 		appendCommentLine(getCurrentJobContent(), commentline);
 	}
 	
+	protected void appendGenerationPoint(String point){
+		appendCommentLine("Generator point: " + point);
+		emptyline();
+	}
+	
 	protected void appendCommentLine(StringBuilder target, String commentline){
 		String tokens[] = StringUtils.tokenize(commentline, '\n');
 		if (tokens.length!=1)
