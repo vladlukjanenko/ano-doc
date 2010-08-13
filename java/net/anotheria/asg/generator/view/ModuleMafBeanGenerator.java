@@ -10,6 +10,8 @@ import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.forms.meta.MetaForm;
+import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
 import net.anotheria.asg.generator.meta.MetaListProperty;
@@ -244,4 +246,53 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 		emptyline();
 		
 	}
+		
+		public static String getListItemBeanSortTypeImport(Context context, MetaDocument doc){
+			return getPackage(context, doc)+"."+getListItemBeanSortTypeName(doc);
+		}
+		
+		public static String getListItemBeanSortTypeName(MetaDocument doc){
+			return getListItemBeanName(doc)+"SortType";
+		}
+		
+		public static String getListItemBeanName(MetaDocument doc){
+			return doc.getName()+"ListItemBean";
+		}
+		
+		public static String getDialogBeanImport(MetaDialog dialog, MetaDocument doc){
+			return getPackage(GeneratorDataRegistry.getInstance().getContext(), doc)+"."+getDialogBeanName(dialog, doc);
+		}
+		
+		public static String getListItemBeanImport(Context context, MetaDocument doc){
+			return getPackage(context, doc)+"."+getListItemBeanName(doc);
+		}
+		
+		public static String getContainerEntryFormImport(MetaDocument doc, MetaContainerProperty p){
+			return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerEntryFormName(p);
+		}
+		
+		public static String getContainerEntryFormName(MetaContainerProperty p){
+			return StringUtils.capitalize(p.getName())+p.getContainerEntryName()+"Form";
+		}
+		
+		public static String getContainerQuickAddFormImport(MetaDocument doc, MetaContainerProperty p){
+			return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerQuickAddFormName(p);
+		}
+		
+		public static String getContainerQuickAddFormName(MetaContainerProperty p){
+			return StringUtils.capitalize(p.getName())+"QuickAddForm";
+		}
+		
+		public static String getFormBeanImport(MetaForm form){
+			return getPackage()+"."+getFormBeanName(form);
+		}
+		
+		@Deprecated
+		public static String getPackage(){
+		    return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".bean";
+		}
+		
+		public static String getFormBeanName(MetaForm form){
+		    return StringUtils.capitalize(form.getId())+"AutoForm";
+		}
 }

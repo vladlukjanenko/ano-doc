@@ -338,6 +338,10 @@ public class AbstractGenerator{
 		appendCommentLine(getCurrentJobContent(), commentline);
 	}
 	
+	protected void appendGenerationPoint(Class<?> clazz, String point){
+		appendGenerationPoint(clazz + "." + point);
+	}
+	
 	protected void appendGenerationPoint(String point){
 		appendCommentLine("Generator point: " + point);
 		emptyline();

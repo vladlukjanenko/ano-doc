@@ -220,7 +220,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		if (containsComparable) {
 			clazz.addImport("net.anotheria.util.sorter.Sorter");
 			clazz.addImport("net.anotheria.util.sorter.QuickSorter");
-			clazz.addImport(ModuleBeanGenerator.getListItemBeanSortTypeImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+			clazz.addImport(ModuleMafBeanGenerator.getListItemBeanSortTypeImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 
 			appendStatement("private Sorter<"+doc.getName()+ "> sorter");
 			emptyline();
@@ -281,7 +281,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		//check if its sortable.
 		if (containsComparable) {
-			String sortType = ModuleBeanGenerator.getListItemBeanSortTypeName(doc);
+			String sortType = ModuleMafBeanGenerator.getListItemBeanSortTypeName(doc);
 			appendStatement("int sortMethod = " + sortType + ".SORT_BY_DEFAULT");
 			appendStatement("boolean sortOrder = " + sortType + ".ASC");
 			appendStatement("boolean sortParamSet = false");
@@ -548,7 +548,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		
 	    clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-	    clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
+	    clazz.addImport(ModuleMafBeanGenerator.getDialogBeanImport(dialog, doc));
         if (cMSStorageType){
             clazz.addImport("net.anotheria.asg.data.LockableObject");
             clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
@@ -628,7 +628,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	
 	private void generateExecuteMethod(GeneratedClass clazz, MetaDialog dialog, MetaDocument document){
 		String formBeanName = ModuleMafBeanGenerator.getDialogBeanName(dialog, document);
-		clazz.addImport("net.anotheria.anosite.gen.aswebdata.bean."+formBeanName);
 		clazz.addImport("net.anotheria.maf.bean.annotations.Form");
 //		clazz.addImport(clazz);
 		appendString("@Override");
@@ -741,7 +740,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    clazz.addImport("net.anotheria.anoplass.api.util.paging.PagingControl");
 	    addStandardActionImports(clazz);
 	    clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-	    clazz.addImport(ModuleBeanGenerator.getListItemBeanImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+	    clazz.addImport(ModuleMafBeanGenerator.getListItemBeanImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 		
 		clazz.addImport("net.anotheria.util.slicer.Slicer");
 		clazz.addImport("net.anotheria.util.slicer.Slice");
@@ -790,11 +789,11 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    boolean containsDecorators = neededDecorators.size() >0;
 	    
 		if (containsComparable){
-			clazz.addImport(ModuleBeanGenerator.getListItemBeanSortTypeImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+			clazz.addImport(ModuleMafBeanGenerator.getListItemBeanSortTypeImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 			clazz.addImport("net.anotheria.util.sorter.Sorter");
 			clazz.addImport("net.anotheria.util.sorter.QuickSorter");
 
-			appendStatement("private Sorter<", ModuleBeanGenerator.getListItemBeanName(doc), "> sorter");
+			appendStatement("private Sorter<", ModuleMafBeanGenerator.getListItemBeanName(doc), "> sorter");
 			emptyline();
 		}
 		
@@ -820,7 +819,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		increaseIdent();
 		appendStatement("super()");
 		if (containsComparable)
-			appendStatement("sorter = new QuickSorter<"+ModuleBeanGenerator.getListItemBeanName(doc)+">()");
+			appendStatement("sorter = new QuickSorter<"+ModuleMafBeanGenerator.getListItemBeanName(doc)+">()");
 		if (containsDecorators){
 			appendString( "try{ ");
 			increaseIdent();
@@ -877,7 +876,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    
 	    //check if its sortable.
 		if (containsComparable){
-			String sortType = ModuleBeanGenerator.getListItemBeanSortTypeName(doc);
+			String sortType = ModuleMafBeanGenerator.getListItemBeanSortTypeName(doc);
 			appendStatement("int sortMethod = "+sortType+".SORT_BY_DEFAULT");
 			appendStatement("boolean sortOrder = "+sortType+".ASC");
 			appendStatement("boolean sortParamSet = false");
@@ -900,17 +899,17 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			decreaseIdent();
 			appendString( "}catch(Exception ignored){}");
 			emptyline();
-			appendStatement(ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+" sortType = null");
+			appendStatement(ModuleMafBeanGenerator.getListItemBeanSortTypeName(doc)+" sortType = null");
 			appendString( "if (sortParamSet){");
 			increaseIdent();
-			appendStatement("sortType = new "+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+"(sortMethod, sortOrder)");
+			appendStatement("sortType = new "+ModuleMafBeanGenerator.getListItemBeanSortTypeName(doc)+"(sortMethod, sortOrder)");
 			appendStatement("addBeanToSession(req, SA_SORT_TYPE, sortType)");
 			decreaseIdent();
 			appendString( "}else{");
 			increaseIdent();
-			appendStatement("sortType = ("+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+")getBeanFromSession(req, SA_SORT_TYPE)");
+			appendStatement("sortType = ("+ModuleMafBeanGenerator.getListItemBeanSortTypeName(doc)+")getBeanFromSession(req, SA_SORT_TYPE)");
 			appendString( "if (sortType==null)");
-			appendIncreasedStatement("sortType = new "+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+"(sortMethod, sortOrder)");
+			appendIncreasedStatement("sortType = new "+ModuleMafBeanGenerator.getListItemBeanSortTypeName(doc)+"(sortMethod, sortOrder)");
 		    append(closeBlock());
 			appendStatement("req.setAttribute("+quote("currentSortCode")+", sortType.getMethodAndOrderCode())");
 			emptyline();
@@ -938,14 +937,14 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		    appendStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
 	    }
 
-		appendStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
+		appendStatement("List<"+ModuleMafBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleMafBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
 		appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : "+listName+"){");
 		increaseIdent();
 		//autoUnlocking!
 		if (StorageType.CMS.equals(doc.getParentModule().getStorageType())) {
 			appendStatement("check" + doc.getMultiple() + "(" + doc.getVariableName() + ", req)");
 		}
-		appendStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
+		appendStatement(ModuleMafBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleMafBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
 		appendStatement("beans.add(bean)");
 		append(closeBlock());
 	    emptyline();
@@ -964,7 +963,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    appendString( "try{");
 	    appendIncreasedStatement("itemsOnPage = Integer.parseInt(req.getParameter("+quote("itemsOnPage")+"))");
 	    appendString( "}catch(Exception ignored){}");
-	    appendStatement("Slice<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> slice = Slicer.slice(new Segment(pageNumber, itemsOnPage), beans)");
+	    appendStatement("Slice<"+ModuleMafBeanGenerator.getListItemBeanName(doc)+"> slice = Slicer.slice(new Segment(pageNumber, itemsOnPage), beans)");
 	    appendStatement("beans = slice.getSliceData()");
 	    emptyline();
 	    
@@ -1000,9 +999,9 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    
 	    
 	    // BEAN creation function
-	    appendString( "protected "+ModuleBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+") {");
+	    appendString( "protected "+ModuleMafBeanGenerator.getListItemBeanName(doc)+" "+getMakeBeanFunctionName(ModuleMafBeanGenerator.getListItemBeanName(doc))+"("+doc.getName()+" "+doc.getVariableName()+") {");
 	    increaseIdent();
-	    appendStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = new "+ModuleBeanGenerator.getListItemBeanName(doc)+"()");
+	    appendStatement(ModuleMafBeanGenerator.getListItemBeanName(doc)+" bean = new "+ModuleMafBeanGenerator.getListItemBeanName(doc)+"()");
 	    //set the properties.
 	    //this is a hack...
 	    appendStatement("bean.setPlainId("+doc.getVariableName()+".getId())");
@@ -1285,7 +1284,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-		clazz.addImport(ModuleBeanGenerator.getListItemBeanImport(GeneratorDataRegistry.getInstance().getContext(), doc));
+		clazz.addImport(ModuleMafBeanGenerator.getListItemBeanImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 		
 		clazz.setName(getExecuteQueryActionName(section));
 		clazz.setParent(getShowActionName(section));
@@ -1304,10 +1303,10 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"ByProperty(property, criteria)");
 		//appendStatement("System.out.println(\"result: \"+"+listName+")");
 
-		appendStatement("List<"+ModuleBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
+		appendStatement("List<"+ModuleMafBeanGenerator.getListItemBeanName(doc)+"> beans = new ArrayList<"+ModuleMafBeanGenerator.getListItemBeanName(doc)+">("+listName+".size())");
 		appendString("for (int i=0; i<"+listName+".size(); i++){");
 		increaseIdent();
-		appendStatement("beans.add("+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"(("+doc.getName()+")"+listName+".get(i)))");
+		appendStatement("beans.add("+getMakeBeanFunctionName(ModuleMafBeanGenerator.getListItemBeanName(doc))+"(("+doc.getName()+")"+listName+".get(i)))");
 		append(closeBlock());
 		emptyline();
 		appendStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
@@ -1401,7 +1400,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
 		Context context = GeneratorDataRegistry.getInstance().getContext();
-		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
+		clazz.addImport(ModuleMafBeanGenerator.getDialogBeanImport(dialog, doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(context, doc));
 	    
@@ -1432,6 +1431,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	 * @param methodName
 	 */
 	private void generateUpdateActionMethod(MetaModuleSection section, String methodName){
+		appendGenerationPoint(getClass(), "generateUpdateActionMethod");
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc);
@@ -1439,10 +1439,10 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendString( getExecuteDeclaration(methodName));
 		increaseIdent();
 	
-		appendStatement(ModuleBeanGenerator.getDialogBeanName(dialog, doc)+" form = ("+ModuleBeanGenerator.getDialogBeanName(dialog, doc)+") af");
+		appendStatement(ModuleMafBeanGenerator.getDialogBeanName(dialog, doc)+" form = ("+ModuleMafBeanGenerator.getDialogBeanName(dialog, doc)+") af");
 		//check if we have a form submission at all.
-		appendString( "if (!form.isFormSubmittedFlag())");
-		appendIncreasedStatement("throw new RuntimeException(\"Request broken!\")");
+//		appendString( "if (!form.isFormSubmittedFlag())");
+//		appendIncreasedStatement("throw new RuntimeException(\"Request broken!\")");
 		//if update, then first get the target object.
 		appendStatement("boolean create = false");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = null");
@@ -1680,7 +1680,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
-		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
+		clazz.addImport(ModuleMafBeanGenerator.getDialogBeanImport(dialog, doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
 		if (doc.isMultilingual())
@@ -1759,7 +1759,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		increaseIdent();
 	
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
-		appendStatement(ModuleBeanGenerator.getDialogBeanName(dialog, doc), " form = new ", ModuleBeanGenerator.getDialogBeanName(dialog, doc), "() ");	
+		appendStatement(ModuleMafBeanGenerator.getDialogBeanName(dialog, doc), " form = new ", ModuleMafBeanGenerator.getDialogBeanName(dialog, doc), "() ");	
 
 		appendStatement(doc.getName()," ",doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
         final boolean isCMS = StorageType.CMS.equals(doc.getParentModule().getStorageType());
@@ -1793,7 +1793,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		}
 		
 		if (doc.isMultilingual()){
-			MetaProperty p = doc.getField(ModuleBeanGenerator.FIELD_ML_DISABLED);
+			MetaProperty p = doc.getField(ModuleMafBeanGenerator.FIELD_ML_DISABLED);
 			String propertyCopy = "form."+p.toBeanSetter()+"(((MultilingualObject)"+doc.getVariableName()+").isMultilingualDisabledInstance())";
 			appendStatement(propertyCopy);
 		}
@@ -2061,7 +2061,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    
 		//write imports...
 		addStandardActionImports(clazz);
-		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
+		clazz.addImport(ModuleMafBeanGenerator.getDialogBeanImport(dialog, doc));
 	    
 		//check if we have to import list.
 		for (MetaViewElement element : elements) {
@@ -2100,7 +2100,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendString( getExecuteDeclaration());
 		increaseIdent();
 	
-		appendStatement(ModuleBeanGenerator.getDialogBeanName(dialog, doc)+" form = new "+ModuleBeanGenerator.getDialogBeanName(dialog, doc)+"() ");	
+		appendStatement(ModuleMafBeanGenerator.getDialogBeanName(dialog, doc)+" form = new "+ModuleMafBeanGenerator.getDialogBeanName(dialog, doc)+"() ");	
 		appendStatement("form.setId("+quote("")+")");
 		
 		Set<String> linkTargets = new HashSet<String>();
@@ -2171,6 +2171,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		MetaDocument doc = section.getDocument();
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint(ModuleMafActionsGenerator.class + ".generateBaseAction");
 
 	    clazz.setPackageName(getPackage(section.getModule()));
 	    clazz.setAbstractClass(true);
@@ -2178,7 +2179,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		boolean isCMS = StorageType.CMS.equals(section.getModule().getStorageType());
 
 	    emptyline();
-	    clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action."+BaseViewActionGenerator.getViewActionName(view));
+	    clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action."+BaseViewMafActionGenerator.getViewActionName(view));
 		if (isCMS) {
 			clazz.addImport("javax.servlet.http.HttpServletRequest");
 			clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
@@ -2187,10 +2188,9 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			clazz.addImport("net.anotheria.asg.util.locking.exeption.LockingException");
 			clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
 			clazz.addImport("org.apache.log4j.Logger");
-			clazz.addImport("net.anotheria.maf.bean.FormBean");
-			clazz.addImport("net.anotheria.anosite.gen.shared.action.BaseContentMafAction");
 			
 		}
+		clazz.addImport("net.anotheria.maf.bean.FormBean");
 		clazz.setGeneric("T extends FormBean");
 		clazz.setName(getBaseActionName(section));
 	    clazz.setParent(BaseViewMafActionGenerator.getViewActionName(view), "T");
@@ -2429,7 +2429,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
+		clazz.addImport(ModuleMafBeanGenerator.getContainerEntryFormImport(doc, containerProperty));
 //        if(StorageType.CMS.equals(section.getModule().getStorageType())){
 //            clazz.addImport("net.anotheria.asg.data.LockableObject");
 //            clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
@@ -2438,7 +2438,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			MetaProperty containedProperty = ((MetaListProperty)containerProperty).getContainedProperty();
 			if(containedProperty.isLinked()){
 				MetaListProperty list = ((MetaListProperty)containerProperty);
-				clazz.addImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, containerProperty));
+				clazz.addImport(ModuleMafBeanGenerator.getContainerQuickAddFormImport(doc, containerProperty));
 	
 				MetaLink link = (MetaLink)list.getContainedProperty();
 				
@@ -2535,7 +2535,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
+		clazz.addImport(ModuleMafBeanGenerator.getContainerEntryFormImport(doc, list));
 		
 		clazz.setName(getContainerAddEntryActionName(doc, list));
 		clazz.setParent(getContainerShowActionName(doc, list));	
@@ -2549,7 +2549,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		MetaDocument doc = section.getDocument();
 		appendString( getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(list)+" form = ("+ModuleBeanGenerator.getContainerEntryFormName(list)+") af");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = ("+ModuleMafBeanGenerator.getContainerEntryFormName(list)+") af");
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
@@ -2590,7 +2590,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.setPackageName(getPackage(section.getModule()));
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-		clazz.addImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
+		clazz.addImport(ModuleMafBeanGenerator.getContainerQuickAddFormImport(doc, list));
 		clazz.addImport("net.anotheria.util.StringUtils");
 		
 		clazz.setName(getContainerQuickAddActionName(doc, list));
@@ -2608,7 +2608,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement(ModuleBeanGenerator.getContainerQuickAddFormName(list)+" form = ("+ModuleBeanGenerator.getContainerQuickAddFormName(list)+") af");
+		appendStatement(ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+" form = ("+ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+") af");
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
@@ -2661,7 +2661,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		//write imports...
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
+		clazz.addImport(ModuleMafBeanGenerator.getContainerEntryFormImport(doc, table));
          if(StorageType.CMS.equals(section.getModule().getStorageType())){
             clazz.addImport("net.anotheria.asg.data.LockableObject");
             clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
@@ -2673,7 +2673,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		startClassBody();
 		appendString(getExecuteDeclaration());
 		increaseIdent();
-		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" form = ("+ModuleBeanGenerator.getContainerEntryFormName(table)+") af");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(table)+" form = ("+ModuleMafBeanGenerator.getContainerEntryFormName(table)+") af");
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
@@ -2907,9 +2907,9 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.addImport("java.util.ArrayList");
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, list));
+		clazz.addImport(ModuleMafBeanGenerator.getContainerEntryFormImport(doc, list));
 		if (list.getContainedProperty().isLinked()){
-			clazz.addImport(ModuleBeanGenerator.getContainerQuickAddFormImport(doc, list));
+			clazz.addImport(ModuleMafBeanGenerator.getContainerQuickAddFormImport(doc, list));
 			MetaLink link = (MetaLink)list.getContainedProperty();
 			
 			String tDocName = link.getTargetDocumentName(); 
@@ -2946,14 +2946,14 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		}
 		emptyline();
 		
-		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(list)+"() ");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(list)+"() ");
 		appendStatement("form.setPosition(-1)"); //hmm?
 		appendStatement("form.setOwnerId("+doc.getVariableName()+".getId())");	
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerEntryFormName(doc, list))+", form)");
 		emptyline();
 		
 		if (list.getContainedProperty().isLinked()){
-			appendStatement(ModuleBeanGenerator.getContainerQuickAddFormName(list)+" quickAddForm = new "+ModuleBeanGenerator.getContainerQuickAddFormName(list)+"() ");
+			appendStatement(ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+" quickAddForm = new "+ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+"() ");
 			appendStatement("quickAddForm.setOwnerId("+doc.getVariableName()+".getId())");	
 			appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerQuickAddFormName(doc, list))+", quickAddForm)");
 			emptyline();
@@ -3015,14 +3015,14 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		
 		
 		appendStatement("int size = "+doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName(list)+"()");
-		appendStatement("List<"+ModuleBeanGenerator.getContainerEntryFormName(list)+"> beans = new ArrayList<"+ModuleBeanGenerator.getContainerEntryFormName(list)+">(size)");
+		appendStatement("List<"+ModuleMafBeanGenerator.getContainerEntryFormName(list)+"> beans = new ArrayList<"+ModuleMafBeanGenerator.getContainerEntryFormName(list)+">(size)");
 		//appendStatement("List elements = "+doc.getVariableName()+".get"+list.getAccesserName()+"()");
 		
 		
 		appendString( "for (int i=0; i<size; i++){");
 		increaseIdent();
 		appendStatement(list.getContainedProperty().toJavaType() + " value = "+doc.getVariableName()+"."+DataFacadeGenerator.getListElementGetterName(list)+"(i)");
-		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(list)+" bean = new "+ModuleBeanGenerator.getContainerEntryFormName(list)+"()");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" bean = new "+ModuleMafBeanGenerator.getContainerEntryFormName(list)+"()");
 		appendStatement("bean.setOwnerId("+doc.getVariableName()+".getId())");
 		appendStatement("bean.setPosition(i)");
 		appendStatement("bean."+list.getContainedProperty().toSetter()+"(value)");
@@ -3067,7 +3067,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.addImport("java.util.ArrayList");
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-		clazz.addImport(ModuleBeanGenerator.getContainerEntryFormImport(doc, table));
+		clazz.addImport(ModuleMafBeanGenerator.getContainerEntryFormImport(doc, table));
 
 		clazz.setName(getContainerShowActionName(doc, table));
 		clazz.setParent(getBaseActionName(section));
@@ -3083,7 +3083,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		}
 		emptyline();
 		
-		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(table)+"() ");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(table)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(table)+"() ");
 		appendStatement("form.setPosition(\"-1\")");
 		appendStatement("form.setOwnerId("+doc.getVariableName()+".getId())");	
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerEntryFormName(doc, table))+", form)");
@@ -3095,7 +3095,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendString("for (int i=0; i<rows.size(); i++){");
 		increaseIdent();
 		appendStatement("List row = (List) rows.get(i)");
-		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(table)+" bean = new "+ModuleBeanGenerator.getContainerEntryFormName(table)+"()");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(table)+" bean = new "+ModuleMafBeanGenerator.getContainerEntryFormName(table)+"()");
 		appendStatement("bean.setOwnerId("+doc.getVariableName()+".getId())");
 		appendStatement("bean.setPosition(\"\"+i)");
 		List<MetaProperty> columns = table.getColumns();
@@ -3138,7 +3138,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		clazz.setPackageName(getPackage());
 		addStandardActionImports(clazz);
-		clazz.addImport(ModuleBeanGenerator.getFormBeanImport(form));
+		clazz.addImport(ModuleMafBeanGenerator.getFormBeanImport(form));
 		clazz.addImport("net.anotheria.communication.data.HtmlMailMessage");
 		clazz.addImport("net.anotheria.communication.service.IMessagingService");
 		clazz.addImport("net.anotheria.communication.service.MessagingServiceFactory");
@@ -3162,7 +3162,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		increaseIdent();
 	
 
-		appendStatement(ModuleBeanGenerator.getFormBeanName(form)+" form = ("+ModuleBeanGenerator.getFormBeanName(form)+") af");	
+		appendStatement(ModuleMafBeanGenerator.getFormBeanName(form)+" form = ("+ModuleMafBeanGenerator.getFormBeanName(form)+") af");	
 		//create message.
 		appendString("//create message");
 		appendStatement("String message = "+quote(""));
