@@ -8,10 +8,9 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
@@ -24,18 +23,25 @@ import net.anotheria.util.StringUtils;
 public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	
 	private static enum SectionAction{
-		SHOW("Show", false);
+		SHOW("Show", false, true),
+		EDIT("Edit", false, false){
+			@Override public boolean isIgnoreForSection(MetaModuleSection section) {
+				return StorageType.FEDERATION == section.getModule().getStorageType() || section.getDialogs().size() == 0;
+			}
+		};
 		
 		private String name;
-		private boolean multiop;
+		private boolean multiOperation;
+		private boolean multiDocument;
 		
-		private SectionAction(String aName, boolean aMultiop) {
+		private SectionAction(String aName, boolean aMultiOperation, boolean aListDocument) {
 			name = aName;
-			multiop = aMultiop;
+			multiOperation = aMultiOperation;
+			multiDocument = aListDocument;
 		}
 		
 		private String getClassName(MetaModuleSection section){
-			return name + section.getDocument().getMultiple()+"MafAction";
+			return name + section.getDocument().getName(multiDocument)+"MafAction";
 		}
 		
 		private String getMappingName(MetaDocument doc){
@@ -43,7 +49,11 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		private String getViewName(MetaDocument doc){
-			return name+doc.getMultiple();
+			return name+doc.getName(multiDocument) + "Maf";
+		}
+
+		public boolean isIgnoreForSection(MetaModuleSection section){
+			return false;
 		}
 		
 	}
@@ -111,6 +121,8 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 		
 		for(SectionAction action: SectionAction.values()){
+			if(action.isIgnoreForSection(section))
+				continue;
 			String actionName = action.getClassName(section);
 			clazz.addImport(actionsPackage + "." + actionName);
 			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(doc)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(jspPath + action.getViewName(doc)+".jsp") + "))");

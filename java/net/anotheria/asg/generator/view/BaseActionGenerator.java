@@ -44,6 +44,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateBaseAction");
 		
 		clazz.setPackageName(getSharedActionPackageName());
 

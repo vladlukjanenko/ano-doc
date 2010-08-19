@@ -21,7 +21,6 @@ import net.anotheria.util.ExecutionTimer;
 public class ViewGenerator extends AbstractAnoDocGenerator{
 	
 	
-	
 	public void generate(String path, List<MetaView> views){
 		
 		ExecutionTimer timer = new ExecutionTimer("ViewGenerator");
@@ -36,15 +35,23 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		//hack, works only with one view.
 		files.add(new BaseActionGenerator().generate(views));
 		files.add(new BaseMafActionGenerator().generate(views));
+		
 		files.add(new IndexPageActionGenerator().generate(views));
+		
 		files.add(new IndexPageJspGenerator().generate(context));
+		files.add(new IndexPageJspMafGenerator().generate(context));
+		
 		files.add(new SharedJspFooterGenerator().generate(views, context));
+		
+		files.add(new JspMafMenuGenerator().generate(views, context));
 		files.add(new JspMenuGenerator().generate(views, context));
+		
 		files.addAll(new WebXMLGenerator().generate(views, context));
 		// UserSettings
 		files.addAll(new UserSettingsBeansGenerator().generate());
 		files.addAll(new UserSettingsActionsGenerator().generate());		
 		files.add(new UserSettingsJspGenerator().generate());
+		files.add(new UserSettingsJspMafGenerator().generate());
 		
 		timer.stopExecution("common");
 		
@@ -70,13 +77,17 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 			
 			if(view.isCms20())
 				files.addAll(new JspViewCms20Generator().generate(view));
-			else
+			
+			else {
 				files.addAll(new JspViewGenerator().generate(view));
+				files.addAll(new JspMafViewGenerator().generate(view));
+			}
 			
 			timer.stopExecution("v-"+view.getName()+"-Jsp");
 			
 			timer.startExecution("v-"+view.getName()+"-JspQueries");
 			files.addAll(new JspQueriesGenerator().generate(view));
+			files.addAll(new JspMafQueriesGenerator().generate(view));
 			timer.stopExecution("v-"+view.getName()+"-JspQueries");
 			
 			timer.startExecution("v-"+view.getName()+"-StrutsConfig");

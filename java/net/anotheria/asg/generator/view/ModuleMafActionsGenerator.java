@@ -531,7 +531,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	private GeneratedClass generateMultiOpDialogAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		appendGenerationPoint(ModuleMafActionsGenerator.class + ".generateMultiOpDialogAction");
+		appendGenerationPoint("generateMultiOpDialogAction");
 		
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
@@ -724,6 +724,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	private GeneratedClass generateShowAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateShowAction");
 		
 	    MetaDocument doc = section.getDocument();
 		List<MetaViewElement> elements = section.getElements();
@@ -1431,7 +1432,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	 * @param methodName
 	 */
 	private void generateUpdateActionMethod(MetaModuleSection section, String methodName){
-		appendGenerationPoint(getClass(), "generateUpdateActionMethod");
+		appendGenerationPoint("generateUpdateActionMethod");
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc);
@@ -1673,6 +1674,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	private GeneratedClass generateEditAction(MetaModuleSection section){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateEditAction");
 		
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
@@ -1878,7 +1880,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendStatement("addBeanToRequest(req, "+quote("objectId")+" , "+doc.getVariableName()+".getId())");
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+doc.getVariableName()+".getObjectInfo().toString())");
-		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Update")+")");
+		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+", "+quote("Apply")+")");
 	    // User settings
 		appendCommentLine(" Add user settings beans");
 	    appendStatement("addUserSettingsBeansToRequest(req)");
@@ -2149,7 +2151,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		emptyline();
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
-		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Create")+")");
+		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
 		
 	    // User settings
@@ -2171,7 +2173,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		MetaDocument doc = section.getDocument();
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		appendGenerationPoint(ModuleMafActionsGenerator.class + ".generateBaseAction");
+		appendGenerationPoint("generateBaseAction");
 
 	    clazz.setPackageName(getPackage(section.getModule()));
 	    clazz.setAbstractClass(true);
@@ -2417,7 +2419,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
-		appendGenerationPoint(ModuleMafActionsGenerator.class + ".generateContainerMultiOpAction");
+		appendGenerationPoint("generateContainerMultiOpAction");
 		
 		MetaDocument doc = section.getDocument();
 
@@ -3329,7 +3331,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    }
 	    
 	    public void generateEnumerationPropertyHandling(MetaEnumerationProperty mep, boolean editMode){
-	        EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
+	    	appendGenerationPoint("generateEnumerationPropertyHandling");
+	    	EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
 			emptyline();
 			String arrName = type.getName()+"_values";
 		    String listName = arrName+"List";
