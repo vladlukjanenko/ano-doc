@@ -251,11 +251,11 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getEditPageName(MetaDocument doc){
-		return "Edit"+doc.getName()+"Dialog"+"Maf";
+		return "Edit"+doc.getName()+"Maf";
 	}
 	
 	public static String getDialogName(MetaDialog dialog, MetaDocument doc){
-		return dialog.getName()+doc.getName()+"Dialog"+"Maf";
+		return dialog.getName()+doc.getName()+"Maf";
 	}
 	
 	public static String getLinksToMePageName(MetaDocument doc){

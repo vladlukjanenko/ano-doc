@@ -5,6 +5,7 @@ import java.util.List;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
@@ -86,11 +87,12 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 							appendString("<div class=\"clear\"><!-- --></div>");
 							appendString("<ul>");
 									increaseIdent();
-									appendString("<logic:iterate name=\"AnyFilterMissingTranslation\" id=\"triggerer\" type=\"net.anotheria.asg.util.filter.FilterTrigger\">");
-									appendString("<li>");
-									appendString("<input type=\"checkbox\" id=\"lang_en\"/><label for=\"lang_en\">EN</label>");
-									appendString("</li>");
-									appendString("</logic:iterate>");
+									for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+										appendString("<option value=\""+sl+"\">"+sl+"</option>");
+										appendString("<li>");
+										appendString("<input type=\"checkbox\" id=\"lang_en\"/><label for=\"lang_en\">"+sl+"</label>");
+										appendString("</li>");
+									}
 								decreaseIdent();
 								appendString("</ul>");
 								appendString("<a href=\"#\" class=\"button\"><span>Apply</span></a>");

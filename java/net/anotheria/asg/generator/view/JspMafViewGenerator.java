@@ -1,15 +1,45 @@
 package net.anotheria.asg.generator.view;
 
-import net.anotheria.asg.data.LockableObject;
-import net.anotheria.asg.generator.*;
-import net.anotheria.asg.generator.forms.meta.*;
-import net.anotheria.asg.generator.meta.*;
-import net.anotheria.asg.generator.util.DirectLink;
-import net.anotheria.asg.generator.view.meta.*;
-import net.anotheria.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import sun.org.mozilla.javascript.internal.Context;
+
+import net.anotheria.asg.data.LockableObject;
+import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedJSPFile;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.IGenerateable;
+import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.forms.meta.MetaForm;
+import net.anotheria.asg.generator.forms.meta.MetaFormField;
+import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
+import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
+import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
+import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
+import net.anotheria.asg.generator.meta.MetaContainerProperty;
+import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
+import net.anotheria.asg.generator.meta.MetaLink;
+import net.anotheria.asg.generator.meta.MetaListProperty;
+import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.util.DirectLink;
+import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
+import net.anotheria.asg.generator.view.meta.MetaDialog;
+import net.anotheria.asg.generator.view.meta.MetaEmptyElement;
+import net.anotheria.asg.generator.view.meta.MetaFieldElement;
+import net.anotheria.asg.generator.view.meta.MetaFilter;
+import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
+import net.anotheria.asg.generator.view.meta.MetaListElement;
+import net.anotheria.asg.generator.view.meta.MetaModuleSection;
+import net.anotheria.asg.generator.view.meta.MetaSection;
+import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.asg.generator.view.meta.MetaViewElement;
+import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.util.StringUtils;
 
 /**
  * Generates the jsps for the edit view.
@@ -540,7 +570,10 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		decreaseIdent();
 		appendString("</head>");
 		appendString("<body>");
+		
+		
 		appendString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
+		
 		
 		appendString("<div class=\"right\">");
 		appendString("<div class=\"r_w\">");
@@ -555,69 +588,154 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					increaseIdent();
 						appendString("<li class=\"first\">Scroll to:&nbsp;</li>");
 						List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument()); 
+						
 						for (int i=0; i<elements.size(); i++){
 							MetaViewElement element = elements.get(i);
+							if(element instanceof MultilingualFieldElement) {
+							appendString("<li>");
+							appendString("<a href=\"#"+element.getName()+"\">"+element.getName()+"</a><a href=\"#\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
+							appendString("<div class=\"pop_up\">");
+							increaseIdent();
+								appendString("<div class=\"top\">");
+								increaseIdent();
+									appendString("<div><!-- --></div>");
+								decreaseIdent();
+								appendString("</div>");
+								appendString("<div class=\"in_l\">");
+								increaseIdent();
+									appendString("<div class=\"in_r\">");
+									increaseIdent();
+										appendString("<div class=\"in_w\">");
+										increaseIdent();
+											appendString("<ul>");
+												while (elements.get(i) instanceof MultilingualFieldElement){
+												String lang = getElementLanguage(element);	
+												appendString("<li><a href=\"#"+section.getDocument().getField(element.getName()).getName(lang)+"\">"+section.getDocument().getField(element.getName()).getName(lang)+"</a></li>");
+												i++;
+												element = elements.get(i);
+												}											
+												appendString("</ul>");
+											decreaseIdent();
+											appendString("</div>");
+										decreaseIdent();
+										appendString("</div>");
+									decreaseIdent();
+									appendString("</div>");
+									appendString("<div class=\"bot\">");
+									appendString("<div><!-- --></div>");
+								decreaseIdent();
+								appendString("</div>");
+							decreaseIdent();
+							appendString("</div>");
+							
+							
+							}
+							if(element instanceof MetaFieldElement){
 							appendString("<li><a href=\"#"+element.getName()+"\">"+element.getName()+"</a></li>");
+							}
 						}
 					decreaseIdent();
-					appendString("/<ul>");
-					appendString("<div class="clear"><!-- --></div>");
-					
+					appendString("</ul>");
+					appendString("<div class=\"clear\"><!-- --></div>");
+				decreaseIdent();
+				// SAVE AND CLOSE BUTTONS SHOULD BE HERE
+				appendString("</div>");
+				
+				
+				appendString("<div class=\"right_p\"><a href=\"#\"><img src=\"../img/settings.gif\" alt=\"\"/></a>");
+				increaseIdent();
+					appendString("<div class=\"pop_up\">");
+					increaseIdent();
+						appendString("<div class=\"top\">");
+							increaseIdent();
+							appendString("<div><!-- --></div>");
+						decreaseIdent();
+						appendString("</div>");
+						appendString("<div class=\"in_l\">");
+							increaseIdent();
+							appendString("<div class=\"in_r\">");
+								increaseIdent();
+								appendString("<div class=\"in_w\">");
+									increaseIdent();
+									// *** END MULILINGUAL COPY *** //
+									int colspan=2;
+									if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()) {
+										addMultilanguageOperations(section, colspan);
+									}
+									// *** END MULILINGUAL COPY *** //
+									appendString("</div>");
+								decreaseIdent();
+								appendString("</div>");
+							decreaseIdent();
+							appendString("<div class=\"bot\">");
+							appendIncreasedString("<div><!-- --></div>");
+							appendString("</div>");
+						decreaseIdent();
+						appendString("</div>");
+					decreaseIdent();
+					appendString("</div>");
+				decreaseIdent();
+				appendString("</div>");
+				
+				
+				appendString("<div class=\"main_area\">");
+				appendString("<div class=\"c_l\"><!-- --></div>");
+				appendString("<div class=\"c_r\"><!-- --></div>");
+				appendString("<div class=\"c_b_l\"><!-- --></div>");
+				appendString("<div class=\"c_b_r\"><!-- --></div>");
+				
+				
+				
+				
+				
+				
 		
-		
-		
-		increaseIdent();		
-		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
-		increaseIdent();
-		appendString("<tr>");
-		appendIncreasedString("<td class=\"menuTitleSelected\">");
-		appendIncreasedString(dialog.getTitle()+"</td>");
-		appendString("</tr>");
-		decreaseIdent();
-		appendString("</table>");
-		
-		int colspan=2;
-		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
-		increaseIdent();
-		appendString("<tr>");
-		increaseIdent();
-		appendString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
-		decreaseIdent(); 
-		appendString("</tr>");
-		
-		// Language filtering settings
-		appendString("<tr>");
-		appendString("<td align=\""+("center")+"\">");
-		increaseIdent();
-		generateLanguageFilteringSettingsViewComponentForDialog(dialog,section);
-		decreaseIdent();
-		appendString("</td>");
-		appendString("</tr>");
-
-		// *** END MULILINGUAL COPY *** //
-		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()) {
-			addMultilanguageOperations(section, colspan);
-		}
-		// *** END MULILINGUAL COPY *** //
-		appendString("</table>");
-		appendString("<html:form action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		 
+		appendString("<form name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) +" method=\"post\" action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		 
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED)+" value="+quote("true")+">");
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("nextAction")+" value="+quote("close")+">");
 
-        if (StorageType.CMS.equals(((MetaModuleSection) currentSection).getDocument().getParentModule().getStorageType())) {
-            appendString("<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">");
-            appendString("<div> Current Document is Locked by <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/></b>");
-            appendString("<div> Locking time :  <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/></b>");
-            appendString("</logic:equal>");
-        }
-
+		appendString("<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\" border=\"0\">");
+		appendString("<tbody>");
+			increaseIdent();
+			appendString("<!-- i dont know, what is it???!!! -->");
+			appendString("<bean:write name=\"description.null\" ignore=\"true\"/>");
+		decreaseIdent();
+		appendString("<tr>");
+			increaseIdent();
+			appendString("<td align=\"left\">");
+			if (StorageType.CMS.equals(((MetaModuleSection) currentSection).getDocument().getParentModule().getStorageType())) {
+				//appendString("<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">");
+				
+				//String path = StrutsConfigGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), StrutsConfigGenerator.ACTION_UNLOCK);
+		       
+				//MetaDocument doc = section.getDocument();
+				//String entryName = doc.getName().toLowerCase();
+				
+				//path+= "?pId=<bean:write name=" + quote(entryName) + " property=\"plainId\"/>";
+		       // path+="&nextAction=showList";
+				//String alt = "Locked by: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+
+				//"/>, time: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
+				
+				//appendString("<div class=\"locked_by\"><a href="+quote("<ano:tslink>"+path+"</ano:tslink>\" class=\"unlock\"")+ 
+				//"onClick= "+quote("return confirm('"+alt+" Really unlock - Locked  "+((MetaModuleSection)currentSection).getDocument().getName()+
+				//		" with id : <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getUnLockImage(alt)+"</a>Current Document is Locked by <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/></b>");
+				//appendString("Locking time :  <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/></b>");
+				//appendString("</logic:equal>");
+			}
+			appendString("<div class=\"clear\"><!-- --></div>");
+			//appendString("</logic:equal>");
+			//UNLOCK HERE!!!!!
+			appendString("</td>");
+		decreaseIdent();
+		appendString("</tr>");
+			
         //*** CMS2.0 START ***
+		
 		List<MetaViewElement> richTextElementsRegistry = new ArrayList<MetaViewElement>();
 		List<MetaViewElement> linkElementsRegistry = new ArrayList<MetaViewElement>();
 		//*** CMS2.0 FINISH ***
 		
-		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 
@@ -640,12 +758,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 
 			//ALTERNATIVE EDITOR FOR DISABLED MODE
 			if (lang!=null && lang.equals(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage())){
-				
 				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
-
-				appendString("<tr class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
-				increaseIdent();
-				appendString("<td align=\"right\" width=\"35%\">");
+				appendString("<td class=\"lang_hide def\">");
+				appendString("<td align=\"right\"> <a id=\"contentDEF\" name=\"contentDEF\"></a>");
 				increaseIdent();
 				String name = section.getDocument().getField(element.getName()).getName()+"<b>DEF</b>";
 				if (name==null || name.length()==0)
@@ -653,15 +768,11 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				appendString(name);
 				decreaseIdent(); 
 				appendString("</td>");
-				decreaseIdent();
-				
-				appendString("<td align=\"left\" width=\"65%\">&nbsp;");
+				appendString("<td align=\"left\">");
 				append(getElementEditor(section.getDocument(), element));
 				appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
 				appendString("</td>");
-				
 				appendString("</tr>");
-				
 				appendString("</logic:equal>");
 			}//END ALTERNATIVE EDITOR FOR MULTILANG DISABLED FORM
 
@@ -675,23 +786,23 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";						
 			}
 			
-			appendString("<tr " + displayLanguageCheck + " class="+quote(i%2==0 ? "lineLight" : "lineDark")+">");
-			increaseIdent();
-			appendString("<td align=\"right\" width=\"35%\">");
-			increaseIdent();
-			String name = lang == null ? element.getName() : section.getDocument().getField(element.getName()).getName(lang);
-			if (name==null || name.length()==0)
-				name = "&nbsp;";
-			appendString(name);
-			decreaseIdent(); 
-			appendString("</td>");
+			appendString("<tr " + displayLanguageCheck+">");
+				increaseIdent();
+				appendString("<td align=\"right\">");
+					increaseIdent();
+						String name = lang == null ? element.getName() : section.getDocument().getField(element.getName()).getName(lang);
+						if (name==null || name.length()==0)
+							name = "&nbsp;";
+						appendString(name);
+					decreaseIdent(); 
+					appendString("</td>");
+					appendString("<td align=\"left\">");
+						increaseIdent();
+						append(getElementEditor(section.getDocument(), element));
+						appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
+					decreaseIdent();
+					appendString("</td>");
 			decreaseIdent();
-			
-			appendString("<td align=\"left\" width=\"65%\">&nbsp;");
-			append(getElementEditor(section.getDocument(), element));
-			appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
-			appendString("</td>");
-			
 			appendString("</tr>");
 			
 			if (lang!=null)
@@ -699,76 +810,23 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		}
 		
 		decreaseIdent();
+		appendString("</tbody>");
+		decreaseIdent();
 		appendString("</table>");
-		appendString("</html:form>");
-		appendString("<br/>");
+		appendString("</form>");
+		appendString("<div class=\"clear\"><!-- --></div>");
 		
 		//Link to the Links to Me page
 		appendString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
 		String linksToMePagePath = StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_LINKS_TO_ME)+"?pId=<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property=\"id\"/>";
+		appendString("<div class=\"generated\"><span><bean:write name="+quote("objectInfoString")+"/></span>");
 		appendString("<a href="+quote("<ano:tslink>"+linksToMePagePath+"</ano:tslink>")+">Show direct links to  this document</a>");
 		appendString("</logic:present>");
-		
-		//HOTFIX: commentation of direct link to me section START
-		appendString("<%--");
-		appendString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
-		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
-		increaseIdent();
-		appendString("<tr>");
-		increaseIdent();
-		appendString("<td>Direct links to  this document</td>");
-		decreaseIdent();
-		appendString("</tr>");
-		appendString("<logic:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
-		increaseIdent();
-		appendString("<tr>");
-		increaseIdent();
-	
-		String docDescriptionStatement = "Type: <bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentType")+"/>";
-		docDescriptionStatement += ", Id: <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentId")+"/></a>";
-		docDescriptionStatement += "<logic:equal name="+quote("linkToMe")+" property="+quote("descriptionAvailable") +" value="+quote("true")+">, Name: <b> <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentDescription")+"/></a></b></logic:equal>";
-		docDescriptionStatement += ", in <b><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentProperty")+"/></b>.";
-		appendString("<td>"+docDescriptionStatement+"</td>");
-		decreaseIdent();
-		appendString("</tr>");
-		decreaseIdent();
-		appendString("</logic:iterate>");
-		appendString("</table>");
-		
-		appendString("<br/>");
-		appendString("<br/>");
-		appendString("</logic:present>");
-		//HOTFIX: commentation of direct link to me section END
-		appendString("--%>");
-		appendString("<!-- ");
-		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
-		increaseIdent();
-		appendString("<tr>");
-		increaseIdent();
-		appendString("<td>This "+section.getDocument().getName()+" can be used in following documents:</td>");
-		decreaseIdent();
-		appendString("</tr>");
-		
-		List<DirectLink> linkee = GeneratorDataRegistry.getInstance().findLinksToDocument(section.getDocument());
-		for (DirectLink l : linkee){
-			appendString("<tr>");
-			increaseIdent();
-			appendString("<td>");
-			appendString(l.getModule().getName()+"."+l.getDocument().getName()+", property: "+l.getProperty().getName());
-			appendString("</td>");
-			decreaseIdent();
-			appendString("</tr>");
-		}
-		
-		decreaseIdent();
-		appendString("</table>");
-		appendString("-->");
-		
-		//object info
-		appendString("<p align="+quote("right")+"><small>ObjectInfo: <bean:write name="+quote("objectInfoString")+"/></small></p>");
-
-
-		decreaseIdent();
+		appendString("</form>");
+		appendString("<div class=\"clear\"><!-- --></div>");
+		appendString("</div>");
+		appendString("</div>");
+		appendString("</div>");
 		appendString("</body>");
 		decreaseIdent();
 		
@@ -779,7 +837,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("</html:html>");
 		appendString("<!-- / generated by JspMafViewGenerator.generateDialog -->");
 		
-		append(getBaseJSPFooter());
 		
 		return jsp;
 	}
@@ -791,51 +848,59 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	 */
 	private void addMultilanguageOperations(MetaModuleSection section, int colspan) {
 		appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
+		increaseIdent();
 		appendString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
-		appendString("<tr>");
 		increaseIdent();
-		appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG)+"\">");
+		appendString("<form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_COPY_LANG)+"\">");
+		increaseIdent();
 		appendString("<input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>From&nbsp;");
-		appendString("<select name=\"pSrcLang\">");
-		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-			appendString("<option value=\""+sl+"\">"+sl+"</option>");
-		}
-		appendString("</select>");
-
-
-		appendString("To&nbsp;");
-		appendString("<select name=\"pDestLang\">");
-		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-			appendString("<option value=\""+sl+"\">"+sl+"</option>");
-		}
-		appendString("</select>");
-
-		appendString("&nbsp;");
-		appendString("<a href=\"#\" onclick=\"document.CopyLang.submit(); return false\">Copy</a>&nbsp;");
-
-		appendString("</form></td>");
-		decreaseIdent();
-		appendString("</tr>");
-		appendString("<tr>");
+		appendString("<div>");
 		increaseIdent();
-		appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+		appendString("Copy <select name=\"pSrcLang\">");
+		increaseIdent();
+		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+			appendString("<option value=\""+sl+"\">"+sl+"</option>");
+		}
+		decreaseIdent();
+		appendString("</select>");
+
+
+		appendString("to");
+		appendString("<select name=\"pDestLang\">");
+		increaseIdent();
+		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+			appendString("<option value=\""+sl+"\">"+sl+"</option>");
+		}
+		decreaseIdent();
+		appendString("</select>");
+		decreaseIdent();
+		appendString("</div>");
+		
+		appendString("<a href=\"#\" class=\"button\" onclick=\"document.CopyLang.submit(); return false\"><span>Copy</span></a>");
+		decreaseIdent();
+		appendString("</form>");
+		appendString("<form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+		increaseIdent();
 		appendString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
-		appendString("&nbsp;Languages enabled.&nbsp;");
-		appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Disable</a>&nbsp;");
-		appendString("</form></td>");
-		appendString("</tr>");
+		appendString("Languages enabled");
+		appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Disable</a>");
+		decreaseIdent();
+		appendString("</form>");
+		decreaseIdent();
 		appendString("</logic:notEqual>");
+		decreaseIdent();
 		appendString("</logic:equal>");
 		appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
-		appendString("<td align=\"right\" colspan=\""+colspan+"\"><form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
+		increaseIdent();
+		appendString("<form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" method=\"get\" action=\""+StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
 		appendString("<input type=\"hidden\" name=\"value\" value=\"false\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
-		appendString("&nbsp;Languages disabled.&nbsp;");
-		appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Enable</a>&nbsp;");
-		appendString("</form></td>");
-		appendString("</tr>");
+		appendString("Languages disabled");
+		appendString("<a href=\"#\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\">Enable</a>");
+		decreaseIdent();
+		appendString("</form>");
 		appendString("</logic:equal>");
 	}
-
+	
 	private GeneratedJSPFile generateLinksToDocument(MetaModuleSection section, MetaView view){
 
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
@@ -1228,14 +1293,12 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String lang = getElementLanguage(element);
 		String ret ="";
 		
-		ret += "<div class=\"yui-skin-sam\">";
 		if(element.isRich())
 			ret += "<button id="+quote("toggleEditorButton_" + p.getName(lang))+" type=\"button\">Toggle Editor</button><br/>";
-		ret += "<textarea cols=\"80\" rows=\"15\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
+		ret += "<textarea cols=\"\" rows=\"10\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
 		ret += ">";
 		ret += "<bean:write filter=\"false\" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
 		ret += "</textarea>";
-		ret += "</div>";
 		return ret;
 	}
 
