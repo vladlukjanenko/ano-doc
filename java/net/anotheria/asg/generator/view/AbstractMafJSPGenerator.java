@@ -206,7 +206,7 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	}
 	
 	public static String getSearchResultPageName(){
-		return "SearchResult";
+		return "SearchResultMaf";
 	}
 
 	/**
@@ -214,7 +214,7 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getVersionInfoPageName(){
-		return "VersionInfo";
+		return "VersionInfoMaf";
 	}
 
 	/**
@@ -235,7 +235,7 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getExportAsCSVPageName(MetaDocument doc){
-		return "Show"+doc.getMultiple()+"AsCSV";
+		return "Show"+doc.getMultiple()+"AsCSVMaf";
 	}
 
 	/**
@@ -243,7 +243,7 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getExportAsXMLPageName(MetaDocument doc){
-		return "Show"+doc.getMultiple()+"AsXML";
+		return "Show"+doc.getMultiple()+"AsXMLMaf";
 	}
 
 	/**
@@ -259,7 +259,7 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	}
 	
 	public static String getLinksToMePageName(MetaDocument doc){
-		return "LinksTo"+doc.getName();
+		return "LinksToMaf"+doc.getName();
 	}
 
 	public static String getContainerPageName(MetaDocument doc, MetaContainerProperty table){

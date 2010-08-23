@@ -23,37 +23,54 @@ import net.anotheria.util.StringUtils;
 public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	
 	private static enum SectionAction{
-		SHOW("Show", false, true),
-		EDIT("Edit", false, false){
-			@Override public boolean isIgnoreForSection(MetaModuleSection section) {
-				return StorageType.FEDERATION == section.getModule().getStorageType() || section.getDialogs().size() == 0;
-			}
-		};
+		SHOW("Show", "Show", false, true, false),
+		EDIT("Edit", "Edit", false, false, true),
 		
-		private String name;
+		CLOSE("Close", "Show", true, false, true),
+		UPDATE("Update", "Show", true, false, true),
+		DELETE("Delete", "Show", true, false, true),
+		DUPLICATE("Duplicate", "Show", true, false, true),
+		LOCK("Lock", "EditBoxDialog", true, false, true),
+		UNLOCK("UnLock", "EditBoxDialog", true, false, true),
+		COPYLANG("CopyLang", "EditBoxDialog", true, false, true),
+		SWITCHMULTILANG("SwitchMultilang", "EditBoxDialog", true, false, true),
+		VERSIONINFO("Versioninfo", "EditBoxDialog", true, false, true),
+		
+		MEDIALINKSSHOW("MediaLinksAction", "MediaLinks", true, false, true),
+		
+		;
+		
+		private String action;
+		private String view;
 		private boolean multiOperation;
 		private boolean multiDocument;
+		private boolean ignoreFederationSections;
 		
-		private SectionAction(String aName, boolean aMultiOperation, boolean aListDocument) {
-			name = aName;
+		private SectionAction(String anAction, String aView, boolean aMultiOperation, boolean aListDocument, boolean anIgnoreFederationSections) {
+			action = anAction;
+			view = aView;
 			multiOperation = aMultiOperation;
 			multiDocument = aListDocument;
+			ignoreFederationSections = anIgnoreFederationSections;
 		}
 		
 		private String getClassName(MetaModuleSection section){
-			return name + section.getDocument().getName(multiDocument)+"MafAction";
+			if(multiOperation)
+				return ModuleMafActionsGenerator.getMultiOpDialogActionName(section);
+			return action + section.getDocument().getName(multiDocument)+"MafAction";
 		}
 		
+		
 		private String getMappingName(MetaDocument doc){
-			return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName()) + name;
+			return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName()) + action;
 		}
 		
 		private String getViewName(MetaDocument doc){
-			return name+doc.getName(multiDocument) + "Maf";
+			return view+doc.getName(multiDocument) + "Maf";
 		}
 
 		public boolean isIgnoreForSection(MetaModuleSection section){
-			return false;
+			return section.getDialogs().size() == 0 || ignoreFederationSections && StorageType.FEDERATION == section.getModule().getStorageType();
 		}
 		
 	}

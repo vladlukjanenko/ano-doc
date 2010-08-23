@@ -431,7 +431,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}
 
 	public static String getSearchActionName(MetaModuleSection section){
-	    return "Search"+section.getDocument().getMultiple()+"Action";
+	    return "Search"+section.getDocument().getMultiple()+"MafAction";
 	}
 
 	public static String getShowQueryActionName(MetaModuleSection section){
@@ -443,47 +443,47 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}
 
 	public static String getEditActionName(MetaModuleSection section){
-	    return "Edit"+getActionSuffix(section);
+	    return "EditMaf"+getActionSuffix(section);
 	}
 
 	public static String getUpdateActionName(MetaModuleSection section){
-	    return "Update"+getActionSuffix(section);
+	    return "UpdateMaf"+getActionSuffix(section);
 	}
 	
 	public static String getLanguageCopyActionName(MetaModuleSection section){
-	    return "CopyLang"+getActionSuffix(section);
+	    return "CopyLangMaf"+getActionSuffix(section);
 	}
 
 	public static String getSwitchMultilingualityActionName(MetaModuleSection section){
-	    return "SwitchMultilang"+getActionSuffix(section);
+	    return "SwitchMultilangMaf"+getActionSuffix(section);
 	}
 
 	public static String getVersionInfoActionName(MetaModuleSection section){
-	    return "VersionInfo"+getActionSuffix(section);
+	    return "VersionInfoMaf"+getActionSuffix(section);
 	}
 
 	public static String getNewActionName(MetaModuleSection section){
-	    return "New"+getActionSuffix(section);
+	    return "NewMaf"+getActionSuffix(section);
 	}
 	
 	public static String getCreateActionName(MetaModuleSection section){
-	    return "Create"+getActionSuffix(section);
+	    return "CreateMaf"+getActionSuffix(section);
 	}
 	
 	public static String getDeleteActionName(MetaModuleSection section){
-	    return "Delete"+getActionSuffix(section);
+	    return "DeleteMaf"+getActionSuffix(section);
 	}
 
 	public static String getDuplicateActionName(MetaModuleSection section){
-		return "Duplicate"+getActionSuffix(section);
+		return "DuplicateMaf"+getActionSuffix(section);
 	}
 
     public static String getLockActionName(MetaModuleSection section) {
-        return "Lock"+getActionSuffix(section);
+        return "LockMaf"+getActionSuffix(section);
     }
 
     public static String getUnLockActionName(MetaModuleSection section) {
-        return "UnLock"+getActionSuffix(section);
+        return "UnLockMaf"+getActionSuffix(section);
     }
 	
 	/**
@@ -1881,6 +1881,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+doc.getVariableName()+".getObjectInfo().toString())");
 		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+", "+quote("Apply")+")");
+		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
 	    // User settings
 		appendCommentLine(" Add user settings beans");
 	    appendStatement("addUserSettingsBeansToRequest(req)");

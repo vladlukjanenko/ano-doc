@@ -545,7 +545,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/fonts/fonts-min.css")) + " />");
 		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/assets/skins/sam/skin.css")) + " />");
 		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/container/assets/skins/sam/container.css")) + " />");
-		appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\"/>");
 
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container-min.js")) + "></script>");
@@ -563,8 +563,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		//*** CMS2.0 FINISH ***
 		
 		//*** CMS3.0 START ***
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/jquery-1.4.min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/anofunctions.js")) + "></script>");
+		appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("jquery-1.4.min.js")+"\"></script>");
+		appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("anofunctions.js")+"\"></script>");
 		//*** CMS3.0 FINISH ***
 		
 		decreaseIdent();
@@ -593,41 +593,42 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 							MetaViewElement element = elements.get(i);
 							if(element instanceof MultilingualFieldElement) {
 							appendString("<li>");
-							appendString("<a href=\"#"+element.getName()+"\">"+element.getName()+"</a><a href=\"#\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
-							appendString("<div class=\"pop_up\">");
 							increaseIdent();
-								appendString("<div class=\"top\">");
+								appendString("<a href=\"#"+element.getName()+"\">"+element.getName()+"</a><a href=\"#\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
+								appendString("<div class=\"pop_up\">");
 								increaseIdent();
-									appendString("<div><!-- --></div>");
-								decreaseIdent();
-								appendString("</div>");
-								appendString("<div class=\"in_l\">");
-								increaseIdent();
-									appendString("<div class=\"in_r\">");
+									appendString("<div class=\"top\">");
 									increaseIdent();
-										appendString("<div class=\"in_w\">");
+										appendString("<div><!-- --></div>");
+									decreaseIdent();
+									appendString("</div>");
+									appendString("<div class=\"in_l\">");
+									increaseIdent();
+										appendString("<div class=\"in_r\">");
 										increaseIdent();
-											appendString("<ul>");
+											appendString("<div class=\"in_w\">");
+											increaseIdent();
+												appendString("<ul>");
 												while (elements.get(i) instanceof MultilingualFieldElement){
-												String lang = getElementLanguage(element);	
-												appendString("<li><a href=\"#"+section.getDocument().getField(element.getName()).getName(lang)+"\">"+section.getDocument().getField(element.getName()).getName(lang)+"</a></li>");
-												i++;
-												element = elements.get(i);
-												}											
-												appendString("</ul>");
+													String lang = getElementLanguage(element);	
+													appendString("<li><a href=\"#"+section.getDocument().getField(element.getName()).getName(lang)+"\">"+lang+"</a></li>");
+													i++;
+													element = elements.get(i);
+													}											
+													appendString("</ul>");
+												decreaseIdent();
+												appendString("</div>");
 											decreaseIdent();
 											appendString("</div>");
 										decreaseIdent();
 										appendString("</div>");
+										appendString("<div class=\"bot\">");
+										appendString("<div><!-- --></div>");
+										appendString("</div>");
 									decreaseIdent();
 									appendString("</div>");
-									appendString("<div class=\"bot\">");
-									appendString("<div><!-- --></div>");
 								decreaseIdent();
-								appendString("</div>");
-							decreaseIdent();
-							appendString("</div>");
-							
+								appendString("</li>");
 							
 							}
 							if(element instanceof MetaFieldElement){
@@ -638,6 +639,12 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					appendString("</ul>");
 					appendString("<div class=\"clear\"><!-- --></div>");
 				decreaseIdent();
+				for (int i=0; i<elements.size(); i++){
+					MetaViewElement element = elements.get(i);
+					if (element instanceof MetaListElement)
+						append(getElementEditor(section.getDocument(), element));
+					
+				}
 				// SAVE AND CLOSE BUTTONS SHOULD BE HERE
 				appendString("</div>");
 				
@@ -657,12 +664,13 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 								increaseIdent();
 								appendString("<div class=\"in_w\">");
 									increaseIdent();
-									// *** END MULILINGUAL COPY *** //
+									// *** START MULILINGUAL COPY *** //
 									int colspan=2;
 									if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()) {
 										addMultilanguageOperations(section, colspan);
 									}
 									// *** END MULILINGUAL COPY *** //
+									appendString("</div>");
 									appendString("</div>");
 								decreaseIdent();
 								appendString("</div>");
@@ -683,12 +691,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				appendString("<div class=\"c_r\"><!-- --></div>");
 				appendString("<div class=\"c_b_l\"><!-- --></div>");
 				appendString("<div class=\"c_b_r\"><!-- --></div>");
-				
-				
-				
-				
-				
-				
 		
 		appendString("<form name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) +" method=\"post\" action="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_UPDATE))+">");		 
 		appendIncreasedString("<input type="+quote("hidden")+" name="+quote("_ts")+" value="+quote("<%=System.currentTimeMillis()%>")+">");
@@ -738,9 +740,11 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
-
-			
 			//*** CMS2.0 START ***
+			if (element instanceof MetaListElement){
+				//now we draw control elements upside our page
+				i++; continue;
+				} 
 			if(element instanceof MetaFieldElement){
 				MetaDocument doc = ((MetaModuleSection)currentSection).getDocument();
 				MetaProperty p = doc.getField(element.getName());
@@ -759,7 +763,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			//ALTERNATIVE EDITOR FOR DISABLED MODE
 			if (lang!=null && lang.equals(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage())){
 				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
-				appendString("<td class=\"lang_hide def\">");
 				appendString("<td align=\"right\"> <a id=\"contentDEF\" name=\"contentDEF\"></a>");
 				increaseIdent();
 				String name = section.getDocument().getField(element.getName()).getName()+"<b>DEF</b>";
@@ -768,7 +771,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				appendString(name);
 				decreaseIdent(); 
 				appendString("</td>");
-				appendString("<td align=\"left\">");
+				appendString("<td align=\"left\">&nbsp;");
 				append(getElementEditor(section.getDocument(), element));
 				appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
 				appendString("</td>");
@@ -788,15 +791,16 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			
 			appendString("<tr " + displayLanguageCheck+">");
 				increaseIdent();
-				appendString("<td align=\"right\">");
 					increaseIdent();
+					appendString("<td align=\"right\">");
 						String name = lang == null ? element.getName() : section.getDocument().getField(element.getName()).getName(lang);
 						if (name==null || name.length()==0)
 							name = "&nbsp;";
+						appendString("<a id=\""+name+"\" name=\""+name+"\"></a>");
 						appendString(name);
 					decreaseIdent(); 
 					appendString("</td>");
-					appendString("<td align=\"left\">");
+					appendString("<td align=\"left\">&nbsp;");
 						increaseIdent();
 						append(getElementEditor(section.getDocument(), element));
 						appendString("&nbsp;<i><bean:write name=\"description."+element.getName()+"\" ignore=\"true\"/></i>");
@@ -822,7 +826,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<div class=\"generated\"><span><bean:write name="+quote("objectInfoString")+"/></span>");
 		appendString("<a href="+quote("<ano:tslink>"+linksToMePagePath+"</ano:tslink>")+">Show direct links to  this document</a>");
 		appendString("</logic:present>");
-		appendString("</form>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		appendString("</div>");
 		appendString("</div>");
