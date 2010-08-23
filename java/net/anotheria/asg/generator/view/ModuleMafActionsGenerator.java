@@ -443,47 +443,47 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}
 
 	public static String getEditActionName(MetaModuleSection section){
-	    return "EditMaf"+getActionSuffix(section);
+	    return "Edit"+getActionSuffix(section);
 	}
 
 	public static String getUpdateActionName(MetaModuleSection section){
-	    return "UpdateMaf"+getActionSuffix(section);
+	    return "Update"+getActionSuffix(section);
 	}
 	
 	public static String getLanguageCopyActionName(MetaModuleSection section){
-	    return "CopyLangMaf"+getActionSuffix(section);
+	    return "CopyLang"+getActionSuffix(section);
 	}
 
 	public static String getSwitchMultilingualityActionName(MetaModuleSection section){
-	    return "SwitchMultilangMaf"+getActionSuffix(section);
+	    return "SwitchMultilang"+getActionSuffix(section);
 	}
 
 	public static String getVersionInfoActionName(MetaModuleSection section){
-	    return "VersionInfoMaf"+getActionSuffix(section);
+	    return "VersionInfo"+getActionSuffix(section);
 	}
 
 	public static String getNewActionName(MetaModuleSection section){
-	    return "NewMaf"+getActionSuffix(section);
+	    return "New"+getActionSuffix(section);
 	}
 	
 	public static String getCreateActionName(MetaModuleSection section){
-	    return "CreateMaf"+getActionSuffix(section);
+	    return "Create"+getActionSuffix(section);
 	}
 	
 	public static String getDeleteActionName(MetaModuleSection section){
-	    return "DeleteMaf"+getActionSuffix(section);
+	    return "Delete"+getActionSuffix(section);
 	}
 
 	public static String getDuplicateActionName(MetaModuleSection section){
-		return "DuplicateMaf"+getActionSuffix(section);
+		return "Duplicate"+getActionSuffix(section);
 	}
 
     public static String getLockActionName(MetaModuleSection section) {
-        return "LockMaf"+getActionSuffix(section);
+        return "Lock"+getActionSuffix(section);
     }
 
     public static String getUnLockActionName(MetaModuleSection section) {
-        return "UnLockMaf"+getActionSuffix(section);
+        return "UnLock"+getActionSuffix(section);
     }
 	
 	/**

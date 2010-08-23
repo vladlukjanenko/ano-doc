@@ -1588,7 +1588,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				appendString("<li>");
 				increaseIdent();
 					appendString("<logic:equal name=\"pageElement\" property=\"separator\" value=\"true\">...</logic:equal>");
-					appendString("<a href=\"?pageNumber=<bean:write name=\"pageElement\" property=\"caption\"/>\"><bean:write name=\"pageElement\" property=\"caption\"/></a>");
+					appendString("${pageElement.caption==pagingControl.currentPage ? \"<bean:write name=\"pageElement\" property=\"caption\"/>\":\"<a href=\"?pageNumber=<bean:write name=\"pageElement\" property=\"caption\"/>\"><bean:write name=\"pageElement\" property=\"caption\"/></a>\"}");
 				decreaseIdent();
 				appendString("</li>");
 			decreaseIdent();
