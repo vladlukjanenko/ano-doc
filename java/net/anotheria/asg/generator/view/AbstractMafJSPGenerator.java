@@ -259,11 +259,11 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	}
 	
 	public static String getLinksToMePageName(MetaDocument doc){
-		return "LinksToMaf"+doc.getName();
+		return "LinksTo"+doc.getName()+"Maf";
 	}
 
 	public static String getContainerPageName(MetaDocument doc, MetaContainerProperty table){
-		return "Show"+doc.getName()+StringUtils.capitalize(table.getName());
+		return "Show"+doc.getName()+StringUtils.capitalize(table.getName())+"Maf";
 	}
 	
 	protected static String generateTimestampedLinkPath(String path){

@@ -91,6 +91,9 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	private static enum ContainerAction{
 		SHOW("Show"),
 		DELETE("Delete"),
+		MOVE("Move"),
+		ADD("Add"),
+		QUICKADD("QuickAdd"),
 		;
 		
 		private String action;
