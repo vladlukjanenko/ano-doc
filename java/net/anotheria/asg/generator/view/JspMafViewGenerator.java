@@ -1,6 +1,7 @@
 package net.anotheria.asg.generator.view;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import sun.org.mozilla.javascript.internal.Context;
@@ -27,6 +28,8 @@ import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.util.DirectLink;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.ContainerAction;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SectionAction;
 import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaEmptyElement;
@@ -197,8 +200,13 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
 		
 		resetIdent();
+		
+		String addFormAction = ContainerAction.ADD.getMappingName(doc, list);
+		String addFormName = addFormAction + "ElementForm";
 
-		String formName = StrutsConfigGenerator.getContainerEntryFormName(doc, list);
+		String quickAddFormAction = ContainerAction.QUICKADD.getMappingName(doc, list);
+		String quickAddFormName = quickAddFormAction + "Form";
+		
 		MetaProperty p = list.getContainedProperty();
 
 		append(getBaseJSPHeader());
@@ -211,6 +219,12 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				appendString("<title>Edit "+doc.getName()+StringUtils.capitalize(list.getName())+"</title>");
 				generatePragmas();
 				appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+				appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
+				appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container-min.js")) + "></script>");
+				appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/element/element-min.js")) + "></script>");
+				appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/datasource/datasource-min.js")) + "></script>");
+				appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/autocomplete/autocomplete-min.js")) + "></script>");
+				appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/ComboBox.js")) + "></script>");
 				appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("jquery-1.4.min.js")+"\"></script>");
 				appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("anofunctions.js")+"\"></script>");
 			decreaseIdent();
@@ -230,8 +244,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 							increaseIdent();
 							appendString("<div class=\"clear\"><!-- --></div>");
 						decreaseIdent();
-						appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+formName+".submit()")+"><span>Add</span></a>");
-						appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+formName+".submit()")+">&nbsp;&raquo&nbsp;QuickAdd&nbsp;</a>");
+						appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+addFormName+".submit()")+"><span>Add</span></a>");
+						appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+quickAddFormName+".submit()")+"><span>QuickAdd</span></a>");
 						// SAVE AND CLOSE BUTTONS SHOULD BE HERE
 						appendString("</div>");
 					decreaseIdent();
@@ -269,8 +283,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link2p.getTargetModuleName());
 
 			MetaDocument linkTarget = targetModule.getDocumentByName(link2p.getTargetDocumentName());
-			String targetLinkAction = StrutsConfigGenerator.getPath(linkTarget, StrutsConfigGenerator.ACTION_EDIT);
-			 
+			String targetLinkAction = SectionAction.EDIT.getMappingName(doc);
 			
 			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></a></td>");
 			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote("description")+"/></a></td>");
@@ -297,51 +310,52 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("</tbody>");
 		appendString("</table>");
 		
-//*/
+		String name = p.getName();
+		if (name==null || name.length()==0)
+			name = "&nbsp;";
 		
 		appendString("<table width="+quote("100%")+" cellspacing="+quote("0")+" cellpadding="+quote("0")+" border="+quote("0")+">");
 		appendString("<tbody>");
 		increaseIdent();
-		appendString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_ADD))+">");
-		appendString("<html:hidden property="+quote("ownerId")+"/>");
-		appendString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">");
+		appendString("<form name="+quote(addFormName)+" action="+quote(addFormAction)+" method=\"post\">");
+		appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
 		
 		appendString("<tr>");
 		appendIncreasedString("<td align=\"right\">Add </td>");
 		appendString("<td align=\"left\">&nbsp;&nbsp;&nbsp;");
 		increaseIdent();
-		String name = p.getName();
-		if (name==null || name.length()==0)
-			name = "&nbsp;";
 		appendString(name+":");
 		decreaseIdent(); 
 	
 		if (!p.isLinked() && !(p instanceof MetaEnumerationProperty)){
 			String field = "";
+			appendGenerationPoint("generateListPage: ");
 			field += "<input class=\"add_id\" type=\"text\" style=\"width:25%\" name="+quote(name);
-			field += " value=\"<bean:write name="+quote(StrutsConfigGenerator.getContainerEntryFormName(doc,list ))+" property="+quote(name)+"/>";
+			field += " value=\"<bean:write name="+quote(addFormAction)+" property="+quote(name)+"/>";
 			field += "\">";
 			appendIncreasedString(field);
 		}else{
 			//String select = "";
+			//appendString("<em id=\"Type\" name=\"type\" class=\"selectBox\"></em>");
+			appendString("<em id=\""+doc.getMultiple() + "Values\" name=\"" + doc.getMultiple().toLowerCase() + "\" class=\"selectBox\"></em><div id=\""+doc.getMultiple()+"ValuesSelector\"></div>");
 			appendString("<span class=\"select_row\">");
-			appendString("<html:select property="+quote(name)+">");
-			appendIncreasedString("<html:optionsCollection property="+quote(name+"Collection")+" filter=\"false\"/>");
-			appendString("</html:select>");
-			appendString("</span>");
+//			appendString("<html:select property="+quote(name)+">");
+//			appendIncreasedString("<html:options collection="+quote(doc.getMultiple().toLowerCase()+"Values")+" filter=\"false\"/>");
+//			appendString("</html:select>");
+//			appendString("</span>");
 		}
 			
-		
-		appendString("</html:form>");
+		appendString("</form>");
 		decreaseIdent();
 
 		//QUICK ADD Form 
 		if (p.isLinked()){
-			formName = StrutsConfigGenerator.getContainerQuickAddFormName(doc, list);
 			increaseIdent();
-			appendString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_QUICK_ADD))+">");
-			appendString("<html:hidden property="+quote("ownerId")+"/>");
-			appendString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">");
+//			appendString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_QUICK_ADD))+">");
+			appendGenerationPoint("generateList");
+			appendString("<form name="+quote(quickAddFormName)+" action="+quote(quickAddFormAction)+" method=\"post\">");
+			increaseIdent();
+			appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
 			
 			
 			p = list.getContainedProperty();
@@ -352,8 +366,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			String field = "";
 			field += "<input class=\"add_in\" type=\"text\" style=\"width:25%;\" name="+quote("quickAddIds");
 			field += " value=\"\"/>";
-			appendIncreasedString(field);
-			appendString("</html:form>");
+			appendString(field);
+			decreaseIdent();
+			appendString("</form>");
 			decreaseIdent();
 		}
 		//QUICK ADD END
@@ -373,9 +388,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("</html:html>");
 		appendString("<!-- / generated by JspMafViewGenerator.generateListPage -->");
 		
-		append(getBaseJSPFooter());
+		generateListLinkElementEditorJS(section.getDocument(), name.toLowerCase()+"ValuesCollection");
 		
-	    
+		append(getBaseJSPFooter());
 		return jsp;
 
 	}
@@ -503,7 +518,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
 		
 		resetIdent();
-		
 		currentDialog = dialog;
 		
 		append(getBaseJSPHeader());
@@ -512,7 +526,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		// Language filtering settings
 		generateProcessLanguageFilteringSettings();
 		
-		appendString("<!--  generated by JspMafViewGenerator.generateDialog -->");
+		appendGenerationPoint("generateDialog");
 		appendString("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
 		appendString("\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		appendString("<html:html>");
@@ -683,9 +697,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				String result = "<logic:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
 				String path = StrutsConfigGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), StrutsConfigGenerator.ACTION_LOCK);
 				path += "?pId=<bean:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
-				result += " \t<div class=\"unlock\"></div><a href=" + quote("<ano:tslink>" + path + "</ano:tslink>") + "  onClick= "+quote("return confirm('All unsaved data will be lost!!!. Really lock  "+
-						StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())+" with id : <bean:write name="
-						+ entryName + " property=\"id\"/>;');")+">&nbsp;&raquo&nbsp;Lock&nbsp;</a>";
+				result += "<a href=\"#\" onClick= "+quote("lightbox('All unsaved data will be lost!!!<br /> Really lock  "+
+						StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())+" with id: <bean:write name="
+						+ entryName + " property=\"id\"/>?','<ano:tslink>" + path + "</ano:tslink>');")+">"+getLockImage()+"&nbsp;Lock</a>";
 				result += "</logic:equal>";
 				appendString(result);
 				
@@ -695,16 +709,15 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					path = StrutsConfigGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), StrutsConfigGenerator.ACTION_UNLOCK);
 					path+= "?pId=<bean:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
 					
-					String alt = "Locked by: <bean:write name="+entryName+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+
-					"/>, time: <bean:write name="+entryName+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
+					String alt = ((MetaModuleSection)currentSection).getDocument().getName() + " is locked by: <bean:write name="+entryName+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+
+					"/>, at: <bean:write name="+entryName+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
 					
-					appendString("<div class=\"locked_by\"></div><a href="+quote("<ano:tslink>"+path+"</ano:tslink>\" class=\"unlock\"")+ 
-							"onClick= "+quote("return confirm('"+alt+" Really unlock - Locked  "+((MetaModuleSection)currentSection).getDocument().getName()+
-							" with id : <bean:write name="+entryName+" property=\"id\"/>');")+">"+getUnLockImage(alt)+"" +
-							"</a>Current Document is Locked by <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+
+					appendString("<a href=\"#\" onClick= "+quote("lightbox('"+alt+"<br /> Unlock "+((MetaModuleSection)currentSection).getDocument().getName()+
+							" with id: <bean:write name="+entryName+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getUnLockImage(alt)+"" +
+							" Unlock</a><span>&nbsp;Locked by <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+
 							" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/></b>");
-					appendString("Locking time :  <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+
-							" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/></b>");
+					appendString("at:  <b><bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+
+							" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/></b></span>");
 					appendString("</logic:equal>");
 				}
 		
@@ -731,7 +744,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
         //*** CMS2.0 START ***
 		
 		List<MetaViewElement> richTextElementsRegistry = new ArrayList<MetaViewElement>();
-		List<MetaViewElement> linkElementsRegistry = new ArrayList<MetaViewElement>();
+		List<String> linkElementsRegistry = new ArrayList<String>();
 		//*** CMS2.0 FINISH ***
 		
 		for (int i=0; i<elements.size(); i++){
@@ -749,7 +762,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 							richTextElementsRegistry.add(element);
 				
 				if(p.isLinked())
-					linkElementsRegistry.add(element);
+					linkElementsRegistry.add(element.getName());
 			}
 			//*** CMS2.0 FINISH ***
 			
@@ -823,6 +836,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("</form>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		
+		
 		//Link to the Links to Me page
 		appendString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
 		String linksToMePagePath = StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_LINKS_TO_ME)+"?pId=<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property=\"id\"/>";
@@ -831,6 +845,37 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("</logic:present>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		appendString("</div>");
+		appendString("</div>");
+		appendString("</div>");
+		appendString("<div class=\"lightbox\" style=\"display:none;\">");
+		appendString("<div class=\"black_bg\"><!-- --></div>");
+		appendString("<div class=\"box\">");
+		increaseIdent();
+			appendString("<div class=\"box_top\">");
+			increaseIdent();
+				appendString("<div><!-- --></div>");
+				appendString("<span><!-- --></span>");
+				appendString("<a class=\"close_box\"><!-- --></a>");
+				appendString("<div class=\"clear\"><!-- --></div>");
+			decreaseIdent();
+			appendString("</div>");
+			appendString("<div class=\"box_in\">");
+			increaseIdent();
+				appendString("<div class=\"right\">");
+				increaseIdent();
+					appendString("<div class=\"text_here\">");
+					appendString("</div>");
+				decreaseIdent();
+				appendString("</div>");
+			decreaseIdent();
+			appendString("</div>");
+			appendString("<div class=\"box_bot\">");
+			increaseIdent();
+				appendString("<div><!-- --></div>");
+				appendString("<span><!-- --></span>");
+			decreaseIdent();
+			appendString("</div>");
+		decreaseIdent();
 		appendString("</div>");
 		appendString("</div>");
 		appendString("</body>");
@@ -1014,13 +1059,33 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	
 	
 	//*** CMS2.0 START ***
-	private void generateLinkElementEditorJS(MetaDocument doc, List<MetaViewElement> linkElements){
+	private void generateListLinkElementEditorJS(MetaDocument doc, String elName){
+		String elCapitalName = StringUtils.capitalize(elName);
+		
 		appendString("<script type=\"text/javascript\">");
 		increaseIdent();
-		for(MetaViewElement el: linkElements){
+			
+		appendString("//Initializing items for " + elName);
+		appendString("var " +elName+ "Json = {items:[");
+		appendString("<logic:iterate id=\"item\" name=\""+elName+"\" type=\"net.anotheria.webutils.bean.LabelValueBean\">");
+		increaseIdent();
+		appendString("{id:\"<bean:write name=\"item\" property=\"value\" filter=\"true\"/>\",name:\"<bean:write name=\"item\" property=\"label\" filter=\"true\"/>\"},");
+		//appendString("{id:\"${item.value}\",name:\"${item.label}\"},");
+		decreaseIdent();
+		appendString("</logic:iterate>");
+		appendString("]};");
+		appendString("new YAHOO.anoweb.widget.ComboBox("+quote(elCapitalName)+",\""+elCapitalName+"Selector\","+elName+"Json);");
+
+		decreaseIdent();
+		appendString("</script>");
+
+	}
+	private void generateLinkElementEditorJS(MetaDocument doc, List<String> linkElements){
+		appendString("<script type=\"text/javascript\">");
+		increaseIdent();
+		for(String elName: linkElements){
 
 			//FIXME: here is assumed that links can't be multilanguage
-			String elName = getElementName(doc, el);
 			String elCapitalName = StringUtils.capitalize(elName);
 			String beanName = StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument());
 			
@@ -1170,8 +1235,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		 */
 		
 		//*** CMS2.0 START ***
-		ret += "<div id="+quote(StringUtils.capitalize(p.getName()))+" name="+quote(p.getName())+" class=\"selectBox\"></div><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
-		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+"name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
+		ret += "<em id="+quote(StringUtils.capitalize(p.getName()))+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
+		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+"name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
 		//*** CMS2.0 FINISH ***
 		
 		return ret;
@@ -1186,7 +1251,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		ret += "<html:optionsCollection property="+quote(p.getName()+"Collection"+(lang==null ? "":lang))+" filter=\"false\"/>";
 		ret += "</html:select>";
 		ret += "&nbsp;";
-		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
+		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 
 		return ret;
 	}
@@ -1280,10 +1345,18 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	}
 
 	private String getStringEditor(MetaFieldElement element, MetaProperty p){
+		return getInputEditor(element, p, "text");
+	}
+	
+	private String getBooleanEditor(MetaFieldElement element, MetaProperty p){
+		return getInputEditor(element, p, "checkbox");
+	}
+	
+	private String getInputEditor(MetaFieldElement element, MetaProperty p, String inputType){
 		String ret ="";
 		String lang = getElementLanguage(element); 
 		
-		ret += "<input type=\"text\" name="+quote(p.getName(lang));
+		ret += "<input type=" + quote(inputType) + " name="+quote(p.getName(lang));
 		//ret += "<html:text filter=\"false\" property="+quote(element.getName());
 		ret += " value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang));
 		ret += "/>\"";
@@ -1310,13 +1383,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		return ret;
 	}
 
-	private String getBooleanEditor(MetaFieldElement element, MetaProperty p){
-		String ret ="";
-		ret += "<html:checkbox property="+quote(element.getName());
-		ret += "/>";
-		return ret;
-	}
-	
 	private GeneratedJSPFile generateCSVExport(MetaModuleSection section, MetaView view){
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
@@ -1671,6 +1737,38 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			appendString("</div>");
 		decreaseIdent();
 		appendString("</div>");
+		
+		appendString("<div class=\"lightbox\" style=\"display:none;\">");
+		appendString("<div class=\"black_bg\"><!-- --></div>");
+		appendString("<div class=\"box\">");
+		increaseIdent();
+			appendString("<div class=\"box_top\">");
+			increaseIdent();
+				appendString("<div><!-- --></div>");
+				appendString("<span><!-- --></span>");
+				appendString("<a class=\"close_box\"><!-- --></a>");
+				appendString("<div class=\"clear\"><!-- --></div>");
+			decreaseIdent();
+			appendString("</div>");
+			appendString("<div class=\"box_in\">");
+			increaseIdent();
+				appendString("<div class=\"right\">");
+				increaseIdent();
+					appendString("<div class=\"text_here\">");
+					appendString("</div>");
+				decreaseIdent();
+				appendString("</div>");
+			decreaseIdent();
+			appendString("</div>");
+			appendString("<div class=\"box_bot\">");
+			increaseIdent();
+				appendString("<div><!-- --></div>");
+				appendString("<span><!-- --></span>");
+			decreaseIdent();
+			appendString("</div>");
+		decreaseIdent();
+		appendString("</div>");
+		appendString("</div>");
 		appendString("</body>");
 		appendString("</html>");
 		appendString("<!-- / generated by JspMafViewGenerator.generateShowPage -->");
@@ -1971,8 +2069,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String path = StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_UNLOCK);
 		path += "?pId=<bean:write name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>";
 		path += "&nextAction=showEdit";
-		result += " \t<a href=" + quote("<ano:tslink>" + path + "</ano:tslink>") + "  onClick= "+quote("return confirm(' All unsaved data will be lost!!! Really unLock  "+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+" : <bean:write name="
-				+ quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>;');")+">&nbsp;&raquo&nbsp;UnLock&nbsp;</a>";
+		result += " \t<a href=\"#\" onClick= "+quote("lightbox(' All unsaved data will be lost!!! UnLock  "+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+" : <bean:write name="
+				+ quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>;','<ano:tslink>"+path+"</ano:tslink>');")+">&nbsp;&raquo&nbsp;UnLock&nbsp;</a>";
 		result += "</logic:equal>";
 		return result;
 	}
@@ -1989,8 +2087,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String path = StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_LOCK);
 		path += "?pId=<bean:write name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>";
 		path += "&nextAction=showEdit";
-		result += " \t<a href=" + quote("<ano:tslink>" + path + "</ano:tslink>") + "  onClick= "+quote("return confirm('All unsaved data will be lost!!!. Really lock  "+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+" with id : <bean:write name="
-				+ quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>;');")+">&nbsp;&raquo&nbsp;Lock&nbsp;</a>";
+		result += " \t<a href=\"#\" onClick= "+quote("lightbox('All unsaved data will be lost!!!. Really lock  "+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+" with id : <bean:write name="
+				+ quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>;?','<ano:tslink>"+path+"</ano:tslink>');")+">&nbsp;&raquo&nbsp;Lock&nbsp;</a>";
 		result += "</logic:equal>";
 		return result;
 	}
@@ -2002,9 +2100,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
         String path = StrutsConfigGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), StrutsConfigGenerator.ACTION_UNLOCK);
         path += "?pId=<bean:write name=" + quote(entryName) + " property=\"plainId\"/>";
         path+="&nextAction=showList";
-		String alt = "Locked by: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/>, time: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
-        String link = "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")
-				+ "onClick= "+quote("return confirm('"+alt+" Really unlock - Locked  "+((MetaModuleSection)currentSection).getDocument().getName()+" with id : <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getUnLockImage(alt)+"</a>";
+		String alt = "Locked by: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/>, at: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
+        String link = "<a href=\"#\" onClick= "+quote("lightbox('"+alt+"<br /> Unlock "+((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getUnLockImage(alt)+"</a>";
         String result  = "<logic:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">";
         result+=link;
         result+= "</logic:equal>";
@@ -2018,8 +2115,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
         String path = StrutsConfigGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), StrutsConfigGenerator.ACTION_LOCK);
         path += "?pId=<bean:write name=" + quote(entryName) + " property=\"plainId\"/>";
         path+="&nextAction=showList";
-        String link =  "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+ "onClick="+quote("return confirm('Really lock "+
-				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getLockImage()+"</a>" ;
+        String link =  "<a href=\"#\" onClick= "+quote("lightbox('Lock "+
+				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getLockImage()+"</a>" ;
         String result  = "<logic:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + ">";
         result+=link;
         result+= "</logic:equal>";

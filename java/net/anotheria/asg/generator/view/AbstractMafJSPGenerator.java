@@ -32,6 +32,13 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	 */
 //	private Context context;
 	
+	
+	@Override
+	protected void appendCommentLine(String commentLine){
+		appendString("<%-- " + commentLine + " --%>");
+	}
+	
+	
 	/**
 	 * Generates the header for all jsp files. 
 	 * @return

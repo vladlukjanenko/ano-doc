@@ -1072,7 +1072,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
             appendStatement(propertyCopy);
             prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,"string");
             propertyCopy = "bean."+prop.toBeanSetter()+"(NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()) +" +
-					" \" automatic unlock expected AT : \" + NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout()))";
+					" \" till: \" + NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout()))";
             appendStatement(propertyCopy);
         }
 
@@ -2153,7 +2153,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		emptyline();
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
-		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
+		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+" , "+quote("Apply")+")");
 		
 	    // User settings
 		appendCommentLine(" Add user settings beans");
@@ -2937,6 +2937,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}	
 
 	private void generateListShowActionMethod(MetaModuleSection section, MetaListProperty list, String methodName){
+		appendGenerationPoint("generateListShowActionMethod");
 		MetaDocument doc = section.getDocument();
 
 		appendString( getExecuteDeclaration(methodName));
@@ -2949,19 +2950,9 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		}
 		emptyline();
 		
-		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(list)+"() ");
-		appendStatement("form.setPosition(-1)"); //hmm?
-		appendStatement("form.setOwnerId("+doc.getVariableName()+".getId())");	
-		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerEntryFormName(doc, list))+", form)");
+		appendStatement("addBeanToRequest(req, "+quote("ownerId")+", id)");
 		emptyline();
 		
-		if (list.getContainedProperty().isLinked()){
-			appendStatement(ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+" quickAddForm = new "+ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+"() ");
-			appendStatement("quickAddForm.setOwnerId("+doc.getVariableName()+".getId())");	
-			appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerQuickAddFormName(doc, list))+", quickAddForm)");
-			emptyline();
-		}
-
 		if (list.getContainedProperty().isLinked()){
 			//generate list collection
 			MetaLink link = (MetaLink)list.getContainedProperty();
@@ -2981,8 +2972,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getTemporaryVariableName()+".getId(), "+targetDocument.getTemporaryVariableName()+".getName()+\" [\"+"+targetDocument.getTemporaryVariableName()+".getId()+\"]\" )");
 			appendStatement(listName+"Values.add(bean)");
 			append(closeBlock());
-			appendStatement("addBeanToRequest(req, "+quote(listName+"Values")+", "+listName+"Values"+")");
-			appendStatement("form."+list.getContainedProperty().toBeanSetter()+"Collection("+listName+"Values"+")");
+			appendStatement("addBeanToRequest(req, "+quote(listName+"ValuesCollection")+", "+listName+"Values"+")");
 			
 		}
 		
@@ -3000,7 +2990,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+" + "element.getValue(), element.name())");
 		    appendStatement(listName+"Values"+".add(bean)");
 		    append(closeBlock());
-		    appendStatement("form."+list.getContainedProperty().toBeanSetter()+"Collection("+listName+"Values"+")");
 		}
 		
 		appendString( "// generate list ...");

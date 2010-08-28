@@ -29,9 +29,10 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		MULTIPLE_DIALOG,
 	}
 	
-	private static enum SectionAction{
+	public static enum SectionAction{
 		SHOW("Show", "Show", OperationType.SINGLE, true, false),
 		EDIT("Edit", "Edit", OperationType.SINGLE),
+		NEW("New", "Edit", OperationType.SINGLE),
 		
 		CLOSE("Close", "Show", OperationType.MULTIPLE_DIALOG),
 		UPDATE("Update", "Show", OperationType.MULTIPLE_DIALOG),
@@ -62,7 +63,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 			ignoreFederationSections = anIgnoreFederationSections;
 		}
 		
-		private String getClassName(MetaModuleSection section) {
+		public String getClassName(MetaModuleSection section) {
 			switch (type) {
 			case SINGLE:
 				return action + section.getDocument().getName(multiDocument) + "MafAction";
@@ -74,11 +75,11 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		
-		private String getMappingName(MetaDocument doc){
+		public String getMappingName(MetaDocument doc){
 			return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName()) + action;
 		}
 		
-		private String getViewName(MetaDocument doc){
+		public String getViewName(MetaDocument doc){
 			return view+doc.getName(multiDocument) + "Maf";
 		}
 
@@ -88,7 +89,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 	}
 	
-	private static enum ContainerAction{
+	public static enum ContainerAction{
 		SHOW("Show"),
 		DELETE("Delete"),
 		MOVE("Move"),
@@ -156,6 +157,8 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 				if (!(section instanceof MetaModuleSection))
 					continue;
 				MetaModuleSection s = (MetaModuleSection)section;
+				if(s.getDialogs().size() == 0)
+					continue;
 				appendCommentLine("Mapping " + s.getDocument().getName());
 				generateSectionMappings(clazz, s);
 				emptyline();
@@ -198,7 +201,6 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	}
 	
 	private void generateContainerMappings(GeneratedClass clazz, MetaDocument doc, MetaContainerProperty container){
-	
 		String actionsPackage = ModuleMafActionsGenerator.getPackage(doc);
 		String jspPath = FileEntry.package2path(JspMafViewGenerator.getPackage(doc)).substring(FileEntry.package2path(JspMafViewGenerator.getPackage(doc)).indexOf('/'))+"/";
 		
