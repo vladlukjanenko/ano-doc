@@ -244,8 +244,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 							increaseIdent();
 							appendString("<div class=\"clear\"><!-- --></div>");
 						decreaseIdent();
-						appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+addFormName+".submit()")+"><span>Add</span></a>");
-						appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+quickAddFormName+".submit()")+"><span>QuickAdd</span></a>");
+						
+						
 						// SAVE AND CLOSE BUTTONS SHOULD BE HERE
 						appendString("</div>");
 					decreaseIdent();
@@ -276,13 +276,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		increaseIdent();
 		appendString("<td><bean:write name="+quote("element")+" property="+quote("position")+"/></td>");
 		
+		
 		if (p.isLinked()){
-			
-			MetaLink link2p = (MetaLink)p;
-			MetaModule targetModule = link2p.getLinkTarget().indexOf('.')== -1 ?
-					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link2p.getTargetModuleName());
 
-			MetaDocument linkTarget = targetModule.getDocumentByName(link2p.getTargetDocumentName());
 			String targetLinkAction = SectionAction.EDIT.getMappingName(doc);
 			
 			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></a></td>");
@@ -296,11 +292,11 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String parameter = "pId=<bean:write name="+quote("element")+" property="+quote("ownerId")+"/>";
 		parameter += "&pPosition=<bean:write name="+quote("element")+" property="+quote("position")+"/>";
 		appendString("<td>");
-		appendIncreasedString("<a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=top&"+parameter)+">"+getTopImage("move to top")+"</a>");
-		appendIncreasedString("<a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=up&"+parameter)+">"+getUpImage("move up")+"</a>");
-		appendIncreasedString("<a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?dir=down&"+parameter)+">"+getDownImage("move down")+"</a>");
-		appendIncreasedString("<a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_MOVE)+"?=bottom&"+parameter)+">"+getBottomImage("move to bottom")+"</a>");
-		appendIncreasedString("<a href="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_DELETE)+"?"+parameter)+">"+getDeleteImage("delete row")+"</a>");
+		appendIncreasedString("<a href="+quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=top&"+parameter)+">"+getTopImage("move to top")+"</a>");
+		appendIncreasedString("<a href="+quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=up&"+parameter)+">"+getUpImage("move up")+"</a>");
+		appendIncreasedString("<a href="+quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=down&"+parameter)+">"+getDownImage("move down")+"</a>");
+		appendIncreasedString("<a href="+quote(ContainerAction.MOVE.getMappingName(doc, list) + "?=bottom&"+parameter)+">"+getBottomImage("move to bottom")+"</a>");
+		appendIncreasedString("<a href="+quote(ContainerAction.DELETE.getMappingName(doc, list) + "?"+parameter)+">"+getDeleteImage("delete row")+"</a>");
 		appendString("</td>");
 		decreaseIdent();
 		appendString("</tr>");
@@ -317,42 +313,32 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<table width="+quote("100%")+" cellspacing="+quote("0")+" cellpadding="+quote("0")+" border="+quote("0")+">");
 		appendString("<tbody>");
 		increaseIdent();
-		appendString("<form name="+quote(addFormName)+" action="+quote(addFormAction)+" method=\"post\">");
-		appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
 		
 		appendString("<tr>");
-		appendIncreasedString("<td align=\"right\">Add </td>");
-		appendString("<td align=\"left\">&nbsp;&nbsp;&nbsp;");
-		increaseIdent();
-		appendString(name+":");
-		decreaseIdent(); 
+		appendString("<form name="+quote(addFormName)+" action="+quote(addFormAction)+" method=\"post\">");
+		appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
+		appendIncreasedString("<td align=\"right\">Add "+name+": </td>");
+		appendString("<td align=\"left\">");
 	
 		if (!p.isLinked() && !(p instanceof MetaEnumerationProperty)){
 			String field = "";
-			appendGenerationPoint("generateListPage: ");
 			field += "<input class=\"add_id\" type=\"text\" style=\"width:25%\" name="+quote(name);
 			field += " value=\"<bean:write name="+quote(addFormAction)+" property="+quote(name)+"/>";
 			field += "\">";
 			appendIncreasedString(field);
 		}else{
-			//String select = "";
-			//appendString("<em id=\"Type\" name=\"type\" class=\"selectBox\"></em>");
-			appendString("<em id=\""+doc.getMultiple() + "Values\" name=\"" + doc.getMultiple().toLowerCase() + "\" class=\"selectBox\"></em><div id=\""+doc.getMultiple()+"ValuesSelector\"></div>");
-			appendString("<span class=\"select_row\">");
-//			appendString("<html:select property="+quote(name)+">");
-//			appendIncreasedString("<html:options collection="+quote(doc.getMultiple().toLowerCase()+"Values")+" filter=\"false\"/>");
-//			appendString("</html:select>");
-//			appendString("</span>");
+			appendString("<em id=\""+ "Value\" name=\"" + list.getContainedProperty().getName().toLowerCase() + "\" class=\"selectBox\"></em><div id=\""+"ValuesSelector\"></div>");
 		}
-			
+		appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+addFormName+".submit()")+"><span>Add</span></a>");
+		appendString("</td>");
 		appendString("</form>");
 		decreaseIdent();
+		appendString("</tr>");
 
 		//QUICK ADD Form 
 		if (p.isLinked()){
 			increaseIdent();
-//			appendString("<html:form action="+quote(StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_QUICK_ADD))+">");
-			appendGenerationPoint("generateList");
+			appendString("<tr>");
 			appendString("<form name="+quote(quickAddFormName)+" action="+quote(quickAddFormAction)+" method=\"post\">");
 			increaseIdent();
 			appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
@@ -364,16 +350,21 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			if (name==null || name.length()==0)
 				name = "&nbsp;";
 			String field = "";
-			field += "<input class=\"add_in\" type=\"text\" style=\"width:25%;\" name="+quote("quickAddIds");
-			field += " value=\"\"/>";
+			field += "<input class=\"add_id fll\" type=\"text\" style=\"width:25%;\" name="+quote("quickAddIds");
+			field += " value=\"\"/><span class=\"fll mr_10\">id's comma separated list.</span>";
+			appendString("<td align=\"right\">");
+			appendString("Quick&nbsp;add");
+			appendString("</td>");
+			appendString("<td align=\"left\">");
 			appendString(field);
 			decreaseIdent();
-			appendString("</form>");
 			decreaseIdent();
+			appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+quickAddFormName+".submit()")+"><span>QuickAdd</span></a>");
+			appendString("</td>");
+			appendString("</form>");
+			appendString("</tr>");
 		}
 		//QUICK ADD END
-		appendString("</td>");
-		appendString("</tr>");
 
 		appendString("</tbody>");
 		appendString("</table>");
@@ -387,7 +378,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		decreaseIdent();
 		appendString("</html:html>");
 		appendString("<!-- / generated by JspMafViewGenerator.generateListPage -->");
-		
 		generateListLinkElementEditorJS(section.getDocument(), name.toLowerCase()+"ValuesCollection");
 		
 		append(getBaseJSPFooter());
@@ -1074,7 +1064,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		decreaseIdent();
 		appendString("</logic:iterate>");
 		appendString("]};");
-		appendString("new YAHOO.anoweb.widget.ComboBox("+quote(elCapitalName)+",\""+elCapitalName+"Selector\","+elName+"Json);");
+		appendString("new YAHOO.anoweb.widget.ComboBox("+quote("Value")+",\""+"ValuesSelector\","+elName+"Json);");
 
 		decreaseIdent();
 		appendString("</script>");
