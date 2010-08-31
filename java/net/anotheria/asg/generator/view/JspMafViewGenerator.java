@@ -1781,11 +1781,38 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<html>");
 		increaseIdent();
 		appendString("<head>");
-		increaseIdent();
-		appendString("<title>Search result</title>");
+			increaseIdent();
+			appendString("<title>Search result</title>");
+			generatePragmas();
+			appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+			appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("jquery-1.4.min.js")+"\"></script>");
+			appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("anofunctions.js")+"\"></script>");
+		decreaseIdent();
+		appendString("</head>");
+		appendString("<body>");
+		appendString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
+	
+		appendString("<div class=\"right\">");
+			increaseIdent();
+			appendString("<div class=\"r_w\">");
+				increaseIdent();
+				appendString("<div class=\"top_nav\">");
+					increaseIdent();
+					appendString("<div class=\"r_b_l\"><!-- --></div>");
+					appendString("<div class=\"r_b_r\"><!-- --></div>");
+					appendString("<div class=\"left_p\">");
+						increaseIdent();
+						appendString("<div class=\"clear\"><!-- --></div>");
+					decreaseIdent();
+					
+					
+					// SAVE AND CLOSE BUTTONS SHOULD BE HERE
+					appendString("</div>");
+				decreaseIdent();
+				appendString("</div>");
+		
+		
 		//appendString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
-		generatePragmas();
-		appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
 		appendString("</head>");
 		appendString("<body>");
