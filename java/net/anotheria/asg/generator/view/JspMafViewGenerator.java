@@ -1,10 +1,7 @@
 package net.anotheria.asg.generator.view;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import sun.org.mozilla.javascript.internal.Context;
 
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.generator.FileEntry;
@@ -21,7 +18,6 @@ import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
@@ -279,7 +275,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		
 		if (p.isLinked()){
 
-			String targetLinkAction = SectionAction.EDIT.getMappingName(doc);
+			String targetLinkAction = SectionAction.EDIT.getMappingName(section);
 			
 			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></a></td>");
 			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote("description")+"/></a></td>");
@@ -317,7 +313,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<tr>");
 		appendString("<form name="+quote(addFormName)+" action="+quote(addFormAction)+" method=\"post\">");
 		appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
-		appendIncreasedString("<td align=\"right\">Add "+name+": </td>");
+		appendIncreasedString("<td align=\"right\">Add&nbsp;"+name+": </td>");
 		appendString("<td align=\"left\">");
 	
 		if (!p.isLinked() && !(p instanceof MetaEnumerationProperty)){
@@ -327,7 +323,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			field += "\">";
 			appendIncreasedString(field);
 		}else{
-			appendString("<em id=\""+ "Value\" name=\"" + list.getContainedProperty().getName().toLowerCase() + "\" class=\"selectBox\"></em><div id=\""+"ValuesSelector\"></div>");
+			appendString("<em id=\""+ "Value\" name=\"" + list.getContainedProperty().getName().toLowerCase() + "\" class=\"selectBox fll mr_10\">&nbsp;none</em>&nbsp;&nbsp;<div id=\""+"ValuesSelector\"></div>");
 		}
 		appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+addFormName+".submit()")+"><span>Add</span></a>");
 		appendString("</td>");
@@ -353,7 +349,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			field += "<input class=\"add_id fll\" type=\"text\" style=\"width:25%;\" name="+quote("quickAddIds");
 			field += " value=\"\"/><span class=\"fll mr_10\">id's comma separated list.</span>";
 			appendString("<td align=\"right\">");
-			appendString("Quick&nbsp;add");
+			appendString("Quick&nbsp;add:");
 			appendString("</td>");
 			appendString("<td align=\"left\">");
 			appendString(field);
@@ -577,7 +573,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 
 						for (int i=0; i<elements.size(); i++){
 							MetaViewElement element = elements.get(i);
-							if(element instanceof MultilingualFieldElement) {
+							while (elements.get(i) instanceof MultilingualFieldElement){
 								appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
 								appendString("<li><a href=\"#"+element.getName()+"DEF"+"\">"+element.getName()+"DEF"+"</a></li>");
 								appendString("</logic:equal>");
@@ -600,12 +596,11 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 											appendString("<div class=\"in_w\">");
 											increaseIdent();
 												appendString("<ul>");
-												while (elements.get(i) instanceof MultilingualFieldElement){
-													lang = getElementLanguage(element);	
-													appendString("<li><a href=\"#"+section.getDocument().getField(element.getName()).getName(lang)+"\">"+lang+"</a></li>");
+												for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
+													appendString("<li><a href=\"#"+section.getDocument().getField(element.getName()).getName(sl)+"\">"+sl+"</a></li>");
 													i++;
 													element = elements.get(i);
-													}											
+												}
 													appendString("</ul>");
 												decreaseIdent();
 												appendString("</div>");
@@ -632,7 +627,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				decreaseIdent();
 				for (int i=0; i<elements.size(); i++){
 					MetaViewElement element = elements.get(i);
-					if (element instanceof MetaListElement)
+					if (element instanceof MetaListElement)	
 						append(getElementEditor(section.getDocument(), element));
 					
 				}
@@ -762,7 +757,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			//ALTERNATIVE EDITOR FOR DISABLED MODE
 			if (lang!=null && lang.equals(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage())){
 				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
-				appendString("<td align=\"right\"> <a id=\"contentDEF\" name=\"contentDEF\"></a>");
+				appendString("<td align=\"right\"> <a id=\""+element.getName()+"DEF\" name=\""+element.getName()+"DEF\"></a>");
 				increaseIdent();
 				String name = section.getDocument().getField(element.getName()).getName()+"<b>DEF</b>";
 				if (name==null || name.length()==0)
@@ -826,11 +821,11 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("</form>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		
+		appendString("<div class=\"generated\"><span><bean:write name="+quote("objectInfoString")+"/></span>");
 		
 		//Link to the Links to Me page
 		appendString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
 		String linksToMePagePath = StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_LINKS_TO_ME)+"?pId=<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property=\"id\"/>";
-		appendString("<div class=\"generated\"><span><bean:write name="+quote("objectInfoString")+"/></span>");
 		appendString("<a href="+quote("<ano:tslink>"+linksToMePagePath+"</ano:tslink>")+">Show direct links to  this document</a>");
 		appendString("</logic:present>");
 		appendString("<div class=\"clear\"><!-- --></div>");
@@ -1233,13 +1228,10 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	}
 	
 	private String getEnumerationEditor(MetaFieldElement element, MetaProperty p){
-		//for now we have only one link...
 		String ret = "";
 		String lang = getElementLanguage(element); 
 		
-		ret += "<html:select size=\"1\" property="+quote(p.getName(lang))+">";
-		ret += "<html:optionsCollection property="+quote(p.getName()+"Collection"+(lang==null ? "":lang))+" filter=\"false\"/>";
-		ret += "</html:select>";
+		ret += "<em id="+quote(StringUtils.capitalize(p.getName(lang)))+", name="+quote(p.getName(lang))+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
 		ret += "&nbsp;";
 		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 
@@ -1721,6 +1713,44 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						appendString("</tbody>");
 					decreaseIdent();
 					appendString("</table>");
+					appendString("<div class=\"paginator\">");
+					increaseIdent();
+					appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfElements\" value=\"1\">");
+						appendString("<ul>");
+						increaseIdent();
+							appendString("<logic:notEqual name=\"pagingControl\" property=\"first\" value=\"true\">");
+							appendIncreasedString("<li class=\"prev\"><a href=\"?pageNumber=<bean:write name=\"pagingControl\" property=\"previousPageNumber\"/>\">prev</a></li>");
+							appendString("</logic:notEqual>");
+							appendString("<logic:iterate id=\"pageElement\" name=\"pagingControl\" property=\"elements\" indexId=\"index\">");
+							increaseIdent();
+								appendString("<li>");
+								increaseIdent();
+									appendString("<logic:equal name=\"pageElement\" property=\"separator\" value=\"true\">...</logic:equal>");
+									appendString("<logic:equal name=\"pageElement\" property=\"active\" value=\"true\"><bean:write name=\"pageElement\" property=\"caption\"/></logic:equal>");
+									appendString("<logic:equal name=\"pageElement\" property=\"active\" value=\"false\"><a href=\"?pageNumber=<bean:write name=\"pageElement\" property=\"caption\"/>\"><bean:write name=\"pageElement\" property=\"caption\"/></a></logic:equal>");
+								decreaseIdent();
+								appendString("</li>");
+							decreaseIdent();
+							appendString("</logic:iterate>");
+							appendString("<logic:notEqual name=\"pagingControl\" property=\"last\" value=\"true\">");
+							appendIncreasedString("<li class=\"next\"><a href=\"?pageNumber=<bean:write name=\"pagingControl\" property=\"nextPageNumber\"/>\">next</a></li>");
+							appendString("</logic:notEqual>");
+						decreaseIdent();
+						appendString("</ul>");
+						appendString("</logic:greaterThan>");
+
+						appendString("<form name=\"ItemsOnPageForm1\" action=\"\" method=\"GET\">");
+						increaseIdent();
+							appendString("<select name=\"itemsOnPage\" onchange=\"document.ItemsOnPageForm1.submit();\">");
+							appendString("<logic:iterate name=\"PagingSelector\" type=\"java.lang.String\" id=\"option\">");
+							appendString("<option value=\"<bean:write name=\"option\"/>\" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name=\"option\"/> per page</option>");
+							appendString("</logic:iterate>");
+							appendString("</select>");
+						decreaseIdent();
+						appendString("</form>");
+					decreaseIdent();
+					appendString("</div>");
+					appendString("<div class=\"clear\"><!-- --></div>");
 				decreaseIdent();
 				appendString("</div>");
 			decreaseIdent();
@@ -1958,6 +1988,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			String actionZA = action + "&" + ViewConstants.PARAM_SORT_ORDER + "="+ViewConstants.VALUE_SORT_ORDER_DESC; 
 			header += "<logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+"><a href="+quote(generateTimestampedLinkPath(actionZA))+"class=\"down\">"+StringUtils.capitalize(name)+"</a></logic:equal><logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+"><a href="+quote(generateTimestampedLinkPath(actionAZ))+"class=\"up\">"+StringUtils.capitalize(name)+"</a></logic:equal><logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+"><logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+"><a href="+quote(generateTimestampedLinkPath(actionAZ))+">"+StringUtils.capitalize(name)+"</a></logic:notEqual></logic:notEqual>";
 		}
+		else {header =  StringUtils.capitalize(name);}
 		String displayLanguageCheck = "";
 		if(element instanceof MultilingualFieldElement) {
 			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
@@ -2063,11 +2094,13 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		}
 
 		if (element.getName().equals("lock") && StorageType.CMS.equals(doc.getParentModule().getStorageType())) {
-			return getLockFunctionLink(doc, element);
+			//For now we dont draw Lock and Unlock functions here
+			//return getLockFunctionLink(doc, element);
 		}
 
 		if (element.getName().equals("unlock") && StorageType.CMS.equals(doc.getParentModule().getStorageType())) {
-			return getUnLockFunctionLink(doc, element);
+			//For now we dont draw Lock and Unlock functions here
+			//return getUnLockFunctionLink(doc, element);
 		}
 
 

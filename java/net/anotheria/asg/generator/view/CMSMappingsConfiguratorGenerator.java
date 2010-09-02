@@ -43,6 +43,14 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		COPYLANG("CopyLang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		SWITCHMULTILANG("SwitchMultilang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		VERSIONINFO("Versioninfo", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
+		
+		SEARCH("Search", "SearchResult", OperationType.SINGLE, true, false){
+			@Override
+			public String getViewName(MetaModuleSection section){
+				return "SearchResult";
+			}
+		},
+		EXPORT("Export", "ExportAs", OperationType.SINGLE, true, false),
 		;
 		
 		private String action;
@@ -74,12 +82,13 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 
 		}
 		
-		
-		public String getMappingName(MetaDocument doc){
+		public String getMappingName(MetaModuleSection section){
+			MetaDocument doc = section.getDocument();
 			return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName()) + action;
 		}
 		
-		public String getViewName(MetaDocument doc){
+		public String getViewName(MetaModuleSection section){
+			MetaDocument doc = section.getDocument();
 			return view+doc.getName(multiDocument) + "Maf";
 		}
 
@@ -117,7 +126,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 	}
-	
+
 	
 	public List<FileEntry> generate(List<MetaView> views) {
 		List<FileEntry> ret = new ArrayList<FileEntry>(); 
@@ -195,7 +204,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 				continue;
 			String actionName = action.getClassName(section);
 			clazz.addImport(actionsPackage + "." + actionName);
-			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(doc)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(jspPath + action.getViewName(doc)+".jsp") + "))");
+			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(jspPath + action.getViewName(section)+".jsp") + "))");
 		}
 
 	}

@@ -2972,7 +2972,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getTemporaryVariableName()+".getId(), "+targetDocument.getTemporaryVariableName()+".getName()+\" [\"+"+targetDocument.getTemporaryVariableName()+".getId()+\"]\" )");
 			appendStatement(listName+"Values.add(bean)");
 			append(closeBlock());
-			appendStatement("addBeanToRequest(req, "+quote(link.getName()+"ValuesCollection")+", "+listName+"Values"+")");
+			appendStatement("addBeanToRequest(req, "+quote(link.getName().toLowerCase()+"ValuesCollection")+", "+listName+"Values"+")");
 			
 		}
 		

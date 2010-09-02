@@ -88,9 +88,8 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 							appendString("<ul>");
 									increaseIdent();
 									for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-										appendString("<option value=\""+sl+"\">"+sl+"</option>");
 										appendString("<li>");
-										appendString("<input type=\"checkbox\" id=\"lang_en\"/><label for=\"lang_en\">"+sl+"</label>");
+										appendString("<input type=\"checkbox\" id=\"lang_"+sl+"\"/><label for=\"lang_"+sl+"\">"+sl+"</label>");
 										appendString("</li>");
 									}
 								decreaseIdent();
