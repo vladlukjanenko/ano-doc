@@ -3,23 +3,38 @@ package net.anotheria.asg.generator.view;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 
-public class IndexPageJspMafGenerator extends AbstractJSPGenerator {
+public class IndexPageJspMafGenerator extends AbstractMafJSPGenerator {
 
 	public FileEntry generate(Context context) {
-		FileEntry page = new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED) + ".jsp"), getIndexPageJspName(),
+		FileEntry page = new FileEntry(getIndexPagePathJSP(), getIndexPageJspName(),
 				generateIndexPage().createFileContent());
 		page.setType(".jsp");
 		return page;
 	}
 
 	public static final String getIndexPageJspName() {
-		return "IndexPage";
+		return "WelcomePageMaf";
 	}
 
 	public static final String getSharedJspFooterPageName() {
-		return getIndexPageJspName() + "Maf.jsp";
+		return getIndexPageJspName() + ".jsp";
+	}
+	
+	public static final String getIndexJspFullName() {
+		return getIndexPageJspPath() + "/" + getSharedJspFooterPageName();
+	}
+	
+	
+	public static final String getIndexPagePathJSP(){
+		return  FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".jsp");      
+	}
+
+	public static final String getIndexPageJspPath(){
+	
+		 return      FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)).substring(FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)).indexOf('/'))+"/jsp";
 	}
 
 	private GeneratedJSPFile generateIndexPage() {
@@ -37,6 +52,8 @@ public class IndexPageJspMafGenerator extends AbstractJSPGenerator {
 		increaseIdent();
 		appendString("<title>" + getIndexPageJspName() + "</title>");
 		generatePragmas();
+		appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("jquery-1.4.min.js")+"\"></script>");
+		appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("anofunctions.js")+"\"></script>");
 		appendString("<link href=\"" + getCurrentCSSPath("newadmin.css") + "\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
 		appendString("</head>");
@@ -72,6 +89,7 @@ public class IndexPageJspMafGenerator extends AbstractJSPGenerator {
 					"<p>Last login: 23.02.2010 at 14:45<br/> Another additional information: will be here</p>");
 			appendString("</div>");
 			appendString("<div class=\"clear\"><!-- --></div>");
+			appendString("</div>");
 			appendString("</div>");
 			appendString("</div>");
 			

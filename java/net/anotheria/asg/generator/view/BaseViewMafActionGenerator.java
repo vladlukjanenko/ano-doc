@@ -69,23 +69,14 @@ public class BaseViewMafActionGenerator extends AbstractGenerator {
 		
 		startClassBody();
 
-		appendStatement("public static final String BEAN_MAIN_NAVIGATION = "+quote("mainNavigation"));
-		appendStatement("public static final String BEAN_QUERIES_NAVIGATION = "+quote("queriesNavigation"));
-		emptyline();
 		
 		appendString("protected abstract String getTitle();");
 		emptyline();
 		
 		appendString("@Override");
 		appendString("protected String getActiveMainNavi() {");
-		appendIncreasedStatement("return \""+StringUtils.capitalize(view.getName())+"\"");
-		append(closeBlock());
-		emptyline();
-		
-		appendString("public void preProcess(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
-		appendStatement("super.preProcess(mapping, req, res)");
-		appendStatement("prepareMenu(req)");
+		appendStatement("return \""+StringUtils.capitalize(view.getName())+"\"");
 		append(closeBlock());
 		emptyline();
 		
@@ -102,17 +93,12 @@ public class BaseViewMafActionGenerator extends AbstractGenerator {
 			appendIncreasedStatement("return MY_ROLES");
 			appendString("}");
 		}
-					
-		appendString("private void prepareMenu(HttpServletRequest req){");
-		increaseIdent();
-			appendStatement("List<NavigationItemBean> navigation = getMainNavigation(req)");
-			appendString("for(NavigationItemBean naviItem: navigation){");
-			increaseIdent();
-				appendString("if(naviItem.isActive()){");
-				increaseIdent();
-				appendStatement("List<NavigationItemBean> subNavi = new ArrayList<NavigationItemBean>()");
-				appendStatement("naviItem.setSubNavi(subNavi)");
-					for (int i=0; i<sections.size(); i++){
+			
+		emptyline();		
+			appendStatement("protected List<NavigationItemBean> getSubNavigation(){");
+			appendStatement("List<NavigationItemBean> subNavi = new ArrayList<NavigationItemBean>()");
+			increaseIdent();		
+				for (int i=0; i<sections.size(); i++){
 						MetaSection section = (MetaSection)sections.get(i);
 						if (section instanceof MetaModuleSection)
 							appendStatement("subNavi.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)section).getDocument(), StrutsConfigGenerator.ACTION_SHOW))+"))");
@@ -120,28 +106,11 @@ public class BaseViewMafActionGenerator extends AbstractGenerator {
 							appendStatement("subNavi.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(((MetaCustomSection)section).getPath())+"))");
 								
 					}
-				append(closeBlock());
+					appendStatement("return subNavi");
 			append(closeBlock());
 			
-		appendStatement("addBeanToRequest(req, BEAN_MAIN_NAVIGATION, navigation)");
 		emptyline();
 		
-		appendStatement("List<NavigationItemBean> queriesMenu = new ArrayList<NavigationItemBean>()");
-		for (int i=0; i<sections.size(); i++){
-			MetaSection section = (MetaSection)sections.get(i);
-			if (section instanceof MetaModuleSection){
-				MetaDocument doc = ((MetaModuleSection)section).getDocument();
-				if (doc.getLinks().size()>0){
-					appendStatement("queriesMenu.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(doc, StrutsConfigGenerator.ACTION_SHOW_QUERIES))+"))");
-				}
-			}
-		}
-		appendStatement("addBeanToRequest(req, BEAN_QUERIES_NAVIGATION, queriesMenu)");
-		
-		
-		append(closeBlock());
-		emptyline();
-
 		appendString("private NavigationItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();
 		appendString("NavigationItemBean bean = new NavigationItemBean();");
@@ -149,10 +118,9 @@ public class BaseViewMafActionGenerator extends AbstractGenerator {
 		appendString("bean.setLink(link);");
 		appendString("bean.setActive(title.equals(getTitle()));");
 		appendString("return bean;");
-		decreaseIdent();
 		append(closeBlock());		
 		emptyline();
-
+		
 		//security...
 		appendString("protected boolean isAuthorizationRequired(){");
 		increaseIdent();

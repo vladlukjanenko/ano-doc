@@ -4,6 +4,8 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.tools.doclets.internal.toolkit.taglets.BaseInlineTaglet;
+
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
@@ -136,6 +138,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 			System.out.println("CMSMappingsConfiguratorGenerator error: " + e.getMessage());
 			e.printStackTrace();
 		}
+		
 		return ret;
 	}
 	
@@ -149,8 +152,14 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		clazz.addImport("net.anotheria.maf.action.ActionForward");
 		clazz.addImport("net.anotheria.maf.action.ActionMappings");
 		clazz.addImport("net.anotheria.maf.action.ActionMappingsConfigurator");
-		clazz.addImport("net.anotheria.maf.action.ActionMappingsConfigurator");
-
+		clazz.addImport(IndexPageMafActionGenerator.getIndexPageFullName());
+		clazz.addImport("net.anotheria.webutils.filehandling.actions.ShowFile");
+		clazz.addImport("net.anotheria.webutils.filehandling.actions.UploadFile");
+		clazz.addImport("net.anotheria.webutils.filehandling.actions.ShowTmpFile");
+		clazz.addImport("net.anotheria.webutils.filehandling.actions.GetFile");
+		clazz.addImport("net.anotheria.webutils.actions.LoginAction");
+		clazz.addImport("net.anotheria.webutils.actions.LogoutAction");
+		
 
 		clazz.addInterface("ActionMappingsConfigurator");
 		clazz.setName("CMSMappingsConfigurator");
@@ -161,6 +170,12 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 		appendString("@Override");
 		openFun("public void configureActionMappings()");
+		appendStatement("ActionMappings.addMapping(\"index\", " + IndexPageMafActionGenerator.getIndexPageActionName() + ".class, new ActionForward(\"success\", "+quote(IndexPageJspMafGenerator.getIndexJspFullName())+"))");
+//		appendStatement("ActionMappings.addMapping(\"fileShow\", ShowFile.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
+//		appendStatement("ActionMappings.addMapping(\"fileUpload\", UploadFile.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFileResult.jsp\"))");
+//		appendStatement("ActionMappings.addMapping(\"login\", LoginAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
+//		appendStatement("ActionMappings.addMapping(\"logout\", LogoutAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
+		
 		for(MetaView view: views){
 			for (MetaSection section: view.getSections()){
 				if (!(section instanceof MetaModuleSection))
@@ -185,6 +200,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 		return clazz;
 	}
+
 	
 	
 	private String getPackageName(){

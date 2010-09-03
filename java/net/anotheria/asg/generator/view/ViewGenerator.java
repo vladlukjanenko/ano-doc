@@ -37,14 +37,15 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		files.add(new BaseMafActionGenerator().generate(views));
 		
 		files.add(new IndexPageActionGenerator().generate(views));
+		files.add(new IndexPageMafActionGenerator().generate(views));
 		
-		files.add(new IndexPageJspGenerator().generate(context));
 		files.add(new IndexPageJspMafGenerator().generate(context));
+		files.add(new IndexPageJspGenerator().generate(context));
 		
 		files.add(new SharedJspFooterGenerator().generate(views, context));
 		
-		files.add(new JspMafMenuGenerator().generate(views, context));
 		files.add(new JspMenuGenerator().generate(views, context));
+		files.add(new JspMafMenuGenerator().generate(views, context));
 		
 		files.addAll(new WebXMLGenerator().generate(views, context));
 		// UserSettings

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+
 import org.apache.log4j.Logger;
 
 import net.anotheria.anoprise.metafactory.Extension;
@@ -50,13 +51,15 @@ public class BaseMafActionGenerator extends AbstractActionGenerator {
 		clazz.setPackageName(getSharedActionPackageName());
 
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
-		
+		appendCommentLine("BaseMafActionGenerator");
 		clazz.addImport("net.anotheria.webutils.actions.*");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
 		clazz.addImport("net.anotheria.maf.action.ActionForward");
 		clazz.addImport("net.anotheria.maf.action.ActionMapping");
-		clazz.addImport("net.anotheria.maf.bean.FormBean");		
+		clazz.addImport("net.anotheria.maf.bean.FormBean");	
+		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");	
+		
 
 		clazz.setAbstractClass(true);
 		clazz.setParent("BaseMafAction");
@@ -65,6 +68,7 @@ public class BaseMafActionGenerator extends AbstractActionGenerator {
 
 		startClassBody();
 		
+		appendStatement("public static final String BEAN_MAIN_NAVIGATION = \"mainNavigation\"");
 		appendStatement("public static final String PARAM_SORT_TYPE = "+quote(ViewConstants.PARAM_SORT_TYPE));
 		appendStatement("public static final String PARAM_SORT_TYPE_NAME = "+quote(ViewConstants.PARAM_SORT_TYPE_NAME));
 		appendStatement("public static final String PARAM_SORT_ORDER = "+quote(ViewConstants.PARAM_SORT_ORDER));
@@ -121,6 +125,12 @@ public class BaseMafActionGenerator extends AbstractActionGenerator {
 		appendString("}");
         // end initing Lock Config
 	
+		append(closeBlock());
+		emptyline();
+		
+		appendString("public void preProcess(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res) throws Exception {");
+		appendString("super.preProcess(mapping, req, res);");
+		appendString("prepareMenu(req);");
 		append(closeBlock());
 		emptyline();
 		
@@ -262,12 +272,23 @@ public class BaseMafActionGenerator extends AbstractActionGenerator {
 		append(closeBlock());
 		appendStatement("return false");
 		append(closeBlock());
+		
+		appendString("protected void prepareMenu(HttpServletRequest req) {");
+		increaseIdent();
+		appendString("List<NavigationItemBean> navigation = getMainNavigation(req);");
+		appendString("for (NavigationItemBean naviItem : navigation)");
+		appendString("if (naviItem.isActive())");
+		appendString("naviItem.setSubNavi(getSubNavigation());");
+		appendString("addBeanToRequest(req, BEAN_MAIN_NAVIGATION, navigation);");
+		append(closeBlock());
+		emptyline();
 
+		appendString("protected abstract List<NavigationItemBean> getSubNavigation();");
+		emptyline();
 		
 		appendString("protected List<NavigationItemBean> getMainNavigation(HttpServletRequest req) {");
 		increaseIdent();
-		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");
-		appendStatement("List<NavigationItemBean> menu = new ArrayList<NavigationItemBean>();");
+		appendString("List<NavigationItemBean> menu = new ArrayList<NavigationItemBean>();");
 		for (int i=0; i<views.size(); i++){
 			MetaView view = views.get(i);
 			MetaSection first = view.getSections().get(0);
@@ -286,10 +307,11 @@ public class BaseMafActionGenerator extends AbstractActionGenerator {
 				appendStatement(statement);
 			}
 		}
-		appendStatement("return menu");
+	
+		appendString("return menu;");
 		append(closeBlock());
 		emptyline();
-
+		
 		appendString("protected abstract String getActiveMainNavi();");
 		emptyline();
 		
@@ -321,7 +343,7 @@ public class BaseMafActionGenerator extends AbstractActionGenerator {
 		appendString("NavigationItemBean bean = new NavigationItemBean();");
 		appendString("bean.setCaption(title);");
 		appendString("bean.setLink(link);");
-		appendString("bean.setActive(getActiveMainNavi().equals(title));");
+		appendString("bean.setActive(title.equals(getActiveMainNavi()));");
 		appendString("return bean;");
 		append(closeBlock());
 		emptyline();

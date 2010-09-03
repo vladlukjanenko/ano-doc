@@ -1,5 +1,6 @@
 package net.anotheria.asg.generator.view;
 
+import java.util.Collections;
 import java.util.List;
 
 import net.anotheria.asg.generator.AbstractGenerator;
@@ -14,7 +15,7 @@ import net.anotheria.asg.generator.view.meta.MetaView;
  * 
  * @author abolbat
  */
-public class IndexPageActionGenerator extends AbstractGenerator {
+public class IndexPageMafActionGenerator extends AbstractGenerator {
 
 	public FileEntry generate(List<MetaView> views) {
 		return new FileEntry(generateBaseAction(views));
@@ -25,7 +26,7 @@ public class IndexPageActionGenerator extends AbstractGenerator {
 	}
 	
 	public static String getIndexPageActionName() {
-		return "BaseIndexPageAction";
+		return "WelcomePageMafAction";
 	}
 	
 	public static String getIndexPageFullName() {
@@ -35,17 +36,21 @@ public class IndexPageActionGenerator extends AbstractGenerator {
 	public GeneratedClass generateBaseAction(List<MetaView> views) {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		appendGenerationPoint("generateBaseAction");
+		appendGenerationPoint("generateBaseMafAction");
 		clazz.setPackageName(getIndexPagePackageName());
 
+		
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
 		emptyline();
-		clazz.addImport("org.apache.struts.action.ActionForm");
-		clazz.addImport("org.apache.struts.action.ActionForward");
-		clazz.addImport("org.apache.struts.action.ActionMapping");
+		clazz.addImport("net.anotheria.maf.action.ActionForward");
+		clazz.addImport("net.anotheria.maf.action.ActionMapping");
+		clazz.addImport("net.anotheria.maf.bean.FormBean");
+		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");
+		clazz.addImport("java.util.Collections");
+		clazz.addImport("java.util.List");
 
-		clazz.setParent(BaseActionGenerator.getBaseActionName());
+		clazz.setParent(BaseMafActionGenerator.getBaseMafActionName());
 		clazz.setName(getIndexPageActionName());
 
 		startClassBody();
@@ -56,18 +61,26 @@ public class IndexPageActionGenerator extends AbstractGenerator {
 		append(closeBlock());
 		emptyline();
 
-		appendString("protected void init(ActionMapping aMapping, ActionForm aAf, HttpServletRequest aReq, HttpServletResponse aRes) throws Exception {");
-		increaseIdent();
-		appendStatement("super.init(aMapping, aAf, aReq, aRes)");
-		append(closeBlock());
-		emptyline();
-
-		appendString("public ActionForward anoDocExecute(ActionMapping aMapping, ActionForm aAf, HttpServletRequest aReq, HttpServletResponse aRes) throws Exception {");
+		appendString("public ActionForward anoDocExecute(ActionMapping aMapping, FormBean aAf, HttpServletRequest aReq, HttpServletResponse aRes) throws Exception {");
 		increaseIdent();
 		appendStatement("return aMapping.findForward(\"success\")");
 		append(closeBlock());
 		emptyline();
-
+		
+		appendString("@Override");
+		increaseIdent();
+		appendStatement("protected String getActiveMainNavi() {");
+		appendStatement("return null");
+		append(closeBlock());
+		emptyline();
+		
+		appendString("@Override");
+		appendString("protected List<NavigationItemBean> getSubNavigation() {");
+		increaseIdent();
+		appendStatement("return Collections.emptyList()");
+		append(closeBlock());
+		emptyline();
+		
 		return clazz;
 	}
 

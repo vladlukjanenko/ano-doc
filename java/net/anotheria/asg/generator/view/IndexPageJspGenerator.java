@@ -21,7 +21,7 @@ public class IndexPageJspGenerator extends AbstractJSPGenerator {
 	public static final String getSharedJspFooterPageName() {
 		return getIndexPageJspName() + ".jsp";
 	}
-
+	
 	private GeneratedJSPFile generateIndexPage() {
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
