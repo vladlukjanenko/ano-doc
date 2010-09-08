@@ -8,7 +8,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 public class IndexPageJspGenerator extends AbstractJSPGenerator {
 
 	public FileEntry generate(Context context) {
-		FileEntry page = new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED) + ".jsp"), getIndexPageJspName(),
+		FileEntry page = new FileEntry(FileEntry.package2fullPath(context.getPackageName(MetaModule.SHARED) + ".jsp"), getIndexPageJspName(),
 				generateIndexPage().createFileContent());
 		page.setType(".jsp");
 		return page;

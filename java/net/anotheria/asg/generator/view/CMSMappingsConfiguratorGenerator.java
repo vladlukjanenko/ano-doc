@@ -4,8 +4,6 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.tools.doclets.internal.toolkit.taglets.BaseInlineTaglet;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
@@ -35,7 +33,12 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		SHOW("Show", "Show", OperationType.SINGLE, true, false),
 		EDIT("Edit", "Edit", OperationType.SINGLE),
 		NEW("New", "Edit", OperationType.SINGLE),
-		
+//		LINKSTOME("LinksToMe", "LinksTo", OperationType.SINGLE, false, false){
+//			@Override
+//			public String getClassName(MetaModuleSection section){
+//				//return action + section.getDocument().getName() + "MafAction";
+//			}
+//		},
 		CLOSE("Close", "Show", OperationType.MULTIPLE_DIALOG),
 		UPDATE("Update", "Show", OperationType.MULTIPLE_DIALOG),
 		DELETE("Delete", "Show", OperationType.MULTIPLE_DIALOG),
@@ -46,13 +49,17 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		SWITCHMULTILANG("SwitchMultilang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		VERSIONINFO("Versioninfo", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		
-		SEARCH("Search", "SearchResult", OperationType.SINGLE, true, false){
+		SEARCH("Search", "SearchResultMaf", OperationType.SINGLE, true, false){
 			@Override
 			public String getViewName(MetaModuleSection section){
-				return "SearchResult";
+				return "SearchResultMaf";
+			}
+			@Override
+			public String getViewPath(MetaModuleSection section){
+				return "/" + FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".jsp") + "/";
 			}
 		},
-		EXPORT("Export", "ExportAs", OperationType.SINGLE, true, false),
+		EXPORT("Export", "Show2", OperationType.SINGLE, true, false),
 		;
 		
 		private String action;
@@ -89,9 +96,18 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 			return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName()) + action;
 		}
 		
+		
 		public String getViewName(MetaModuleSection section){
 			MetaDocument doc = section.getDocument();
 			return view+doc.getName(multiDocument) + "Maf";
+		}
+		
+		public String getViewPath(MetaModuleSection section){
+			return "/" + FileEntry.package2path(JspMafViewGenerator.getPackage(section.getModule())) + "/";
+		}
+		
+		public String getViewFullName(MetaModuleSection section){
+			return getViewPath(section) + getViewName(section);
 		}
 
 		public boolean isIgnoreForSection(MetaModuleSection section){
@@ -209,25 +225,21 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	
 	private void generateSectionMappings(GeneratedClass clazz, MetaModuleSection section){
 		MetaModule module = section.getModule();
-		MetaDocument doc  = section.getDocument();
-	
 		String actionsPackage = ModuleMafActionsGenerator.getPackage(module);
-		String jspPath = FileEntry.package2path(JspMafViewGenerator.getPackage(module)).substring(FileEntry.package2path(JspMafViewGenerator.getPackage(module)).indexOf('/')) + "/";
-		
-		
 		for(SectionAction action: SectionAction.values()){
 			if(action.isIgnoreForSection(section))
 				continue;
 			String actionName = action.getClassName(section);
 			clazz.addImport(actionsPackage + "." + actionName);
-			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(jspPath + action.getViewName(section)+".jsp") + "))");
+			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName(section)+".jsp") + "))");
 		}
 
 	}
 	
 	private void generateContainerMappings(GeneratedClass clazz, MetaDocument doc, MetaContainerProperty container){
 		String actionsPackage = ModuleMafActionsGenerator.getPackage(doc);
-		String jspPath = FileEntry.package2path(JspMafViewGenerator.getPackage(doc)).substring(FileEntry.package2path(JspMafViewGenerator.getPackage(doc)).indexOf('/'))+"/";
+		String jspPath = FileEntry.package2fullPath(JspMafViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspMafViewGenerator.getPackage(doc)).indexOf('/'))+"/";
+		
 		
 		for(ContainerAction action: ContainerAction.values()){
 			String actionName = action.getClassName(doc, container);

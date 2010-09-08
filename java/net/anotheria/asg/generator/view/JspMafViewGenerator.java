@@ -1231,10 +1231,16 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String ret = "";
 		String lang = getElementLanguage(element); 
 		
-		ret += "<em id="+quote(StringUtils.capitalize(p.getName(lang)))+", name="+quote(p.getName(lang))+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
+		ret += "<select name=\""+p.getName(lang)+"\">";
+		ret += "<logic:iterate indexId=\"index\" id=\"element\" property=\"commandCollection\" name=\""+StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\">";
+		ret += "<option value=\"<bean:write name=\"element\" property=\"value\"/>\" <logic:equal name=\""+StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\" property=\""+p.getName()+"CurrentValue"+(lang==null ? "":lang)+"\" value=\"${element.label}\">selected</logic:equal>><bean:write name=\"element\" property=\"label\"/></option>";
+		ret += "</logic:iterate>";
+		ret += "</select>";
+		
+		
 		ret += "&nbsp;";
-		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
-
+		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
+		
 		return ret;
 	}
 	
@@ -1840,49 +1846,51 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					appendString("</div>");
 				decreaseIdent();
 				appendString("</div>");
+				
+				
+				
+				
+		appendString("<div class=\"main_area\">");
+		appendString("<div class=\"c_l\"><!-- --></div>");
+		appendString("<div class=\"c_r\"><!-- --></div>");
+		appendString("<div class=\"c_b_l\"><!-- --></div>");
+		appendString("<div class=\"c_b_r\"><!-- --></div>");
+		appendString("<h2>Search result: </h2>");
+		appendString("<div class=\"clear\"><!-- --></div>");
+		appendString("<div class=\"clear\"><!-- --></div>");
 		
-		
-		//appendString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
-		decreaseIdent();
-		appendString("</head>");
-		appendString("<body>");
+		appendString("<table cellspacing=\"1\" cellpadding=\"1\" border=\"0\" width=\"100%\" class=\"pages_table\">");
+		appendString("<thead>");
 		increaseIdent();
-		//appendString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
-
-		int colspan = 3;
-		
-		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"1\">");
+		appendString("<tr class=\"linecaptions\">");
 		increaseIdent();
-		appendString("<tr>");
-		increaseIdent();
-		appendString("<td colspan=\""+colspan+"\"><img src="+quote(getCurrentImagePath("s.gif"))+" width=\"1\" height=\"1\"></td>");
-		decreaseIdent(); 
-		appendString("</tr>");
-		
-		//write header
-		appendString("<tr class=\"lineCaptions\">");
-		increaseIdent();
-		appendString("<td width=\"5%\">Id</td>");
-		appendString("<td width=\"15%\">Property name</td>");
-		appendString("<td width=\"80%\">Match</td>");
+		appendString("<td style=\"width: 50px;\">Id</td>");
+		appendString("<td style=\"width: 200px;\">Property name</td>");
+		appendString("<td>Match</td>");
 		decreaseIdent();
 		appendString("</tr>");
+		appendString("</thead>");
 		appendString("<logic:present name="+quote("result")+" >");
+		appendString("<tbody>");
 		appendString("<logic:iterate name="+quote("result")+" type="+quote("net.anotheria.anodoc.query2.ResultEntryBean")+" id="+quote("entry")+" indexId=\"ind\">");
 		increaseIdent();
 		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
-		appendString("<td width=\"5%\"><a href="+quote("<bean:write name="+quote("entry")+" property="+quote("editLink")+"/>")+" target="+quote("_blank")+"><bean:write name="+quote("entry")+" property="+quote("documentId")+"/></td>");
-		appendString("<td width=\"15%\"><bean:write name="+quote("entry")+" property="+quote("propertyName")+"/></td>");
-		appendString("<td width=\"80%\"><bean:write name="+quote("entry")+" property="+quote("info")+" filter="+quote("false")+"/></td>");
+		appendString("<td style=\"width: 50px;\"><a href="+quote("<bean:write name="+quote("entry")+" property="+quote("editLink")+"/>")+" target="+quote("_blank")+"><bean:write name="+quote("entry")+" property="+quote("documentId")+"/></td>");
+		appendString("<td style=\"width: 200px;\"><bean:write name="+quote("entry")+" property="+quote("propertyName")+"/></td>");
+		appendString("<td><bean:write name="+quote("entry")+" property="+quote("info")+" filter="+quote("false")+"/></td>");
 		appendString("</tr>");
 		decreaseIdent();
 		appendString("</logic:iterate>");
+		appendString("</tbody>");
 		appendString("</logic:present>");
 
 		decreaseIdent();
 		appendString("</table>");
+		appendString("<div class=\"clear\"><!-- --></div>");
 		decreaseIdent();
-		//appendString("<jsp:include page=\""+getFooterName(view)+".jsp\" flush=\"true\"/>");
+		appendString("</div>");
+		appendString("</div>");
+		appendString("</div>");
 		appendString("</body>");
 		decreaseIdent();
 		appendString("</html>");

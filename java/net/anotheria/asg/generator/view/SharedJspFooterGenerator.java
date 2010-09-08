@@ -17,7 +17,7 @@ public class SharedJspFooterGenerator extends AbstractJSPGenerator {
     public FileEntry generate(List<MetaView> views , Context context) {
 		
 		String ret = generateSharedFooter(views, context);
-		FileEntry footer = new FileEntry(FileEntry.package2path(context.getPackageName(MetaModule.SHARED)+".jsp"), getSharedJspFooterName(), ret);
+		FileEntry footer = new FileEntry(FileEntry.package2fullPath(context.getPackageName(MetaModule.SHARED)+".jsp"), getSharedJspFooterName(), ret);
 		footer.setType(".jsp");
 		return footer;
 		

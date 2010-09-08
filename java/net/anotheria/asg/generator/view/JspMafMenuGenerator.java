@@ -1,12 +1,16 @@
 package net.anotheria.asg.generator.view;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SectionAction;
+import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
 public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
@@ -27,6 +31,7 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 	}
 	
 	private GeneratedJSPFile generateMenu(List<MetaView> views, Context context){
+		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		jsp.setName(getMenuName());
@@ -40,7 +45,7 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 			appendString("<div class= \"scroll_left\">");
 				increaseIdent();
 				appendString("<img class=\"logo\" src=\"../img/logo.gif\" alt=\"CMS Logo\"/>");
-				appendString("<form name=\"Search\" action=\"aswebdataBoxSearch\">");
+				appendString("<form name=\"Search\" action="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_SEARCH))+">");
 					increaseIdent();
 					appendString("<input class=\"search\" name=\"criteria\" type=\"text\" value=\"Search...\" />");
 					appendString("<a href=\"#\" class=\"adv_search \">Advanced search</a>");

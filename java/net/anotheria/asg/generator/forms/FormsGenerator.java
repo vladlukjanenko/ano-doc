@@ -42,7 +42,7 @@ public class FormsGenerator extends AbstractAnoDocGenerator{
 //			todo.add(new FileEntry(mafBeanGenerator.generateFormBean(form)));
 //			todo.add(new FileEntry(mafActionsGenerator.generateDialogForm(form)));
 
-			FileEntry formPage = new FileEntry(FileEntry.package2path(registry.getContext().getPackageName()+".jsp"), jspGenerator.getFormIncludePageName(form), jspGenerator.generateFormInclude(form));
+			FileEntry formPage = new FileEntry(FileEntry.package2fullPath(registry.getContext().getPackageName()+".jsp"), jspGenerator.getFormIncludePageName(form), jspGenerator.generateFormInclude(form));
 			formPage.setType(".jsp");
 			todo.add(formPage); 
 			

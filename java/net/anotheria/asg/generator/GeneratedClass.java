@@ -212,7 +212,7 @@ public class GeneratedClass extends GeneratedArtefact{
 
 	@Override
 	public String getPath() {
-		return FileEntry.package2path(getPackageName());
+		return FileEntry.package2fullPath(getPackageName());
 	}
 
 	/**

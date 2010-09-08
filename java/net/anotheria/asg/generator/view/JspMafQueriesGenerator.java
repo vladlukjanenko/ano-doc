@@ -21,7 +21,7 @@ import net.anotheria.util.StringUtils;
  * Generator for the queries page. Currently obsolete.
  * @author another
  */
-public class JspMafQueriesGenerator extends AbstractJSPGenerator implements IGenerator{
+public class JspMafQueriesGenerator extends AbstractMafJSPGenerator implements IGenerator{
 	
 
 	/* (non-Javadoc)

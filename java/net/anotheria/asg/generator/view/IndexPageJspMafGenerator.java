@@ -29,12 +29,12 @@ public class IndexPageJspMafGenerator extends AbstractMafJSPGenerator {
 	
 	
 	public static final String getIndexPagePathJSP(){
-		return  FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".jsp");      
+		return  FileEntry.package2fullPath(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".jsp");      
 	}
 
 	public static final String getIndexPageJspPath(){
 	
-		 return      FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)).substring(FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)).indexOf('/'))+"/jsp";
+		 return      FileEntry.package2fullPath(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)).substring(FileEntry.package2fullPath(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)).indexOf('/'))+"/jsp";
 	}
 
 	private GeneratedJSPFile generateIndexPage() {

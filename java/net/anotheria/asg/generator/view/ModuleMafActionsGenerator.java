@@ -2141,7 +2141,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 					String lang = getElementLanguage(element);
 					appendStatement("form." + p.toBeanSetter() + "Collection" + (lang == null ? "" : lang) + "(" + listName + "Values" + ")");
 					linkTargets.add(link.getLinkTarget());
-					appendStatement("addBeanToRequest(req, "+quote("Collection")+", \""+ listName +"\")");
 				}//...end if (p.isLinked())
 
 				if (p instanceof MetaEnumerationProperty) {
@@ -2152,7 +2151,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		}
 
 		emptyline();
-		
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
 		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+" , "+quote("Apply")+")");

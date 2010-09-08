@@ -76,7 +76,7 @@ public class BaseViewMafActionGenerator extends AbstractGenerator {
 		appendString("@Override");
 		appendString("protected String getActiveMainNavi() {");
 		increaseIdent();
-		appendStatement("return \""+StringUtils.capitalize(view.getName())+"\"");
+		appendStatement("return \""+StringUtils.capitalize(view.getTitle())+"\"");
 		append(closeBlock());
 		emptyline();
 		
