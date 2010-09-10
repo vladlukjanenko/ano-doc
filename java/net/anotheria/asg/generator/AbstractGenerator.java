@@ -288,6 +288,9 @@ public class AbstractGenerator{
 		b.append(writeString("}"));
 	}
 	
+	/**
+	 * @deprecated use closeBlock(String) instead
+	 */
 	@Deprecated
 	protected String closeBlock(){
 		decreaseIdent();
@@ -295,6 +298,10 @@ public class AbstractGenerator{
 		return ret;
 	}
 
+	/**
+	 * Generates ident decreasing and block closing. Appends message just after block
+	 * @param message comment message to block closing. Usually block/method name.
+	 */
 	protected void closeBlock(String message){
 		decreaseIdent();
 		appendString("} //"+message);

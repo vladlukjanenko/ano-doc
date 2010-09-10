@@ -45,7 +45,7 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 			appendString("<div class= \"scroll_left\">");
 				increaseIdent();
 				appendString("<img class=\"logo\" src=\"../img/logo.gif\" alt=\"CMS Logo\"/>");
-				appendString("<form name=\"Search\" action="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_SEARCH))+">");
+				//appendString("<form name=\"Search\" action="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_SEARCH))+">");
 					increaseIdent();
 					appendString("<input class=\"search\" name=\"criteria\" type=\"text\" value=\"Search...\" />");
 					appendString("<a href=\"#\" class=\"adv_search \">Advanced search</a>");

@@ -30,7 +30,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	}
 	
 	public static enum SectionAction{
-		SHOW("Show", "Show", OperationType.SINGLE, true, false),
+		SHOW("Show", "Show", OperationType.SINGLE, true),
 		EDIT("Edit", "Edit", OperationType.SINGLE),
 		NEW("New", "Edit", OperationType.SINGLE),
 //		LINKSTOME("LinksToMe", "LinksTo", OperationType.SINGLE, false, false){
@@ -48,36 +48,23 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		COPYLANG("CopyLang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		SWITCHMULTILANG("SwitchMultilang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		VERSIONINFO("Versioninfo", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
-		
-		SEARCH("Search", "SearchResultMaf", OperationType.SINGLE, true, false){
-			@Override
-			public String getViewName(MetaModuleSection section){
-				return "SearchResultMaf";
-			}
-			@Override
-			public String getViewPath(MetaModuleSection section){
-				return "/" + FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".jsp") + "/";
-			}
-		},
-		EXPORT("Export", "Show2", OperationType.SINGLE, true, false),
+		EXPORT("Export", "Show2", OperationType.SINGLE, true),
 		;
 		
 		private String action;
 		private String view;
 		private OperationType type;
 		private boolean multiDocument;
-		private boolean ignoreFederationSections;
 		
 		private SectionAction(String anAction, String aView, OperationType aType) {
-			this(anAction, aView, aType, false, true);
+			this(anAction, aView, aType, false);
 		}
 		
-		private SectionAction(String anAction, String aView, OperationType aType, boolean aListDocument, boolean anIgnoreFederationSections) {
+		private SectionAction(String anAction, String aView, OperationType aType, boolean aListDocument) {
 			action = anAction;
 			view = aView;
 			type = aType;
 			multiDocument = aListDocument;
-			ignoreFederationSections = anIgnoreFederationSections;
 		}
 		
 		public String getClassName(MetaModuleSection section) {
@@ -111,9 +98,63 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 
 		public boolean isIgnoreForSection(MetaModuleSection section){
-			return section.getDialogs().size() == 0 || ignoreFederationSections && StorageType.FEDERATION == section.getModule().getStorageType();
+			return !multiDocument && (section.getDialogs().size() == 0 || StorageType.FEDERATION == section.getModule().getStorageType());
 		}
 		
+	}
+	
+	public static enum SharedAction{
+		//SHOW("Show", "Show", OperationType.SINGLE, true, false),
+		
+		SEARCH("CmsSearch", "SearchResultMaf"){
+//			@Override
+//			public String getViewName(MetaModuleSection section){
+//				return "SearchResultMaf";
+//			}
+//			@Override
+//			public String getViewPath(MetaModuleSection section){
+//				return "/" + FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".jsp") + "/";
+//			}
+//			@Override
+//			public String getClassName(MetaModuleSection section){
+//				return "SearchMafAction";
+//			}
+		},
+		;
+		
+		private String action;
+		private String view;
+		
+		private SharedAction(String anAction, String aView) {
+			action = anAction;
+			view = aView;
+		}
+		
+		public String getClassName() {
+				return action + "MafAction";
+		}
+		
+		public String getMappingName(){
+			return action.toLowerCase();
+		}
+		
+		
+		public String getViewName(){
+			return view;
+		}
+		
+		public String getViewPath(){
+			return "/" + FileEntry.package2path(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".jsp") + "/";
+		}
+		
+		public String getViewFullName(){
+			return getViewPath() + getViewName();
+		}
+		
+		public static final String getPackageName(){
+			return GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action";
+		}
+
 	}
 	
 	public static enum ContainerAction{
@@ -175,6 +216,8 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		clazz.addImport("net.anotheria.webutils.filehandling.actions.GetFile");
 		clazz.addImport("net.anotheria.webutils.actions.LoginAction");
 		clazz.addImport("net.anotheria.webutils.actions.LogoutAction");
+		clazz.addImport("net.anotheria.webutils.actions.LogoutAction");
+		
 		
 
 		clazz.addInterface("ActionMappingsConfigurator");
@@ -192,13 +235,16 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 //		appendStatement("ActionMappings.addMapping(\"login\", LoginAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
 //		appendStatement("ActionMappings.addMapping(\"logout\", LogoutAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
 		
+		generateSharedMappings(clazz);
 		for(MetaView view: views){
 			for (MetaSection section: view.getSections()){
 				if (!(section instanceof MetaModuleSection))
 					continue;
 				MetaModuleSection s = (MetaModuleSection)section;
-				if(s.getDialogs().size() == 0)
-					continue;
+				
+				
+//				if(s.getDialogs().size() == 0)
+//					continue;
 				appendCommentLine("Mapping " + s.getDocument().getName());
 				generateSectionMappings(clazz, s);
 				emptyline();
@@ -206,7 +252,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 				for (int p=0; p<doc.getProperties().size(); p++){
 					MetaProperty pp = doc.getProperties().get(p);
 					if (pp instanceof MetaContainerProperty){
-						generateContainerMappings(clazz, doc, (MetaContainerProperty)pp);
+						generateContainerMappings(clazz, s, (MetaContainerProperty)pp);
 					}
 				}
 				emptyline();
@@ -229,6 +275,9 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		for(SectionAction action: SectionAction.values()){
 			if(action.isIgnoreForSection(section))
 				continue;
+			if(StorageType.FEDERATION == section.getModule().getStorageType()){
+				System.out.println("!!!!!!!!!!!!! GENERATING FEDERATION: " + section.getTitle());
+			}
 			String actionName = action.getClassName(section);
 			clazz.addImport(actionsPackage + "." + actionName);
 			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName(section)+".jsp") + "))");
@@ -236,7 +285,20 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 
 	}
 	
-	private void generateContainerMappings(GeneratedClass clazz, MetaDocument doc, MetaContainerProperty container){
+	private void generateSharedMappings(GeneratedClass clazz){
+		String actionsPackage = GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action";
+		for(SharedAction action: SharedAction.values()){
+			String actionName = action.getClassName();
+			clazz.addImport(actionsPackage + "." + actionName);
+			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName()) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName()+".jsp") + "))");
+		}
+
+	}
+	
+	private void generateContainerMappings(GeneratedClass clazz, MetaModuleSection section, MetaContainerProperty container){
+		if(section.getDialogs().size() == 0)
+			return;
+		MetaDocument doc = section.getDocument();
 		String actionsPackage = ModuleMafActionsGenerator.getPackage(doc);
 		String jspPath = FileEntry.package2fullPath(JspMafViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspMafViewGenerator.getPackage(doc)).indexOf('/'))+"/";
 		

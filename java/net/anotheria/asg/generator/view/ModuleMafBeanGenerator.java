@@ -272,7 +272,7 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 		}
 		
 		public static String getContainerEntryFormName(MetaContainerProperty p){
-			return StringUtils.capitalize(p.getName())+p.getContainerEntryName()+"Form";
+			return StringUtils.capitalize(p.getName())+p.getContainerEntryName()+"FB";
 		}
 		
 		public static String getContainerQuickAddFormImport(MetaDocument doc, MetaContainerProperty p){
@@ -280,7 +280,7 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 		}
 		
 		public static String getContainerQuickAddFormName(MetaContainerProperty p){
-			return StringUtils.capitalize(p.getName())+"QuickAddForm";
+			return StringUtils.capitalize(p.getName())+"QuickAddFB";
 		}
 		
 		public static String getFormBeanImport(MetaForm form){

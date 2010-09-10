@@ -2549,10 +2549,12 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}
 	
 	private void generateListAddRowActionMethod(MetaModuleSection section, MetaListProperty list, String methodName){
+		appendGenerationPoint("generateListAddRowActionMethod");
 		MetaDocument doc = section.getDocument();
 		appendString( getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = ("+ModuleMafBeanGenerator.getContainerEntryFormName(list)+") af");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(list));
+		appendStatement("populateFormBean(req, form)");
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
@@ -2578,6 +2580,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		else
 			appendStatement("return "+StrutsConfigGenerator.getContainerPath(doc, list, StrutsConfigGenerator.ACTION_SHOW)+"(mapping, af, req, res)");
 		append(closeBlock());
+		
 	}
 	
 	private GeneratedClass generateListQuickAddAction(MetaModuleSection section, MetaListProperty list){
@@ -2606,12 +2609,13 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	}
 
 	private void generateListQuickAddActionMethod(MetaModuleSection section, MetaListProperty list, String methodName){
-
+		appendGenerationPoint("generateListQuickAddActionMethod");
 		MetaDocument doc = section.getDocument();
-
+		
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement(ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+" form = ("+ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+") af");
+		appendStatement(ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerQuickAddFormName(list));
+		appendStatement("populateFormBean(req, form)");
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");

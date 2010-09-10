@@ -22,7 +22,6 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 	
 	
 	public void generate(String path, List<MetaView> views){
-		
 		ExecutionTimer timer = new ExecutionTimer("ViewGenerator");
 		timer.startExecution("common");
 		List<FileEntry> files = new ArrayList<FileEntry>();
@@ -35,6 +34,8 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		//hack, works only with one view.
 		files.add(new BaseActionGenerator().generate(views));
 		files.add(new BaseMafActionGenerator().generate(views));
+		
+		files.addAll(new CMSSearchMafActionsGenerator().generate(views));
 		
 		files.add(new IndexPageActionGenerator().generate(views));
 		files.add(new IndexPageMafActionGenerator().generate(views));
@@ -138,7 +139,9 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		ret.addAll(new ModuleMafBeanGenerator().generate(section));
 		ret.addAll(new ModuleMafActionsGenerator(view).generate(section));
 		ret.addAll(new ModuleBeanGenerator().generate(section));
+		ret.addAll(new ModuleMafBeanGenerator().generate(section));
 	    ret.addAll(new ModuleActionsGenerator(view).generate(section));
+	    ret.addAll(new ModuleMafActionsGenerator(view).generate(section));
 	    
 	    return ret;
 	}
