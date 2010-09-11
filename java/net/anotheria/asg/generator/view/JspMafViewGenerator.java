@@ -266,7 +266,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		
 		appendString("</thead>");
 		appendString("<tbody>");
-		appendString("<logic:iterate name="+quote("elements")+" id="+quote("element")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, list))+" indexId="+quote("ind")+">");
+		appendString("<logic:iterate name="+quote("elements")+" id="+quote("element")+" type="+quote(ModuleMafBeanGenerator.getContainerEntryFormImport(doc, list))+" indexId="+quote("ind")+">");
 		increaseIdent();
 		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
 		increaseIdent();

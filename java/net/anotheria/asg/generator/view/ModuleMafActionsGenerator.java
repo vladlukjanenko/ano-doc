@@ -38,6 +38,7 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.types.EnumTypeGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 import net.anotheria.asg.generator.util.DirectLink;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SectionAction;
 import net.anotheria.asg.generator.view.meta.MetaDecorator;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
@@ -586,7 +587,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    	writePathResolveForMultiOpAction(doc, StrutsConfigGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE);
 	    }
         //Lock && Unlock!!!
-
+	    
         if(cMSStorageType){
             writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_LOCK);
             writePathResolveForMultiOpAction(doc,StrutsConfigGenerator.ACTION_UNLOCK);
@@ -2553,9 +2554,11 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		MetaDocument doc = section.getDocument();
 		appendString( getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(list));
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(list)+"()");
 		appendStatement("populateFormBean(req, form)");
 		appendStatement("String id = form.getOwnerId()");
+		appendStatement("System.out.println(req.getParameter(\"ownerId\")+\"*********************************\");");
+		
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
 
@@ -2614,7 +2617,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement(ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerQuickAddFormName(list));
+		appendStatement(ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+"()");
 		appendStatement("populateFormBean(req, form)");
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
@@ -2680,7 +2683,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		startClassBody();
 		appendString(getExecuteDeclaration());
 		increaseIdent();
-		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(table)+" form = ("+ModuleMafBeanGenerator.getContainerEntryFormName(table)+") af");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(table)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(table)+"()");
+		appendStatement("populateFormBean(req, form)");
 		appendStatement("String id = form.getOwnerId()");
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
@@ -2948,14 +2952,25 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		increaseIdent();
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+		appendStatement("addBeanToRequest(req, \"ownerId\", id)");
 		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
 			//autoUnlocking!
 		    appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
 		}
 		emptyline();
 		
-		appendStatement("addBeanToRequest(req, "+quote("ownerId")+", id)");
+		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(list)+"() ");
+		appendStatement("form.setPosition(-1)"); //hmm?
+		appendStatement("form.setOwnerId("+doc.getVariableName()+".getId())");	
+		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerEntryFormName(doc, list))+", form)");
 		emptyline();
+		
+		if (list.getContainedProperty().isLinked()){
+			appendStatement(ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+" quickAddForm = new "+ModuleMafBeanGenerator.getContainerQuickAddFormName(list)+"() ");
+			appendStatement("quickAddForm.setOwnerId("+doc.getVariableName()+".getId())");	
+			appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getContainerQuickAddFormName(doc, list))+", quickAddForm)");
+			emptyline();
+		}
 		
 		if (list.getContainedProperty().isLinked()){
 			//generate list collection
@@ -2977,7 +2992,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			appendStatement(listName+"Values.add(bean)");
 			append(closeBlock());
 			appendStatement("addBeanToRequest(req, "+quote(link.getName().toLowerCase()+"ValuesCollection")+", "+listName+"Values"+")");
-			
 		}
 		
 		if(list.getContainedProperty() instanceof MetaEnumerationProperty){
