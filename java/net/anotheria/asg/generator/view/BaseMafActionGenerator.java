@@ -22,7 +22,7 @@ import net.anotheria.util.StringUtils;
  * Generator class for the base action for a generator.
  * @author lrosenberg
  */
-public class BaseMafActionGenerator extends AbstractActionGenerator {
+public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 
 	/**
 	 * Generates all artefacts for this action.
@@ -88,7 +88,7 @@ public class BaseMafActionGenerator extends AbstractActionGenerator {
 		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
 		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
 		appendStatement("private static LockingConfig lockConfig;");
-		appendStatement("private static Logger log = Logger.getLogger("+getBaseActionName()+".class)");
+		appendStatement("private static Logger log = Logger.getLogger("+getBaseMafActionName()+".class)");
 		clazz.addImport("org.apache.log4j.Logger");
 
 		appendString("static{");

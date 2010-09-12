@@ -33,12 +33,17 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		SHOW("Show", "Show", OperationType.SINGLE, true),
 		EDIT("Edit", "Edit", OperationType.SINGLE),
 		NEW("New", "Edit", OperationType.SINGLE),
-//		LINKSTOME("LinksToMe", "LinksTo", OperationType.SINGLE, false, false){
-//			@Override
-//			public String getClassName(MetaModuleSection section){
-//				//return action + section.getDocument().getName() + "MafAction";
-//			}
-//		},
+		LINKSTOME("LinksToMe", "LinksTo", OperationType.SINGLE, false){
+			@Override
+			public String getClassName(MetaModuleSection section){
+				return "Edit" + section.getDocument().getName() + "MafAction";
+			}
+			@Override
+			public String getViewName(MetaModuleSection section){
+				MetaDocument doc = section.getDocument();
+				return "LinksTo"+doc.getName();
+			}
+		},
 		CLOSE("Close", "Show", OperationType.MULTIPLE_DIALOG),
 		UPDATE("Update", "Show", OperationType.MULTIPLE_DIALOG),
 		DELETE("Delete", "Show", OperationType.MULTIPLE_DIALOG),
@@ -48,7 +53,28 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		COPYLANG("CopyLang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		SWITCHMULTILANG("SwitchMultilang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		VERSIONINFO("Versioninfo", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
-		EXPORT("Export", "Show2", OperationType.SINGLE, true),
+		EXPORTtoCSV("Export.csv", "Show", OperationType.SINGLE, true){
+			@Override
+			public String getClassName(MetaModuleSection section){
+				return "Export" + section.getDocument().getName(true) + "MafAction";
+			}
+			@Override
+			public String getViewName(MetaModuleSection section){
+				MetaDocument doc = section.getDocument();
+				return "Show"+doc.getName(true) + "AsCSVMaf";
+			}
+		},
+		EXPORTtoXML("Export.xml", "Show", OperationType.SINGLE, true){
+			@Override
+			public String getClassName(MetaModuleSection section){
+				return "Export" + section.getDocument().getName(true) + "MafAction";
+			}
+			@Override
+			public String getViewName(MetaModuleSection section){
+				MetaDocument doc = section.getDocument();
+				return "Show"+doc.getName(true) + "AsXMLMaf";
+			}
+		},
 		;
 		
 		private String action;
