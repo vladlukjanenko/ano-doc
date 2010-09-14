@@ -56,9 +56,6 @@ public class BaseViewMafActionGenerator extends AbstractGenerator {
 
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
-		clazz.addImport("javax.servlet.http.HttpServletRequest");
-		clazz.addImport("javax.servlet.http.HttpServletResponse");
-		clazz.addImport("net.anotheria.maf.action.ActionMapping");
 		clazz.addImport("net.anotheria.maf.bean.FormBean");
 		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");
 

@@ -780,7 +780,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			String displayLanguageCheck = "";			
 			if(element instanceof MultilingualFieldElement) {
 				MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
-				displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";						
+				displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal> class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\"";						
 			}
 			
 			appendString("<tr " + displayLanguageCheck+">");
