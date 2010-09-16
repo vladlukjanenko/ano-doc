@@ -3,10 +3,6 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
-import sun.org.mozilla.javascript.internal.Context;
-
-import apple.laf.CoreUIConstants.ShowArrows;
-
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
