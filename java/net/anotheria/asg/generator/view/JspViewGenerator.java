@@ -1264,7 +1264,7 @@ public class JspViewGenerator extends AbstractJSPGenerator implements IGenerator
 		startNewJob(jsp);
 		jsp.setName(getExportAsXMLPageName(section.getDocument()));
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
-		
+		appendGenerationPoint("generateXMLExport");
 		ident = 0;
 		append(getBaseXMLHeader());
 		

@@ -1272,11 +1272,11 @@ public class JspViewCms20Generator extends AbstractJSPGenerator implements IGene
 	}
 	
 	private GeneratedJSPFile generateXMLExport(MetaModuleSection section, MetaView view){
-		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		jsp.setName(getExportAsXMLPageName(section.getDocument()));
 		jsp.setPackage(getContext().getJspPackageName(section.getModule()));
+		appendGenerationPoint("generateXMLExport");
 		
 		ident = 0;
 		append(getBaseXMLHeader());

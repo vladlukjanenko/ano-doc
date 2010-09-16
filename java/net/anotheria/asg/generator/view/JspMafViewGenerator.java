@@ -3,6 +3,10 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import sun.org.mozilla.javascript.internal.Context;
+
+import apple.laf.CoreUIConstants.ShowArrows;
+
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
@@ -241,6 +245,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 							appendString("<div class=\"clear\"><!-- --></div>");
 						decreaseIdent();
 						
+						String backButtonHref = SectionAction.EDIT.getMappingName(section);
+						backButtonHref += "?pId=<bean:write name=\"ownerId\"/>";
+						appendString("<a href=" + backButtonHref + " class=\"button\"><span>Back to "+section.getDocument().getName()+"</span></a>");
 						
 						// SAVE AND CLOSE BUTTONS SHOULD BE HERE
 						appendString("</div>");
@@ -285,7 +292,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		}
 		
 		
-		String parameter = "pId=<bean:write name="+quote("element")+" property="+quote("ownerId")+"/>";
+		String parameter = "ownerId=<bean:write name="+quote("element")+" property="+quote("ownerId")+"/>";
 		parameter += "&pPosition=<bean:write name="+quote("element")+" property="+quote("position")+"/>";
 		appendString("<td>");
 		appendIncreasedString("<a href="+quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=top&"+parameter)+">"+getTopImage("move to top")+"</a>");
@@ -311,10 +318,10 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		increaseIdent();
 		
 		appendString("<tr>");
-		appendString("<form name="+quote(addFormName)+" action="+quote(addFormAction)+" method=\"post\">");
-		appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
 		appendIncreasedString("<td align=\"right\">Add&nbsp;"+name+": </td>");
 		appendString("<td align=\"left\">");
+		appendString("<form name="+quote(addFormName)+" action="+quote(addFormAction)+" method=\"post\">");
+		appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
 	
 		if (!p.isLinked() && !(p instanceof MetaEnumerationProperty)){
 			String field = "";
@@ -326,8 +333,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			appendString("<em id=\""+ "Value\" name=\"" + list.getContainedProperty().getName().toLowerCase() + "\" class=\"selectBox fll mr_10\">&nbsp;none</em>&nbsp;&nbsp;<div id=\""+"ValuesSelector\"></div>");
 		}
 		appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+addFormName+".submit()")+"><span>Add</span></a>");
-		appendString("</td>");
 		appendString("</form>");
+		appendString("</td>");
 		decreaseIdent();
 		appendString("</tr>");
 
@@ -335,6 +342,10 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		if (p.isLinked()){
 			increaseIdent();
 			appendString("<tr>");
+			appendString("<td align=\"right\">");
+			appendString("Quick&nbsp;add:");
+			appendString("</td>");
+			appendString("<td align=\"left\">");
 			appendString("<form name="+quote(quickAddFormName)+" action="+quote(quickAddFormAction)+" method=\"post\">");
 			increaseIdent();
 			appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+" value=\"<bean:write name="+quote("ownerId")+"/>\">");
@@ -348,16 +359,12 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			String field = "";
 			field += "<input class=\"add_id fll\" type=\"text\" style=\"width:25%;\" name="+quote("quickAddIds");
 			field += " value=\"\"/><span class=\"fll mr_10\">id's comma separated list.</span>";
-			appendString("<td align=\"right\">");
-			appendString("Quick&nbsp;add:");
-			appendString("</td>");
-			appendString("<td align=\"left\">");
 			appendString(field);
 			decreaseIdent();
 			decreaseIdent();
 			appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+quickAddFormName+".submit()")+"><span>QuickAdd</span></a>");
-			appendString("</td>");
 			appendString("</form>");
+			appendString("</td>");
 			appendString("</tr>");
 		}
 		//QUICK ADD END
@@ -1313,8 +1320,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		ret += "</logic:notEqual>";
 		ret += "&nbsp;";
 		String actionName = StrutsConfigGenerator.getContainerPath(((MetaModuleSection)currentSection).getDocument(), p, StrutsConfigGenerator.ACTION_SHOW);
-		actionName += "?pId=<bean:write name="+name+" property="+quote("id")+"/>";
-		ret += "<a href="+quote(actionName)+" target="+quote("_blank")+">&nbsp;&raquo&nbsp;Edit&nbsp;</a>";
+		actionName += "?ownerId=<bean:write name="+name+" property="+quote("id")+"/>";
+		ret += "<a href="+quote(actionName)+">&nbsp;&raquo&nbsp;Edit&nbsp;</a>";
 		ret += "</logic:notEqual>";
 		
 		return ret;
@@ -1637,7 +1644,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	appendString("<% String selectedPaging = \"\"+request.getAttribute("+quote("currentItemsOnPage")+"); %>");
 	appendString("<div class=\"paginator\">");
 	increaseIdent();
-	appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfElements\" value=\"1\">");
+	appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfPages\" value=\"1\">");
 		appendString("<ul>");
 		increaseIdent();
 			appendString("<logic:notEqual name=\"pagingControl\" property=\"first\" value=\"true\">");
@@ -1721,7 +1728,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					appendString("</table>");
 					appendString("<div class=\"paginator\">");
 					increaseIdent();
-					appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfElements\" value=\"1\">");
+					appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfPages\" value=\"1\">");
 						appendString("<ul>");
 						increaseIdent();
 							appendString("<logic:notEqual name=\"pagingControl\" property=\"first\" value=\"true\">");
@@ -1745,9 +1752,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						appendString("</ul>");
 						appendString("</logic:greaterThan>");
 
-						appendString("<form name=\"ItemsOnPageForm1\" action=\"\" method=\"GET\">");
+						appendString("<form name=\"ItemsOnPageForm2\" action=\"\" method=\"GET\">");
 						increaseIdent();
-							appendString("<select name=\"itemsOnPage\" onchange=\"document.ItemsOnPageForm1.submit();\">");
+							appendString("<select name=\"itemsOnPage\" onchange=\"document.ItemsOnPageForm2.submit();\">");
 							appendString("<logic:iterate name=\"PagingSelector\" type=\"java.lang.String\" id=\"option\">");
 							appendString("<option value=\"<bean:write name=\"option\"/>\" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name=\"option\"/> per page</option>");
 							appendString("</logic:iterate>");
@@ -2247,8 +2254,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	private String getDeleteWithConfirmationFunction(String entryName, MetaFunctionElement element){
 		String path = StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_DELETE);
 		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
-		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+" onClick="+quote("return confirm('Really delete "+
-				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>');")+">"+getDeleteImage()+"</a>" ;
+		return "<a href=\"#\" onClick="+quote("lightbox('Really delete "+
+				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getDeleteImage()+"</a>" ;
 	}
 
 	private String getEditFunction(String entryName, MetaFunctionElement element){

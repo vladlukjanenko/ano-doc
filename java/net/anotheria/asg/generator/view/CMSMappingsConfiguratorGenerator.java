@@ -53,6 +53,17 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		COPYLANG("CopyLang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		SWITCHMULTILANG("SwitchMultilang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		VERSIONINFO("Versioninfo", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
+//		SHOWQUERIES("Show", "ShowQueries", OperationType.SINGLE, true){
+//			@Override
+//			public String getViewName(MetaModuleSection section){
+//				MetaDocument doc = section.getDocument();
+//				return "ShowQueries"+doc.getName()+"Queries";
+//			}
+//			@Override
+//			public String getClassName(MetaModuleSection section){
+//				return "Show" + section.getDocument().getName(true) + "QueriesMafAction";
+//			}
+//		},
 		EXPORTtoCSV("Export.csv", "Show", OperationType.SINGLE, true){
 			@Override
 			public String getClassName(MetaModuleSection section){
@@ -75,6 +86,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 				return "Show"+doc.getName(true) + "AsXMLMaf";
 			}
 		},
+		
 		;
 		
 		private String action;
@@ -305,9 +317,6 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		for(SectionAction action: SectionAction.values()){
 			if(action.isIgnoreForSection(section))
 				continue;
-			if(StorageType.FEDERATION == section.getModule().getStorageType()){
-				System.out.println("!!!!!!!!!!!!! GENERATING FEDERATION: " + section.getTitle());
-			}
 			String actionName = action.getClassName(section);
 			clazz.addImport(actionsPackage + "." + actionName);
 			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName(section)+".jsp") + "))");

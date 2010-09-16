@@ -80,7 +80,7 @@ public class JspMafQueriesGenerator extends AbstractMafJSPGenerator implements I
 		appendString("</head>");
 		appendString("<body>");
 		increaseIdent();
-		appendString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
+		//appendString("<jsp:include page=\""+getMenuName(view)+".jsp\" flush=\"true\"/>");
 
 /*
 		List elements = section.getElements();

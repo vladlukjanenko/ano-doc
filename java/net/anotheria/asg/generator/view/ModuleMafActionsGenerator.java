@@ -2557,7 +2557,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendStatement(ModuleMafBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleMafBeanGenerator.getContainerEntryFormName(list)+"()");
 		appendStatement("populateFormBean(req, form)");
 		appendStatement("String id = form.getOwnerId()");
-		appendStatement("System.out.println(req.getParameter(\"ownerId\")+\"*********************************\");");
+		appendStatement("System.out.println(\"FormBean: \" + form.toString());");
 		
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
@@ -2742,7 +2742,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement("String id = getStringParameter(req, PARAM_ID)");
+		appendStatement("String id = getStringParameter(req, \"ownerId\")");
          if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
            appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
            //appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
@@ -2812,7 +2812,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement("String id = getStringParameter(req, PARAM_ID)");
+		appendStatement("String id = getStringParameter(req, \"ownerId\")");
 		appendStatement("int position = getIntParameter(req, "+quote("pPosition")+")");
 		appendStatement("String direction = getStringParameter(req, "+quote("dir")+")");
 
@@ -2950,7 +2950,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
 		appendString( getExecuteDeclaration(methodName));
 		increaseIdent();
-		appendStatement("String id = getStringParameter(req, PARAM_ID)");
+		appendStatement("String id = getStringParameter(req, \"ownerId\")");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 		appendStatement("addBeanToRequest(req, \"ownerId\", id)");
 		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
