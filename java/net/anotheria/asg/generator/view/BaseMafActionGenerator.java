@@ -41,7 +41,6 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 	 * @return
 	 */
 	public GeneratedClass generateBaseAction(List<MetaView> views){
-
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
@@ -49,6 +48,7 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
 		appendCommentLine("BaseMafActionGenerator");
+		clazz.addImport("net.anotheria.util.StringUtils");
 		clazz.addImport("net.anotheria.webutils.actions.*");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
@@ -64,6 +64,8 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		clazz.setName(getBaseMafActionName());
 
 		startClassBody();
+		
+		appendGenerationPoint("generateBaseAction");
 		
 		appendStatement("public static final String BEAN_MAIN_NAVIGATION = \"mainNavigation\"");
 		appendStatement("public static final String PARAM_SORT_TYPE = "+quote(ViewConstants.PARAM_SORT_TYPE));
@@ -122,40 +124,43 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		appendString("}");
         // end initing Lock Config
 	
-		append(closeBlock());
+		closeBlock("");
 		emptyline();
 		
 		appendString("public void preProcess(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res) throws Exception {");
+		increaseIdent();
 		appendString("super.preProcess(mapping, req, res);");
 		appendString("prepareMenu(req);");
-		append(closeBlock());
+		closeBlock("preProcess");
 		emptyline();
 		
 		appendString("public abstract ActionForward anoDocExecute(ActionMapping mapping, T formBean, HttpServletRequest req, HttpServletResponse res) throws Exception;");
 		emptyline();
+		appendGenerationPoint("generateBaseAction");
 		appendString("@Override");
 		appendString("public ActionForward execute(ActionMapping mapping, FormBean formBean, HttpServletRequest req, HttpServletResponse res) throws Exception {");
+		increaseIdent();
 		appendString("if (isAuthorizationRequired()){");
 			increaseIdent();
 				appendStatement("boolean authorized = checkAuthorization(req)");
 				appendString("if (!authorized){");
 				increaseIdent();
-					appendStatement("String queryString = req.getQueryString()");
-					appendString("if (queryString != null)");
-					appendIncreasedStatement("queryString = \"?\"+queryString");
-					appendString("else");
-					appendIncreasedStatement("queryString = \"\"");
-					appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, \""+GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"\"+req.getPathInfo()+queryString)");
+				//build url.
+					appendStatement("String url = req.getRequestURI()");
+					appendStatement("String qs = req.getQueryString()");
+					appendString("if (!StringUtils.isEmpty(qs))");
+					appendIncreasedStatement("url += qs;");
+					appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, url)");
 					appendStatement("String redUrl = "+quote(GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"/login"));
 					appendStatement("res.sendRedirect(redUrl)");
 					appendStatement("return null");		
-				append(closeBlock());
-			append(closeBlock());
+				closeBlock("if");
+			closeBlock("if");
 			appendStatement("checkAccessPermissions(req)");
 		emptyline();
 
 		appendString("return anoDocExecute(mapping, (T) formBean, req, res);");
-		closeBlock("doExecute");
+		closeBlock("execute");
 		emptyline();
 		//generate service getter
 		for (MetaModule m:modules){
