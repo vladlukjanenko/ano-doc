@@ -3,6 +3,10 @@ package net.anotheria.asg.generator.view;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+
+
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
@@ -555,46 +559,41 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		decreaseIdent();
 		appendString("</head>");
 		appendString("<body>");
-		
-		
 		appendString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
-		
-		
 		appendString("<div class=\"right\">");
 		appendString("<div class=\"r_w\">");
 		increaseIdent();
-			appendString("<div class=\"top_nav\">");
-			increaseIdent();
-				appendString("<div class=\"r_b_l\"><!-- --></div>");
-				appendString("<div class=\"r_b_r\"><!-- --></div>");
-				appendString("<div class=\"left_p\">");
+		appendString("<div class=\"top_nav\">");
+		increaseIdent();
+		appendString("<div class=\"r_b_l\"><!-- --></div>");
+		appendString("<div class=\"r_b_r\"><!-- --></div>");
+		appendString("<div class=\"left_p\">");
+		increaseIdent();
+		appendString("<ul>");
+		increaseIdent();
+		appendString("<li class=\"first\">Scroll to:&nbsp;</li>");
+		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument()); 
+		for (int i=0; i<elements.size(); i++){
+			MetaViewElement element = elements.get(i);
+			while (elements.get(i) instanceof MultilingualFieldElement){
+				appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
+				appendString("<li><a href=\"#"+element.getName()+"DEF"+"\">"+element.getName()+"DEF"+"</a></li>");
+				appendString("</logic:equal>");
+				appendString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
+				appendString("<li>");
 				increaseIdent();
-					appendString("<ul>");
-					increaseIdent();
-						appendString("<li class=\"first\">Scroll to:&nbsp;</li>");
-						List<MetaViewElement> elements = createMultilingualList(dialog.getElements(),section.getDocument()); 
-
-						for (int i=0; i<elements.size(); i++){
-							MetaViewElement element = elements.get(i);
-							while (elements.get(i) instanceof MultilingualFieldElement){
-								appendString("<logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
-								appendString("<li><a href=\"#"+element.getName()+"DEF"+"\">"+element.getName()+"DEF"+"</a></li>");
-								appendString("</logic:equal>");
-							appendString("<logic:notEqual name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
-							appendString("<li>");
-							increaseIdent();
-								String lang = getElementLanguage(element);
-								appendString("<a href=\"#"+section.getDocument().getField(element.getName()).getName(lang)+"\">"+element.getName()+"</a><a href=\"#\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
-								appendString("<div class=\"pop_up\">");
-								increaseIdent();
-									appendString("<div class=\"top\">");
-									increaseIdent();
-										appendString("<div><!-- --></div>");
-									decreaseIdent();
-									appendString("</div>");
-									appendString("<div class=\"in_l\">");
-									increaseIdent();
-										appendString("<div class=\"in_r\">");
+				String lang = getElementLanguage(element);
+				appendString("<a href=\"#"+section.getDocument().getField(element.getName()).getName(lang)+"\">"+element.getName()+"</a><a href=\"#\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
+				appendString("<div class=\"pop_up\">");
+				increaseIdent();
+				appendString("<div class=\"top\">");
+				increaseIdent();
+				appendString("<div><!-- --></div>");
+				decreaseIdent();
+				appendString("</div>");
+				appendString("<div class=\"in_l\">");
+				increaseIdent();
+				appendString("<div class=\"in_r\">");
 										increaseIdent();
 											appendString("<div class=\"in_w\">");
 											increaseIdent();
@@ -1522,28 +1521,26 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
 		appendString("\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		appendString("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+		appendString("<head>");
 			increaseIdent();
-			appendString("<head>");
-				increaseIdent();
-				appendString("<title>"+view.getTitle()+"</title>");
-				//appendString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
-				generatePragmas(view);
-				appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
-				appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("jquery-1.4.min.js")+"\"></script>");
-				appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("anofunctions.js")+"\"></script>");
-				decreaseIdent();
-				appendString("</head>");
-				appendString("<body>");
-					increaseIdent();
-					appendString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
+			appendString("<title>"+view.getTitle()+"</title>");
+			generatePragmas(view);
+			appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
+			appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("jquery-1.4.min.js")+"\"></script>");
+			appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("anofunctions.js")+"\"></script>");
+			decreaseIdent();
+		appendString("</head>");
+		appendString("<body>");
+			increaseIdent();
+			appendString("<jsp:include page=\""+getTopMenuPage()+"\" flush=\"true\"/>");
 
 		List<MetaViewElement> elements = createMultilingualList(section.getElements(), doc);
-		int colspan = elements.size();
-		
+
 		appendString("<div class=\"right\">");
 			increaseIdent();
 			appendString("<div class=\"r_w\">");
 				increaseIdent();
+				//top navigation start
 				appendString("<div class=\"top_nav\">");
 					increaseIdent();
 					appendString("<div class=\"r_b_l\"><!-- --></div>");
@@ -1567,7 +1564,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 											increaseIdent();
 											//actually  - currentPage  parameter ! - for export paging!!!
 											String pageNumberParam = "?pageNumber=<bean:write name="+quote("currentpage")+" scope="+quote("request")+"/>";
-											appendString("<span>Export to <a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_XML)+pageNumberParam)+">XML</a> or <a href="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_EXPORT+StrutsConfigGenerator.SUFFIX_CSV)+pageNumberParam)+">CSV</a></span>");
+											appendString("<span>Export to <a href="+quote(SectionAction.EXPORTtoXML.getMappingName(section)+pageNumberParam)+">XML</a> or <a href="+quote(SectionAction.EXPORTtoCSV.getMappingName(section)+pageNumberParam)+">CSV</a></span>");
 										decreaseIdent();
 										appendString("</div>");
 									decreaseIdent();
@@ -1584,7 +1581,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					appendString("</div>");
 				decreaseIdent();
 				appendString("</div>");
-					
+				//top navigation end
 				
 				
 		appendString("<div class=\"main_area\">");
@@ -1594,9 +1591,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			appendString("<div class=\"c_b_l\"><!-- --></div>");
 			appendString("<div class=\"c_b_r\"><!-- --></div>");
 		
-			// FILTER START ----------------------------------------
-			//filter management line
-				
+			//filters start
 				appendString("<a href=\"#\" class=\"filter_open\">Filters</a>");
 				appendString("<div class=\"filters\" style= \"display:none;\">");
 				increaseIdent();
@@ -1622,7 +1617,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 									appendIncreasedString("<li><a href=\"#\" class=\"active\"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a></li>");
 									appendString("</logic:equal>");
 									appendString("<logic:notEqual name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
-									appendIncreasedString("<li><a href="+quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW)+"?pFilter"+i+"=<bean:write name="+quote("triggerer")+" property="+quote("parameter")+"/>")+"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a></li>");
+									appendIncreasedString("<li><a href="+quote(SectionAction.SHOW.getMappingName(section)+"?pFilter"+i+"=<bean:write name="+quote("triggerer")+" property="+quote("parameter")+"/>")+"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a></li>");
 									appendString("</logic:notEqual>");
 								decreaseIdent();
 								appendString("</logic:iterate>");
@@ -1631,13 +1626,14 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						appendString("</ul>");
 						appendString("<br/>");
 			}
-			// ------------------------------------------ FILTER END 
+			//filters end 
 			
 		appendString("<div class=\"clear\"><!-- --></div>");
 	decreaseIdent();
 	appendString("</div>");
 	
 	appendString("<% String selectedPaging = \"\"+request.getAttribute("+quote("currentItemsOnPage")+"); %>");
+	//first paging start
 	appendString("<div class=\"paginator\">");
 	increaseIdent();
 	appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfPages\" value=\"1\">");
@@ -1664,22 +1660,19 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("</ul>");
 		appendString("</logic:greaterThan>");
 
-		appendString("<form name=\"ItemsOnPageForm1\" action=\"\" method=\"GET\">");
 		increaseIdent();
-			appendString("<select name=\"itemsOnPage\" onchange=\"document.ItemsOnPageForm1.submit();\">");
+			appendString("<select name=\"itemsOnPage\" onchange=\"window.location='?itemsOnPage=' + this.options[this.selectedIndex].value\">");
 			appendString("<logic:iterate name=\"PagingSelector\" type=\"java.lang.String\" id=\"option\">");
 			appendString("<option value=\"<bean:write name=\"option\"/>\" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name=\"option\"/> per page</option>");
 			appendString("</logic:iterate>");
 			appendString("</select>");
 		decreaseIdent();
-		appendString("</form>");
 	decreaseIdent();
 	appendString("</div>");
 	appendString("<div class=\"clear\"><!-- --></div>");
+	//first paging end
 		
-		
-
-		//write header
+	//main table start
 		appendString("<table cellspacing=\"1\" cellpadding=\"1\" width=\"100%\" border=\"0\" class=\"pages_table\">");
 		increaseIdent();
 			appendString("<thead>");
@@ -1722,6 +1715,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						appendString("</tbody>");
 					decreaseIdent();
 					appendString("</table>");
+					//main table end
+					
+					//second paging start
 					appendString("<div class=\"paginator\">");
 					increaseIdent();
 					appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfPages\" value=\"1\">");
@@ -1747,16 +1743,13 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						decreaseIdent();
 						appendString("</ul>");
 						appendString("</logic:greaterThan>");
-
-						appendString("<form name=\"ItemsOnPageForm2\" action=\"\" method=\"GET\">");
 						increaseIdent();
-							appendString("<select name=\"itemsOnPage\" onchange=\"document.ItemsOnPageForm2.submit();\">");
+							appendString("<select name=\"itemsOnPage\" onchange=\"window.location='?itemsOnPage=' + this.options[this.selectedIndex].value\">");
 							appendString("<logic:iterate name=\"PagingSelector\" type=\"java.lang.String\" id=\"option\">");
 							appendString("<option value=\"<bean:write name=\"option\"/>\" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name=\"option\"/> per page</option>");
 							appendString("</logic:iterate>");
 							appendString("</select>");
 						decreaseIdent();
-						appendString("</form>");
 					decreaseIdent();
 					appendString("</div>");
 					appendString("<div class=\"clear\"><!-- --></div>");
@@ -1766,7 +1759,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			appendString("</div>");
 		decreaseIdent();
 		appendString("</div>");
+		//second paging end
 		
+		//lightbox start
 		appendString("<div class=\"lightbox\" style=\"display:none;\">");
 		appendString("<div class=\"black_bg\"><!-- --></div>");
 		appendString("<div class=\"box\">");
@@ -1796,6 +1791,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			decreaseIdent();
 			appendString("</div>");
 		decreaseIdent();
+		//lightbox end
+		
 		appendString("</div>");
 		appendString("</div>");
 		appendString("</body>");
@@ -2003,7 +2000,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String displayLanguageCheck = "";
 		if(element instanceof MultilingualFieldElement) {
 			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
-			displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";			
+			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";			
 		}
 		
 		return "<td " + displayLanguageCheck + ">"+header+"</td>";
@@ -2028,7 +2025,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String displayLanguageCheck = "";
 		if(element instanceof MultilingualFieldElement) {
 			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
-			displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";			
+			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";			
 		}
 		
 		return "<td " + displayLanguageCheck + "><bean:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
