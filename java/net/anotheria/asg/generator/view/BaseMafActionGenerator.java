@@ -149,7 +149,7 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 					appendStatement("String url = req.getRequestURI()");
 					appendStatement("String qs = req.getQueryString()");
 					appendString("if (!StringUtils.isEmpty(qs))");
-					appendIncreasedStatement("url += qs;");
+					appendIncreasedStatement("url += \"?\"+qs;");
 					appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, url)");
 					appendStatement("String redUrl = "+quote(GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"/login"));
 					appendStatement("res.sendRedirect(redUrl)");
