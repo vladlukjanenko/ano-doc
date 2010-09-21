@@ -53,17 +53,21 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		COPYLANG("CopyLang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		SWITCHMULTILANG("SwitchMultilang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		VERSIONINFO("Versioninfo", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
-//		SHOWQUERIES("Show", "ShowQueries", OperationType.SINGLE, true){
-//			@Override
-//			public String getViewName(MetaModuleSection section){
-//				MetaDocument doc = section.getDocument();
-//				return "ShowQueries"+doc.getName()+"Queries";
-//			}
-//			@Override
-//			public String getClassName(MetaModuleSection section){
-//				return "Show" + section.getDocument().getName(true) + "QueriesMafAction";
-//			}
-//		},
+		SHOWQUERIES("ShowQueries", "ShowQueries", OperationType.SINGLE, true){
+			@Override
+			public String getViewName(MetaModuleSection section){
+				MetaDocument doc = section.getDocument();
+				return "Show"+doc.getName()+"QueriesMaf";
+			}
+			@Override
+			public String getClassName(MetaModuleSection section){
+				return "Show" + section.getDocument().getName(true) + "QueriesMafAction";
+			}
+			@Override
+			public boolean isIgnoreForSection(MetaModuleSection section){
+				return section.getDocument().getLinks().size()==0;
+			}
+		},
 		EXPORTtoCSV("Export.csv", "Show", OperationType.SINGLE, true){
 			@Override
 			public String getClassName(MetaModuleSection section){

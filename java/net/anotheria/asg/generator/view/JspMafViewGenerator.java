@@ -637,7 +637,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				appendString("</div>");
 				
 				
-				appendString("<div class=\"right_p\"><a href=\"#\"><img src=\"../img/settings.gif\" alt=\"\"/></a>");
+				appendString("<div class=\"right_p\"><a href=\"#\"><img src=\"../cms_static/img/settings.gif\" alt=\"\"/></a>");
 				increaseIdent();
 					appendString("<div class=\"pop_up\">");
 					increaseIdent();
@@ -1234,7 +1234,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String lang = getElementLanguage(element); 
 		
 		ret += "<select name=\""+p.getName(lang)+"\">";
-		ret += "<logic:iterate indexId=\"index\" id=\"element\" property=\"commandCollection\" name=\""+StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\">";
+		ret += "<logic:iterate indexId=\"index\" id=\"element\" property=\""+ p.getName() +"Collection\" name=\""+StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\">";
 		ret += "<option value=\"<bean:write name=\"element\" property=\"value\"/>\" <logic:equal name=\""+StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\" property=\""+p.getName()+"CurrentValue"+(lang==null ? "":lang)+"\" value=\"${element.label}\">selected</logic:equal>><bean:write name=\"element\" property=\"label\"/></option>";
 		ret += "</logic:iterate>";
 		ret += "</select>";
@@ -1546,7 +1546,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					appendString("<div class=\"r_b_l\"><!-- --></div>");
 					appendString("<div class=\"r_b_r\"><!-- --></div>");
 					appendString("<div class=\"left_p\">"+generateNewFunction("", new MetaFunctionElement("add"))+"</div>");
-					appendString("<div class=\"right_p\"><a href=\"#\"><img src=\"../img/settings.gif\" alt=\"\"/></a>");
+					appendString("<div class=\"right_p\"><a href=\"#\"><img src=\"../cms_static/img/settings.gif\" alt=\"\"/></a>");
 						increaseIdent();
 						appendString("<div class=\"pop_up\">");
 							increaseIdent();

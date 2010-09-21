@@ -10,6 +10,7 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SectionAction;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SharedAction;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
@@ -44,8 +45,8 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 			increaseIdent();
 			appendString("<div class= \"scroll_left\">");
 				increaseIdent();
-				appendString("<img class=\"logo\" src=\"../img/logo.gif\" alt=\"CMS Logo\"/>");
-				//appendString("<form name=\"Search\" action="+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), StrutsConfigGenerator.ACTION_SEARCH))+">");
+				appendString("<img class=\"logo\" src=\"../cms_static/img/logo.gif\" alt=\"CMS Logo\"/>");
+				appendString("<form name=\"Search\" action="+quote(SharedAction.SEARCH.getMappingName())+">");
 					increaseIdent();
 					appendString("<input class=\"search\" name=\"criteria\" type=\"text\" value=\"Search...\" />");
 					appendString("<a href=\"#\" class=\"adv_search \">Advanced search</a>");
@@ -137,7 +138,7 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 							
 							appendString("<a href=\"<ano:tslink>logout</ano:tslink>\" class=\"logout\">Logout</a>");
 							appendString("<div class=\"clear\"><!-- --></div>");
-							appendString("<a href=\"http://www.anotheria.net\" class=\"powered\"><img src=\"../img/powered_conf.gif\" alt=\"\"/></a>");
+							appendString("<a href=\"http://www.anotheria.net\" class=\"powered\"><img src=\"../cms_static/img/powered_conf.gif\" alt=\"\"/></a>");
 						
 						decreaseIdent();		
 						appendString("</div>");

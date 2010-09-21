@@ -304,15 +304,15 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	}
 
 	public static String getCSSPath(String stylesheetName, Context context){
-		return context.getApplicationURLPath()+"/css/"+stylesheetName;
+		return context.getApplicationURLPath()+"/cms_static/css/"+stylesheetName;
 	}
 
 	public static String getJSPath(String jsName, Context context){
-		return context.getApplicationURLPath()+"/js/"+jsName;
+		return context.getApplicationURLPath()+"/cms_static/js/"+jsName;
 	}
 
 	public static String getJavaScriptPath(String javaScript, Context context){
-		return context.getApplicationURLPath()+"/js/"+javaScript;
+		return context.getApplicationURLPath()+"/cms_static/js/"+javaScript;
 	}
 	
 	public static String getYUIPath(String yuiName, Context context){
@@ -450,7 +450,7 @@ public abstract class AbstractMafJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	protected String getImage(String name, String alt){
-		return "<img src=\""+GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/img/"+name+".gif"+"\" alt="+quote(alt)+" title="+quote(alt)+">";
+		return "<img src=\""+GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/cms_static/img/"+name+".gif"+"\" alt="+quote(alt)+" title="+quote(alt)+">";
 	}
 
 	public Context getContext() {
