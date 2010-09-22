@@ -758,8 +758,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		//check if we have decorators
 		List<MetaDecorator> neededDecorators = new ArrayList<MetaDecorator>();
 		
-		for (int i=0; i<elements.size(); i++){
-			MetaViewElement element = elements.get(i);
+		for (MetaViewElement element: elements){
 			if (element instanceof MetaFieldElement){
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());

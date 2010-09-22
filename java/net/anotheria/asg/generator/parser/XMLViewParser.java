@@ -171,10 +171,14 @@ public final class XMLViewParser {
 			section.setDefaultSortable(element);
 		}
 		
-		Element decElement = elem.getChild("decorator");
-		if (decElement!=null){
-			element.setDecorator(parseDecorator(decElement));
-			//System.out.println("found decorator!");
+		try{
+			Element decElement = elem.getChild("decorator");
+			if (decElement!=null){
+				element.setDecorator(parseDecorator(decElement));
+				//System.out.println("found decorator!");
+			}
+		}catch(Exception e){
+			log.error("*********** Could not parse decorator cause: " + e.getMessage() + " ***********");
 		}
 		
 		return element;
