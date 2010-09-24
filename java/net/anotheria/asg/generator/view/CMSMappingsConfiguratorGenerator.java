@@ -306,8 +306,9 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		for(SectionAction action: SectionAction.values()){
 			if(action.isIgnoreForSection(section))
 				continue;
-			String actionName = action.getClassName(section);
-			clazz.addImport(actionsPackage + "." + actionName);
+//			String actionName = action.getClassName(section);
+//			clazz.addImport(actionsPackage + "." + actionName);
+			String actionName = actionsPackage + "." + action.getClassName(section);
 			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName(section)+".jsp") + "))");
 		}
 
@@ -316,8 +317,9 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	private void generateSharedMappings(GeneratedClass clazz){
 		String actionsPackage = GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action";
 		for(SharedAction action: SharedAction.values()){
-			String actionName = action.getClassName();
-			clazz.addImport(actionsPackage + "." + actionName);
+//			String actionName = action.getClassName();
+//			clazz.addImport(actionsPackage + "." + actionName);
+			String actionName = actionsPackage + "." + action.getClassName();
 			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName()) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName()+".jsp") + "))");
 		}
 
@@ -332,8 +334,9 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 		
 		for(ContainerAction action: ContainerAction.values()){
-			String actionName = action.getClassName(doc, container);
-			clazz.addImport(actionsPackage + "." + actionName);
+//			String actionName = action.getClassName(doc, container);
+//			clazz.addImport(actionsPackage + "." + actionName);
+			String actionName = actionsPackage + "." + action.getClassName(doc, container);
 			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(doc, container)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(jspPath + action.getViewName(doc, container)+".jsp") + "))");
 		}
 

@@ -332,13 +332,6 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 			}
 			
 			writeInterfaceFun(
-	        		"Executes a query on all data objects (documents, vo) which are part of this module and managed by this service", 
-        			"QueryResult", 
-        			"executeQueryOnAllObjects", 
-        			"DocumentQuery query"
-        			);
-			
-			writeInterfaceFun(
 					"Creates an xml element with selected contained data.",
 					"XMLNode",
 					"export"+doc.getMultiple()+"ToXML",
@@ -364,6 +357,13 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    			"String sourceLanguage, String targetLanguage"
 	    			);
 	    }
+	    
+	    writeInterfaceFun(
+        		"Executes a query on all data objects (documents, vo) which are part of this module and managed by this service", 
+    			"QueryResult", 
+    			"executeQueryOnAllObjects", 
+    			"DocumentQuery query"
+    			);
 	    
         writeInterfaceFun(
         		"creates an xml element with all contained data.", 
@@ -851,15 +851,6 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 				containsAnyMultilingualDocs = true;
 			}
-
-			writeStubFun(
-		    		"Executes a query on all data objects (documents, vo) which are part of this module and managed by this service",
-		    		"QueryResult",
-		    		"executeQueryOnAllObjects",
-		    		"DocumentQuery query",
-		    		"query",
-		    		"query"
-		    		);
 			
 			writeStubFun(
 					"Creates an xml element with all contained data.",
@@ -893,6 +884,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		);
 	    }
 	    
+
+		writeStubFun(
+	    		"Executes a query on all data objects (documents, vo) which are part of this module and managed by this service",
+	    		"QueryResult",
+	    		"executeQueryOnAllObjects",
+	    		"DocumentQuery query",
+	    		"query",
+	    		"query"
+	    		);
 	    
 	    writeStubFun(
 	    		"creates an xml element with all contained data.",
