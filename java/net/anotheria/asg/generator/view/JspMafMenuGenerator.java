@@ -69,7 +69,6 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 						decreaseIdent();
 						appendString("<ul>");
 						appendString("<a href=\"#\" class=\"button\" onClick=\"document.Search.submit();return false\"><span>Search</span></a>");
-						appendString("<a href=\"<ano:tslink>aswebdataPagexShowQueries</ano:tslink>\" class=\"quer\">Queries</a>");
 					decreaseIdent();
 					appendString("</div>");
 					appendString("<div class=\"bot\">");

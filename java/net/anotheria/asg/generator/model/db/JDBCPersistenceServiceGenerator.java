@@ -110,6 +110,8 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 	    
+		appendGenerationPoint("generateInterface");
+		
 	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module), this));
  
 	    clazz.setPackageName(getPackageName(module));
@@ -197,6 +199,8 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		
+		appendGenerationPoint("generateImplementation");
 		
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+"."));
 
@@ -468,6 +472,8 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	private GeneratedClass generateFactory(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		
+		appendGenerationPoint("generateFactory");
 		
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getFactoryName(module),"The factory for the "+getInterfaceName(module)+" implementation."));
 

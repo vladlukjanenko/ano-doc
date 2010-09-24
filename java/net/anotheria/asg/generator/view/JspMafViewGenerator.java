@@ -330,7 +330,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			field += "\">";
 			appendIncreasedString(field);
 		}else{
-			appendString("<em id=\""+ "Value\" name=\"" + list.getContainedProperty().getName().toLowerCase() + "\" class=\"selectBox fll mr_10\">&nbsp;none</em>&nbsp;&nbsp;<div id=\""+"ValuesSelector\"></div>");
+			appendString("<em id=\""+ "Value\" name=\"" + list.getContainedProperty().getName().toLowerCase() + "\" class=\"selectBox fll mr_10\">&nbsp;none</em><div id=\""+"ValuesSelector\"></div>");
 		}
 		appendString("<a href="+quote("#")+" class=\"button\" onClick="+quote("document."+addFormName+".submit()")+"><span>Add</span></a>");
 		appendString("</form>");
@@ -358,7 +358,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				name = "&nbsp;";
 			String field = "";
 			field += "<input class=\"add_id fll\" type=\"text\" style=\"width:25%;\" name="+quote("quickAddIds");
-			field += " value=\"\"/><span class=\"fll mr_10\">id's comma separated list.</span>";
+			field += " value=\"\"/><span class=\"fll mr_10 mt_4\">id's comma separated list.</span>";
 			appendString(field);
 			decreaseIdent();
 			decreaseIdent();
@@ -1865,7 +1865,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<tr class=\"linecaptions\">");
 		increaseIdent();
 		appendString("<td style=\"width: 50px;\">Id</td>");
-		appendString("<td style=\"width: 200px;\">Property name</td>");
+		appendString("<td style=\"width: 200px;\">Document</td>");
+		appendString("<td style=\"width: 200px;\">Property</td>");
 		appendString("<td>Match</td>");
 		decreaseIdent();
 		appendString("</tr>");
@@ -1876,6 +1877,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		increaseIdent();
 		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
 		appendString("<td style=\"width: 50px;\"><a href="+quote("<bean:write name="+quote("entry")+" property="+quote("editLink")+"/>")+" target="+quote("_blank")+"><bean:write name="+quote("entry")+" property="+quote("documentId")+"/></td>");
+		appendString("<td style=\"width: 200px;\"><bean:write name="+quote("entry")+" property="+quote("documentName")+"/></td>");
 		appendString("<td style=\"width: 200px;\"><bean:write name="+quote("entry")+" property="+quote("propertyName")+"/></td>");
 		appendString("<td><bean:write name="+quote("entry")+" property="+quote("info")+" filter="+quote("false")+"/></td>");
 		appendString("</tr>");

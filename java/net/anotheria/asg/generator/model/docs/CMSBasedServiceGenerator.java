@@ -1,5 +1,7 @@
 package net.anotheria.asg.generator.model.docs;
 
+import net.anotheria.anodoc.query2.DocumentQuery;
+import net.anotheria.anodoc.query2.QueryResult;
 import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
@@ -50,6 +52,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.addInterface("CRUDService<"+doc.getName()+">");
 
 		startClassBody();
+		appendGenerationPoint("generateCRUDService");
 	    appendStatement(getInterfaceName(module)+" service");
 	    emptyline();
 	    appendString("public ", getCRUDServiceName(doc), "(){");
@@ -127,6 +130,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 
 	    startClassBody();
 
+	    appendGenerationPoint("generateImplementation");
+	    
 	    appendStatement("private static "+getImplementationName(module)+" instance");
 	    emptyline();
 
@@ -565,7 +570,17 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			emptyline();
 	    }
 
-
+	    appendComment("Executes a query on all data objects (documents, vo) which are part of this module and managed by this service");
+		appendString("public QueryResult executeQueryOnAllObjects(DocumentQuery query){");
+		increaseIdent();
+		appendStatement("QueryResult ret = new QueryResult()");
+		for (MetaDocument doc : docs){
+			appendStatement("ret.add(executeQueryOn"+doc.getMultiple()+"(query).getEntries())");
+		}
+		appendStatement("return ret");
+		closeBlock("executeQueryOnAllObjects");
+		emptyline();
+		
 	    //generate export function
 	    emptyline();
 	    for (MetaDocument d : docs){

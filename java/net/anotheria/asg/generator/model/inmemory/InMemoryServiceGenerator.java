@@ -630,6 +630,16 @@ public class InMemoryServiceGenerator extends AbstractServiceGenerator implement
 	    	emptyline();
 }
 	    
+	    appendComment("Executes a query on all data objects (documents, vo) which are part of this module and managed by this service");
+		appendString("public QueryResult executeQueryOnAllObjects(DocumentQuery query)" + throwsClause + "{");
+		increaseIdent();
+		appendStatement("QueryResult ret = new QueryResult()");
+		for (MetaDocument doc : docs){
+			appendStatement("ret.add(executeQueryOn"+doc.getMultiple()+"(query).getEntries())");
+		}
+		appendStatement("return ret");
+		closeBlock("executeQueryOnAllObjects");
+		emptyline();
 
 	    appendString("public XMLNode exportToXML(){");
 	    increaseIdent();

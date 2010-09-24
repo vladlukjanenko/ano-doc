@@ -14,6 +14,10 @@ public class ResultEntryBean {
 	 */
 	private String documentId;
 	/**
+	 * The name of the document/object which was found.
+	 */
+	private String documentName;
+	/**
 	 * The name of the property which matched.
 	 */
 	private String propertyName;
@@ -45,6 +49,12 @@ public class ResultEntryBean {
 	}
 	public void setPropertyName(String propertyName) {
 		this.propertyName = propertyName;
+	}
+	public void setDocumentName(String documentName) {
+		this.documentName = documentName;
+	}
+	public String getDocumentName() {
+		return documentName;
 	}
 	
 	

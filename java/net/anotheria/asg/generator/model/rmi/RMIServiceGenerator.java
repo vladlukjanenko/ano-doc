@@ -1,7 +1,18 @@
 package net.anotheria.asg.generator.model.rmi;
 
 
-import net.anotheria.asg.generator.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.anotheria.asg.generator.CommentGenerator;
+import net.anotheria.asg.generator.Context;
+import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GenerationOptions;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.IGenerateable;
+import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.TypeOfClass;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
@@ -10,9 +21,6 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Generates a RMI-Backed distribution of a module interface and the according factory.
@@ -110,6 +118,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	private GeneratedClass generateRemoteException(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateRemoteException");
 		
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRemoteExceptionName(module), this));
 		clazz.setPackageName(getPackageName(module));
@@ -137,6 +146,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateRemoteInterface");
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module), this));
 		clazz.setPackageName(getPackageName(module));
 		clazz.setType(TypeOfClass.INTERFACE);
@@ -320,7 +330,14 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	        			);
 				containsAnyMultilingualDocs = true;
 			}
-
+			
+			writeInterfaceFun(
+	        		"Executes a query on all data objects (documents, vo) which are part of this module and managed by this service", 
+        			"QueryResult", 
+        			"executeQueryOnAllObjects", 
+        			"DocumentQuery query"
+        			);
+			
 			writeInterfaceFun(
 					"Creates an xml element with selected contained data.",
 					"XMLNode",
@@ -420,6 +437,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	private GeneratedClass generateLookup(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateLookup");
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getLookupName(module), this));
 		clazz.setPackageName(getPackageName(module));
 
@@ -468,6 +486,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateServer");
 		
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getServerName(module), this));
 		clazz.setPackageName(getPackageName(module));
@@ -559,6 +578,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateStub");
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getStubName(module), this));
 		clazz.setPackageName(getPackageName(module));
 
@@ -833,6 +853,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 			}
 
 			writeStubFun(
+		    		"Executes a query on all data objects (documents, vo) which are part of this module and managed by this service",
+		    		"QueryResult",
+		    		"executeQueryOnAllObjects",
+		    		"DocumentQuery query",
+		    		"query",
+		    		"query"
+		    		);
+			
+			writeStubFun(
 					"Creates an xml element with all contained data.",
 					"XMLNode",
 					"export"+doc.getMultiple()+"ToXML",
@@ -912,6 +941,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateSkeleton");
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getSkeletonName(module), this));
 		clazz.setPackageName(getPackageName(module));
 		
@@ -1176,6 +1206,14 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		    		);
 	    }
 	    
+	    writeSkeletonFun(
+	    		"Executes a query on all data objects (documents, vo) which are part of this module and managed by this service",
+	    		"QueryResult",
+	    		"executeQueryOnAllObjects",
+	    		"DocumentQuery query",
+	    		"query",
+	    		"query"
+	    		);
 	    
 	    writeSkeletonFun(
 	    		"creates an xml element with all contained data.",

@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.anotheria.anodoc.query2.QueryResultEntry;
+import net.anotheria.asg.data.DataObject;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SectionAction;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SharedAction;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.util.StringUtils;
 
 public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 
@@ -59,6 +63,8 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		clazz.addImport("net.anotheria.maf.bean.FormBean");
 		clazz.addImport("net.anotheria.maf.bean.annotations.Form");
 		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");
+		clazz.addImport("net.anotheria.util.StringUtils");
+		clazz.addImport("net.anotheria.asg.data.DataObject");
 	
 		clazz.setParent(BaseMafActionGenerator.getBaseMafActionName(), "SearchFB");
 		clazz.setName(getCmsSearchActionName());
@@ -83,12 +89,16 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		appendString("}else{");
 		increaseIdent();
 		appendString("List<ResultEntryBean> beans = new ArrayList<ResultEntryBean>(result.getEntries().size());");
-		appendString("for (int i=0; i<result.getEntries().size(); i++){");
+		appendString("for (QueryResultEntry entry: result.getEntries()){");
 		increaseIdent();
-		appendString("QueryResultEntry entry = result.getEntries().get(i);");
+		appendStatement("DataObject doc = (DataObject)entry.getMatchedDocument()");
 		appendString("ResultEntryBean bean = new ResultEntryBean();");
-		appendString("bean.setEditLink(formBean.getModule() + formBean.getDocument() + \"Edit?pId=\"+entry.getMatchedDocument().getId()+\"&ts=\"+System.currentTimeMillis());");
+		
+		appendString("bean.setEditLink(doc.getDefinedParentName().toLowerCase() + StringUtils.capitalize(doc.getDefinedName()) + \"Edit?pId=\" + doc.getId() + \"&ts=\" + System.currentTimeMillis());");
+
 		appendString("bean.setDocumentId(entry.getMatchedDocument().getId());");
+		appendString("bean.setDocumentName(doc.getDefinedName());");
+		appendString("bean.setPropertyName(entry.getMatchedProperty().getId());");
 		appendString("bean.setInfo(entry.getInfo().toHtml());");
 		appendString("beans.add(bean);");
 		closeBlock("");
@@ -98,35 +108,38 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		closeBlock("");
 		emptyline();
 		appendString("private QueryResult executeQuery(String moduleName, String documentName, DocumentQuery query) throws ASGRuntimeException{");
+		increaseIdent();
+		appendStatement("QueryResult ret = new QueryResult()");
+		appendStatement("boolean wholeCms = \"wholeCms\".equals(moduleName)");
+		appendStatement("boolean wholeModule = wholeCms || \"wholeModule\".equals(documentName)");
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
 		for(MetaModule module: modules){
 			emptyline();
-			appendString("if(moduleName.equalsIgnoreCase(\""+module.getName()+"\")){");
+			appendString("if(wholeCms || moduleName.equals(\""+module.getName()+"\")){");
 			increaseIdent();
 			for(MetaDocument document: module.getDocuments()){
 				increaseIdent();
-				appendString("if(documentName.equals(\""+document.getName()+"\"))");
-				appendIncreasedString("return get"+module.getName()+"Service().executeQueryOn"+document.getName(true)+"(query);");
+				appendString("if(wholeModule || documentName.equals(\""+document.getName()+"\"))");
+				appendIncreasedString("ret.add(get"+module.getName()+"Service().executeQueryOn"+document.getName(true)+"(query).getEntries());");
 				decreaseIdent();
 			}
 			closeBlock("if");
 		}
 		
 		emptyline();
-		increaseIdent();
-		appendString("throw new AssertionError(\"Could not execute query: unknow target \" + moduleName + \".\" + documentName);");
+		appendStatement("return ret");
 		closeBlock("executeQuery");
 		emptyline();
-		increaseIdent();
 		appendString("@Override");
 		appendString("protected String getActiveMainNavi() {");
-		appendIncreasedString("return null;");
-		closeBlock("");
 		increaseIdent();
+		appendStatement("return null");
+		closeBlock("");
 		emptyline();
 		appendString("@Override");
 		appendString("protected List<NavigationItemBean> getSubNavigation(){");
-		appendString("return Collections.emptyList();");
+		increaseIdent();
+		appendStatement("return Collections.emptyList()");
 		closeBlock("");
 		
 		emptyline();
@@ -161,6 +174,7 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		appendString("private String criteria;");
 		appendString("private String module;");
 		appendString("private String document;");
+		appendString("private String searchArea;");
 		emptyline();
 		increaseIdent();
 		appendString("public String getCriteria() {");
@@ -190,6 +204,16 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		increaseIdent();
 		appendString("public void setDocument(String document) {");
 		appendIncreasedString("this.document = document;");
+		closeBlock("");
+		emptyline();
+		increaseIdent();
+		appendString("public String getSearchArea() {");
+		appendIncreasedString("return searchArea;");
+		closeBlock("");
+		emptyline();
+		increaseIdent();
+		appendString("public void setSearchArea(String searchArea) {");
+		appendIncreasedString("this.searchArea = searchArea;");
 		closeBlock("");
 		emptyline();
 		

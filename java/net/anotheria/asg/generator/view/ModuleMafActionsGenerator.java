@@ -758,7 +758,8 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		//check if we have decorators
 		List<MetaDecorator> neededDecorators = new ArrayList<MetaDecorator>();
 		
-		for (MetaViewElement element: elements){
+		for (int i=0; i<elements.size(); i++){
+			MetaViewElement element = elements.get(i);
 			if (element instanceof MetaFieldElement){
 				MetaFieldElement field = (MetaFieldElement)element;
 				MetaProperty p = doc.getField(field.getName());
@@ -1276,7 +1277,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		
+		appendGenerationPoint("generateExecuteQueryAction");
 		MetaDocument doc = section.getDocument();
 		//List<MetaViewElement> elements = section.getElements();
 	    
@@ -1311,7 +1312,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		append(closeBlock());
 		emptyline();
 		appendStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
-		
+		appendStatement("addUserSettingsBeansToRequest(req)");
 		
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());
