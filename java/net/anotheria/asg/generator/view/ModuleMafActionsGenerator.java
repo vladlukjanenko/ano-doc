@@ -2204,10 +2204,25 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		if(isCMS)
 		appendStatement("private final Logger logger = Logger.getLogger(\"cms-lock-log\")");
 	    //generate getTitle
-	    appendString( "public String getTitle(){");
+	    appendString( "protected String getTitle(){");
 	    increaseIdent();
 	    appendStatement("return "+quote(section.getTitle()));
-	    append(closeBlock());
+	    closeBlock("getTitle");
+	    emptyline();
+	    
+	    //generate getCurrentModuleDefName
+	    appendString( "protected String getCurrentModuleDefName(){");
+	    increaseIdent();
+	    appendStatement("return "+quote(section.getModule().getName()));
+	    closeBlock("getCurrentModuleDefName");
+	    emptyline();
+	    
+		//generate getCurrentDocumentDefName
+	    appendString( "protected String getCurrentDocumentDefName(){");
+	    increaseIdent();
+	    appendStatement("return "+quote(section.getDocument().getName()));
+	    closeBlock("getCurrentDocumentDefName");
+	    emptyline();
 
 		//starting additional methods generation!!!!!! Actually Lock & Unlock!!! + state checker!!!
 

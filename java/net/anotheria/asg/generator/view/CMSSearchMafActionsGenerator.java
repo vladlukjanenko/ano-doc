@@ -81,7 +81,9 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		appendString("public ActionForward anoDocExecute(ActionMapping mapping, SearchFB formBean, HttpServletRequest req, HttpServletResponse res) throws Exception{");
 		increaseIdent();
 		appendString("DocumentQuery query = new ContainsStringQuery(formBean.getCriteria());");
-		appendString("QueryResult result = executeQuery(formBean.getModule(), formBean.getDocument(), query);");
+		appendString("QueryResult result = executeQuery(formBean.getModule(), formBean.getDocument(), query, formBean.getSearchArea());");
+		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, formBean.getDocument())");
+		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, formBean.getModule())");
 		appendString("if (result.getEntries().size()==0){");
 		increaseIdent();
 		appendString("req.setAttribute(\"srMessage\", \"Nothing found.\");");
@@ -107,11 +109,11 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		appendString("return mapping.findForward(\"success\");");
 		closeBlock("");
 		emptyline();
-		appendString("private QueryResult executeQuery(String moduleName, String documentName, DocumentQuery query) throws ASGRuntimeException{");
+		appendString("private QueryResult executeQuery(String moduleName, String documentName, DocumentQuery query, String searchArea) throws ASGRuntimeException{");
 		increaseIdent();
 		appendStatement("QueryResult ret = new QueryResult()");
-		appendStatement("boolean wholeCms = \"wholeCms\".equals(moduleName)");
-		appendStatement("boolean wholeModule = wholeCms || \"wholeModule\".equals(documentName)");
+		appendStatement("boolean wholeCms = \"wholeCms\".equals(searchArea)");
+		appendStatement("boolean wholeModule = wholeCms || \"wholeModule\".equals(searchArea)");
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
 		for(MetaModule module: modules){
 			emptyline();
@@ -141,7 +143,17 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		increaseIdent();
 		appendStatement("return Collections.emptyList()");
 		closeBlock("");
-		
+		appendString("@Override");
+		appendString("protected String getCurrentDocumentDefName() {");
+		increaseIdent();
+		appendStatement("return null");
+		closeBlock("getCurrentDocumentDefName");
+		emptyline();
+		appendString("@Override");
+		appendString("protected String getCurrentModuleDefName() {");
+		increaseIdent();
+		appendStatement("return null");
+		closeBlock("getCurrentModuleDefName");
 		emptyline();
 		return clazz;
 	}
@@ -216,6 +228,7 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		appendIncreasedString("this.searchArea = searchArea;");
 		closeBlock("");
 		emptyline();
+	
 		
 		emptyline();
 		return clazz;

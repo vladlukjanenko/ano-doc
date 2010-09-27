@@ -68,6 +68,9 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		appendGenerationPoint("generateBaseAction");
 		
 		appendStatement("public static final String BEAN_MAIN_NAVIGATION = \"mainNavigation\"");
+		appendStatement("public static final String BEAN_DOCUMENT_DEF_NAME = \"documentName\"");
+		appendStatement("public static final String BEAN_MODULE_DEF_NAME = \"moduleName\"");
+		appendStatement("public static final String FLAG_DISABLED_SEARCH = \"disabledSearchFlag\"");
 		appendStatement("public static final String PARAM_SORT_TYPE = "+quote(ViewConstants.PARAM_SORT_TYPE));
 		appendStatement("public static final String PARAM_SORT_TYPE_NAME = "+quote(ViewConstants.PARAM_SORT_TYPE_NAME));
 		appendStatement("public static final String PARAM_SORT_ORDER = "+quote(ViewConstants.PARAM_SORT_ORDER));
@@ -158,7 +161,9 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 			closeBlock("if");
 			appendStatement("checkAccessPermissions(req)");
 		emptyline();
-
+		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, getCurrentDocumentDefName())");
+		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, getCurrentModuleDefName())");
+		emptyline();
 		appendString("return anoDocExecute(mapping, (T) formBean, req, res);");
 		closeBlock("execute");
 		emptyline();
@@ -315,6 +320,10 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		emptyline();
 		
 		appendString("protected abstract String getActiveMainNavi();");
+		emptyline();
+		
+		appendString("protected abstract String getCurrentModuleDefName();");
+		appendString("protected abstract String getCurrentDocumentDefName();");
 		emptyline();
 		
 		appendComment("Get current application supported languages wrapper method.");

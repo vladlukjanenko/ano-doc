@@ -63,6 +63,7 @@ public class IndexPageMafActionGenerator extends AbstractGenerator {
 
 		appendString("public ActionForward anoDocExecute(ActionMapping aMapping, FormBean aAf, HttpServletRequest aReq, HttpServletResponse aRes) throws Exception {");
 		increaseIdent();
+		appendStatement("addBeanToRequest(aReq, FLAG_DISABLED_SEARCH, true)");
 		appendStatement("return aMapping.findForward(\"success\")");
 		append(closeBlock());
 		emptyline();
@@ -79,6 +80,20 @@ public class IndexPageMafActionGenerator extends AbstractGenerator {
 		increaseIdent();
 		appendStatement("return Collections.emptyList()");
 		append(closeBlock());
+		emptyline();
+		
+		appendString("@Override");
+		appendString("protected String getCurrentDocumentDefName() {");
+		increaseIdent();
+		appendStatement("return null");
+		closeBlock("getCurrentDocumentDefName");
+		emptyline();
+		
+		appendString("@Override");
+		appendString("protected String getCurrentModuleDefName() {");
+		increaseIdent();
+		appendStatement("return null");
+		closeBlock("getCurrentModuleDefName");
 		emptyline();
 		
 		return clazz;
