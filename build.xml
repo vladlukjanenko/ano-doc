@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <project name="ano-doc" default="dist" basedir="."> <!-- before all -->
+	<property name="ivy.deliver.revision" value="2.0"/>
 	<import file="../build/basic-project.xml"/>	
 
 	<property name="ivy.organisation" value="anotheria.net"/>
