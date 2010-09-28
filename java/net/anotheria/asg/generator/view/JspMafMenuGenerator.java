@@ -80,8 +80,8 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 				appendString("</div>");
 			decreaseIdent();
 			appendString("</form>");
-			appendString("</logic:notEqual>");
 			appendString("<a href=\"#\" class=\"lang_open\">Languages</a>");
+			appendString("</logic:notEqual>");
 				appendString("<div class=\"clear\"><!-- --></div>");
 				appendString("<div class=\"open lang_s_open\">");
 							increaseIdent();

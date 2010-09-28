@@ -912,8 +912,8 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		decreaseIdent();
 		appendString("</select>");
 		decreaseIdent();
-		appendString("<a href=\"#\" class=\"button\" onclick=\"document.CopyLang.submit(); return false\"><span>Copy</span></a>");
 		appendString("</div>");
+		appendString("<a href=\"#\" class=\"button\" onclick=\"document.CopyLang.submit(); return false\"><span>Copy</span></a>");
 		
 		decreaseIdent();
 		appendString("</form>");
@@ -921,9 +921,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		increaseIdent();
 		appendString("<div>");
 		appendString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
-		appendString("<a href=\"#\" class=\"button\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\"><span>Disable languages</span></a>");
 		decreaseIdent();
 		appendString("</div>");
+		appendString("<a href=\"#\" class=\"button\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\"><span>Disable languages</span></a>");
 		appendString("</form>");
 		decreaseIdent();
 		appendString("</logic:notEqual>");
@@ -1673,6 +1673,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	//first paging end
 		
 	//main table start
+		appendString("<div class=\"scroll_x\">");
 		appendString("<table cellspacing=\"1\" cellpadding=\"1\" width=\"100%\" border=\"0\" class=\"pages_table\">");
 		increaseIdent();
 			appendString("<thead>");
@@ -1702,7 +1703,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				            MetaViewElement element = elements.get(i);
 				        	
 							if (element instanceof MetaFunctionElement && opened == false)
-							{appendString("<td>"); opened = true;}
+							{appendString("<td class=\"no_wrap\">"); opened = true;}
 							
 				            appendString(generateElement(entryName, element,doc));
 				        }
@@ -1715,6 +1716,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						appendString("</tbody>");
 					decreaseIdent();
 					appendString("</table>");
+					appendString("</div>");
 					//main table end
 					
 					//second paging start
