@@ -106,6 +106,7 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		closeBlock("");
 		appendString("req.setAttribute(\"result\", beans);");
 		closeBlock("");
+		appendString("req.setAttribute(\"criteria\", formBean.getCriteria());");
 		appendString("return mapping.findForward(\"success\");");
 		closeBlock("");
 		emptyline();

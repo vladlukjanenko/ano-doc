@@ -1857,7 +1857,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<div class=\"c_r\"><!-- --></div>");
 		appendString("<div class=\"c_b_l\"><!-- --></div>");
 		appendString("<div class=\"c_b_r\"><!-- --></div>");
-		appendString("<h2>Search result: </h2>");
+		appendString("<h2>Search result: <bean:write name=\"criteria\"/></h2>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		

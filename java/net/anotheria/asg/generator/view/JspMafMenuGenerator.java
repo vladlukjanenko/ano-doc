@@ -122,7 +122,7 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 											appendString("<ul>");
 												increaseIdent();
 												appendString("<logic:iterate id=\"subNaviItem\" name=\"NaviItem\" property=\"subNavi\">");
-												appendString("<li><a <logic:equal name=\"subNaviItem\" property=\"active\" value=\"true\"> class=\"active\"</logic:equal><logic:notEqual name=\"subNaviItem\" property=\"active\" value=\"true\">href=\"<bean:write name=\"subNaviItem\" property=\"link\"/>\"</logic:notEqual>><bean:write name=\"subNaviItem\" property=\"caption\"/></a></li>");
+												appendString("<li><a <logic:equal name=\"subNaviItem\" property=\"active\" value=\"true\"> class=\"active\" href=\"<bean:write name=\"subNaviItem\" property=\"link\"/>\"</logic:equal><logic:notEqual name=\"subNaviItem\" property=\"active\" value=\"true\">href=\"<bean:write name=\"subNaviItem\" property=\"link\"/>\"</logic:notEqual>><bean:write name=\"subNaviItem\" property=\"caption\"/></a></li>");
 												appendString("</logic:iterate>");
 											decreaseIdent();		
 											appendString("</ul>");
