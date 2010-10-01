@@ -1,21 +1,18 @@
 package net.anotheria.asg.generator.view;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import net.anotheria.anodoc.query2.QueryResultEntry;
-import net.anotheria.asg.data.DataObject;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SectionAction;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SharedAction;
+import net.anotheria.asg.generator.view.meta.MetaModuleSection;
+import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.util.StringUtils;
+import net.anotheria.asg.util.listener.SysOutServiceListener;
 
 public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 
@@ -114,16 +111,19 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		increaseIdent();
 		appendStatement("QueryResult ret = new QueryResult()");
 		appendStatement("boolean wholeCms = \"wholeCms\".equals(searchArea)");
-		appendStatement("boolean wholeModule = wholeCms || \"wholeModule\".equals(searchArea)");
-		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
-		for(MetaModule module: modules){
+		appendStatement("boolean wholeSection = wholeCms || \"wholeSection\".equals(searchArea)");
+		
+		for(MetaView view: views){
 			emptyline();
-			appendString("if(wholeCms || moduleName.equals(\""+module.getName()+"\")){");
+			appendString("if(wholeCms || moduleName.equals(\""+view.getName()+"\")){");
 			increaseIdent();
-			for(MetaDocument document: module.getDocuments()){
+			for(MetaSection section: view.getSections()){
+				if(!(section instanceof MetaModuleSection))
+					continue;
+				MetaModuleSection s = (MetaModuleSection)section;
 				increaseIdent();
-				appendString("if(wholeModule || documentName.equals(\""+document.getName()+"\"))");
-				appendIncreasedString("ret.add(get"+module.getName()+"Service().executeQueryOn"+document.getName(true)+"(query).getEntries());");
+				appendString("if(wholeSection || documentName.equals(\""+s.getDocument().getName()+"\"))");
+				appendIncreasedString("ret.add(get"+s.getModule().getName()+"Service().executeQueryOn"+s.getDocument().getName(true)+"(query).getEntries());");
 				decreaseIdent();
 			}
 			closeBlock("if");

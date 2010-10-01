@@ -162,7 +162,7 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 			appendStatement("checkAccessPermissions(req)");
 		emptyline();
 		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, getCurrentDocumentDefName())");
-		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, getCurrentModuleDefName())");
+		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, getActiveMainNavi())");
 		emptyline();
 		appendString("return anoDocExecute(mapping, (T) formBean, req, res);");
 		closeBlock("execute");
