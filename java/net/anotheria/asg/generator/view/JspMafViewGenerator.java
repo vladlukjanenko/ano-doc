@@ -583,7 +583,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				appendString("<li>");
 				increaseIdent();
 				String lang = getElementLanguage(element);
-				appendString("<a href=\"#"+section.getDocument().getField(element.getName()).getName(lang)+"\">"+element.getName()+"</a><a href=\"#\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
+				appendString("<a href=\"#"+section.getDocument().getField(element.getName()).getName(lang)+"\">"+element.getName()+"</a><a href=\"javascript:void(0);\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
 				appendString("<div class=\"pop_up\">");
 				increaseIdent();
 				appendString("<div class=\"top\">");
@@ -599,7 +599,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 											increaseIdent();
 												appendString("<ul>");
 												for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-													appendString("<li><a href=\"#"+section.getDocument().getField(element.getName()).getName(sl)+"\">"+sl+"</a></li>");
+													appendString("<li class=\"lang_"+sl+" lang_hide\"><a href=\"#"+section.getDocument().getField(element.getName()).getName(sl)+"\">"+sl+"</a></li>");
 													i++;
 													element = elements.get(i);
 												}
@@ -637,6 +637,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				appendString("</div>");
 				
 				
+				if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()) {
 				appendString("<div class=\"right_p\"><a href=\"#\"><img src=\"../cms_static/img/settings.gif\" alt=\"\"/></a>");
 				increaseIdent();
 					appendString("<div class=\"pop_up\">");
@@ -654,9 +655,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 									increaseIdent();
 									// *** START MULILINGUAL COPY *** //
 									int colspan=2;
-									if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && section.getDocument().isMultilingual()) {
 										addMultilanguageOperations(section, colspan);
-									}
 									// *** END MULILINGUAL COPY *** //
 									appendString("</div>");
 									appendString("</div>");
@@ -670,6 +669,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						appendString("</div>");
 					decreaseIdent();
 					appendString("</div>");
+				}
 				decreaseIdent();
 				appendString("</div>");
 				

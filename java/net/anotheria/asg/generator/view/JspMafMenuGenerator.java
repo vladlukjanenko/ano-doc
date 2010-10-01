@@ -64,8 +64,8 @@ public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
 						appendString("<ul>");
 							increaseIdent();	
 							//appendString("<li><input type=\"radio\" id=\"r3\" value=\"wholeCMS\" CHECKED name=\"searchArea\"/><label for=\"r3\">Curent page</label></li>");
-							appendString("<li><input type=\"radio\" id=\"r1\" value=\"wholePage\" name=\"searchArea\"/><label for=\"r1\">Whole CMS</label></li>");
-							appendString("<li><input type=\"radio\" id=\"r2\" value=\"wholeModule\" name=\"searchArea\"/><label for=\"r2\">Curent section</label></li>");
+							appendString("<li><input type=\"radio\" id=\"r1\" value=\"wholePage\" name=\"searchArea\"/><label for=\"r1\">Current page</label></li>");
+							appendString("<li><input type=\"radio\" id=\"r2\" value=\"wholeModule\" CHECKED name=\"searchArea\"/><label for=\"r2\">Current section</label></li>");
 						decreaseIdent();
 						appendString("<ul>");
 						appendString("<input type=\"hidden\" value=\"<bean:write name=\"moduleName\" />\" name=\"module\"/>");
