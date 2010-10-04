@@ -9,43 +9,43 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.anotheria</groupId>
   <artifactId>ano-doc</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>anotheria.net document generation framework</name>
 
 <!-- 
-        <dependency org="org.apache" name="ant" rev="stable" transitive="false"/>
+        <dependency org="org.apache" name="ant" rev="stable" transitive="false" />
 
-        <dependency org="org.jdom" name="jdom" rev="stable" transitive="false"/>
+        <dependency org="org.jdom" name="jdom" rev="stable" transitive="false" />
 
 
 
-        <dependency org="org.apache" name="xalan" rev="latest" transitive="false"/>
+        <dependency org="org.apache" name="xalan" rev="latest" transitive="false" />
  -->
   <dependencies>
 	<dependency>
 		<groupId>net.anotheria</groupId>
 		<artifactId>ano-util</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0</version>
 	</dependency>
 	<dependency>
 		<groupId>net.anotheria</groupId>
 		<artifactId>ano-prise</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0</version>
 	</dependency>
 	<dependency>
 	  <groupId>net.anotheria</groupId>
 	  <artifactId>configureme</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
+	  <version>1.0.0</version>
 	</dependency>
 	<dependency>
 	  <groupId>net.anotheria</groupId>
 	  <artifactId>moskito-core</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
+	  <version>1.0.0</version>
 	</dependency>
 	<dependency>
 	  <groupId>net.anotheria</groupId>
 	  <artifactId>moskito-util</artifactId>
-	  <version>1.0.0-SNAPSHOT</version>
+	  <version>1.0.0</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.jdom</groupId>
@@ -60,8 +60,8 @@
   </dependencies>
 
 	<scm>
-		<url>svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</url>
-		<connection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</connection>
-		<developerConnection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</developerConnection>
+		<url>svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.1</url>
+		<connection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.1</connection>
+		<developerConnection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.1</developerConnection>
 	</scm>
 </project>
