@@ -1,6 +1,7 @@
 package net.anotheria.asg.generator.parser;
 
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,8 @@ public final class XMLDataParser {
 				ret.add(parseModule(elem));
 			}
 		}catch(JDOMException e){
+			e.printStackTrace();
+		}catch(IOException e){
 			e.printStackTrace();
 		}
 		return ret;

@@ -132,7 +132,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		System.out.println("composite");
 		Enumeration<String> e = c.getKeys();
 		while(e.hasMoreElements()){
-			String key = (String)e.nextElement();
+			String key = e.nextElement();
 			IBasicStoreableObject obj = (IBasicStoreableObject) c.getObject(key);
 			printObject(obj, tabs+1);
 		}
