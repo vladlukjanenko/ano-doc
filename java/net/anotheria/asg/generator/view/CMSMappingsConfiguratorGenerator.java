@@ -106,7 +106,10 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		public String getMappingName(MetaModuleSection section){
-			MetaDocument doc = section.getDocument();
+			return getMappingName(section.getDocument());
+		}
+		
+		public String getMappingName(MetaDocument doc){
 			return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName()) + action;
 		}
 		
