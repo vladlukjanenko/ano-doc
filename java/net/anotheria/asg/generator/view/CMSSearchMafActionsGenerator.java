@@ -107,7 +107,7 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		appendString("return mapping.findForward(\"success\");");
 		closeBlock("");
 		emptyline();
-		appendString("private QueryResult executeQuery(String moduleName, String documentName, DocumentQuery query, String searchArea) throws ASGRuntimeException{");
+		appendString("private QueryResult executeQuery(String sectionName, String documentName, DocumentQuery query, String searchArea) throws ASGRuntimeException{");
 		increaseIdent();
 		appendStatement("QueryResult ret = new QueryResult()");
 		appendStatement("boolean wholeCms = \"wholeCms\".equals(searchArea)");
@@ -115,7 +115,7 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		
 		for(MetaView view: views){
 			emptyline();
-			appendString("if(wholeCms || moduleName.equals(\""+view.getName()+"\")){");
+			appendString("if(wholeCms || sectionName.equals(\""+view.getName()+"\")){");
 			increaseIdent();
 			for(MetaSection section: view.getSections()){
 				if(!(section instanceof MetaModuleSection))
