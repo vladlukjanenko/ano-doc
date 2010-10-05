@@ -36,8 +36,6 @@ public final class XMLTypesParser {
 		
 		}catch(JDOMException e){
 			e.printStackTrace();
-		}catch(IOException e){
-			e.printStackTrace();
 		}
 		return ret;
 	}
