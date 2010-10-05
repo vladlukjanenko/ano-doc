@@ -11,46 +11,36 @@
   <artifactId>ano-doc</artifactId>
   <version>1.0.2-SNAPSHOT</version>
   <name>anotheria.net document generation framework</name>
-
-<!-- 
-        <dependency org="org.apache" name="ant" rev="stable" transitive="false" />
-
-        <dependency org="org.jdom" name="jdom" rev="stable" transitive="false" />
-
-
-
-        <dependency org="org.apache" name="xalan" rev="latest" transitive="false" />
- -->
   <dependencies>
 	<dependency>
 		<groupId>net.anotheria</groupId>
 		<artifactId>ano-util</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>RELEASE</version>
 	</dependency>
 	<dependency>
 		<groupId>net.anotheria</groupId>
 		<artifactId>ano-prise</artifactId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 	</dependency>
 	<dependency>
 	  <groupId>net.anotheria</groupId>
 	  <artifactId>configureme</artifactId>
-	  <version>1.0.1-SNAPSHOT</version>
+	  <version>1.0.0</version>
 	</dependency>
 	<dependency>
 	  <groupId>net.anotheria</groupId>
 	  <artifactId>moskito-core</artifactId>
-	  <version>1.0.1-SNAPSHOT</version>
+	  <version>1.0.0</version>
 	</dependency>
 	<dependency>
 	  <groupId>net.anotheria</groupId>
 	  <artifactId>moskito-util</artifactId>
-	  <version>1.0.1-SNAPSHOT</version>
+	  <version>1.0.0</version>
 	</dependency>
 	<dependency>
-	    <groupId>org.jdom</groupId>
-	    <artifactId>jdom</artifactId>
-	    <version>1.1</version>
+    	<groupId>jdom</groupId>
+    	<artifactId>jdom</artifactId>
+    	<version>0.7</version>
 	</dependency>
 	<dependency>
 	    <groupId>org.apache.ant</groupId>
