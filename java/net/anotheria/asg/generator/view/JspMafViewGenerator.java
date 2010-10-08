@@ -550,6 +550,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");
 		
 //		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/animation/animation-min.js")) + "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentJSPath("tiny_mce/tiny_mce.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/datasource/datasource-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/autocomplete/autocomplete-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/dragdrop/dragdrop-min.js")) + "></script>");
@@ -1104,84 +1105,29 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	
 	private void generateRichTextEditorJS(MetaDocument doc, List<MetaViewElement> richTextElements){
 		
-		if(richTextElements.size() == 0){
-			appendString("<script type=\"text/javascript\">");
-			appendString("function handleSubmit(){");
-			appendString("	}");
-			appendString("</script>");
-			return;
-		}
-		
-		/*
-		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/assets/skins/sam/skin.css")) + " />");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container_core-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/element/element-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/button/button-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/EditorHider.js")) + "></script>");
-		*/
+		appendString("<!-- TinyMCE -->");
 		
 		appendString("<script type=\"text/javascript\">");
-		increaseIdent();
-		for(MetaViewElement el: richTextElements){
-			appendStatement("var " + getEditorVarName(doc, el));
+		appendString("tinyMCE.init({");
+		appendString("mode : \"exact\",");
+		String allRichTextElements = "";
+		String lang = "";
+		for (MetaViewElement elm:richTextElements){
+			lang=getElementLanguage(elm);
+			allRichTextElements+=elm.getName()+lang+"_ID, ";
 		}
-		appendString("function handleSubmit(){");
-		increaseIdent();
-		for(MetaViewElement el: richTextElements){
-//			appendString("if(isActiveEditor(" + getEditorVarName(doc, el) + "))");
-			appendIncreasedString(getEditorVarName(doc, el) + ".saveHtmlIfShowed();");
-		}
-		decreaseIdent();
-		appendString("}");
-
-		appendString("(function() {");
-		increaseIdent();
-		appendString("var Dom = YAHOO.util.Dom,");
-		appendString("Event = YAHOO.util.Event,");
-		appendString("status = null;"); 
-		appendString("//The Editor config");
-		appendString("var myConfig = {");
-		appendString("width: '660px',"); 
-		appendString("height: '200px',"); 
-		appendString("dompath: false, ");
-		appendString("animate: true, ");
-		appendString("handleSubmit: true ");
-		appendString("}; ");
-		appendString("//Now let's load the Editors..."); 
-		for(MetaViewElement el: richTextElements){
-			String button = getToggleEditorButtonVarName(doc, el);
-			String editor = getEditorVarName(doc, el);
-			appendString(editor + " = new YAHOO.widget.Editor('"+getElementName(doc, el)+"_ID', myConfig);"); 
-			appendString(editor + ".render(); ");
-			appendString("var " + button +" = new YAHOO.widget.Button('"+button+"');");
-			appendString(button + ".addClass('toggleEditor');");
-			appendString("var state = 'on';");
-			appendString(button + ".on('click', function(ev) {");
-			increaseIdent();
-			appendString("Event.stopEvent(ev);");
-			appendString("if (state == 'on') {");
-			increaseIdent();
-			appendString(editor + ".hideEditor();");
-			appendString("state = 'off';");
-			decreaseIdent();
-			appendString("} else {");
-			increaseIdent();
-			appendString(editor + ".showEditor();");
-			appendString("state = 'on';");
-			decreaseIdent();
-			appendString("}");
-			decreaseIdent();
-			appendString("});");
-		}
-
-		decreaseIdent();
-		appendString("})();"); 
-		decreaseIdent();
+		appendString("elements:\""+allRichTextElements+"\",");
+		appendString("theme : \"advanced\",");
+		appendString("plugins : \"save, table\",");
+		appendString("theme_advanced_layout_manager : \"SimpleLayout\",");
+		appendString("theme_advanced_toolbar_align : \"left\",");
+		appendString("theme_advanced_toolbar_location : \"top\",");
+		appendString("theme_advanced_buttons1 : \"undo, redo, separator, bold, italic, underline, separator, justifyleft, justifycenter, justifyright, justifyfull, formatselect, fontselect, fontsizeselect, forecolor, separator, bullist, numlist, separator, image, link, unlink, separator, table, code\",");
+		appendString("theme_advanced_buttons2 : \"\",");
+		appendString("theme_advanced_buttons3 : \"\"");
+		appendString("});");
 		appendString("</script>");
-		
+		appendString("<!-- /TinyMCE -->");
 		
 	}
 	//*** CMS2.0 FINISH ***
@@ -1370,12 +1316,15 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String lang = getElementLanguage(element);
 		String ret ="";
 		
-		if(element.isRich())
-			ret += "<button id="+quote("toggleEditorButton_" + p.getName(lang))+" type=\"button\">Toggle Editor</button><br/>";
 		ret += "<textarea cols=\"\" rows=\"10\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
 		ret += ">";
 		ret += "<bean:write filter=\"false\" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
 		ret += "</textarea>";
+		if(element.isRich()){
+			ret += "<div class=\"clear\"></div>";
+			ret += "<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('"+p.getName(lang) + "_ID').hide();\" class=\"button rich_on_off\"><span>Rich off</span></a>";
+			ret += "<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('"+p.getName(lang) + "_ID').show();\" class=\"button rich_on_off\"><span>Rich on</span></a>";
+		}
 		return ret;
 	}
 
