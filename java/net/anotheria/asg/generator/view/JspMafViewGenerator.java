@@ -22,6 +22,7 @@ import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
+import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
@@ -281,8 +282,13 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		
 		
 		if (p.isLinked()){
+			
+			MetaLink link2p = (MetaLink)p;
+			MetaModule targetModule = link2p.getLinkTarget().indexOf('.')== -1 ?
+					doc.getParentModule() : GeneratorDataRegistry.getInstance().getModule(link2p.getTargetModuleName());
 
-			String targetLinkAction = SectionAction.EDIT.getMappingName(section);
+			MetaDocument linkTarget = targetModule.getDocumentByName(link2p.getTargetDocumentName());
+			String targetLinkAction = SectionAction.EDIT.getMappingName(linkTarget);
 			
 			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></a></td>");
 			appendString("<td><a href=<ano:tslink>"+quote(targetLinkAction+"?pId=<bean:write name="+quote("element")+" property="+quote(list.getContainedProperty().getName())+"/></ano:tslink>")+"><bean:write name="+quote("element")+" property="+quote("description")+"/></a></td>");
@@ -358,7 +364,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 				name = "&nbsp;";
 			String field = "";
 			field += "<input class=\"add_id fll\" type=\"text\" style=\"width:25%;\" name="+quote("quickAddIds");
-			field += " value=\"\"/><span class=\"fll mr_10 mt_4\">id's comma separated list.</span>";
+			field += " value=\"\"/><span class=\"fll mr_10 mt_4 mt_5\">id's comma separated list.</span>";
 			appendString(field);
 			decreaseIdent();
 			decreaseIdent();
