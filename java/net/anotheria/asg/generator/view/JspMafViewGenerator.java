@@ -547,20 +547,18 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/element/element-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/button/button-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/editor/editor-min.js")) + "></script>");
 		
 //		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/animation/animation-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentJSPath("tiny_mce/tiny_mce.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/datasource/datasource-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/autocomplete/autocomplete-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/dragdrop/dragdrop-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/EditorHider.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/ComboBox.js")) + "></script>");
 		//*** CMS2.0 FINISH ***
 		
 		//*** CMS3.0 START ***
 		appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("jquery-1.4.min.js")+"\"></script>");
 		appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("anofunctions.js")+"\"></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentJSPath("tiny_mce/tiny_mce.js")) + "></script>");
 		//*** CMS3.0 FINISH ***
 		
 		decreaseIdent();
@@ -1299,9 +1297,17 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String lang = getElementLanguage(element); 
 		
 		ret += "<input type=" + quote(inputType) + " name="+quote(p.getName(lang));
+		
 		//ret += "<html:text filter=\"false\" property="+quote(element.getName());
-		ret += " value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang));
-		ret += "/>\"";
+		if (inputType.equalsIgnoreCase("checkbox"))	{
+			ret += " <logic:equal name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" value=\"true\""; 
+			ret += ">";
+			ret += "checked</logic:equal>";
+		}
+		else {
+			ret += " value=\"<bean:write name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang));
+			ret += "/>\"";
+		}
 		if (element.isReadonly())
 			ret += " readonly="+quote("true");
 		ret += "/>";
@@ -1564,7 +1570,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						
 						appendString("<ul>");
 						increaseIdent();
-							appendString("<li>"+StringUtils.capitalize(f.getName())+":</li>");
+							appendString("<li>"+StringUtils.capitalize(f.getName())+" "+StringUtils.capitalize(f.getFieldName())+":</li>");
 							increaseIdent();
 								appendString("<logic:iterate name="+quote(ModuleActionsGenerator.getFilterVariableName(f))+" id="+quote("triggerer")+" type="+quote("net.anotheria.asg.util.filter.FilterTrigger")+">");
 								increaseIdent();
@@ -2147,17 +2153,17 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					" property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
 			result+="  <logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
-			result+="\t<a href=\"#\" class=\"button\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"apply.label.prefix\"/></span></a> \n";
 			result+="  </logic:equal> \n";
 			result+="</logic:equal> \n";
 			result+="<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-			result+="\t<a href=\"#\" class=\"button\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"apply.label.prefix\"/></span></a>\n";
 			result+="</logic:equal> \n";
 			return result;
 		}
-		return "<a href=\"#\" class=\"button\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+		return "<a href=\"#\" class=\"button\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"apply.label.prefix\"/></span></a>";
 	}
 	private String getUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
@@ -2167,17 +2173,17 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 					" property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
 			result+="  <logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
-			result+="\t<a href=\"#\" class=\"button\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"save.label.prefix\"/></span></a> \n";
 			result+="  </logic:equal> \n";
 			result+="</logic:equal> \n";
 			result+="<logic:equal name=" + quote(StrutsConfigGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-			result+="\t<a href=\"#\" class=\"button\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"save.label.prefix\"/></span></a> \n";
 			result+="</logic:equal> \n";
 			return result;
 		}
-		return "<a href=\"#\" class=\"button\" onClick=\"handleSubmit(); document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
+		return "<a href=\"#\" class=\"button\" onClick=\"document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='close'; document."+StrutsConfigGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"save.label.prefix\"/></span></a>";
 	}			
 	
