@@ -29,7 +29,6 @@ public class CmsChangesTracker {
 	public static void saveChange(String userName, String documentName, Action action, long timestamp){
 		//create new change in the history
 //		history.offer()
-		history.offer();
 	}
 	
 	

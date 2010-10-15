@@ -12,6 +12,7 @@ import net.anotheria.anodoc.data.StringProperty;
 import net.anotheria.anodoc.query2.DocumentQuery;
 import net.anotheria.anodoc.query2.QueryResultEntry;
 import net.anotheria.asg.data.DataObject;
+import net.anotheria.util.StringUtils;
 
 import org.apache.log4j.Logger;
 
@@ -119,6 +120,8 @@ public class ContainsStringQuery implements DocumentQuery {
 	 * Match method with simple expressions processing support.
 	 */
 	public List<QueryResultEntry> match(DataObject obj) {
+		log.debug("Match DataObject  " + obj.getDefinedName() + " with ID " + obj.getId() + "." + this);
+		
 		List<QueryResultEntry> ret = new ArrayList<QueryResultEntry>();
 
 		if (!(obj instanceof Document) || (criteriaRegExPattern == null)
@@ -140,12 +143,12 @@ public class ContainsStringQuery implements DocumentQuery {
 		// search in properties
 		for (int i = 0; i < properties.size(); i++) {
 			Property p = properties.get(i);
-			if (p instanceof StringProperty) {
-				tempEntry = getMatchQueryResultEntry((StringProperty) p, doc);
-				if (tempEntry != null) {
-					ret.add(tempEntry);
-				}
+//			if (p instanceof StringProperty) {
+			tempEntry = getMatchQueryResultEntry(p, doc);
+			if (tempEntry != null) {
+				ret.add(tempEntry);
 			}
+//			}
 		}
 
 		return ret;
@@ -160,77 +163,41 @@ public class ContainsStringQuery implements DocumentQuery {
 	 * @param matchedDocument
 	 *            document
 	 */
-	private QueryResultEntry getMatchQueryResultEntry(
-			StringProperty matchedProperty, Document matchedDocument) {
-		QueryResultEntry retEntry = null;
+	private QueryResultEntry getMatchQueryResultEntry(Property matchedProperty, Document matchedDocument) {
 
-		if (matchedProperty != null) {
+		if (matchedProperty == null || matchedProperty.getValue() == null)
+			return null;
 
-			Object valueObj = matchedProperty.getValue();
+		String value = matchedProperty.getValue().toString();
+		
+		// Check is value matches to pattern
+		if (StringUtils.isEmpty(value) || !criteriaRegExPattern.matcher(value).matches())
+			return null;
 
-			if (valueObj != null) {
-				
-				String value = valueObj.toString();
-				String pre;
-				String match;
-				String post;
-				Matcher matchMatcher;
+		QueryResultEntry retEntry = new QueryResultEntry();
+		retEntry.setMatchedDocument(matchedDocument);
+		retEntry.setMatchedProperty(matchedProperty);
 
-				// if( value!= null ){
-				//				
-				//				
-				// String encodedCriteria;
-				// try {
-				// encodedCriteria = new String(criteria.getBytes(),"CP1251");
-				// } catch (UnsupportedEncodingException e) {
-				//					
-				// log.warn("UnsupportedEncodingException: " + e.getMessage() +
-				// ". Criteria will not be encoded into " + "UTF-8");
-				// encodedCriteria = criteria;
-				// }
-				//								
-				// log.info("criteria: " + criteria + " encoded: " +
-				// encodedCriteria + " property: " + matchedProperty.getId() +
-				// " value: " + value);
-				// System.out.println("criteria: " + criteria + " encoded: " +
-				// encodedCriteria + " property: " + matchedProperty.getId() +
-				// " value: " + value);
-				//				
-				// }
+		// find pre-match-post parts
+		Matcher matchMatcher = criteriaMatchRegExPattern.matcher(value);
+		String pre = "";
+		String match = value;
+		String post = "";
+		
+		if (matchMatcher.find()) {
+			pre = value.substring(0, matchMatcher.start());
+			match = matchMatcher.group();
+			post = value.substring(matchMatcher.end());
+		}
 
-				// Check is value matches to pattern
-				if (value != null
-						&& criteriaRegExPattern.matcher(value).matches()) {
-
-					retEntry = new QueryResultEntry();
-					retEntry.setMatchedDocument(matchedDocument);
-					retEntry.setMatchedProperty(matchedProperty);
-
-					// find pre-match-post parts
-					matchMatcher = criteriaMatchRegExPattern.matcher(value);
-					if (matchMatcher.find()) {
-						pre = value.substring(0, matchMatcher.start());
-						match = matchMatcher.group();
-						post = value.substring(matchMatcher.end());
-					} else {
-						pre = "";
-						match = value;
-						post = "";
-					}
-
-					StringMatchingInfo info = new StringMatchingInfo(pre,
-							match, post);
-					retEntry.setInfo(info);
-				} // if value
-			} // if valueObj
-		} // if matchedProperty
+		retEntry.setInfo(new StringMatchingInfo(pre, match, post));
 
 		return retEntry;
 	}
 
 	@Override
 	public String toString() {
-		return criteria;
+		return "ContainsStringQuery [criteria=" + criteria + ", criteriaMatchRegExPattern=" + criteriaMatchRegExPattern + ", criteriaRegExPattern=" + criteriaRegExPattern + "]";
 	}
 
 }
