@@ -1,40 +1,34 @@
 package net.anotheria.asg.util;
 
 import java.util.Collection;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class CmsChangesTracker {
 
+	public static int TRACING_SIZE = 20;
+	
 	public static enum Action{
 		CREATE,
 		UPDATE,
+		IMPORT,
 		DELETE;
 		public String getShortName(){
 			return name().charAt(0) + "";
 		}
 	}
 	
-	public static class DocumentChange{
-		String userName;
-		String documentName;
-		Action action;
-		long timestamp;
-		//add cahnge properties
+	private static List<DocumentChange> history = new CopyOnWriteArrayList<DocumentChange>();
+	
+	public static void saveChange(DocumentChange documentChanges){
+		history.add(0,documentChanges);
+		if(history.size() > TRACING_SIZE)
+			history.remove(history.size() - 1);
 	}
-	
-	private static Queue<DocumentChange> history = new ConcurrentLinkedQueue<DocumentChange>();
-	
-	public static void saveChange(String userName, String documentName, Action action, long timestamp){
-		//create new change in the history
-//		history.offer()
-	}
-	
 	
 	public static Collection<DocumentChange> getChanges(){
-		//return changes history
-		return null;
+		return history;
 	}
 	
 }

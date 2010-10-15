@@ -800,6 +800,11 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						appendString("<a id=\""+name+"\" name=\""+name+"\"></a>");
 						appendString(name);
 					decreaseIdent(); 
+					if(element.isRich()){
+						appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('"+section.getDocument().getField(element.getName()).getName(lang) + "_ID').show();\" class=\"rich_on_off\" style=\"display:none;\">on</a>");
+						appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('"+section.getDocument().getField(element.getName()).getName(lang) + "_ID').hide();\" class=\"rich_on_off\">off</a>");
+						appendString("<span class=\"rich_on_off\">Rich:</span>");
+					}
 					appendString("</td>");
 					appendString("<td align=\"left\">&nbsp;");
 						increaseIdent();
@@ -1108,21 +1113,23 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		appendString("<script type=\"text/javascript\">");
 		appendString("tinyMCE.init({");
 		appendString("mode : \"exact\",");
-		String allRichTextElements = "";
+		String allRichTextElements = "elements:\"";
 		String lang = "";
-		for (MetaViewElement elm:richTextElements){
-			lang=getElementLanguage(elm);
-			allRichTextElements+=elm.getName()+lang+"_ID, ";
+		for (int i=0; i<richTextElements.size(); i++){
+			allRichTextElements+=richTextElements.get(i).getName()+getElementLanguage(richTextElements.get(i))+"_ID";
+			if (i+1!=richTextElements.size())
+				allRichTextElements+=", ";
 		}
-		appendString("elements:\""+allRichTextElements+"\",");
+		appendString(allRichTextElements+"\",");
 		appendString("theme : \"advanced\",");
 		appendString("plugins : \"save, table\",");
 		appendString("theme_advanced_layout_manager : \"SimpleLayout\",");
 		appendString("theme_advanced_toolbar_align : \"left\",");
 		appendString("theme_advanced_toolbar_location : \"top\",");
-		appendString("theme_advanced_buttons1 : \"undo, redo, separator, bold, italic, underline, separator, justifyleft, justifycenter, justifyright, justifyfull, formatselect, fontselect, fontsizeselect, forecolor, separator, bullist, numlist, separator, image, link, unlink, separator, table, code\",");
-		appendString("theme_advanced_buttons2 : \"\",");
-		appendString("theme_advanced_buttons3 : \"\"");
+		appendString("theme_advanced_buttons1 : \"undo, redo, separator, bold, italic, underline, separator, justifyleft, justifycenter, justifyright, justifyfull, formatselect,  fontselect, fontsizeselect, forecolor\",");
+		appendString("theme_advanced_buttons2 : \"bullist, numlist, separator, image, link, unlink, separator, table, code\",");
+		appendString("theme_advanced_buttons3 : \"\",");
+		appendString("theme_advanced_resize_horizontal : true");
 		appendString("});");
 		appendString("</script>");
 		appendString("<!-- /TinyMCE -->");
@@ -1322,15 +1329,11 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		String lang = getElementLanguage(element);
 		String ret ="";
 		
-		ret += "<textarea cols=\"\" rows=\"10\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
+		ret += "<textarea cols=\"\" rows=\"16\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
 		ret += ">";
 		ret += "<bean:write filter=\"false\" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
 		ret += "</textarea>";
-		if(element.isRich()){
-			ret += "<div class=\"clear\"></div>";
-			ret += "<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('"+p.getName(lang) + "_ID').hide();\" class=\"button rich_on_off\"><span>Rich off</span></a>";
-			ret += "<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('"+p.getName(lang) + "_ID').show();\" class=\"button rich_on_off\"><span>Rich on</span></a>";
-		}
+
 		return ret;
 	}
 

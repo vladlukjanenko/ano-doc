@@ -70,7 +70,23 @@ public class IndexPageJspMafGenerator extends AbstractMafJSPGenerator {
 			appendString("<div class=\"c_r\"><!-- --></div>");
 			appendString("<div class=\"c_b_l\"><!-- --></div>");
 			appendString("<div class=\"c_b_r\"><!-- --></div>");
-			appendString("<h1>Welcome, Another!</h1>");
+			appendString("<h1>Welcome, <bean:write name=\"currentUserId\"/>!</h1>");
+			
+			appendString("<table cellpadding=\"0\" cellspacing=\"0\" width=\"48.8%\" class=\"pages_table welcome_table\">");
+			appendString("<thead>");
+			appendString("<tr>");
+			appendString("<td>Last changes</td>");
+			appendString("</tr>");
+			appendString("</thead>");
+			appendString("<tbody>");
+			appendString("<logic:iterate name=\"changes\" id=\"change\" type=\"net.anotheria.anosite.gen.shared.bean.DocumentChangeFB\">");
+			appendString("<tr class=\"lineLight\">");
+			appendString("<td><a href=\"#\">Name:<bean:write name=\"change\" property=\"userName\"/> Document:<bean:write name=\"change\" property=\"documentName\"/> Time:<bean:write name=\"change\" property=\"date\"/> Action:<bean:write name=\"change\" property=\"action\"/> Link:<bean:write name=\"change\" property=\"documentLink\"/></a></td>");
+			appendString("</tr>");
+			appendString("</logic:iterate>");
+			appendString("</tbody>");
+			appendString("</table>");
+			
 			appendString("<div class=\"welcome_text\">");
 			appendString("<p>You are on AnoSiteGenerator v.2.0 main page now. This system helps to create pages, layouts and content for site pages.</p>");
 			appendString("</div>");

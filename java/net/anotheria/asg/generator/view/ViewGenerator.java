@@ -38,7 +38,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		files.addAll(new CMSSearchMafActionsGenerator().generate(views));
 		
 		files.add(new IndexPageActionGenerator().generate(views));
-		files.add(new IndexPageMafActionGenerator().generate(views));
+		files.addAll(new IndexPageMafActionGenerator().generate(views));
 		
 		files.add(new IndexPageJspMafGenerator().generate(context));
 		files.add(new IndexPageJspGenerator().generate(context));

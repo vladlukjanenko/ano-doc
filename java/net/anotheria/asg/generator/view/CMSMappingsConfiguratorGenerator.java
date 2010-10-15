@@ -2,7 +2,9 @@ package net.anotheria.asg.generator.view;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
@@ -229,6 +231,13 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		return ret;
 	}
 	
+	public static String getClassSimpleName(){
+		return "CMSMappingsConfigurator";
+	}
+	
+	public static String getClassName(){
+		return getPackageName() + "." + getClassSimpleName();
+	}
 	
 	private GeneratedClass generateCMSMapping(List<MetaView> views){
 		GeneratedClass clazz = new GeneratedClass();
@@ -236,6 +245,8 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 		clazz.setPackageName(getPackageName());
 		
+		clazz.addImport(Map.class);
+		clazz.addImport(HashMap.class);
 		clazz.addImport("net.anotheria.maf.action.ActionForward");
 		clazz.addImport("net.anotheria.maf.action.ActionMappings");
 		clazz.addImport("net.anotheria.maf.action.ActionMappingsConfigurator");
@@ -250,11 +261,30 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 
 		clazz.addInterface("ActionMappingsConfigurator");
-		clazz.setName("CMSMappingsConfigurator");
+		clazz.setName(getClassSimpleName());
 
 		startClassBody();
 		
 		emptyline();
+		
+		appendString("private static final Map<String, String> showActionsRegistry;");
+		appendString("static{");
+		appendStatement("showActionsRegistry = new HashMap<String,String>()");
+		
+		for(MetaView view: views){
+			for (MetaSection section: view.getSections()){
+				if (!(section instanceof MetaModuleSection))
+					continue;
+				MetaModuleSection s = (MetaModuleSection)section;
+				generateActionsRegistry(s);
+			}
+		}
+		
+		closeBlock("close static block");
+		
+		openFun("public static String getActionPath(String parentName, String documentName)");
+		appendStatement("return showActionsRegistry.get(parentName + \".\" + documentName)");
+		closeBlock("getActionPath");
 		
 		appendString("@Override");
 		openFun("public void configureActionMappings()");
@@ -299,7 +329,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 
 	
 	
-	private String getPackageName(){
+	private static String getPackageName(){
 		return GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".filter";
 	}
 	
@@ -316,6 +346,13 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 
 	}
+	
+	private void generateActionsRegistry(MetaModuleSection section){
+			if(SectionAction.SHOW.isIgnoreForSection(section))
+				return;
+			appendStatement("showActionsRegistry.put(" + quote(section.getModule().getName() + "." + section.getDocument().getName()) + ", " + quote(SectionAction.SHOW.getMappingName(section)) + ")");
+	}
+	
 	
 	private void generateSharedMappings(GeneratedClass clazz){
 		String actionsPackage = GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action";
