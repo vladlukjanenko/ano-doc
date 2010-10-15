@@ -671,7 +671,7 @@ public class Document extends DataHolder
 		return getLong(PROP_LAST_UPDATE); 
 	}
 	
-	public void setAuthor(){
+	public void setCallContextAuthor(){
 		CallContext callContext = ContextManager.getCallContext();
 		String author = callContext != null? callContext.getCurrentAuthor(): "UNKNOWN";
 		setString(PROP_AUTHOR, author);

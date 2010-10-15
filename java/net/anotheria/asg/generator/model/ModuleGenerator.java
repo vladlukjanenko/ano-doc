@@ -160,6 +160,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		appendString("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> "+doc.getMultiple().toLowerCase()+" = _get"+doc.getMultiple()+"();");
 		appendString(doc.getMultiple().toLowerCase()+".removeDocumentById("+doc.getVariableName()+".getId());");
 		appendStatement(doc.getVariableName()+".setLastUpdateNow()");
+		appendStatement(doc.getVariableName()+".setCallContextAuthor()");
 		appendString(doc.getMultiple().toLowerCase()+".addDocument("+doc.getVariableName()+");");
 		appendString("_update"+doc.getMultiple()+"("+doc.getMultiple().toLowerCase()+");");
 		append(closeBlock());
@@ -182,6 +183,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		emptyline();
 		appendStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
 		appendStatement(doc.getVariableName()+".setLastUpdateNow()");
+		appendStatement(doc.getVariableName()+".setCallContextAuthor()");
 		appendStatement("entries.addDocument("+doc.getVariableName()+")");
 		appendStatement("_update"+doc.getMultiple()+"(entries)");
 		appendStatement("return "+doc.getVariableName());
@@ -196,6 +198,7 @@ public class ModuleGenerator extends AbstractGenerator implements IGenerator{
 		emptyline();
 		appendStatement("DocumentList<"+DocumentGenerator.getDocumentName(doc)+"> entries = _get"+doc.getMultiple()+"()");
 		appendStatement(doc.getVariableName()+".setLastUpdateNow()");
+		appendStatement(doc.getVariableName()+".setCallContextAuthor()");
 		appendStatement("entries.addDocument("+doc.getVariableName()+")");
 		appendStatement("_update"+doc.getMultiple()+"(entries)");
 		appendStatement("return "+doc.getVariableName());
