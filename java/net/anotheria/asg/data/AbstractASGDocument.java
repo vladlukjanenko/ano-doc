@@ -20,7 +20,10 @@ public abstract class AbstractASGDocument extends Document implements DataObject
 
 	@Override public ObjectInfo getObjectInfo(){
 		ObjectInfo ret = new ObjectInfo(this);
-		ret.setAuthor("rfu");
+		ret.setId(getId());
+		ret.setAuthor(getAuthor());
+		ret.setLastChangeTimestamp(getLastUpdateTimestamp());
+		ret.setFootprint(getFootprint());
 		return ret;
 	}
 	

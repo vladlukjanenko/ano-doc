@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.anotheria.anodoc.util.context.ContextManager;
 import net.anotheria.anoprise.metafactory.Extension;
 import net.anotheria.anoprise.metafactory.MetaFactory;
 import net.anotheria.anoprise.metafactory.MetaFactoryException;
@@ -49,6 +50,7 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
 		appendCommentLine("BaseMafActionGenerator");
 		clazz.addImport("net.anotheria.util.StringUtils");
+		clazz.addImport(ContextManager.class);
 		clazz.addImport("net.anotheria.webutils.actions.*");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
@@ -210,8 +212,11 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		appendString("protected boolean checkAuthorization(HttpServletRequest req){");
 		increaseIdent();
 		appendStatement("String userId = (String )getBeanFromSession(req, BEAN_USER_ID)");
-		appendStatement("return userId!=null");
-		append(closeBlock());
+		appendString("if(userId == null)");
+		appendIncreasedStatement("return false");
+		appendStatement("ContextManager.getCallContext().setCurrentAuthor(userId)");
+		appendStatement("return true");
+		closeBlock("checkAuthorization");
 		emptyline();
 		
 		appendString("public String getSubsystem() {");

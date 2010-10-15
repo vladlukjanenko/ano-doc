@@ -10,6 +10,7 @@ import java.util.List;
  */
 public abstract class CallContext implements Serializable{
 	
+	private String currentAuthor;
 	private String currentLanguage;
 	private DBContext dbContext; 
 	
@@ -41,6 +42,14 @@ public abstract class CallContext implements Serializable{
 		if (dbContext==null)
 			dbContext = new DBContext();
 		return dbContext;
+	}
+
+	public String getCurrentAuthor() {
+		return currentAuthor;
+	}
+
+	public void setCurrentAuthor(String currentAuthor) {
+		this.currentAuthor = currentAuthor;
 	}
 }
 
