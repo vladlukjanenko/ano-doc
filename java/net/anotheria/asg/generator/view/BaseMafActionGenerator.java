@@ -70,6 +70,7 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		appendGenerationPoint("generateBaseAction");
 		
 		appendStatement("public static final String BEAN_MAIN_NAVIGATION = \"mainNavigation\"");
+		appendStatement("public static final String BEAN_SEARCH_SCOPE = \"searchScope\"");
 		appendStatement("public static final String BEAN_DOCUMENT_DEF_NAME = \"documentName\"");
 		appendStatement("public static final String BEAN_MODULE_DEF_NAME = \"moduleName\"");
 		appendStatement("public static final String FLAG_DISABLED_SEARCH = \"disabledSearchFlag\"");

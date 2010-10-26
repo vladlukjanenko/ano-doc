@@ -81,6 +81,7 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		appendString("QueryResult result = executeQuery(formBean.getModule(), formBean.getDocument(), query, formBean.getSearchArea());");
 		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, formBean.getDocument())");
 		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, formBean.getModule())");
+		appendStatement("req.getSession().setAttribute(BEAN_SEARCH_SCOPE, formBean.getSearchArea())");
 		appendString("if (result.getEntries().size()==0){");
 		increaseIdent();
 		appendString("req.setAttribute(\"srMessage\", \"Nothing found.\");");
@@ -110,8 +111,8 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		appendString("private QueryResult executeQuery(String sectionName, String documentName, DocumentQuery query, String searchArea) throws ASGRuntimeException{");
 		increaseIdent();
 		appendStatement("QueryResult ret = new QueryResult()");
-		appendStatement("boolean wholeCms = \"wholeCms\".equals(searchArea)");
-		appendStatement("boolean wholeSection = wholeCms || \"wholeSection\".equals(searchArea)");
+		appendStatement("boolean wholeCms = \"cms\".equals(searchArea)");
+		appendStatement("boolean wholeSection = wholeCms || \"section\".equals(searchArea)");
 		
 		for(MetaView view: views){
 			emptyline();

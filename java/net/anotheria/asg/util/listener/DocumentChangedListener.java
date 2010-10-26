@@ -31,7 +31,7 @@ public class DocumentChangedListener implements IServiceListener{
 		DocumentChange dc = new DocumentChange();
 		dc.setAction(action);
 		dc.setDocumentName(doc.getDefinedName());
-		dc.setParentName(doc.getDefinedParentName());
+		dc.setParentName(doc.getDefinedParentName().toLowerCase());
 		dc.setTimestamp(doc.getLastUpdateTimestamp());
 		dc.setUserName(doc.getObjectInfo().getAuthor());
 		dc.setId(doc.getId());
