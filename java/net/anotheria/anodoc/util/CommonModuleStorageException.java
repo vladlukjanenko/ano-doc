@@ -5,6 +5,11 @@ package net.anotheria.anodoc.util;
  */
 
 public class CommonModuleStorageException extends Exception{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public CommonModuleStorageException(String aMessage){
 		super(aMessage);
 	}

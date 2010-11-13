@@ -10,6 +10,11 @@ import net.anotheria.anodoc.service.AbstractModuleFactory;
 public class StatisticsFactory extends AbstractModuleFactory{
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @see biz.beaglesoft.bgldoc.service.IModuleFactory#createDocument(String)
 	 */
 	public Document createDocument(String name) {
