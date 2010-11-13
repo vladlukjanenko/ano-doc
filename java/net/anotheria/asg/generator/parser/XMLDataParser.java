@@ -47,6 +47,8 @@ public final class XMLDataParser {
 			}
 		}catch(JDOMException e){
 			e.printStackTrace();
+		}catch(IOException e){
+			e.printStackTrace();
 		}
 		return ret;
 	}

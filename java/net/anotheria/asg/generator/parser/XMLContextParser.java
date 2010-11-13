@@ -60,6 +60,8 @@ public final class XMLContextParser {
 			
 		}catch(JDOMException e){
 			e.printStackTrace();
+		}catch(IOException e){
+			e.printStackTrace();
 		}
 		return ret;
 	}

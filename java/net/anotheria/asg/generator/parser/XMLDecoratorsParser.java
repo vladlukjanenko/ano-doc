@@ -35,6 +35,8 @@ public final class XMLDecoratorsParser {
 	
 		}catch(JDOMException e){
 			e.printStackTrace();
+		}catch(IOException e){
+			e.printStackTrace();
 		}
 		//System.out.println("Parsed forms: "+ret);
 		return ret;

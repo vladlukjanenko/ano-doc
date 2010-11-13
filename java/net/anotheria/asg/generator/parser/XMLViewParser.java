@@ -53,6 +53,9 @@ public final class XMLViewParser {
 		}catch(JDOMException e){
 			log.error("parseViews", e);
 			throw new RuntimeException("Can't parse view because: "+e.getMessage());
+		}catch(IOException e){
+			log.error("parseViews", e);
+			throw new RuntimeException("Can't parse view because: "+e.getMessage());
 		}
 		return ret;
 	}
