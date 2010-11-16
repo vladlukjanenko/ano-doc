@@ -64,6 +64,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		clazz.addImport("net.anotheria.anodoc.data.Module");
 		clazz.addImport("net.anotheria.anodoc.service.IModuleService");
 		clazz.addImport("net.anotheria.anodoc.service.ModuleServiceFactory");
+		clazz.addImport("net.anotheria.asg.util.listener.IModuleListener");
 
 		clazz.setName("BasicCMSService");
 		clazz.setParent("BasicService");
@@ -98,8 +99,14 @@ public class BasicServiceGenerator extends AbstractGenerator{
         appendString("log.error(\"updateModule\", e);");
         append(closeBlock());
         append(closeBlock());
-            
-    
+		emptyline();
+
+        //generate method for adding module listener.
+        appendString("protected void addModuleListener(String moduleId, IModuleListener moduleListener){");
+        increaseIdent();
+        appendString("service.addModuleListener(moduleId, MY_OWNER_ID, moduleListener);");
+        append(closeBlock());
+    	emptyline();
 
         appendString("protected Module getModule(String moduleId){");
         increaseIdent();

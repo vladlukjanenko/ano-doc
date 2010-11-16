@@ -29,4 +29,9 @@ public interface IServiceListener {
      * @param doc actually document
      */
     void documentImported(DataObject doc);
+
+    /**
+     * Called if data was changed in persistence.
+ 	*/
+	void persistenceChanged();
 }

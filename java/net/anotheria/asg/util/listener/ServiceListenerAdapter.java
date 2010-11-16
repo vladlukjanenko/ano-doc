@@ -19,6 +19,8 @@ public abstract class ServiceListenerAdapter implements IServiceListener{
 
     @Override public void documentImported(DataObject doc) {
 	}
-	
+
+	@Override public void persistenceChanged() {
+	}
 
 }
