@@ -3,19 +3,19 @@
   <parent>
 	<groupId>net.anotheria</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.0</version>
+	<version>1.4</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.anotheria</groupId>
   <artifactId>ano-doc</artifactId>
-  <version>1.0.2-SNAPSHOT</version>
+  <version>1.0.2</version>
   <name>anotheria.net document generation framework</name>
   <dependencies>
 	<dependency>
 		<groupId>net.anotheria</groupId>
 		<artifactId>ano-util</artifactId>
-		<version>RELEASE</version>
+		<version>1.0.1</version>
 	</dependency>
 	<dependency>
 		<groupId>net.anotheria</groupId>
@@ -46,12 +46,13 @@
 	    <groupId>org.apache.ant</groupId>
 	    <artifactId>ant</artifactId>
 	    <version>1.8.1</version>
+		<scope>provided</scope>
 	</dependency>	
   </dependencies>
 
 	<scm>
-		<url>svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</url>
-		<connection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</connection>
-		<developerConnection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</developerConnection>
+		<url>svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.2</url>
+		<connection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.2</connection>
+		<developerConnection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.2</developerConnection>
 	</scm>
 </project>
