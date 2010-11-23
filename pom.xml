@@ -9,7 +9,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.anotheria</groupId>
   <artifactId>ano-doc</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <name>anotheria.net document generation framework</name>
   <dependencies>
 	<dependency>
@@ -51,8 +51,8 @@
   </dependencies>
 
 	<scm>
-		<url>svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.2</url>
-		<connection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.2</connection>
-		<developerConnection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/tags/ano-doc-1.0.2</developerConnection>
+		<url>svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</url>
+		<connection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</connection>
+		<developerConnection>scm:svn:svn://svn.anotheria.net/opensource/ano-doc/trunk</developerConnection>
 	</scm>
 </project>
