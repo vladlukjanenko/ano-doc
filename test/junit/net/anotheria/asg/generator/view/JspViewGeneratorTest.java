@@ -12,6 +12,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.*;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class JspViewGeneratorTest {
 		GeneratorDataRegistry.getInstance().setContext(c);		
 	}
 
-	@Test
+	@Test @Ignore
 	public void shouldViewWithEnumAsSelect() throws IOException {
 		// given
 		List<MetaViewElement> metaViewElements = new ArrayList<MetaViewElement>();
