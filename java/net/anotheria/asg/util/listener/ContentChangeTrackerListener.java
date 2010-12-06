@@ -8,7 +8,7 @@ import net.anotheria.asg.util.CmsChangesTracker.Action;
  * 
  * @author 
  */
-public class DocumentChangedListener implements IServiceListener{
+public class ContentChangeTrackerListener implements IServiceListener{
 	
 	@Override public void documentCreated(DataObject doc) {
 		trackChanges(doc, Action.CREATE);

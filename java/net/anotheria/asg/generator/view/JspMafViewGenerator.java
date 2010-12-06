@@ -801,6 +801,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 						appendString(name);
 					decreaseIdent(); 
 					if(element.isRich()){
+						appendString("<div class=\"clear\"></div>");
 						appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('"+section.getDocument().getField(element.getName()).getName(lang) + "_ID').show();\" class=\"rich_on_off\" style=\"display:none;\">on</a>");
 						appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('"+section.getDocument().getField(element.getName()).getName(lang) + "_ID').hide();\" class=\"rich_on_off\">off</a>");
 						appendString("<span class=\"rich_on_off\">Rich:</span>");

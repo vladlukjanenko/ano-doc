@@ -89,7 +89,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 			
 			timer.startExecution("v-"+view.getName()+"-JspQueries");
 			files.addAll(new JspQueriesGenerator().generate(view));
-			files.addAll(new JspMafQueriesGenerator().generate(view));
+			//files.addAll(new JspMafQueriesGenerator().generate(view));
 			timer.stopExecution("v-"+view.getName()+"-JspQueries");
 			
 			timer.startExecution("v-"+view.getName()+"-StrutsConfig");
