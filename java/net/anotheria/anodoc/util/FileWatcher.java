@@ -39,7 +39,7 @@ public abstract class FileWatcher {
 	 */
 	public void start(){
 		stop();
-		timer = new Timer("FileWatcher("+filePath+")");
+		timer = new Timer("FileWatcher("+filePath+")", true);
 		timer.schedule(new FileWatcherTask(filePath), period, period);
 
 	}

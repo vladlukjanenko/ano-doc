@@ -5,24 +5,24 @@
 	<classpathentry kind="src" path="test/junit"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="lib/ano-db-latest.jar"/>
-	<classpathentry kind="lib" path="lib/ano-prise-latest.jar"/>
-	<classpathentry kind="lib" path="lib/ano-util-latest.jar"/>
-	<classpathentry kind="lib" path="lib/ant-stable.jar"/>
-	<classpathentry kind="lib" path="lib/BlowfishJ-stable.jar"/>
-	<classpathentry kind="lib" path="lib/commons-beanutils-stable.jar"/>
-	<classpathentry kind="lib" path="lib/commons-collections-latest.jar"/>
-	<classpathentry kind="lib" path="lib/commons-lang-stable.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-stable.jar"/>
-	<classpathentry kind="lib" path="lib/configureme-latest.jar"/>
-	<classpathentry kind="lib" path="lib/dozer-annotations-latest.jar"/>
-	<classpathentry kind="lib" path="lib/dozer-latest.jar"/>
-	<classpathentry kind="lib" path="lib/jdom-stable.jar"/>
-	<classpathentry kind="lib" path="lib/json-stable.jar"/>
-	<classpathentry kind="lib" path="lib/junit-stable.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-stable.jar"/>
-	<classpathentry kind="lib" path="lib/moskito-core-latest.jar"/>
-	<classpathentry kind="lib" path="lib/moskito-util-latest.jar"/>
-	<classpathentry kind="lib" path="lib/xalan-latest.jar"/>
+	<classpathentry kind="lib" path="lib/ano-db.jar"/>
+	<classpathentry kind="lib" path="lib/ano-prise.jar"/>
+	<classpathentry kind="lib" path="lib/ano-util.jar"/>
+	<classpathentry kind="lib" path="lib/ant.jar"/>
+	<classpathentry kind="lib" path="lib/BlowfishJ.jar"/>
+	<classpathentry kind="lib" path="lib/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/configureme.jar"/>
+	<classpathentry kind="lib" path="lib/dozer-annotations.jar"/>
+	<classpathentry kind="lib" path="lib/dozer.jar"/>
+	<classpathentry kind="lib" path="lib/jdom.jar"/>
+	<classpathentry kind="lib" path="lib/json.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/moskito-core.jar"/>
+	<classpathentry kind="lib" path="lib/moskito-util.jar"/>
+	<classpathentry kind="lib" path="lib/xalan.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
