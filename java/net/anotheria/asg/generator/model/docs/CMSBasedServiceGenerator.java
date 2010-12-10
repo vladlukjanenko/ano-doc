@@ -141,8 +141,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    		String listClassName = (String)module.getListeners().get(i);
 	    		appendStatement("addServiceListener(new "+listClassName+"())");
 	    	}
-			appendStatement("addModuleListener("+module.getModuleClassName()+".MODULE_ID, this)");
 	    }
+		appendStatement("addModuleListener("+module.getModuleClassName()+".MODULE_ID, this)");
 	    append(closeBlock());
 	    emptyline();
 
