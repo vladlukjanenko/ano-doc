@@ -122,7 +122,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.addImport("net.anotheria.util.xml.XMLNode");
 		clazz.addImport("net.anotheria.util.xml.XMLAttribute");
 
-		clazz.addImport("net.anotheria.asg.util.listener.IModuleListener;");
+		clazz.addImport("net.anotheria.asg.util.listener.IModuleListener");
 				
 	    clazz.setName(getImplementationName(module));
 	    clazz.setParent("BasicCMSService");
