@@ -703,8 +703,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("continue");
 		decreaseIdent();
 		appendString("} finally {");
-		increaseIdent();
-		appendStatement("net.anotheria.db.service.BasePersistenceServiceJDBCImpl.release(ps)");
+		increaseIdent();		
+		appendStatement("net.anotheria.db.util.ResourcesUtil.release(ps)");
 		append(closeBlock());
 		append(closeBlock());
 		appendStatement("log.error(\"All \"+ dbConfig.getIdRecoveryAttempts()+\" attempt of id rereading - Failed. \"+" + callLog + ", throwable)");
@@ -764,7 +764,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		decreaseIdent();
 		appendString("} finally {");
 		increaseIdent();
-		appendStatement("net.anotheria.db.service.BasePersistenceServiceJDBCImpl.release(ps)");
+		appendStatement("net.anotheria.db.util.ResourcesUtil.release(ps)");
 		append(closeBlock());
 		append(closeBlock());
 		appendStatement("log.error(\"All \"+ dbConfig.getIdRecoveryAttempts()+\" attempt of id rereading - Failed. \"+" + callLog + ", throwable)");
@@ -1121,8 +1121,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("} finally {");
 		increaseIdent();
 		if (isCloseResultSet)
-			appendStatement("net.anotheria.db.service.BasePersistenceServiceJDBCImpl.release(result)");
-		appendStatement("net.anotheria.db.service.BasePersistenceServiceJDBCImpl.release(" + (usePreparedSt ? "ps" : "st") + ")");
+			appendStatement("net.anotheria.db.util.ResourcesUtil.release(result)");
+		appendStatement("net.anotheria.db.util.ResourcesUtil.release(" + (usePreparedSt ? "ps" : "st") + ")");
 		append(closeBlock());
 	}
 
