@@ -81,13 +81,12 @@ public class ModuleStatistics extends Module{
 		return IStatisticsConstants._PRE_SIZE + anId;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public long getFutureCumulativeSize(String exchangedId, long exchangedSize){
 		String eId = getSizeId(exchangedId);
-		Enumeration allDocNames = getHolderNames();
+		Enumeration<String> allDocNames = getHolderNames();
 		long sum = exchangedSize;
 		while (allDocNames.hasMoreElements()){
-			String aKey = (String)allDocNames.nextElement();
+			String aKey = allDocNames.nextElement();
 			if (aKey.startsWith(IStatisticsConstants._PRE_SIZE) &&
 				(!aKey.equals(eId))){
 				sum += getStatisticsEntry(aKey).getCount();

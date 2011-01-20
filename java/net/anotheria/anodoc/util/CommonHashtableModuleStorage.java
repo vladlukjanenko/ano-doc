@@ -1,14 +1,5 @@
 package net.anotheria.anodoc.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 import net.anotheria.anodoc.data.IBasicStoreableObject;
 import net.anotheria.anodoc.data.ICompositeDataObject;
 import net.anotheria.anodoc.data.IPlainDataObject;
@@ -16,14 +7,20 @@ import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.service.IModuleFactory;
 import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;
+import net.anotheria.asg.util.listener.IModuleListener;
 import net.anotheria.util.IOUtils;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.configureme.ConfigurationManager;
 import org.configureme.annotations.AfterConfiguration;
 import org.configureme.annotations.Configure;
 import org.configureme.annotations.ConfigureMe;
+
+import java.io.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * This storage stores everything in a hashtable and stores this 
@@ -52,24 +49,37 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	 * Configuration key for the storage dir.
 	 */
 	public String cfgKeyStorageDir;
-	
+
 	public static final String DEF_STORAGE_DIR = ".";
 	@Configure private String storageDir = DEF_STORAGE_DIR;
+
+	/**
+	 * Period for checking file in milliseconds.
+	 */
+	private static final long FILE_CHECK_PERIOD = 60*1000; //todo make it configureable by ConfigureMe
+	/**
+	 * Task for file's changes watching.
+	 */
+	private FileWatcher fileWatchingTimer;
 	/**
 	 * Logger.
 	 */
 	private static Logger log = Logger.getLogger(CommonHashtableModuleStorage.class);
-	
+	/**
+	 * List with listeners. This list is a CopyOnWriteArrayList, hence its safe to add a new listener anytime. However, typically you will add a listener on init of some stuff.
+	 */
+	private List<IModuleListener> listeners = new CopyOnWriteArrayList<IModuleListener>();
+
 	public CommonHashtableModuleStorage(String aFilename, IModuleFactory aFactory){
 		this(aFilename, aFactory, DEF_KEY_CFG_STORAGE_DIRECTORY);
 	}
 	
 	public CommonHashtableModuleStorage(String aFilename, IModuleFactory aFactory, String aCfgKeyStorageDir){
 		storage = new Hashtable<String,Module>();
-		this.filename = aFilename;
-		this.factory = aFactory;
+		filename = aFilename;
+		factory = aFactory;
 		cfgKeyStorageDir = aCfgKeyStorageDir;
-		
+
 		ConfigurationManager.INSTANCE.configure(this);
 	}
 
@@ -78,7 +88,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		String key = makeKey(ownerId, copyId);
 		if (!storage.containsKey(key))
 			throw new NoStoredModuleEntityException(key);
-		return (Module)storage.get(key);
+		return storage.get(key);
 	} 
 	
 	@Override public void saveModule(Module module) {
@@ -91,7 +101,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		storage.remove(key);
 		save();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void saveObject(String asKey, IBasicStoreableObject o, Hashtable<String,Hashtable> target){
 		if (o instanceof ICompositeDataObject)
@@ -132,7 +142,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		System.out.println("composite");
 		Enumeration<String> e = c.getKeys();
 		while(e.hasMoreElements()){
-			String key = (String)e.nextElement();
+			String key = e.nextElement();
 			IBasicStoreableObject obj = (IBasicStoreableObject) c.getObject(key);
 			printObject(obj, tabs+1);
 		}
@@ -170,7 +180,17 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	protected String getFile(String filename){
 		return storageDir + File.separator + filename;
 	}
-	
+
+	/**
+	 * Return path for lock file by file name.
+	 * @param filename file name for dat file.
+	 * @return file name for lock file.
+	 */
+	protected String getFileLock(String filename){
+		String fileLock = getFile("locks"+File.separator+filename);
+		return fileLock.substring(0, fileLock.lastIndexOf(".")) + ".lock";
+	}
+
 	@SuppressWarnings("unchecked")
 	private void save(){
 		//erstmal konvertieren
@@ -184,7 +204,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 			saveObject("module", module, moduleTarget);
 			Hashtable moduleContainer = (Hashtable)moduleTarget.get("module");
 			toSave.put(makeKey(module), moduleContainer);		
-			
+
 		}
 		
 		
@@ -203,6 +223,8 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 
 	@SuppressWarnings("unchecked")
 	private void load(){
+		
+		storage.clear();
 		ObjectInputStream oIn = null;
 		try{
 			oIn = new ObjectInputStream(new FileInputStream(getFile(filename)));
@@ -228,8 +250,9 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 				createdModule.setModuleFactory(factory);
 				createdModule.fillFromContainer(holder);
 				storage.put(aKey, createdModule);
-				
+
 			}
+
 		}catch(FileNotFoundException ignorable){
 			if (log.isEnabledFor(Priority.INFO)) {
 				log.info("FileNotFound "+filename+", assuming new installation");
@@ -258,17 +281,68 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 				toPrint += "list";
 			System.err.println(toPrint);
 			System.err.println("\t"+holder.get(key));
-				
+
 		}
 	}
-
 
 	public void setStorageDir(String value){
 		storageDir = value;			
 	}
 
+	/**
+	 * Adds a service listener to this module storage.
+	 * @param listener the listener to add.
+	 */
+	@Override
+	public void addModuleListener(IModuleListener listener){
+		listeners.add(listener);
+	}
+
+	/**
+	 * Removes the service listener from the module storage.
+	 * @param listener the listener to remove.
+	 */
+	@Override
+	public void removeModuleListener(IModuleListener listener){
+		listeners.remove(listener);
+	}
+
+	/**
+	 * Fires the module changed event. Exceptions persistence from listeners are ignored (and logged).
+	 */
+	private void firePersistenceChangedEvent(){
+		load();
+
+		for (IModuleListener listener : listeners)
+			for (Module changed : storage.values())
+				try{
+					listener.moduleLoaded(changed);
+				}catch(Exception e){
+					log.error("Caught uncaught exception by the listener "+listener+", moduleLoaded("+changed+")", e);
+				}
+	}
+
+	/**
+	 * Starts file watching task.
+	 */
+	private void startFileWatcherTask(){
+		if (fileWatchingTimer != null)
+			fileWatchingTimer.stop();
+
+		fileWatchingTimer = new FileWatcher(getFileLock(filename), FILE_CHECK_PERIOD) {
+			@Override
+			protected void onChange() {
+				log.info("content of modules in " + getFile(filename) + " has been changed");
+				firePersistenceChangedEvent();
+			}
+		};
+
+		fileWatchingTimer.start();
+	}
+
 	@AfterConfiguration public void notifyConfigurationFinished() {
 		load();
+		startFileWatcherTask();
 	}
-}
 
+}

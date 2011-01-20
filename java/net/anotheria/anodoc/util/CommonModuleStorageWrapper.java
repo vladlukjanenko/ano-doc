@@ -5,7 +5,7 @@ import net.anotheria.anodoc.service.IModuleFactory;
 import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;
 import net.anotheria.anodoc.service.StorageFailureException;
-
+import net.anotheria.asg.util.listener.IModuleListener;
 import org.apache.log4j.Logger;
 
 /**
@@ -66,4 +66,19 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 			throw new StorageFailureException(ex.getMessage());
 		}
 	}
+
+	/**
+	 *
+	 * Does nothing.
+	 */
+	@Override public void addModuleListener(IModuleListener listener) {
+	}
+
+	/**
+	 *
+	 * Does nothing.
+	 */
+	@Override public void removeModuleListener(IModuleListener listener) {
+	}
+
 }
