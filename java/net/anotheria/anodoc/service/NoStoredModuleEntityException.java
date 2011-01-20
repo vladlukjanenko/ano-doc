@@ -9,6 +9,11 @@ import net.anotheria.anodoc.util.CommonModuleStorageException;
  * with the create flag, this exception will be caught by the service and a new instance created.
  */
 public class NoStoredModuleEntityException extends CommonModuleStorageException{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public NoStoredModuleEntityException(String message){
 		super(message);
 	}

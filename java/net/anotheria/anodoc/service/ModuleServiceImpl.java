@@ -9,6 +9,7 @@ import net.anotheria.anodoc.stats.ModuleStatistics;
 import net.anotheria.anodoc.stats.StatisticsFactory;
 import net.anotheria.anodoc.util.CommonHashtableModuleStorage;
 
+import net.anotheria.asg.util.listener.IModuleListener;
 import org.apache.log4j.Logger;
 import org.configureme.ConfigurationManager;
 import org.configureme.annotations.AfterConfiguration;
@@ -20,7 +21,7 @@ import org.configureme.annotations.ConfigureMe;
  * which supports local cache and synchronization over network.
  */
 @ConfigureMe (name="anodoc.storage")
-public class ModuleServiceImpl implements IModuleService{
+public class ModuleServiceImpl implements IModuleService, IModuleListener{
 	
 	/**
 	 * A delimiter which is used between different parts of the unique module key.
@@ -41,6 +42,11 @@ public class ModuleServiceImpl implements IModuleService{
 	 * The factories.
 	 */
 	private Map<String, IModuleFactory> factories;
+
+	/**
+	 * Map with listeners for modules.
+	 */
+	private Map<String, IModuleListener> moduleListeners;
 
 	/**
 	 * The module storages.
@@ -71,7 +77,9 @@ public class ModuleServiceImpl implements IModuleService{
 		//initialize local data.
 		factories = new ConcurrentHashMap<String, IModuleFactory>();
 		storages  = new ConcurrentHashMap<String, IModuleStorage>();
-		cache = new ConcurrentHashMap<String, Module>();		
+		cache = new ConcurrentHashMap<String, Module>();
+		moduleListeners = new ConcurrentHashMap<String, IModuleListener>();
+
 		if (log.isDebugEnabled()) {
 			log.debug("Created new ModuleServiceImplementation");
 		}
@@ -81,9 +89,6 @@ public class ModuleServiceImpl implements IModuleService{
 
 		ConfigurationManager.INSTANCE.configure(this);
 	}
-	
-	
-	
 
 	/**
 	 * Attaches a factory for given module id.
@@ -99,7 +104,10 @@ public class ModuleServiceImpl implements IModuleService{
 	 * Attaches a storage for given module id.
 	 */
 	public void attachModuleStorage(String moduleId, IModuleStorage storage){
+
 		storages.put(moduleId, storage);
+		storage.addModuleListener(this);
+
 		if (log.isDebugEnabled()) {
 			log.debug("Attached module storage "+storage+" for moduleId:"+moduleId);
 		}
@@ -120,7 +128,19 @@ public class ModuleServiceImpl implements IModuleService{
 		String key = getKey(moduleId,copyId, ownerId);
 		cache.remove(key);
 	}
-	
+
+	/**
+	 * Returns module from.
+	 * @param module module to serch in cache.
+	 * @return module if it was in cache, otherwise null.
+	 */
+	private Module getModuleFromCache(Module module) {
+		String key = getKey(module);
+		Module cachedModule = cache.get(key);
+
+		return cachedModule;
+	}
+
 	/**
 	 * Put in cache and store.
 	 */
@@ -314,8 +334,44 @@ public class ModuleServiceImpl implements IModuleService{
 		}
 	}
 
+	/**
+	 * Removes changed module from cache and fires moduleLoaded event of registered listener.
+	 * @param module changed module.
+	 */
+	@Override
+	public void moduleLoaded(Module module){
+		log.info("Persistence changed for " + module);
+		removeFromCache(module.getId(),module.getOwnerId(),module.getCopyId());
+
+		IModuleListener listener = moduleListeners.get(getKey(module.getId(), DEFAULT_COPY_ID, module.getOwnerId()));
+		if (listener!=null)
+			try{
+				listener.moduleLoaded(module);
+			}catch(Exception e){
+				log.warn("Caught uncaught exception by the listener "+listener+", contentChanged()", e);
+			}
+	}
+
+	@Override
+	public void addModuleListener(String moduleId, String ownerId, IModuleListener aModuleListeners){
+		String key = getKey(moduleId, DEFAULT_COPY_ID, ownerId);
+
+		moduleListeners.put(key, aModuleListeners);
+	}
+
+	/**
+	 * Removes listener for module.
+	 * @param moduleId id of module.
+	 * @param ownerId  owner id for module.
+	 */
+	@Override
+	public void removeModuleListener(String moduleId, String ownerId) {
+		moduleListeners.remove(getKey(moduleId, DEFAULT_COPY_ID, ownerId));
+	}
+
 	@AfterConfiguration public void notifyConfigurationFinished() {
 		log.info("Cleaning cache.");
 		cache.clear();
 	}
+
 }

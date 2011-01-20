@@ -1,6 +1,10 @@
 package net.anotheria.anodoc.service;
 
 import net.anotheria.anodoc.data.Module;
+import net.anotheria.asg.util.listener.IModuleListener;
+import net.anotheria.asg.util.listener.IServiceListener;
+
+import java.util.List;
 
 /**
  * This interface describes the locally available service for Module management.<br>
@@ -76,6 +80,21 @@ public interface IModuleService {
 	 * is assumed to be the standart copyId.   
 	 */
 	void deleteModule(String ownerId, String moduleId) throws NoStorageForModuleException, StorageFailureException;
-	
+
+	/**
+	 * Adds listener for module.
+	 * @param moduleId module id of module.
+	 * @param ownerId owner id of module.
+	 * @param aModuleListeners listener to add.
+	 */
+	void addModuleListener(String moduleId, String ownerId, IModuleListener aModuleListeners);
+
+	/**
+	 * Removes listener for module.
+	 * @param moduleId id of module.
+	 * @param ownerId owner id for module.
+	 */
+	void removeModuleListener(String moduleId, String ownerId);
+
 }
  
