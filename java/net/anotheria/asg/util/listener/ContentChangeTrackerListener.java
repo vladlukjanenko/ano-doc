@@ -39,6 +39,11 @@ public class ContentChangeTrackerListener implements IServiceListener{
 		CmsChangesTracker.saveChange(dc);
 		
 	}
+
+	@Override
+	public void persistenceChanged() {
+		//nothing todo here
+	}
 	
 }
 

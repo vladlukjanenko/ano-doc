@@ -23,4 +23,9 @@ public class SysOutServiceListener implements IServiceListener{
 	@Override public void documentUpdated(DataObject oldVersion, DataObject newVersion) {
 		System.out.println("Updated a document of type: "+oldVersion.getClass()+" old: "+oldVersion+" new: "+newVersion);		
 	}
+
+	@Override public void persistenceChanged() {
+		System.out.println("Persistence changed");
+	}
+
 }
