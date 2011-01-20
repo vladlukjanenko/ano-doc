@@ -75,7 +75,20 @@ public abstract class AbstractASGService implements ASGService{
 			}
 		}
 	}
-	
+
+	/**
+	 * Fires the persistence change event. The method returns after all listeners have been notified. Exceptions from listeners are ignored (and logged).
+	 */
+	protected void firePersistenceChangedEvent(){
+		for (IServiceListener listener : listeners){
+			try{
+				listener.persistenceChanged();
+			}catch(Exception e){
+				log.warn("Caught uncaught exception by the listener "+listener+", firePersistenceChangedEvent()", e);
+			}
+		}
+	}
+
 	/**
 	 * Adds a service listener to this service.
 	 * @param listener the listener to add.

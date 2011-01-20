@@ -1,5 +1,6 @@
 package net.anotheria.asg.generator.parser;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ public final class XMLFormParser {
 			}
 		
 		}catch(JDOMException e){
+			e.printStackTrace();
+		}catch(IOException e){
 			e.printStackTrace();
 		}
 		//System.out.println("Parsed forms: "+ret);

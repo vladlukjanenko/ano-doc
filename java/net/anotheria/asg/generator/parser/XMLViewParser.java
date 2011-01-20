@@ -1,5 +1,6 @@
 package net.anotheria.asg.generator.parser;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +51,9 @@ public final class XMLViewParser {
 				ret.add(view);
 			}
 		}catch(JDOMException e){
+			log.error("parseViews", e);
+			throw new RuntimeException("Can't parse view because: "+e.getMessage());
+		}catch(IOException e){
 			log.error("parseViews", e);
 			throw new RuntimeException("Can't parse view because: "+e.getMessage());
 		}
