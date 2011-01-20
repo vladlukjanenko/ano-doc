@@ -105,6 +105,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.ArrayList");
+		clazz.addImport("net.anotheria.anodoc.data.Module");
 		clazz.addImport("net.anotheria.anodoc.data.Property");
 		clazz.addImport("net.anotheria.anodoc.data.NoSuchPropertyException");
 		clazz.addImport("net.anotheria.util.sorter.SortType");
@@ -124,9 +125,12 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		clazz.addImport("net.anotheria.util.xml.XMLNode");
 		clazz.addImport("net.anotheria.util.xml.XMLAttribute");
 
+		clazz.addImport("net.anotheria.asg.util.listener.IModuleListener");
+				
 	    clazz.setName(getImplementationName(module));
 	    clazz.setParent("BasicCMSService");
 	    clazz.addInterface(getInterfaceName(module));
+	    clazz.addInterface("IModuleListener");
 
 	    startClassBody();
 
@@ -143,6 +147,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    		appendStatement("addServiceListener(new "+listClassName+"())");
 	    	}
 	    }
+		appendStatement("addModuleListener("+module.getModuleClassName()+".MODULE_ID, this)");
 	    append(closeBlock());
 	    emptyline();
 
@@ -160,6 +165,14 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    appendString("private "+module.getModuleClassName()+" "+getModuleGetterCall(module)+"{");
 	    increaseIdent();
 	    appendStatement("return ("+module.getModuleClassName()+") getModule("+module.getModuleClassName()+".MODULE_ID)");
+	    append(closeBlock());
+	    emptyline();
+
+		//implementing of IModuleListener
+		appendString("@Override");
+	    appendString("public void moduleLoaded(Module module){");
+	    increaseIdent();
+	    appendStatement("firePersistenceChangedEvent()");
 	    append(closeBlock());
 	    emptyline();
 
