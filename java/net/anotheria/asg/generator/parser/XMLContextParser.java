@@ -10,6 +10,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
 import net.anotheria.asg.generator.Context;
+import net.anotheria.util.StringUtils;
 
 /**
  * Parser for the context-xml.
@@ -36,6 +37,14 @@ public final class XMLContextParser {
 			ret.setApplicationURLPath(context.getChildText("applicationURLPath"));
 			ret.setServletMapping(context.getChildText("servletMapping"));
 			ret.setEncoding(context.getChildText("encoding"));
+			
+			String cmsVersion1Value = context.getChildText("cmsVersion1");
+			if(!StringUtils.isEmpty(cmsVersion1Value))
+				ret.setCmsVersion1(Boolean.parseBoolean(cmsVersion1Value));
+			String cmsVersion2Value = context.getChildText("cmsVersion2");
+			if(!StringUtils.isEmpty(cmsVersion2Value))
+				ret.setCmsVersion2(Boolean.parseBoolean(cmsVersion2Value));
+			
 			try{
 				Element languages = context.getChild("languages");
 				if (languages!=null)

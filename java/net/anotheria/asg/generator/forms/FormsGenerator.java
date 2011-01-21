@@ -10,8 +10,6 @@ import net.anotheria.asg.generator.forms.meta.MetaForm;
 import net.anotheria.asg.generator.view.JspViewGenerator;
 import net.anotheria.asg.generator.view.ModuleActionsGenerator;
 import net.anotheria.asg.generator.view.ModuleBeanGenerator;
-import net.anotheria.asg.generator.view.ModuleMafActionsGenerator;
-import net.anotheria.asg.generator.view.ModuleMafBeanGenerator;
 
 
 /**
@@ -27,9 +25,9 @@ public class FormsGenerator extends AbstractAnoDocGenerator{
 		JspViewGenerator jspGenerator = new JspViewGenerator();
 		ModuleActionsGenerator actionsGenerator = new ModuleActionsGenerator(null);
 
-		ModuleMafBeanGenerator mafBeanGenerator = new ModuleMafBeanGenerator();
+//		ModuleMafBeanGenerator mafBeanGenerator = new ModuleMafBeanGenerator();
 //		JspMafViewGenerator jspMafGenerator = new JspMafViewGenerator();
-		ModuleMafActionsGenerator mafActionsGenerator = new ModuleMafActionsGenerator(null);
+//		ModuleMafActionsGenerator mafActionsGenerator = new ModuleMafActionsGenerator(null);
 
 		GeneratorDataRegistry registry = GeneratorDataRegistry.getInstance();
 		
