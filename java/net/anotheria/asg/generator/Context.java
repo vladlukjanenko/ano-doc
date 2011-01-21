@@ -59,6 +59,16 @@ public class Context {
 	 */
 	private Map<String, ContextParameter> parameters;
 	
+	/**
+	 * Allows generation of the CMS 1.0 (struts implementation)
+	 */
+	private boolean cmsVersion1 = true;
+	
+	/**
+	 * Allows generation of CMS 2.0 (ano-maf implementation)
+	 */
+	private boolean cmsVersion2 = false;
+	
 	public Context(){
 		parameters = new HashMap<String, ContextParameter>();
 	}
@@ -229,6 +239,22 @@ public class Context {
 
 	public void setOptions(GenerationOptions options) {
 		this.options = options;
+	}
+
+	public boolean isCmsVersion1() {
+		return cmsVersion1;
+	}
+
+	public void setCmsVersion1(boolean cmsVersion1Generator) {
+		this.cmsVersion1 = cmsVersion1Generator;
+	}
+
+	public boolean isCmsVersion2() {
+		return cmsVersion2;
+	}
+
+	public void setCmsVersion2(boolean cmsVersion2Generator) {
+		this.cmsVersion2 = cmsVersion2Generator;
 	}
 
 }

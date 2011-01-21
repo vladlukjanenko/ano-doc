@@ -48,6 +48,7 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateImplementation");
 		
 		MetaFederationModule module = (MetaFederationModule )moduleX;
 
@@ -435,6 +436,17 @@ public class FederationServiceGenerator extends AbstractServiceGenerator impleme
 			append(closeBlock());
 			emptyline();
 	    }
+	    
+	    appendComment("Executes a query on all data objects (documents, vo) which are part of this module and managed by this service");
+		appendString("public QueryResult executeQueryOnAllObjects(DocumentQuery query)" + throwsClause + "{");
+		increaseIdent();
+		appendStatement("QueryResult ret = new QueryResult()");
+		for (MetaDocument doc : docs){
+			appendStatement("ret.add(executeQueryOn"+doc.getMultiple()+"(query).getEntries())");
+		}
+		appendStatement("return ret");
+		closeBlock("executeQueryOnAllObjects");
+		emptyline();
 	    
 	    //generate export function
 	    emptyline();

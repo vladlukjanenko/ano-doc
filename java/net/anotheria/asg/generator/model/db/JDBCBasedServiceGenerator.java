@@ -37,6 +37,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	private GeneratedClass generateImplementation(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
+		appendGenerationPoint("generateImplementation");
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		
 	    clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getImplementationName(module),"The implementation of the "+getInterfaceName(module)+"."));
@@ -493,6 +494,16 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	emptyline();
 	    }
 	    
+	    appendComment("Executes a query on all data objects (documents, vo) which are part of this module and managed by this service");
+		appendString("public QueryResult executeQueryOnAllObjects(DocumentQuery query)" + throwsClause + "{");
+		increaseIdent();
+		appendStatement("QueryResult ret = new QueryResult()");
+		for (MetaDocument doc : docs){
+			appendStatement("ret.add(executeQueryOn"+doc.getMultiple()+"(query).getEntries())");
+		}
+		appendStatement("return ret");
+		closeBlock("executeQueryOnAllObjects");
+		emptyline();
 
 	    appendString("public XMLNode exportToXML(){");
 	    increaseIdent();

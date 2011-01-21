@@ -5,6 +5,7 @@ import java.io.File;
 import net.anotheria.asg.generator.Generator;
 import net.anotheria.asg.generator.util.FileWriter;
 
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 /**
  * Tasks for generation of java files out of xml data.
@@ -30,7 +31,10 @@ public class GenerateTask extends Task {
 			Generator.generate();
 			log("Generation complete");
 		}catch(Exception e){
-			log("Error: "+e.getMessage());
+			log("Error: " + e.getMessage());
+			//TODO: could not understand how to use native logging
+			System.out.println("Generation failed: " );
+			e.printStackTrace();
 		}
 	}
 

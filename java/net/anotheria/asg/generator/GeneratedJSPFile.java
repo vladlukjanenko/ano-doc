@@ -46,6 +46,6 @@ public class GeneratedJSPFile extends GeneratedArtefact{
 	}
 	
 	public void setPackage(String aPackage){
-		path = FileEntry.package2path(aPackage);
+		path = FileEntry.package2fullPath(aPackage);
 	}
 }

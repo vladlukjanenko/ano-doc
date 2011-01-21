@@ -7,6 +7,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import net.anotheria.anodoc.util.context.CallContext;
+import net.anotheria.anodoc.util.context.ContextManager;
 import net.anotheria.util.xml.XMLAttribute;
 import net.anotheria.util.xml.XMLNode;
 
@@ -39,6 +41,11 @@ public class Document extends DataHolder
 	 * Constant for property name of the property under which last update timestamp is stored.
 	 */
 	public static final String PROP_LAST_UPDATE = "###last_update###";
+	
+	/**
+	 * Constant for property name of the property under which Author is stored.
+	 */
+	public static final String PROP_AUTHOR = "###author###";
 
 	/**
 	 * Creates a new Document with given name. 
@@ -662,6 +669,16 @@ public class Document extends DataHolder
 	
 	public long getLastUpdateTimestamp(){
 		return getLong(PROP_LAST_UPDATE); 
+	}
+	
+	public void setCallContextAuthor(){
+		CallContext callContext = ContextManager.getCallContext();
+		String author = callContext != null? callContext.getCurrentAuthor(): "UNKNOWN";
+		setString(PROP_AUTHOR, author);
+	}
+	
+	public String getAuthor(){
+		return getString(PROP_AUTHOR); 
 	}
 	
 	protected List<String> copyToStringList(List<Property> properties){

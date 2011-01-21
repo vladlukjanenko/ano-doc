@@ -20,15 +20,23 @@ public class IndexPageActionGenerator extends AbstractGenerator {
 		return new FileEntry(generateBaseAction(views));
 	}
 
+	public static String getIndexPagePackageName() {
+		return GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".action";
+	}
+	
 	public static String getIndexPageActionName() {
 		return "BaseIndexPageAction";
+	}
+	
+	public static String getIndexPageFullName() {
+		return getIndexPagePackageName() + "." + getIndexPageActionName();
 	}
 
 	public GeneratedClass generateBaseAction(List<MetaView> views) {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-
-		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".action");
+		appendGenerationPoint("generateBaseAction");
+		clazz.setPackageName(getIndexPagePackageName());
 
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");

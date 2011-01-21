@@ -74,6 +74,10 @@ public class MetaDocument implements IGenerateable{
 	public String getName() {
 		return name;
 	}
+	
+	public String getName(boolean multiple){
+		return multiple? getMultiple(): getName();
+	}
 
 	/**
 	 * Returns all contained properties.
