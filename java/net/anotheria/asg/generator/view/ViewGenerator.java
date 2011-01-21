@@ -7,7 +7,6 @@ import net.anotheria.asg.generator.AbstractAnoDocGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.cms20.view.JspViewCms20Generator;
 import net.anotheria.asg.generator.view.meta.MetaCustomSection;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
@@ -48,8 +47,8 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 		timer.stopExecution("common");
 		
 		timer.startExecution("views");
-		for (int i=0; i<views.size(); i++){
-			MetaView view = views.get(i);
+		for (MetaView view: views){
+
 			timer.startExecution("view-"+view.getName());
 
 			timer.startExecution("v-"+view.getName()+"-BaseViewAction");
@@ -62,10 +61,7 @@ public class ViewGenerator extends AbstractAnoDocGenerator{
 
 			timer.startExecution("v-"+view.getName()+"-Jsp");
 			
-			if(view.isCms20())
-				files.addAll(new JspViewCms20Generator().generate(view));
-			else
-				files.addAll(new JspViewGenerator().generate(view));
+			files.addAll(new JspViewGenerator().generate(view));
 			
 			timer.stopExecution("v-"+view.getName()+"-Jsp");
 			
