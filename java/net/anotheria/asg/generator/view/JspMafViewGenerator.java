@@ -1096,7 +1096,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 			appendString("]};");
 			appendString("var selection"+elCapitalName+"Json = {");
 			increaseIdent();
-			appendString("id:\"${"+beanName+"."+elName+"}\",name:\"${"+beanName+"."+elName+"CurrentValue}\"");
+			appendString("id:'<bean:write name="+quote(beanName)+" property="+quote(elName)+"/>',name:'<bean:write name="+quote(beanName)+" property="+quote(elName + "CurrentValue")+"/>'");
 			decreaseIdent();
 			appendString("};");
 			appendString("new YAHOO.anoweb.widget.ComboBox("+quote(elCapitalName)+",\""+elCapitalName+"Selector\","+elName+"Json,selection"+elCapitalName+"Json);");
