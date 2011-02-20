@@ -346,11 +346,8 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		append(closeBlock());
 		emptyline();
 		
-		appendComment("Add user settings beans to specified request.");
-		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsManager");		
 		appendString("protected void addUserSettingsBeansToRequest(HttpServletRequest req) {");
 		increaseIdent();
-		appendStatement("addBeanToRequest(req, \"userSettings\", UserSettingsManager.loadFromCookies(req) )");		
 		append(closeBlock());
 		emptyline();		
 		

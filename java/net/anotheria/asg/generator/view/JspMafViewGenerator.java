@@ -52,10 +52,6 @@ import net.anotheria.util.StringUtils;
 public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGenerator{
 	
 	/**
-	 * userSettingsActionName
-	 */		
-	final String userSettingsEditActionName = "userSettingsEdit";
-	/**
 	 * Currently generated section.
 	 */
 	private MetaSection currentSection;
@@ -175,21 +171,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		if (p instanceof MetaTableProperty)
 			return generateTablePage(section, doc, (MetaTableProperty)p);
 		throw new RuntimeException("Unsupported container: "+p);
-	}
-	
-	/**
-	 * Generates user settings JSP imports 
-	 * @return
-	 */
-	private String getUserSettingsJSPImports(){
-		String ret = "";
-		ret += "<%@page import=" 
-			+ quote(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsBean")
-			+ "%>" + CRLF;
-		ret += "<%@page import=\"java.net.URLEncoder\"%>" + CRLF;
-		ret += "<%@page import=\"org.apache.commons.lang.ArrayUtils\"%>" + CRLF;
-		
-		return ret;
 	}
 	
 	private GeneratedJSPFile generateListPage(MetaModuleSection section, MetaDocument doc, MetaListProperty list){
@@ -518,10 +499,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		currentDialog = dialog;
 		
 		append(getBaseJSPHeader());
-		append(getUserSettingsJSPImports());
-		
-		// Language filtering settings
-		generateProcessLanguageFilteringSettings();
 		
 		appendGenerationPoint("generateDialog");
 		appendString("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
@@ -1408,61 +1385,6 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 	}
 	
 	
-	private void generateProcessLanguageFilteringSettings() {
-		// Language filtering settings
-		appendString("<!-- Process language filterring settings -->");
-		appendString("<logic:equal name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");
-		increaseIdent();
-		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-			appendString("<bean:define id=\"display" + sl + "\" value='<%= ((UserSettingsBean) request.getAttribute(\"userSettings\")).getDisplayedLanguages().contains(\"" + sl + "\") ? \"true\" : \"false\" %>'/>");
-		}
-		decreaseIdent();
-		appendString("</logic:equal>");
-		appendString("<logic:notEqual name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");
-		increaseIdent();
-		for (String sl : GeneratorDataRegistry.getInstance().getContext().getLanguages()){
-			appendString("<bean:define id=\"display" + sl + "\" value='true'/>");
-		}
-		decreaseIdent();
-		appendString("</logic:notEqual>");
-		appendString("<!-- / End language filterring settings -->");
-	}
-	
-	private void generateLanguageFilteringSettingsViewComponent(MetaModuleSection section) {
-		
-		appendString("<a href=\""+userSettingsEditActionName+"?referrer=<%= URLEncoder.encode(" + quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_SHOW)) + " + ((request.getQueryString() != null) ? (\"?\" + request.getQueryString()) : \"\")," + quote(getContext().getEncoding()) +") %>\">Displayed languages:</a> [");		
-		appendString("<logic:equal name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");
-		increaseIdent();
-		appendString("<logic:iterate id=\"lang\" name=\"userSettings\" property=\"displayedLanguages\" >");
-		appendString("&nbsp;<bean:write name=\"lang\"/>");
-		appendString("</logic:iterate>");
-		decreaseIdent();
-		appendString("</logic:equal>");						
-		appendString("<logic:notEqual name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");		
-		appendIncreasedString("ALL");		
-		appendString("</logic:notEqual>");	
-		appendString("]");
-		
-	}
-	
-	private void generateLanguageFilteringSettingsViewComponentForDialog(MetaDialog dialog, MetaModuleSection section) {
-		
-		appendString("<a href=\""+userSettingsEditActionName+"?referrer=<%= URLEncoder.encode(" + quote(StrutsConfigGenerator.getPath(section.getDocument(), StrutsConfigGenerator.ACTION_EDIT)) + " + ((request.getQueryString() != null) ? (\"?\" + request.getQueryString()) : \"\")," + quote(getContext().getEncoding()) +") %>\""
-			+" onclick=\"if ( confirm('Do you want to save changes before edit settings?')) {document."+StrutsConfigGenerator.getDialogFormName(dialog, ((MetaModuleSection)section).getDocument())+".nextAction.value='stay'; document."+StrutsConfigGenerator.getDialogFormName(dialog, ((MetaModuleSection)section).getDocument())+".submit(); }\" >Displayed languages:</a> [");		
-		appendString("<logic:equal name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");
-		increaseIdent();
-		appendString("<logic:iterate id=\"lang\" name=\"userSettings\" property=\"displayedLanguages\" >");
-		appendString("&nbsp;<bean:write name=\"lang\"/>");
-		appendString("</logic:iterate>");
-		decreaseIdent();
-		appendString("</logic:equal>");						
-		appendString("<logic:notEqual name=\"userSettings\" property=\"displayAllLanguages\" value=\"false\">");		
-		appendIncreasedString("ALL");		
-		appendString("</logic:notEqual>");	
-		appendString("]");
-		
-	}
-	
 	private GeneratedJSPFile generateShowPage(MetaModuleSection section, MetaView view){
 		
 		
@@ -1473,12 +1395,9 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		
 		ident = 0;
 		append(getBaseJSPHeader());		
-		append(getUserSettingsJSPImports());
 		
 		currentSection = section;
 		MetaDocument doc = section.getDocument();
-		// Language filtering settings
-		generateProcessLanguageFilteringSettings();
 		
 		appendString("<!--  generated by JspMafViewGenerator.generateShowPage -->");
 		appendString("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
