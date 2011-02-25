@@ -346,11 +346,6 @@ public class BaseMafActionGenerator extends AbstractMafActionGenerator {
 		append(closeBlock());
 		emptyline();
 		
-		appendString("protected void addUserSettingsBeansToRequest(HttpServletRequest req) {");
-		increaseIdent();
-		append(closeBlock());
-		emptyline();		
-		
 		
 		appendString("private NavigationItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();

@@ -384,10 +384,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			appendStatement("addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\"\"))");
 		}
 
-		// User settings
-		appendCommentLine(" Add user settings beans");
-		appendStatement("addUserSettingsBeansToRequest(req)");
-
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());
 		emptyline();
@@ -991,10 +987,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 	    	appendStatement("addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\"\"))");
 	    }
 	    
-	    // User settings
-		appendCommentLine(" Add user settings beans");
-	    appendStatement("addUserSettingsBeansToRequest(req)");
-	    
 	    appendStatement("return mapping.findForward(\"success\")");
 	    append(closeBlock());
 	    emptyline();
@@ -1311,8 +1303,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendStatement("beans.add("+getMakeBeanFunctionName(ModuleMafBeanGenerator.getListItemBeanName(doc))+"(("+doc.getName()+")"+listName+".get(i)))");
 		append(closeBlock());
 		emptyline();
-		appendStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
-		appendStatement("addUserSettingsBeansToRequest(req)");
 		
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());
@@ -1883,9 +1873,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+doc.getVariableName()+".getObjectInfo().toString())");
 		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+", "+quote("Apply")+")");
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
-	    // User settings
-		appendCommentLine(" Add user settings beans");
-	    appendStatement("addUserSettingsBeansToRequest(req)");
 		
 		//add field descriptions ...
 		appendStatement("String fieldDescription = null");
@@ -2156,9 +2143,6 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
 		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+" , "+quote("Apply")+")");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
-	    // User settings
-		appendCommentLine(" Add user settings beans");
-	    appendStatement("addUserSettingsBeansToRequest(req)");
 
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());

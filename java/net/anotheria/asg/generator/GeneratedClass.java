@@ -106,6 +106,7 @@ public class GeneratedClass extends GeneratedArtefact{
 		if (clazzComment!=null && clazzComment.length()>0){
 			ret.append("/**").append(CRLF);
 			ret.append(" * ").append(clazzComment).append(CRLF);
+//			ret.append(" * ").append("Generator: ").append(generator.getClass()).append(CRLF);
 			ret.append(" */").append(CRLF);
 		}
 

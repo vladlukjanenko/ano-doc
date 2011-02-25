@@ -1156,7 +1156,7 @@ public class JspMafViewGenerator extends AbstractMafJSPGenerator implements IGen
 		
 		//*** CMS2.0 START ***
 		ret += "<em id="+quote(StringUtils.capitalize(p.getName()))+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
-		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+"name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
+		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(StrutsConfigGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
 		//*** CMS2.0 FINISH ***
 		
 		return ret;

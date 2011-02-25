@@ -179,6 +179,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.setName(getExportActionName(section));
 		clazz.setParent(getBaseActionName(section));
 		startClassBody();
+		appendGenerationPoint("generateExportAction()");
 
 		//generate session attributes constants
 		appendStatement("public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+", quote(doc.getName()));
@@ -374,10 +375,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		for (MetaFilter f : section.getFilters()) {
 			appendStatement("addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\"\"))");
 		}
-
-		// User settings
-		appendCommentLine(" Add user settings beans");
-		appendStatement("addUserSettingsBeansToRequest(req)");
 
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());
@@ -756,6 +753,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.setParent(getBaseActionName(section));
 
 		startClassBody();
+		appendGenerationPoint("generateShowAction()");
 	    //generate session attributes constants
 	    appendStatement("public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+", quote(doc.getName()));
 	    appendStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+", quote(doc.getName()));
@@ -982,10 +980,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    for (MetaFilter f : section.getFilters()){
 	    	appendStatement("addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\"\"))");
 	    }
-	    
-	    // User settings
-		appendCommentLine(" Add user settings beans");
-	    appendStatement("addUserSettingsBeansToRequest(req)");
 	    
 	    appendStatement("return mapping.findForward(\"success\")");
 	    append(closeBlock());
@@ -1741,7 +1735,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	 * @return
 	 */
 	private void generateEditActionMethod(MetaModuleSection section, String methodname){
-
+		appendGenerationPoint("generateEditActionMethod()");
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc);
@@ -1872,9 +1866,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("addBeanToRequest(req, "+quote(StrutsConfigGenerator.getDialogFormName(dialog, doc))+" , form)");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+doc.getVariableName()+".getObjectInfo().toString())");
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Update")+")");
-	    // User settings
-		appendCommentLine(" Add user settings beans");
-	    appendStatement("addUserSettingsBeansToRequest(req)");
 		
 		//add field descriptions ...
 		appendStatement("String fieldDescription = null");
@@ -2144,10 +2135,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Create")+")");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
 		
-	    // User settings
-		appendCommentLine(" Add user settings beans");
-	    appendStatement("addUserSettingsBeansToRequest(req)");
-
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock());
 
