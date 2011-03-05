@@ -3,13 +3,6 @@ package net.anotheria.anodoc.util;
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.anodoc.service.IModuleFactory;
 
-/**
- * This interface can be thought of as an extension to {@link biz.beaglesoft.bgldoc.service.IModuleStorage}. 
- * The difference is that you need always you own instance of {@link biz.beaglesoft.bgldoc.service.IModuleStorage}
- * for each module; in this case one instance is enough for all. 
- * This interface defines that difference by just adding
- * the moduleId to each method of {@link biz.beaglesoft.bgldoc.service.IModuleStorage} and taking care of it.
- */
 public interface ICommonModuleStorage {
 
 	/**
