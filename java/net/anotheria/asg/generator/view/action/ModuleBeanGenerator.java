@@ -1,4 +1,4 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,12 @@ import net.anotheria.util.StringUtils;
  * @author lrosenberg
  * @created on Feb 25, 2005
  */
-public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenerator {
+public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator {
+	
+	/**
+	 * Implementation is moved into ano-web, the constant remains.
+	 */
+	public static final String FLAG_FORM_SUBMITTED = "formSubmittedFlag";
 	
 	public static final String FIELD_ML_DISABLED = "multilingualInstanceDisabled";
     

@@ -1,13 +1,12 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.jsp;
 
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.view.jsp.MenuJspMafGenerator;
 
-public class IndexPageJspMafGenerator extends AbstractJSPMafGenerator {
+public class IndexPageJspGenerator extends AbstractJSPGenerator {
 
 	public FileEntry generate(Context context) {
 		FileEntry page = new FileEntry(getIndexPagePathJSP(), getIndexPageJspName(),
@@ -60,7 +59,7 @@ public class IndexPageJspMafGenerator extends AbstractJSPMafGenerator {
 		appendString("</head>");
 		appendString("<body>");
 		
-		appendString("<jsp:include page=\""+"../../shared/jsp/"+MenuJspMafGenerator.getMenuPageName()+"\" flush=\"true\"/>");
+		appendString("<jsp:include page=\""+"../../shared/jsp/"+MenuJspGenerator.getMenuPageName()+"\" flush=\"true\"/>");
 		appendString("<div class=\"right\">");
 		increaseIdent();
 		appendString("<div class=\"r_w\">");

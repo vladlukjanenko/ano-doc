@@ -10,12 +10,19 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.forms.meta.MetaForm;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.meta.StorageType;
-import net.anotheria.asg.generator.view.jsp.JspMafGenerator;
+import net.anotheria.asg.generator.view.action.IndexPageActionGenerator;
+import net.anotheria.asg.generator.view.action.ModuleActionsGenerator;
+import net.anotheria.asg.generator.view.jsp.IndexPageJspGenerator;
+import net.anotheria.asg.generator.view.jsp.JspGenerator;
+import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
@@ -102,7 +109,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 			case SINGLE:
 				return action + section.getDocument().getName(multiDocument) + "MafAction";
 			case MULTIPLE_DIALOG:
-				return ModuleMafActionsGenerator.getMultiOpDialogActionName(section);
+				return ModuleActionsGenerator.getMultiOpDialogActionName(section);
 			}
 			throw new AssertionError("Unsuported OperationType!");
 
@@ -123,7 +130,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		public String getViewPath(MetaModuleSection section){
-			return "/" + FileEntry.package2path(JspMafGenerator.getPackage(section.getModule())) + "/";
+			return "/" + FileEntry.package2path(JspGenerator.getPackage(section.getModule())) + "/";
 		}
 		
 		public String getViewFullName(MetaModuleSection section){
@@ -205,7 +212,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		public String getClassName(MetaDocument doc, MetaContainerProperty container) {
-			return ModuleMafActionsGenerator.getContainerMultiOpActionName(doc, container);
+			return ModuleActionsGenerator.getContainerMultiOpActionName(doc, container);
 		}
 		
 		
@@ -214,7 +221,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		public String getViewName(MetaDocument doc, MetaContainerProperty container){
-			return JspMafGenerator.getContainerPageName(doc, container);
+			return JspGenerator.getContainerPageName(doc, container);
 		}
 		
 	}
@@ -251,7 +258,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		clazz.addImport("net.anotheria.maf.action.ActionForward");
 		clazz.addImport("net.anotheria.maf.action.ActionMappings");
 		clazz.addImport("net.anotheria.maf.action.ActionMappingsConfigurator");
-		clazz.addImport(IndexPageMafActionGenerator.getIndexPageFullName());
+		clazz.addImport(IndexPageActionGenerator.getIndexPageFullName());
 		clazz.addImport("net.anotheria.webutils.filehandling.actions.ShowFileMaf");
 		clazz.addImport("net.anotheria.webutils.filehandling.actions.UploadFileMaf");
 		clazz.addImport("net.anotheria.webutils.filehandling.actions.ShowTmpFileMaf");
@@ -289,7 +296,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 		appendString("@Override");
 		openFun("public void configureActionMappings()");
-		appendStatement("ActionMappings.addMapping(\"index\", " + IndexPageMafActionGenerator.getIndexPageActionName() + ".class, new ActionForward(\"success\", "+quote(IndexPageJspMafGenerator.getIndexJspFullName())+"))");
+		appendStatement("ActionMappings.addMapping(\"index\", " + IndexPageActionGenerator.getIndexPageActionName() + ".class, new ActionForward(\"success\", "+quote(IndexPageJspGenerator.getIndexJspFullName())+"))");
 		appendStatement("ActionMappings.addMapping(\"fileShow\", ShowFileMaf.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
 		appendStatement("ActionMappings.addMapping(\"fileUpload\", UploadFileMaf.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFileResult.jsp\"))");
 		
@@ -336,7 +343,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	
 	private void generateSectionMappings(GeneratedClass clazz, MetaModuleSection section){
 		MetaModule module = section.getModule();
-		String actionsPackage = ModuleMafActionsGenerator.getPackage(module);
+		String actionsPackage = ModuleActionsGenerator.getPackage(module);
 		for(SectionAction action: SectionAction.values()){
 			if(action.isIgnoreForSection(section))
 				continue;
@@ -370,8 +377,8 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		if(section.getDialogs().size() == 0)
 			return;
 		MetaDocument doc = section.getDocument();
-		String actionsPackage = ModuleMafActionsGenerator.getPackage(doc);
-		String jspPath = FileEntry.package2fullPath(JspMafGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspMafGenerator.getPackage(doc)).indexOf('/'))+"/";
+		String actionsPackage = ModuleActionsGenerator.getPackage(doc);
+		String jspPath = FileEntry.package2fullPath(JspGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspGenerator.getPackage(doc)).indexOf('/'))+"/";
 		
 		
 		for(ContainerAction action: ContainerAction.values()){
@@ -382,5 +389,70 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 
 	}
+	
+	
+	//TODO: Investigate this methods copied from StrutsCOnfigGenerator
+	public static final String ACTION_SHOW   = "show";
+	public static final String ACTION_NEW    = "new";
+	public static final String ACTION_EDIT   = "edit";
+	public static final String ACTION_CREATE = "create";
+	public static final String ACTION_UPDATE = "update";
+	public static final String ACTION_DELETE = "delete";
+	public static final String ACTION_VERSIONINFO = "versioninfo";
+	public static final String ACTION_DUPLICATE = "duplicate";
+	public static final String ACTION_DEEPCOPY = "deepcopy";
+	public static final String ACTION_ADD 	 = "add";
+	public static final String ACTION_QUICK_ADD  = "quickAdd";
+	public static final String ACTION_EXPORT = "export";
+	public static final String ACTION_SHOW_QUERIES = "showQueries";
+	public static final String ACTION_EXECUTE_QUERY = "execQuery";
+	public static final String ACTION_LINKS_TO_ME = "LinksToMe";
+	public static final String ACTION_MOVE = "move";
+	public static final String ACTION_SEARCH = "search";
+	public static final String ACTION_COPY_LANG ="copyLang";
+	public static final String ACTION_SWITCH_MULTILANGUAGE_INSTANCE = "switchMultilang";
+    public static final String ACTION_LOCK = "lock";
+    public static final String ACTION_UNLOCK = "unLock";
+    public static final String ACTION_CLOSE = "close";
+	
+	public static final String getPath(MetaDocument doc, String action){
+		return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(action);
+	}
+	public static String getShowQueriesPath(MetaDocument doc){
+		return getPath(doc, ACTION_SHOW_QUERIES);
+	}
+	public static String getShowCMSPath(MetaDocument doc){
+		return getPath(doc, ACTION_SHOW);
+	}
+	public static final String getDialogFormName(MetaDialog dialog, MetaDocument document) {
+		return dialog.getName() + document.getParentModule().getName() + document.getName() + "Form";
+	}
+	public static final String getContainerPath(MetaDocument doc, MetaContainerProperty container, String action){
+		return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(container.getName())+StringUtils.capitalize(action);
+	}
+	public static String getFormName(MetaForm form){
+	    return StringUtils.capitalize(form.getId())+"AutoForm";
+	}
+	public static String getFormPath(MetaForm form){
+	    return form.getId()+StringUtils.capitalize(form.getAction());
+	}
+	public static String getExecuteQueryPath(MetaDocument doc){
+		return getPath(doc, ACTION_EXECUTE_QUERY);
+	}
+	public static final String getContainerEntryFormName(MetaDocument doc, MetaContainerProperty property){
+		String nameAddy = "XXX";
+		if (property instanceof MetaTableProperty)
+			nameAddy = "Row";
+		if (property instanceof MetaListProperty)
+			nameAddy = "Element";
+	    return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(property.getName())+nameAddy+"Form";
+	}
+	public static final String getContainerQuickAddFormName(MetaDocument doc, MetaContainerProperty property){
+		String nameAddy = "XXX";
+		if (property instanceof MetaListProperty)
+			nameAddy = "QuickAdd";
+	    return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(property.getName())+nameAddy+"Form";
+	}
+	//TODO: end
 
 }

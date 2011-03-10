@@ -1,11 +1,10 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.jsp;
 
 import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.view.jsp.MenuJspMafGenerator;
-import net.anotheria.asg.generator.view.jsp.SharedJspFooterGenerator;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
@@ -19,7 +18,7 @@ import java.util.List;
  * Generator for the JSP files used for generations of the view jsps. 
  * @author lrosenberg
  */
-public abstract class AbstractJSPMafGenerator extends AbstractGenerator{
+public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	/**
 	 * Captions for the Queries link in the footer.
 	 */
@@ -136,7 +135,7 @@ public abstract class AbstractJSPMafGenerator extends AbstractGenerator{
 		decreaseIdent();
 		appendString("</td>");
 		appendString("<td>");
-		appendIncreasedString("<jsp:include page="+quote(SharedJspFooterGenerator.getSharedJspFooterPageName())+" flush="+quote("false")+"/>");
+		appendIncreasedString("<jsp:include page="+quote(SharedFooterGenerator.getSharedJspFooterPageName())+" flush="+quote("false")+"/>");
 		appendString("</td>");
 		appendString("<td align="+quote("right")+">");
 		increaseIdent();
@@ -168,7 +167,7 @@ public abstract class AbstractJSPMafGenerator extends AbstractGenerator{
 				MetaModuleSection ms = (MetaModuleSection)s;
 				MetaDocument targetDoc = ms.getDocument();
 				if (targetDoc.getLinks().size()>0){
-					return StrutsConfigGenerator.getShowQueriesPath(targetDoc);
+					return CMSMappingsConfiguratorGenerator.getShowQueriesPath(targetDoc);
 				}
 			}
 		}
@@ -190,7 +189,7 @@ public abstract class AbstractJSPMafGenerator extends AbstractGenerator{
 			MetaSection s = sections.get(i);
 			if (s instanceof MetaModuleSection){
 				MetaDocument targetDoc = ((MetaModuleSection)s).getDocument();
-				return StrutsConfigGenerator.getShowCMSPath(targetDoc);
+				return CMSMappingsConfiguratorGenerator.getShowCMSPath(targetDoc);
 			}
 		}
 		return ret;
@@ -649,7 +648,7 @@ public abstract class AbstractJSPMafGenerator extends AbstractGenerator{
 	}
 	
 	protected String getTopMenuPage(){
-		return "../../shared/jsp/"+MenuJspMafGenerator.getMenuPageName();		
+		return "../../shared/jsp/"+MenuJspGenerator.getMenuPageName();		
 	}
 
 	protected String getMenuName(MetaView view){
