@@ -165,19 +165,15 @@ public final class XMLDataParser {
 	 */
 	private static final MetaProperty parseProperty(Element p){
 		String name = p.getAttributeValue("name");
-		String typeStr = p.getAttributeValue("type");
+		String type = p.getAttributeValue("type");
 			
-		if (typeStr.equals("table"))
+		if (type.equals("table"))
 			return parseTable(p);
-		if (typeStr.equals("list"))
+		if (type.equals("list"))
 			return parseList(p);
-		if (typeStr.equals("enumeration"))
+		if (type.equals("enumeration"))
 			return parseEnumeration(p);
 
-		MetaProperty.Type type = MetaProperty.Type.findTypeByName(typeStr);
-		if(type == null)
-			throw new IllegalArgumentException("Uknown type <" + typeStr + "> for property def " + p);
-		
 		MetaProperty ret = new MetaProperty(name, type); 
 		String multilingual = p.getAttributeValue("multilingual");
 		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
@@ -193,7 +189,7 @@ public final class XMLDataParser {
 	private static final MetaEnumerationProperty parseEnumeration(Element p){
 		String name = p.getAttributeValue("name");
 		String enumeration = p.getAttributeValue("enumeration");
-		MetaEnumerationProperty ret = new MetaEnumerationProperty(name, MetaProperty.Type.INT);
+		MetaEnumerationProperty ret = new MetaEnumerationProperty(name, "int");
 		ret.setEnumeration(enumeration);
 		return ret;
 	}
