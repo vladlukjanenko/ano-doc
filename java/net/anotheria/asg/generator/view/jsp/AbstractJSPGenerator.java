@@ -135,7 +135,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 		decreaseIdent();
 		appendString("</td>");
 		appendString("<td>");
-		appendIncreasedString("<jsp:include page="+quote(SharedFooterGenerator.getSharedJspFooterPageName())+" flush="+quote("false")+"/>");
+		appendIncreasedString("<jsp:include page="+quote(SharedFooterJspGenerator.getSharedJspFooterPageName())+" flush="+quote("false")+"/>");
 		appendString("</td>");
 		appendString("<td align="+quote("right")+">");
 		increaseIdent();
@@ -317,7 +317,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	public static String getYUIPath(String yuiName, Context context){
-		return context.getApplicationURLPath()+"/yui/"+yuiName;
+		return context.getApplicationURLPath()+"/cms_static/yui/"+yuiName;
 	}
 
 	public static String getPackage(MetaModule mod){

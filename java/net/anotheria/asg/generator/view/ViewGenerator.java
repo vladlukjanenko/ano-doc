@@ -7,8 +7,15 @@ import net.anotheria.asg.generator.AbstractAnoDocGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.view.jsp.JspMafGenerator;
-import net.anotheria.asg.generator.view.jsp.MenuJspMafGenerator;
+import net.anotheria.asg.generator.view.action.BaseActionGenerator;
+import net.anotheria.asg.generator.view.action.BaseViewActionGenerator;
+import net.anotheria.asg.generator.view.action.CMSSearchActionsGenerator;
+import net.anotheria.asg.generator.view.action.IndexPageActionGenerator;
+import net.anotheria.asg.generator.view.action.ModuleActionsGenerator;
+import net.anotheria.asg.generator.view.action.ModuleBeanGenerator;
+import net.anotheria.asg.generator.view.jsp.IndexPageJspGenerator;
+import net.anotheria.asg.generator.view.jsp.JspGenerator;
+import net.anotheria.asg.generator.view.jsp.MenuJspGenerator;
 import net.anotheria.asg.generator.view.meta.MetaCustomSection;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
@@ -34,11 +41,11 @@ public class ViewGenerator extends AbstractAnoDocGenerator {
 		files.addAll(new CMSMappingsConfiguratorGenerator().generate(views));
 
 		// hack, works only with one view.
-		files.add(new BaseMafActionGenerator().generate(views));
-		files.addAll(new CMSSearchMafActionsGenerator().generate(views));
-		files.addAll(new IndexPageMafActionGenerator().generate(views));
-		files.add(new IndexPageJspMafGenerator().generate(context));
-		files.add(new MenuJspMafGenerator().generate(views, context));
+		files.add(new BaseActionGenerator().generate(views));
+		files.addAll(new CMSSearchActionsGenerator().generate(views));
+		files.addAll(new IndexPageActionGenerator().generate(views));
+		files.add(new IndexPageJspGenerator().generate(context));
+		files.add(new MenuJspGenerator().generate(views, context));
 
 		timer.stopExecution("common");
 
@@ -52,11 +59,11 @@ public class ViewGenerator extends AbstractAnoDocGenerator {
 			timer.stopExecution("v-" + view.getName() + "-View");
 
 			timer.startExecution("v-" + view.getName() + "-BaseViewMafAction");
-			files.add(new BaseViewMafActionGenerator().generate(view));
+			files.add(new BaseViewActionGenerator().generate(view));
 			timer.stopExecution("v-" + view.getName() + "-BaseViewMafAction");
 
 			timer.startExecution("v-" + view.getName() + "-Jsp");
-			files.addAll(new JspMafGenerator().generate(view));
+			files.addAll(new JspGenerator().generate(view));
 			timer.stopExecution("v-" + view.getName() + "-Jsp");
 
 			// timer.startExecution("v-"+view.getName()+"-JspQueries");
@@ -98,16 +105,8 @@ public class ViewGenerator extends AbstractAnoDocGenerator {
 	private List<FileEntry> generateMetaModuleSection(String path, MetaModuleSection section, MetaView view) {
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 		List<FileEntry> ret = new ArrayList<FileEntry>();
-
-		if (context.isCmsVersion1()) {
-			ret.addAll(new ModuleBeanGenerator().generate(section));
-			ret.addAll(new ModuleActionsGenerator(view).generate(section));
-		}
-
-		if (context.isCmsVersion2()) {
-			ret.addAll(new ModuleMafBeanGenerator().generate(section));
-			ret.addAll(new ModuleMafActionsGenerator(view).generate(section));
-		}
+		ret.addAll(new ModuleBeanGenerator().generate(section));
+		ret.addAll(new ModuleActionsGenerator(view).generate(section));
 		return ret;
 	}
 

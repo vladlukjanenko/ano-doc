@@ -41,7 +41,9 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 	 */
 	private MetaDialog currentDialog;
 	
-	public GeneratedJSPFile generate(MetaSection currentSection, MetaDialog dialog, MetaModuleSection section, MetaView view) {
+	public GeneratedJSPFile generate(MetaSection metaSection, MetaDialog dialog, MetaModuleSection section, MetaView view) {
+		this.currentSection = metaSection;
+		this.currentDialog = dialog;
 		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
@@ -65,16 +67,13 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 		// appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		// *** CMS2.0 START ***
 
-		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/fonts/fonts-min.css"))
-				+ " />");
-		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href="
-				+ quote(getCurrentYUIPath("core/build/assets/skins/sam/skin.css")) + " />");
-		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href="
-				+ quote(getCurrentYUIPath("core/build/container/assets/skins/sam/container.css")) + " />");
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/fonts/fonts-min.css")) + " />");
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/assets/skins/sam/skin.css")) + " />");
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/container/assets/skins/sam/container.css")) + " />");
 		appendString("<link href=\"" + getCurrentCSSPath("newadmin.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>");
+		appendString("<link href=\"" + getCurrentCSSPath("fileuploader.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>");
 
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js"))
-				+ "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/element/element-min.js")) + "></script>");
@@ -84,8 +83,7 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 		// quote(getCurrentYUIPath("core/build/animation/animation-min.js")) +
 		// "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/datasource/datasource-min.js")) + "></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/autocomplete/autocomplete-min.js"))
-				+ "></script>");
+		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/autocomplete/autocomplete-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/dragdrop/dragdrop-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("anoweb/widget/ComboBox.js")) + "></script>");
 		// *** CMS2.0 FINISH ***
@@ -93,7 +91,8 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 		// *** CMS3.0 START ***
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.4.min.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("anofunctions.js") + "\"></script>");
-		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentJSPath("tiny_mce/tiny_mce.js")) + "></script>");
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("fileuploader.js") + "\"></script>");
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("tiny_mce/tiny_mce.js") + "\"></script>");
 		// *** CMS3.0 FINISH ***
 
 		decreaseIdent();
@@ -222,41 +221,41 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 		appendString("<div class=\"c_b_l\"><!-- --></div>");
 		appendString("<div class=\"c_b_r\"><!-- --></div>");
 
-		String entryName = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument()));
+		String entryName = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()));
 		String result = "<logic:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LOCK);
+		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) metaSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LOCK);
 		path += "?pId=<bean:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
 		result += "<a href=\"#\" onClick= "
 				+ quote("lightbox('All unsaved data will be lost!!!<br /> Really lock  "
-						+ CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())
+						+ CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())
 						+ " with id: <bean:write name=" + entryName + " property=\"id\"/>?','<ano:tslink>" + path + "</ano:tslink>');") + ">" + getLockImage()
 				+ "&nbsp;Lock</a>";
 		result += "</logic:equal>";
 		appendString(result);
 
-		if (StorageType.CMS.equals(((MetaModuleSection) currentSection).getDocument().getParentModule().getStorageType())) {
+		if (StorageType.CMS.equals(((MetaModuleSection) metaSection).getDocument().getParentModule().getStorageType())) {
 			appendString("<logic:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">");
 
-			path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_UNLOCK);
+			path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) metaSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_UNLOCK);
 			path += "?pId=<bean:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
 
-			String alt = ((MetaModuleSection) currentSection).getDocument().getName() + " is locked by: <bean:write name=" + entryName + " property="
+			String alt = ((MetaModuleSection) metaSection).getDocument().getName() + " is locked by: <bean:write name=" + entryName + " property="
 					+ quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + "/>, at: <bean:write name=" + entryName + " property="
 					+ quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME) + "/>";
 
 			appendString("<a href=\"#\" onClick= "
-					+ quote("lightbox('" + alt + "<br /> Unlock " + ((MetaModuleSection) currentSection).getDocument().getName()
+					+ quote("lightbox('" + alt + "<br /> Unlock " + ((MetaModuleSection) metaSection).getDocument().getName()
 							+ " with id: <bean:write name=" + entryName + " property=\"id\"/>?','<ano:tslink>" + path + "</ano:tslink>');") + ">"
 					+ getUnLockImage(alt) + "" + " Unlock</a><span>&nbsp;Locked by <b><bean:write name="
-					+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) + " property="
+					+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 					+ quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + "/></b>");
 			appendString("at:  <b><bean:write name="
-					+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) + " property="
+					+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 					+ quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME) + "/></b></span>");
 			appendString("</logic:equal>");
 		}
 
-		appendString("<form name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument()))
+		appendString("<form name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()))
 				+ " method=\"post\" action=" + quote(CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_UPDATE)) + ">");
 		appendIncreasedString("<input type=" + quote("hidden") + " name=" + quote("_ts") + " value=" + quote("<%=System.currentTimeMillis()%>") + ">");
 		appendIncreasedString("<input type=" + quote("hidden") + " name=" + quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED) + " value=" + quote("true") + ">");
@@ -292,7 +291,7 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 				continue;
 			}
 			if (element instanceof MetaFieldElement) {
-				MetaDocument doc = ((MetaModuleSection) currentSection).getDocument();
+				MetaDocument doc = ((MetaModuleSection) metaSection).getDocument();
 				MetaProperty p = doc.getField(element.getName());
 				if (element.isRich())
 					if (p.getType() == MetaProperty.Type.TEXT)
@@ -308,7 +307,7 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 			// ALTERNATIVE EDITOR FOR DISABLED MODE
 			if (lang != null && lang.equals(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage())) {
 				appendString("<logic:equal name="
-						+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) + " property="
+						+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
 				appendString("<td align=\"right\"> <a id=\"" + element.getName() + "DEF\" name=\"" + element.getName() + "DEF\"></a>");
 				increaseIdent();
@@ -328,7 +327,7 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 
 			if (lang != null)
 				appendString("<logic:equal name="
-						+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) + " property="
+						+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("false") + ">");
 
 			// Language Filtering Settings
@@ -390,7 +389,7 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 		// Link to the Links to Me page
 		appendString("<logic:present name=" + quote("linksToMe") + " scope=" + quote("request") + ">");
 		String linksToMePagePath = CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LINKS_TO_ME) + "?pId=<bean:write name="
-				+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) currentSection).getDocument())) + " property=\"id\"/>";
+				+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property=\"id\"/>";
 		appendString("<a href=" + quote("<ano:tslink>" + linksToMePagePath + "</ano:tslink>") + ">Show direct links to  this document</a>");
 		appendString("</logic:present>");
 		appendString("<div class=\"clear\"><!-- --></div>");
@@ -574,7 +573,19 @@ public class DialogJspGenerator extends AbstractJSPGenerator {
 
 	private String getImageEditor(MetaFieldElement element, MetaProperty p){
 		String ret ="";
-		ret += "<iframe src=\"fileShow?nocache=<%=System.currentTimeMillis()%>\" frameborder=\"0\" width=100% height=80 scrolling=\"no\"></iframe>";		
+		ret += "<div id=\"file-uploader-" + p.getName() + "\"><!-- --></div>\r";
+		ret += "<script>\r";
+		ret += "$(document).ready(function() {\r";
+		ret += "	var uploader = new qq.FileUploader({\r";
+		ret += "	    element: document.getElementById('file-uploader-" + p.getName() +"'),\r";
+		ret += "	    action: '/blackstone/cms/fileUpload',\r";
+		ret += "	    params: {\r";
+		ret += "	    	property: '" + p.getName() + "'\r";
+	    ret += "	    }\r";
+
+		ret += "	});\r";
+		ret += "});\r";
+		ret += "</script>\r";
 		return ret;
 	}
 

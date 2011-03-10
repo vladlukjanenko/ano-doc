@@ -2461,6 +2461,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				EnumerationType type = (EnumerationType)GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) containedProperty).getEnumeration());
 				clazz.addImport(EnumTypeGenerator.getEnumImport(type));
 			}
+			if (containedProperty.getType() == MetaProperty.Type.IMAGE){
+				clazz.addImport("net.anotheria.webutils.filehandling.actions.FileStorage");
+				clazz.addImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
+			}
 		}
 		
 		clazz.addImport("net.anotheria.asg.exception.ASGRuntimeException");
@@ -2571,12 +2575,26 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		   appendStatement("check" + doc.getMultiple() + "("+doc.getVariableName()+", req)");
           // appendString("}");
         }
+        
 
-		String call = "";
 		MetaProperty p = list.getContainedProperty();
-		String getter = "form."+p.toBeanGetter()+"()";
-		call += getter;
-		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"("+call+")");
+		//handle images.
+		
+		if (p.getType() == MetaProperty.Type.IMAGE){
+			//will work only with one image.
+			appendString( "//handle image");
+			appendStatement("TemporaryFileHolder holder = FileStorage.getTemporaryFile(req)");
+			appendString( "if (holder!=null && holder.getData()!=null){");
+			increaseIdent();
+			appendStatement("FileStorage.storeFilePermanently(req, holder.getFileName())");
+			appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"(holder.getFileName())");
+			appendStatement("FileStorage.removeTemporaryFile(req)");
+			append(closeBlock());
+		} else {
+			String getter = "form."+p.toBeanGetter()+"()";
+			appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"("+getter+")");
+		}
+		
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 		if (methodName==null)
 			appendStatement("return "+getSuperCall());

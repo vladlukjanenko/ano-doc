@@ -260,7 +260,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		clazz.addImport("net.anotheria.maf.action.ActionMappingsConfigurator");
 		clazz.addImport(IndexPageActionGenerator.getIndexPageFullName());
 		clazz.addImport("net.anotheria.webutils.filehandling.actions.ShowFileMaf");
-		clazz.addImport("net.anotheria.webutils.filehandling.actions.UploadFileMaf");
+		clazz.addImport("net.anotheria.webutils.filehandling.actions.FileAjaxUploadMaf");
 		clazz.addImport("net.anotheria.webutils.filehandling.actions.ShowTmpFileMaf");
 		clazz.addImport("net.anotheria.webutils.filehandling.actions.GetFileMaf");
 		clazz.addImport("net.anotheria.webutils.actions.LoginMafAction");
@@ -298,7 +298,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		openFun("public void configureActionMappings()");
 		appendStatement("ActionMappings.addMapping(\"index\", " + IndexPageActionGenerator.getIndexPageActionName() + ".class, new ActionForward(\"success\", "+quote(IndexPageJspGenerator.getIndexJspFullName())+"))");
 		appendStatement("ActionMappings.addMapping(\"fileShow\", ShowFileMaf.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
-		appendStatement("ActionMappings.addMapping(\"fileUpload\", UploadFileMaf.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFileResult.jsp\"))");
+		appendStatement("ActionMappings.addMapping(\"fileUpload\", FileAjaxUploadMaf.class)");
 		
 		appendStatement("ActionMappings.addMapping(\"showTmpFile\", ShowTmpFileMaf.class)");
 		appendStatement("ActionMappings.addMapping(\"getFile\", GetFileMaf.class)");

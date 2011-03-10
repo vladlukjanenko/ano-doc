@@ -43,9 +43,11 @@ public class ListJspGenerator extends AbstractJSPGenerator {
 		appendString("<title>Edit " + doc.getName() + StringUtils.capitalize(list.getName()) + "</title>");
 		generatePragmas();
 		appendString("<link href=\"" + getCurrentCSSPath("newadmin.css") + "\" rel=\"stylesheet\" type=\"text/css\">");
+		appendString("<link href=\"" + getCurrentCSSPath("fileuploader.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>");
 
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.4.min.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("anofunctions.js") + "\"></script>");
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("fileuploader.js") + "\"></script>");
 		
 		decreaseIdent();
 		appendString("</head>");
@@ -182,14 +184,12 @@ public class ListJspGenerator extends AbstractJSPGenerator {
 		appendString("<form name=" + quote(addFormName) + " action=" + quote(addFormAction) + " method=\"post\">");
 		appendString("<input type=" + quote("hidden") + " name=" + quote("ownerId") + " value=\"<bean:write name=" + quote("ownerId") + "/>\">");
 		
-		if (p.isLinked() && !(p instanceof MetaEnumerationProperty)) {
+		if (p.isLinked() || (p instanceof MetaEnumerationProperty)) {
 			appendString("<em id=\"" + "Value\" name=\"" + list.getContainedProperty().getName().toLowerCase() + "\" class=\"selectBox fll mr_10\">&nbsp;none</em><div id=\"" + "ValuesSelector\"></div>");
-		} else {
+		} else if(p.getType() == MetaProperty.Type.IMAGE){ 
+			appendString(getImageEditor(p));
+		}else {
 			appendIncreasedString("<input class=\"add_id fll\" type=\"text\" style=\"width:25%\" name=" + quote(name) + " value=\"\"/>");
-		}
-		
-		if (p.getType() == MetaProperty.Type.IMAGE){
-			getImageEditor(p);
 		}
 		
 		appendString("<a href=" + quote("#") + " class=\"button\" onClick=" + quote("document." + addFormName + ".submit()") + "><span>Add</span></a>");
@@ -199,8 +199,19 @@ public class ListJspGenerator extends AbstractJSPGenerator {
 
 	private String getImageEditor(MetaProperty p){
 		String ret ="";
-		
-		ret += "<jsp:include page=\"/net/anotheria/webutils/jsp/UploadFile.jsp\"/>";		
+		ret += "<div id=\"file-uploader-" + p.getName() + "\"><!-- --></div>\r";
+		ret += "<script>\r";
+		ret += "$(document).ready(function() {\r";
+		ret += "	var uploader = new qq.FileUploader({\r";
+		ret += "	    element: document.getElementById('file-uploader-" + p.getName() +"'),\r";
+		ret += "	    action: '/blackstone/cms/fileUpload',\r";
+		ret += "	    params: {\r";
+		ret += "	    	property: '" + p.getName() + "'\r";
+	    ret += "	    }\r";
+
+		ret += "	});\r";
+		ret += "});\r";
+		ret += "</script>\r";
 		return ret;
 	}
 	
