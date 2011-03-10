@@ -1,23 +1,26 @@
 package net.anotheria.asg.generator.view;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.cms20.view.JspViewCms20Generator;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
 import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.view.meta.*;
-import org.junit.Assert;
+import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.view.meta.MetaDialog;
+import net.anotheria.asg.generator.view.meta.MetaFieldElement;
+import net.anotheria.asg.generator.view.meta.MetaListElement;
+import net.anotheria.asg.generator.view.meta.MetaModuleSection;
+import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.asg.generator.view.meta.MetaViewElement;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class JspViewGeneratorTest {
 	private static final String PACKAGE_NAME = "net.anotheria.anosite.gen.shared.data";
@@ -51,25 +54,11 @@ public class JspViewGeneratorTest {
 
 		MetaModule module = new MetaModule("test");
 		MetaDocument metaDocument = new MetaDocument("test");
-		MetaListProperty listProperty = new MetaListProperty("prioTestList", new MetaEnumerationProperty("prio", "string"));
+		MetaListProperty listProperty = new MetaListProperty("prioTestList", new MetaEnumerationProperty("prio", MetaProperty.Type.STRING));
 		metaDocument.addProperty(listProperty);
 		module.addDocument(metaDocument);
 		metaSection.setModule(module);
 		metaSection.setDocument(metaDocument);
 
-		IGenerator generator = new JspViewCms20Generator();
-
-		// when
-		final List<FileEntry> entries = generator.generate(view);
-
-		String enumContent = null;
-		for (FileEntry fileEntry : entries) {
-			if (fileEntry.getContent().contains(ENUM)) {
-				enumContent = fileEntry.getContent();
-			}
-		}
-
-		// then
-		Assert.assertNotNull(enumContent);
 	}
 }

@@ -2,33 +2,40 @@ package net.anotheria.asg.generator.meta;
 
 /**
  * Factory for the meta types.
+ * 
  * @author another
  */
 public class TypeFactory {
 	/**
 	 * Creates a type out of a string description.
+	 * 
 	 * @param type
 	 * @return
 	 */
-	public static final IMetaType createType(String type){
-		if (type.equals("string"))
+	public static final IMetaType createType(MetaProperty.Type type) {
+
+		switch (type) {
+		case STRING:
 			return new StringType();
-		if (type.equals("int"))
+		case INT:
 			return new IntType();
-		if (type.equals("long"))
+		case LONG:
 			return new LongType();
-		if (type.equals("list"))
+		case LIST:
 			return new ListType();
-		if (type.equals("text"))
+		case TEXT:
 			return new StringType();
-		if (type.equals("boolean"))
+		case BOOLEAN:
 			return new BooleanType();
-		if (type.equals("double"))
+		case DOUBLE:
 			return new DoubleType();
-		if (type.equals("float"))
+		case FLOAT:
 			return new FloatType();
-		if (type.equals("image"))
+		case IMAGE:
 			return new ImageType();
-		throw new RuntimeException("Unsupported type: "+type);
+		default:
+			throw new RuntimeException("Unsupported type: " + type);
+		}
+
 	}
 }

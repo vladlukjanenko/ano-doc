@@ -1,10 +1,11 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.action;
 
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.anotheria.anodoc.util.context.ContextManager;
 import net.anotheria.anoprise.metafactory.Extension;
 import net.anotheria.anoprise.metafactory.MetaFactory;
 import net.anotheria.anoprise.metafactory.MetaFactoryException;
@@ -13,6 +14,8 @@ import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
+import net.anotheria.asg.generator.view.ViewConstants;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
@@ -41,28 +44,38 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 	 * @return
 	 */
 	public GeneratedClass generateBaseAction(List<MetaView> views){
-
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		appendGenerationPoint("generateBaseAction");
 		
 		clazz.setPackageName(getSharedActionPackageName());
 
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
-		
+		appendCommentLine("BaseMafActionGenerator");
+		clazz.addImport("net.anotheria.util.StringUtils");
+		clazz.addImport(ContextManager.class);
 		clazz.addImport("net.anotheria.webutils.actions.*");
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
-		clazz.addImport("org.apache.struts.action.ActionForm");
-		clazz.addImport("org.apache.struts.action.ActionForward");
-		clazz.addImport("org.apache.struts.action.ActionMapping");		
+		clazz.addImport("net.anotheria.maf.action.ActionForward");
+		clazz.addImport("net.anotheria.maf.action.ActionMapping");
+		clazz.addImport("net.anotheria.maf.bean.FormBean");	
+		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");	
+		
 
 		clazz.setAbstractClass(true);
-		clazz.setParent("BaseAction");
+		clazz.setParent("BaseMafAction");
+		clazz.setGeneric("T extends FormBean");
 		clazz.setName(getBaseActionName());
 
 		startClassBody();
 		
+		appendGenerationPoint("generateBaseAction");
+		
+		appendStatement("public static final String BEAN_MAIN_NAVIGATION = \"mainNavigation\"");
+		appendStatement("public static final String BEAN_SEARCH_SCOPE = \"searchScope\"");
+		appendStatement("public static final String BEAN_DOCUMENT_DEF_NAME = \"documentName\"");
+		appendStatement("public static final String BEAN_MODULE_DEF_NAME = \"moduleName\"");
+		appendStatement("public static final String FLAG_DISABLED_SEARCH = \"disabledSearchFlag\"");
 		appendStatement("public static final String PARAM_SORT_TYPE = "+quote(ViewConstants.PARAM_SORT_TYPE));
 		appendStatement("public static final String PARAM_SORT_TYPE_NAME = "+quote(ViewConstants.PARAM_SORT_TYPE_NAME));
 		appendStatement("public static final String PARAM_SORT_ORDER = "+quote(ViewConstants.PARAM_SORT_ORDER));
@@ -85,13 +98,11 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
 		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
 		appendStatement("private static LockingConfig lockConfig;");
-
+		appendStatement("private static Logger log = Logger.getLogger("+getBaseActionName()+".class)");
+		clazz.addImport("org.apache.log4j.Logger");
 
 		appendString("static{");
 		increaseIdent();
-		
-		clazz.addImport("org.apache.log4j.Logger");
-		appendStatement("Logger staticlogger = Logger.getLogger("+getBaseActionName()+".class)");
 		
 		clazz.addImport(MetaFactory.class);
 		clazz.addImport(Extension.class);
@@ -108,64 +119,59 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("try{");
 		appendIncreasedStatement("userManager = XMLUserManager.getInstance()");
 		appendString("}catch(Exception e){");
-		appendIncreasedStatement("staticlogger.fatal("+quote("Can't init user manager")+", e)");
+		appendIncreasedStatement("log.fatal("+quote("Can't init user manager")+", e)");
 		appendString("}");
 		//end init user manager
 		//initing Lock Config
 		emptyline();
-		appendComment("//initializing lockConfig");
+		appendComment("initializing lockConfig");
 		appendString("try{");
 		appendIncreasedStatement("lockConfig = LockingConfig.getInstance()");
 		appendString("}catch(Exception e){");
-		appendIncreasedStatement("staticlogger.fatal("+quote("Can't init lockConfig")+", e)");
+		appendIncreasedStatement("log.fatal("+quote("Can't init lockConfig")+", e)");
 		appendString("}");
         // end initing Lock Config
 	
-		append(closeBlock());
+		closeBlock("");
 		emptyline();
 		
-		appendString("public abstract ActionForward anoDocExecute(");
+		appendString("public void preProcess(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
-		appendString("ActionMapping mapping,");
-		appendString("ActionForm af,");
-		appendString("HttpServletRequest req,");
-		appendString("HttpServletResponse res)");
-		appendString("throws Exception;");
-		decreaseIdent();
+		appendString("super.preProcess(mapping, req, res);");
+		appendString("prepareMenu(req);");
+		closeBlock("preProcess");
 		emptyline();
-
-		appendString("public ActionForward doExecute(");
+		
+		appendString("public abstract ActionForward anoDocExecute(ActionMapping mapping, T formBean, HttpServletRequest req, HttpServletResponse res) throws Exception;");
+		emptyline();
+		appendGenerationPoint("generateBaseAction");
+		appendString("@Override");
+		appendString("public ActionForward execute(ActionMapping mapping, FormBean formBean, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
-		increaseIdent();
-		appendString("ActionMapping mapping,");
-		appendString("ActionForm af,");
-		appendString("HttpServletRequest req,");
-		appendString("HttpServletResponse res)");
-		appendString("throws Exception{");
-		decreaseIdent();
 		appendString("if (isAuthorizationRequired()){");
-		increaseIdent();
-		appendStatement("boolean authorized = checkAuthorization(req)");
-		appendString("if (!authorized){");
-		increaseIdent();
-		appendStatement("String queryString = req.getQueryString()");
-		appendString("if (queryString!=null)");
-		appendIncreasedStatement("queryString = \"?\"+queryString");
-		appendString("else");
-		appendIncreasedStatement("queryString = \"\"");
-		appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, \""+GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"\"+req.getPathInfo()+queryString)");
-		appendStatement("String redUrl = "+quote(GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"/login"));
-		appendStatement("res.sendRedirect(redUrl)");
-		appendStatement("return null");					
-		append(closeBlock());	
-		append(closeBlock());
-		
-		appendStatement("checkAccessPermissions(req)");
+			increaseIdent();
+				appendStatement("boolean authorized = checkAuthorization(req)");
+				appendString("if (!authorized){");
+				increaseIdent();
+				//build url.
+					appendStatement("String url = req.getRequestURI()");
+					appendStatement("String qs = req.getQueryString()");
+					appendString("if (!StringUtils.isEmpty(qs))");
+					appendIncreasedStatement("url += \"?\"+qs;");
+					appendStatement("addBeanToSession(req, BEAN_TARGET_ACTION, url)");
+					appendStatement("String redUrl = "+quote(GeneratorDataRegistry.getInstance().getContext().getApplicationURLPath()+"/"+GeneratorDataRegistry.getInstance().getContext().getServletMapping()+"/login"));
+					appendStatement("res.sendRedirect(redUrl)");
+					appendStatement("return null");		
+				closeBlock("if");
+			closeBlock("if");
+			appendStatement("checkAccessPermissions(req)");
 		emptyline();
-
-		appendString("return anoDocExecute(mapping, af, req, res);");
-		closeBlock("doExecute");
-
+		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, getCurrentDocumentDefName())");
+		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, getActiveMainNavi())");
+		emptyline();
+		appendString("return anoDocExecute(mapping, (T) formBean, req, res);");
+		closeBlock("execute");
+		emptyline();
 		//generate service getter
 		for (MetaModule m:modules){
 			appendString("protected "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceGetterCall(m)+"{");
@@ -209,8 +215,11 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("protected boolean checkAuthorization(HttpServletRequest req){");
 		increaseIdent();
 		appendStatement("String userId = (String )getBeanFromSession(req, BEAN_USER_ID)");
-		appendStatement("return userId!=null");
-		append(closeBlock());
+		appendString("if(userId == null)");
+		appendIncreasedStatement("return false");
+		appendStatement("ContextManager.getCallContext().setCurrentAuthor(userId)");
+		appendStatement("return true");
+		closeBlock("checkAuthorization");
 		emptyline();
 		
 		appendString("public String getSubsystem() {");
@@ -278,16 +287,27 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		append(closeBlock());
 		appendStatement("return false");
 		append(closeBlock());
-
 		
-		appendString("private void prepareViewSelection(HttpServletRequest req){");
+		appendString("protected void prepareMenu(HttpServletRequest req) {");
 		increaseIdent();
-		clazz.addImport("net.anotheria.webutils.bean.MenuItemBean");
-		appendStatement("List<MenuItemBean> menu = new ArrayList<MenuItemBean>()");
+		appendString("List<NavigationItemBean> navigation = getMainNavigation(req);");
+		appendString("for (NavigationItemBean naviItem : navigation)");
+		appendString("if (naviItem.isActive())");
+		appendString("naviItem.setSubNavi(getSubNavigation());");
+		appendString("addBeanToRequest(req, BEAN_MAIN_NAVIGATION, navigation);");
+		append(closeBlock());
+		emptyline();
+
+		appendString("protected abstract List<NavigationItemBean> getSubNavigation();");
+		emptyline();
+		
+		appendString("protected List<NavigationItemBean> getMainNavigation(HttpServletRequest req) {");
+		increaseIdent();
+		appendString("List<NavigationItemBean> menu = new ArrayList<NavigationItemBean>();");
 		for (int i=0; i<views.size(); i++){
 			MetaView view = views.get(i);
 			MetaSection first = view.getSections().get(0);
-			String statement = "menu.add(makeMenuItemBean("+quote(view.getTitle())+", "+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)first).getDocument(), StrutsConfigGenerator.ACTION_SHOW))+"))";
+			String statement = "menu.add(makeMenuItemBean("+quote(view.getTitle())+", "+quote(CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)first).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_SHOW))+"))";
 			if (view.getRequiredRoles()!=null && view.getRequiredRoles().size()>0){
 				String roles = "";
 				for (String r :view.getRequiredRoles()){
@@ -302,15 +322,16 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 				appendStatement(statement);
 			}
 		}
-		appendStatement("addBeanToRequest(req, BEAN_VIEW_SELECTOR, menu)");
+	
+		appendString("return menu;");
 		append(closeBlock());
 		emptyline();
-
-		appendString("protected void init(ActionMapping mapping, ActionForm af, HttpServletRequest req, HttpServletResponse res) throws Exception {");
-		increaseIdent();
-		appendStatement("super.init(mapping, af, req, res)");
-		appendStatement("prepareViewSelection(req)");
-		append(closeBlock());
+		
+		appendString("protected abstract String getActiveMainNavi();");
+		emptyline();
+		
+		appendString("protected abstract String getCurrentModuleDefName();");
+		appendString("protected abstract String getCurrentDocumentDefName();");
 		emptyline();
 		
 		appendComment("Get current application supported languages wrapper method.");
@@ -327,22 +348,13 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		append(closeBlock());
 		emptyline();
 		
-		appendComment("Add user settings beans to specified request.");
-		clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.USER_SETTINGS) + ".bean.UserSettingsManager");		
-		appendString("protected void addUserSettingsBeansToRequest(HttpServletRequest req) {");
-		increaseIdent();
-		appendStatement("addBeanToRequest(req, \"userSettings\", UserSettingsManager.loadFromCookies(req) )");		
-		append(closeBlock());
-		emptyline();		
 		
-		
-		appendString("private MenuItemBean makeMenuItemBean(String title, String link){");
+		appendString("private NavigationItemBean makeMenuItemBean(String title, String link){");
 		increaseIdent();
-		appendString("MenuItemBean bean = new MenuItemBean();");
+		appendString("NavigationItemBean bean = new NavigationItemBean();");
 		appendString("bean.setCaption(title);");
 		appendString("bean.setLink(link);");
-		appendString("bean.setActive(true);");
-		appendString("bean.setStyle(\"menuTitle\");");
+		appendString("bean.setActive(title.equals(getActiveMainNavi()));");
 		appendString("return bean;");
 		append(closeBlock());
 		emptyline();

@@ -1,4 +1,4 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.jsp;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
-public class SharedJspFooterGenerator extends AbstractJSPGenerator {
+public class SharedFooterJspGenerator extends AbstractJSPGenerator {
 	
 	/**
 	 * A constant for quoting in the scriptlets.

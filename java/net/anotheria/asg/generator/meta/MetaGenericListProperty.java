@@ -2,7 +2,7 @@ package net.anotheria.asg.generator.meta;
 
 public class MetaGenericListProperty extends MetaGenericProperty{
 	public MetaGenericListProperty(String name, MetaProperty... contained){
-		super(name, "list", contained);
+		super(name, MetaProperty.Type.LIST, contained);
 	}
 
 	public String toPropertyGetterCall(){

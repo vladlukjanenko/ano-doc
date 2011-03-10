@@ -152,16 +152,16 @@ public class MetaDocument implements IGenerateable{
 	public MetaProperty getField(String name){
 		
 		if (name.equals("id"))
-			return new MetaProperty("id","string");
+			return new MetaProperty("id",MetaProperty.Type.STRING);
 		
 		if (name.equals("plainId"))
-			return new MetaProperty("plainId","string");
+			return new MetaProperty("plainId",MetaProperty.Type.STRING);
 
 		if (name.equals("documentLastUpdateTimestamp"))
-			return new MetaProperty("documentLastUpdateTimestamp","string");
+			return new MetaProperty("documentLastUpdateTimestamp",MetaProperty.Type.STRING);
 		
 		if (name.equals("multilingualInstanceDisabled"))
-			return new MetaProperty("multilingualInstanceDisabled", "boolean");
+			return new MetaProperty("multilingualInstanceDisabled", MetaProperty.Type.BOOLEAN);
 
 		for (MetaProperty p : properties)
 			if (p.getName().equals(name))

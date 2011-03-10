@@ -1,4 +1,4 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.action;
 
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -13,8 +13,9 @@ public class AbstractActionGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	protected static String getBaseActionName(){
-		return "Base"+StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())+"Action";
+		return "Base"+StringUtils.capitalize(GeneratorDataRegistry.getInstance().getContext().getApplicationName())+"MafAction";
 	}
+	
 	
 	protected static String getSharedActionPackageName(){
 		return GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".action";

@@ -1,4 +1,4 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,13 +8,14 @@ import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SharedAction;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.util.listener.SysOutServiceListener;
 
-public class CMSSearchMafActionsGenerator extends AbstractGenerator {
+public class CMSSearchActionsGenerator extends AbstractGenerator {
 
 	public List<FileEntry> generate(List<MetaView> views) {
 		List<FileEntry> files = new ArrayList<FileEntry>();
@@ -63,7 +64,7 @@ public class CMSSearchMafActionsGenerator extends AbstractGenerator {
 		clazz.addImport("net.anotheria.util.StringUtils");
 		clazz.addImport("net.anotheria.asg.data.DataObject");
 	
-		clazz.setParent(BaseMafActionGenerator.getBaseMafActionName(), "SearchFB");
+		clazz.setParent(BaseActionGenerator.getBaseActionName(), "SearchFB");
 		clazz.setName(getCmsSearchActionName());
 
 		startClassBody();

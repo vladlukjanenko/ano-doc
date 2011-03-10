@@ -1,4 +1,4 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +11,15 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.forms.meta.MetaFormField;
-import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
-import net.anotheria.asg.generator.meta.*;
+import net.anotheria.asg.generator.meta.MetaContainerProperty;
+import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
+import net.anotheria.asg.generator.meta.MetaListProperty;
+import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.ObjectType;
+import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
 import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
@@ -31,15 +35,14 @@ import net.anotheria.util.StringUtils;
  * @created on Feb 25, 2005
  */
 public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator {
-    
-    
+	
 	/**
 	 * Implementation is moved into ano-web, the constant remains.
 	 */
 	public static final String FLAG_FORM_SUBMITTED = "formSubmittedFlag";
 	
 	public static final String FIELD_ML_DISABLED = "multilingualInstanceDisabled";
-
+    
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
 	 */
@@ -50,13 +53,14 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		
 		//System.out.println("Generate section: "+section);
 		
-		ExecutionTimer timer = new ExecutionTimer("BeanGenerator");
+		ExecutionTimer timer = new ExecutionTimer("MafBeanGenerator");
 		timer.startExecution("All");
-
+		
 		timer.startExecution(section.getModule().getName()+"-"+section.getTitle()+"-ListItem");
 		files.add(new FileEntry(generateListItemBean(section)));
 		timer.stopExecution(section.getModule().getName()+"-"+section.getTitle()+"-ListItem");
 		files.add(new FileEntry(generateListItemSortType(section)));
+
 		List<MetaDialog> dialogs = section.getDialogs();
 		for (int i=0; i<dialogs.size(); i++){
 			MetaDialog dlg = dialogs.get(i);
@@ -70,7 +74,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 					files.add(new FileEntry(generateContainerQuickAddForm(doc, (MetaContainerProperty)pp)));
 				}
 			}
-
 		}
 	//	files.add(new FileEntry(FileEntry.package2path(getPackage()), getShowActionName(section), generateShowAction(section)));
 		//files.add(new FileEntry(FileEntry.package2path(getPackage()), getDeleteActionName(section), generateDeleteAction(section)));
@@ -83,32 +86,6 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		return files;
 	}
 	
-	
-	
-	public static String getListItemBeanName(MetaDocument doc){
-		return doc.getName()+"ListItemBean";
-	}
-	
-	public static String getListItemBeanSortTypeName(MetaDocument doc){
-		return getListItemBeanName(doc)+"SortType";
-	}
-	
-	public static String getContainerEntryFormName(MetaContainerProperty p){
-		return StringUtils.capitalize(p.getName())+p.getContainerEntryName()+"Form";
-	}
-
-	public static String getContainerQuickAddFormName(MetaContainerProperty p){
-		return StringUtils.capitalize(p.getName())+"QuickAddForm";
-	}
-
-	public static String getContainerEntryFormImport(MetaDocument doc, MetaContainerProperty p){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerEntryFormName(p);
-	}
-	
-	public static String getContainerQuickAddFormImport(MetaDocument doc, MetaContainerProperty p){
-		return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerQuickAddFormName(p);
-	}
-
 	private GeneratedClass generateContainerEntryForm(MetaDocument doc, MetaContainerProperty p){
 		if (p instanceof MetaTableProperty){
 			return generateTableRowForm(doc, (MetaTableProperty)p);
@@ -125,35 +102,73 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		System.out.println("WARN Unsupported container type: "+p);
 		return null;
 	}
+	
+	private GeneratedClass generateListQuickAddForm(MetaDocument doc, MetaListProperty list){
+		
+		GeneratedClass clazz = new GeneratedClass();
+		startNewJob(clazz);
+		
+		clazz.setPackageName(getPackage(doc));
+		
+		clazz.addImport("net.anotheria.maf.bean.FormBean");
+		
+		clazz.setName(getContainerQuickAddFormName(list));
+		clazz.addInterface("FormBean");
 
+		startClassBody();
+		appendStatement("private String quickAddIds");
+		appendStatement("private String ownerId");
+		
+		emptyline();
+		appendString("public void setQuickAddIds(String someIds){");
+		appendIncreasedStatement("quickAddIds = someIds");
+		appendString("}");
+		emptyline();
+		appendString("public String getQuickAddIds(){");
+		appendIncreasedStatement("return quickAddIds");
+		appendString("}");
+		
+		emptyline();
+		
+		emptyline();
+		appendString("public void setOwnerId(String anId){");
+		appendIncreasedStatement("ownerId = anId");
+		appendString("}");
+		emptyline();
+		appendString("public String getOwnerId(){");
+		appendIncreasedStatement("return ownerId");
+		appendString("}");
+		emptyline();
+
+		return clazz;
+	}
+	
 	private GeneratedClass generateListElementForm(MetaDocument doc, MetaListProperty list){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
 		clazz.setPackageName(getPackage(doc));
-		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
-		clazz.addImport("javax.servlet.http.HttpServletRequest");
-		clazz.addImport("org.apache.struts.action.ActionMapping");
+		clazz.addImport("net.anotheria.maf.bean.FormBean");
 		
 		if (list.getContainedProperty().isLinked()  || list.getContainedProperty() instanceof MetaEnumerationProperty){
 			clazz.addImport("java.util.List");
 		}
 		
 		List<MetaProperty> elements = new ArrayList<MetaProperty>();
-		elements.add(new MetaProperty("ownerId","string"));
-		elements.add(new MetaProperty("position","int"));
+		elements.add(new MetaProperty("ownerId",MetaProperty.Type.STRING));
+		elements.add(new MetaProperty("position",MetaProperty.Type.INT));
 		elements.add(list.getContainedProperty());
-		elements.add(new MetaProperty("description","string"));
+		elements.add(new MetaProperty("description",MetaProperty.Type.STRING));
 
 		clazz.setName(getContainerEntryFormName(list));
-		clazz.setParent("BaseActionForm");
+		clazz.addInterface("FormBean");
 		startClassBody();
 		
 		for (int i=0; i<elements.size(); i++){
 			MetaProperty p = elements.get(i);
 			appendStatement("private "+p.toJavaType()+" "+p.getName());
 			if (p.isLinked() || p instanceof MetaEnumerationProperty){
-				MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
+				MetaProperty collection = new MetaProperty(p.getName()+"Collection",MetaProperty.Type.LIST);
 				appendString("@SuppressWarnings(\"unchecked\")");
 				appendStatement("private "+collection.toJavaType()+" "+collection.getName());
 			}
@@ -182,74 +197,9 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 		emptyline();
 		
-		
-
-		//generate encoding.
-		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
-		increaseIdent();
-		appendString("try {");
-		increaseIdent();
-		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		append(closeBlock());
-		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		append(closeBlock());
-		
 		return clazz;
 	}
-
-	private GeneratedClass generateListQuickAddForm(MetaDocument doc, MetaListProperty list){
-		
-		GeneratedClass clazz = new GeneratedClass();
-		startNewJob(clazz);
-		
-		clazz.setPackageName(getPackage(doc));
-		
-		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
-		clazz.addImport("javax.servlet.http.HttpServletRequest");
-		clazz.addImport("org.apache.struts.action.ActionMapping");
-		
-		clazz.setName(getContainerQuickAddFormName(list));
-		clazz.setParent("BaseActionForm");
-
-		startClassBody();
-		appendStatement("private String quickAddIds");
-		appendStatement("private String ownerId");
-		
-		emptyline();
-		appendString("public void setQuickAddIds(String someIds){");
-		appendIncreasedStatement("quickAddIds = someIds");
-		appendString("}");
-		emptyline();
-		appendString("public String getQuickAddIds(){");
-		appendIncreasedStatement("return quickAddIds");
-		appendString("}");
-		
-		emptyline();
-		
-		emptyline();
-		appendString("public void setOwnerId(String anId){");
-		appendIncreasedStatement("ownerId = anId");
-		appendString("}");
-		emptyline();
-		appendString("public String getOwnerId(){");
-		appendIncreasedStatement("return ownerId");
-		appendString("}");
-		emptyline();
-		
-
-		//generate encoding.
-		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
-		increaseIdent();
-		appendString("try {");
-		increaseIdent();
-		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		append(closeBlock());
-		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		append(closeBlock());
-
-		return clazz;
-	}
-
+	
 	@SuppressWarnings("unchecked")
 	private GeneratedClass generateTableRowForm(MetaDocument doc, MetaTableProperty p){
 		
@@ -266,8 +216,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 
 		startClassBody();
 		List<MetaProperty> columns = (List<MetaProperty>)((ArrayList)p.getColumns()).clone();
-		columns.add(0, new MetaProperty(p.getName()+"_ownerId", "string"));
-		columns.add(0, new MetaProperty(p.getName()+"_position", "int"));
+		columns.add(0, new MetaProperty(p.getName()+"_ownerId", MetaProperty.Type.STRING));
+		columns.add(0, new MetaProperty(p.getName()+"_position", MetaProperty.Type.INT));
 		for (MetaProperty pr : columns)
 			appendStatement("private String "+p.extractSubName(pr));
 		
@@ -299,17 +249,15 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 	}
 	
 	
-	GeneratedClass generateDialogForm(MetaDialog dialog, MetaDocument doc){
+	public GeneratedClass generateDialogForm(MetaDialog dialog, MetaDocument doc){
 
 		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		
 		clazz.setPackageName(getPackage(doc));
-		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
-		clazz.addImport("javax.servlet.http.HttpServletRequest");
-		clazz.addImport("org.apache.struts.action.ActionMapping");
-
+		clazz.addImport("net.anotheria.maf.bean.FormBean");
+		
 		startClassBody();
 		
 		//this is only used if the multilingual support is enabled for the project AND document.
@@ -330,7 +278,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		}
 		
 		clazz.setName(getDialogBeanName(dialog, doc));
-		clazz.setParent("BaseActionForm");
+		clazz.addInterface("FormBean");
 		
 		startClassBody();
 	
@@ -340,16 +288,16 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				String lang = getElementLanguage(field);
 				
 				MetaProperty p = doc.getField(field.getName());
-				MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
+				MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),MetaProperty.Type.INT): p;
 				appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
 				if (p.isLinked()){
-					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),"list");
+					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),MetaProperty.Type.LIST);
 					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
 					appendStatement("private String "+p.getName()+"CurrentValue"+(lang==null?"":lang));
 				}
 				
 				if (p instanceof MetaEnumerationProperty){
-					MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
+					MetaProperty collection = new MetaProperty(p.getName()+"Collection",MetaProperty.Type.LIST);
 					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
 					appendStatement("private String "+p.getName()+"CurrentValue");
 				}
@@ -370,34 +318,66 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			generateFieldMethodsInDialog(multilingualInstanceDisabledElement, doc);
 		}
         // add fields!!!! Lock!!!
-        generateAdditionalFields(doc,"locked","boolean","LockableObject \"locked\" property. For object Locking.");
-        generateAdditionalFields(doc,"lockerId","string","LockableObject \"lockerId\" property. For userName containing.");
-        generateAdditionalFields(doc,"lockingTime","string","LockableObject \"lockingTime\" property.");
-
-
+        generateAdditionalFields(doc,"locked",MetaProperty.Type.BOOLEAN,"LockableObject \"locked\" property. For object Locking.");
+        generateAdditionalFields(doc,"lockerId",MetaProperty.Type.STRING,"LockableObject \"lockerId\" property. For userName containing.");
+        generateAdditionalFields(doc,"lockingTime",MetaProperty.Type.STRING,"LockableObject \"lockingTime\" property.");
+        
         emptyline();
 		
-		//generate encoding.
-		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
-		increaseIdent();
-		appendString("try {");
-		increaseIdent();
-		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		append(closeBlock());
-		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		append(closeBlock());
-		  
 		return clazz;
 	}
+	
+	public static String getPackage(MetaDocument doc){
+	    return getPackage(GeneratorDataRegistry.getInstance().getContext(), doc);
+	}
+	
+	public static String getPackage(MetaModule module){
+	    return getPackage(GeneratorDataRegistry.getInstance().getContext(), module);
+	}
+	
+	public static String getPackage(Context context, MetaModule module){
+	    return context.getPackageName(module)+".bean";
+	}
+	
+	public static String getPackage(Context context, MetaDocument doc){
+	    return context.getPackageName(doc)+".bean";
+	}
+	
+	public static String getDialogBeanName(MetaDialog dialog, MetaDocument document){
+		return StringUtils.capitalize(dialog.getName())+StringUtils.capitalize(document.getName())+"FB";
+	}
+	
+	private void generateFieldMethodsInDialog(MetaFieldElement element, MetaDocument doc){
+		MetaProperty p = null;
+//		String lang = getElementLanguage(element);
+		p = doc.getField(element.getName());
 
-    /**
+		if (p.isLinked() || p instanceof MetaEnumerationProperty){
+			MetaFieldElement pColl = new MetaFieldElement(element.getName()+"Collection");
+			MetaFieldElement pCurr = new MetaFieldElement(element.getName()+"CurrentValue");
+			//;
+			if (p.isMultilingual()){
+				String l = getElementLanguage(element);
+				generateMethods(new MultilingualFieldElement(l, pColl), new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
+				generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", MetaProperty.Type.STRING));
+			}else{
+				generateMethods(pColl, new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
+				generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", MetaProperty.Type.STRING));
+			}
+			
+		}
+		MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),MetaProperty.Type.INT): p;
+		generateMethods(element, tmp);
+	}
+	
+	 /**
      * Actually allow us add fields  such Lock - etc.
      * @param doc document itself
      * @param fieldName name of field
      * @param fieldType field type
      * @param comment comment for the field
      */
-    private void generateAdditionalFields(MetaDocument doc, String fieldName, String fieldType, String comment) {
+    private void generateAdditionalFields(MetaDocument doc, String fieldName, MetaProperty.Type fieldType, String comment) {
         if (doc.getParentModule().getStorageType().equals(StorageType.CMS)) {
             MetaFieldElement fieldElement = new MetaFieldElement(fieldName);
             MetaProperty maField = new MetaProperty(fieldElement.getName(),fieldType);
@@ -407,7 +387,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
             generateMethods(fieldElement,maField);
         }
     }
-
+    
+    
     private GeneratedClass generateListItemSortType(MetaModuleSection section){
 		List<MetaViewElement> elements = section.getElements();
 		boolean containsComparable = false;
@@ -539,9 +520,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 
 		return clazz;
 	}
-	
-	
-	private GeneratedClass generateListItemBean(MetaModuleSection section){
+    
+private GeneratedClass generateListItemBean(MetaModuleSection section){
 		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
@@ -638,11 +618,13 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				generateFunctionMethods((MetaFunctionElement)element);
 			
 		}
+		
+		
 
         // add fields!!!! Lock!!!
-        generateAdditionalFields(doc, "locked", "boolean", "LockableObject \"locked\" property. For object Locking.");
-        generateAdditionalFields(doc, "lockerId", "string", "LockableObject \"lockerId\" property. For userName containing.");
-        generateAdditionalFields(doc, "lockingTime", "string", "LockableObject \"lockingTime\" property.");
+        generateAdditionalFields(doc, "locked", MetaProperty.Type.BOOLEAN, "LockableObject \"locked\" property. For object Locking.");
+        generateAdditionalFields(doc, "lockerId", MetaProperty.Type.STRING, "LockableObject \"lockerId\" property. For userName containing.");
+        generateAdditionalFields(doc, "lockingTime", MetaProperty.Type.STRING, "LockableObject \"lockingTime\" property.");
 
 
         if (containsComparable){
@@ -657,103 +639,11 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		
 		return clazz;
 	}
-	
+
 	private void generateFunctionMethods(MetaFunctionElement function){
-		generateMethods(function, new MetaProperty(function.getPropertyName(), "string"));
-	}
-	
-	private void generateFieldMethodsInDialog(MetaFieldElement element, MetaDocument doc){
-		MetaProperty p = null;
-//		String lang = getElementLanguage(element);
-		p = doc.getField(element.getName());
-
-		if (p.isLinked() || p instanceof MetaEnumerationProperty){
-			MetaFieldElement pColl = new MetaFieldElement(element.getName()+"Collection");
-			MetaFieldElement pCurr = new MetaFieldElement(element.getName()+"CurrentValue");
-			//;
-			if (p.isMultilingual()){
-				String l = getElementLanguage(element);
-				generateMethods(new MultilingualFieldElement(l, pColl), new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
-				generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", "string"));
-			}else{
-				generateMethods(pColl, new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
-				generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", "string"));
-			}
-			
-		}
-		MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
-		generateMethods(element, tmp);
+		generateMethods(function, new MetaProperty(function.getPropertyName(), MetaProperty.Type.STRING));
 	}
 
-	private void generateFieldMethods(MetaFieldElement element, MetaDocument doc){
-		
-		MetaProperty p = doc.getField(element.getName());
-		if (p instanceof MetaEnumerationProperty){
-			MetaProperty tmp = new MetaProperty(p.getName(), "string");
-			generateMethods(element, tmp);
-			return;
-		}
-
-//		if (p instanceof MetaListProperty && element.getDecorator()!=null){
-//			MetaProperty tmp = new MetaProperty(p.getName(), "string");
-//			MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", "int");
-//			return generateMethods(element, tmp)+generateMethods(element, tmpForSorting);		
-//		}
-		
-
-		
-		if (element.getDecorator()!=null){
-			MetaProperty tmpForSorting = (MetaProperty) p.clone();//new MetaProperty(p.getName()+"ForSorting", p.getType());
-			tmpForSorting.setName(tmpForSorting.getName()+"ForSorting");
-			generateMethods(element, tmpForSorting);
-			//if this field has a decorator we have to generate string methods instaed of original methods.
-			p = new MetaProperty(p.getName(), "string", p.isMultilingual());
-		}
-		
-		generateMethods(element, p);
-	}
-	
-	private void generateMethods(MetaViewElement element, MetaProperty p){
-
-		if (element instanceof MultilingualFieldElement){
-			generateMethodsMultilinguage((MultilingualFieldElement)element, p);
-			return;
-		}
-		
-		appendString("public void "+p.toBeanSetter()+"("+p.toJavaType()+" "+p.getName()+" ){");
-		increaseIdent();
-		appendStatement("this."+p.getName()+" = "+p.getName());
-		append(closeBlock());			
-		emptyline();
-			
-		appendString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
-		increaseIdent();
-		appendStatement("return "+p.getName());
-		append(closeBlock());
-		emptyline();
-	}
-	
-	private void generateMethodsMultilinguage(MultilingualFieldElement element, MetaProperty p){
-		
-		//System.out.println("--- m "+p+", "+p.getType());
-		if (p.getType().equals("list"))
-			appendString("@SuppressWarnings(\"unchecked\")");
-		appendString("public void "+p.toBeanSetter(element.getLanguage())+"("+p.toJavaType()+" "+p.getName()+" ){");
-		increaseIdent();
-		appendStatement("this."+p.getName(element.getLanguage())+" = "+p.getName());
-		append(closeBlock());			
-		emptyline();
-			
-		if (p.getType().equals("list"))
-			appendString("@SuppressWarnings(\"unchecked\")");
-		appendString("public "+p.toJavaType()+" "+p.toBeanGetter(element.getLanguage())+"(){");
-		increaseIdent();
-		appendStatement("return "+p.getName(element.getLanguage()));
-		append(closeBlock());
-		emptyline();
-		
-	}
-	
 	private void generateCompareMethod(MetaDocument doc, List<MetaViewElement> elements){
 		appendString("public int compareTo(IComparable anotherComparable, int method){");
 		increaseIdent();
@@ -774,11 +664,11 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			appendString("case "+caseDecl+":");
 			
 			String type2compare = p instanceof MetaEnumerationProperty? "String": StringUtils.capitalize(p.toJavaErasedType());
-
+	
 			String retDecl = "return BasicComparable.compare"+type2compare;
 			retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
 				"("+p.getName(lang)+", anotherBean."+p.getName(lang)+")";
-
+	
 			appendIncreasedStatement(retDecl);
 		}
 		appendString("default:");
@@ -786,142 +676,127 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		append(closeBlock());
 		append(closeBlock());
 	}
-	
-	@Deprecated
-	public static String getPackage(){
-	    return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".bean";
-	}
-	
-	public static String getPackage(MetaModule module){
-	    return getPackage(GeneratorDataRegistry.getInstance().getContext(), module);
-	}
-	
-	public static String getPackage(MetaDocument doc){
-	    return getPackage(GeneratorDataRegistry.getInstance().getContext(), doc);
-	}
 
-	public static String getPackage(Context context, MetaModule module){
-	    return context.getPackageName(module)+".bean";
-	}
-	
-	public static String getPackage(Context context, MetaDocument doc){
-	    return context.getPackageName(doc)+".bean";
-	}
-
-	public static String getListItemBeanSortTypeImport(Context context, MetaDocument doc){
-		return getPackage(context, doc)+"."+getListItemBeanSortTypeName(doc);
-	}
-	
-	public static String getListItemBeanImport(Context context, MetaDocument doc){
-		return getPackage(context, doc)+"."+getListItemBeanName(doc);
-	}
-	
-	public static String getDialogBeanName(MetaDialog dialog, MetaDocument document){
-		return StringUtils.capitalize(dialog.getName())+StringUtils.capitalize(document.getName())+"Form";
-	}
-	
-	public static String getDialogBeanImport(MetaDialog dialog, MetaDocument doc){
-		return getPackage(GeneratorDataRegistry.getInstance().getContext(), doc)+"."+getDialogBeanName(dialog, doc);
-	}
-	
-	public static String getFormBeanImport(MetaForm form){
-		return getPackage()+"."+getFormBeanName(form);
-	}
-
-	public static String getFormBeanName(MetaForm form){
-	    return StringUtils.capitalize(form.getId())+"AutoForm";
-	}
-	
-	public GeneratedClass generateFormBean(MetaForm form){
-	    GeneratedClass clazz = new GeneratedClass();
-	    startNewJob(clazz);
-	    
-		clazz.setPackageName(getPackage());
-		clazz.addImport("net.anotheria.webutils.bean.BaseActionForm");
-		clazz.addImport("javax.servlet.http.HttpServletRequest");
-		clazz.addImport("org.apache.struts.action.ActionMapping");
+	private void generateFieldMethods(MetaFieldElement element, MetaDocument doc){
 		
-		List<MetaFormField> elements = new ArrayList<MetaFormField>();
-		elements.addAll(form.getElements());
-		
-		
-		
-		clazz.setName(getFormBeanName(form));
-		clazz.setParent("BaseActionForm");
-		
-		startClassBody();
-		
-		for (int i=0; i<elements.size(); i++){
-			MetaFormField element = elements.get(i);
-			if (element.isSingle())
-				appendStatement("private "+((MetaFormSingleField)element).getJavaType()+" "+" "+element.getName());
-			if (element.isComplex()){
-				MetaFormTableField table = (MetaFormTableField) element;
-				for (int r = 0; r<table.getRows(); r++){
-					List<MetaFormTableColumn> columns = table.getColumns();
-					for (int c = 0; c<columns.size(); c++){
-						MetaFormTableColumn col = columns.get(c);
-						appendStatement("private "+col.getField().getJavaType()+" "+" "+table.getVariableName(r, c));
-					}
-				}
-			}
+		MetaProperty p = doc.getField(element.getName());
+		if (p instanceof MetaEnumerationProperty){
+			MetaProperty tmp = new MetaProperty(p.getName(), MetaProperty.Type.STRING);
+			generateMethods(element, tmp);
+			return;
 		}
+	
+	//	if (p instanceof MetaListProperty && element.getDecorator()!=null){
+	//		MetaProperty tmp = new MetaProperty(p.getName(), "string");
+	//		MetaProperty tmpForSorting = new MetaProperty(p.getName()+"ForSorting", "int");
+	//		return generateMethods(element, tmp)+generateMethods(element, tmpForSorting);		
+	//	}
+		
+	
+		
+		if (element.getDecorator()!=null){
+			MetaProperty tmpForSorting = (MetaProperty) p.clone();//new MetaProperty(p.getName()+"ForSorting", p.getType());
+			tmpForSorting.setName(tmpForSorting.getName()+"ForSorting");
+			generateMethods(element, tmpForSorting);
+			//if this field has a decorator we have to generate string methods instaed of original methods.
+			p = new MetaProperty(p.getName(), MetaProperty.Type.STRING, p.isMultilingual());
+		}
+		
+		generateMethods(element, p);
+	}
+    
+	private void generateMethods(MetaViewElement element, MetaProperty p){
 
+		if (element instanceof MultilingualFieldElement){
+			generateMethodsMultilinguage((MultilingualFieldElement)element, p);
+			return;
+		}
+		
+		appendString("public void "+p.toBeanSetter()+"("+p.toJavaType()+" "+p.getName()+" ){");
+		increaseIdent();
+		appendStatement("this."+p.getName()+" = "+p.getName());
+		append(closeBlock());			
 		emptyline();
-
-		for (int i=0; i<elements.size(); i++){
-		    MetaFormField element = elements.get(i);
-		    if (element.isSingle()){
-		    	MetaFormSingleField field = (MetaFormSingleField )element;
-				if (field.isSpacer())
-					continue;
-				emptyline();
-				appendString("public "+field.getJavaType()+" get"+StringUtils.capitalize(element.getName())+"(){");
-				increaseIdent();
-				appendStatement("return "+element.getName());
-				append(closeBlock());
-				emptyline();
-				appendString("public void set"+StringUtils.capitalize(element.getName())+"("+field.getJavaType()+" s){");
-				increaseIdent();
-				appendStatement(element.getName()+" = s");
-				append(closeBlock());
-		    }
-		    
-		    if (element.isComplex()){
-				MetaFormTableField table = (MetaFormTableField) element;
-				for (int r = 0; r<table.getRows(); r++){
-					List<MetaFormTableColumn> columns = table.getColumns();
-					for (int c = 0; c<columns.size(); c++){
-						MetaFormTableColumn col = columns.get(c);
-						
-						emptyline();
-						appendString("public "+col.getField().getJavaType()+" get"+StringUtils.capitalize(table.getVariableName(r, c))+"(){");
-						increaseIdent();
-						appendStatement("return "+table.getVariableName(r, c));
-						append(closeBlock());
-						emptyline();
-						appendString("public void set"+StringUtils.capitalize(table.getVariableName(r, c))+"("+col.getField().getJavaType()+" s){");
-						increaseIdent();
-						appendStatement(table.getVariableName(r, c)+" = s");
-						append(closeBlock());
-					}
-				}
-		    }
-		}
-
+			
+		appendString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
+		increaseIdent();
+		appendStatement("return "+p.getName());
+		append(closeBlock());
 		emptyline();
 		
-		//generate encoding.
-		appendString("public void reset( ActionMapping mapping, HttpServletRequest request ){");
-		increaseIdent();
-		appendString("try {");
-		increaseIdent();
-		appendStatement("request.setCharacterEncoding( "+quote(GeneratorDataRegistry.getInstance().getContext().getEncoding())+")");
-		append(closeBlock());
-		appendString("catch ( java.io.UnsupportedEncodingException e ) {}");
-		append(closeBlock());
-	    
-	    return clazz;
 	}
 	
+	
+	
+		private void generateMethodsMultilinguage(MultilingualFieldElement element, MetaProperty p){
+		
+		//System.out.println("--- m "+p+", "+p.getType());
+		if (p.getType() == MetaProperty.Type.LIST)
+			appendString("@SuppressWarnings(\"unchecked\")");
+		appendString("public void "+p.toBeanSetter(element.getLanguage())+"("+p.toJavaType()+" "+p.getName()+" ){");
+		increaseIdent();
+		appendStatement("this."+p.getName(element.getLanguage())+" = "+p.getName());
+		append(closeBlock());			
+		emptyline();
+			
+		if (p.getType() == MetaProperty.Type.LIST)
+			appendString("@SuppressWarnings(\"unchecked\")");
+		appendString("public "+p.toJavaType()+" "+p.toBeanGetter(element.getLanguage())+"(){");
+		increaseIdent();
+		appendStatement("return "+p.getName(element.getLanguage()));
+		append(closeBlock());
+		emptyline();
+		
+	}
+		
+		
+		
+		public static String getListItemBeanSortTypeImport(Context context, MetaDocument doc){
+			return getPackage(context, doc)+"."+getListItemBeanSortTypeName(doc);
+		}
+		
+		public static String getListItemBeanSortTypeName(MetaDocument doc){
+			return getListItemBeanName(doc)+"SortType";
+		}
+		
+		public static String getListItemBeanName(MetaDocument doc){
+			return doc.getName()+"ListItemBean";
+		}
+		
+		public static String getDialogBeanImport(MetaDialog dialog, MetaDocument doc){
+			return getPackage(GeneratorDataRegistry.getInstance().getContext(), doc)+"."+getDialogBeanName(dialog, doc);
+		}
+		
+		public static String getListItemBeanImport(Context context, MetaDocument doc){
+			return getPackage(context, doc)+"."+getListItemBeanName(doc);
+		}
+		
+		public static String getContainerEntryFormImport(MetaDocument doc, MetaContainerProperty p){
+			return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerEntryFormName(p);
+		}
+		
+		public static String getContainerEntryFormName(MetaContainerProperty p){
+			return StringUtils.capitalize(p.getName())+p.getContainerEntryName()+"FB";
+		}
+		
+		public static String getContainerQuickAddFormImport(MetaDocument doc, MetaContainerProperty p){
+			return GeneratorDataRegistry.getInstance().getContext().getPackageName(doc)+".bean."+getContainerQuickAddFormName(p);
+		}
+		
+		public static String getContainerQuickAddFormName(MetaContainerProperty p){
+			return StringUtils.capitalize(p.getName())+"QuickAddFB";
+		}
+		
+		public static String getFormBeanImport(MetaForm form){
+			return getPackage()+"."+getFormBeanName(form);
+		}
+		
+		@Deprecated
+		public static String getPackage(){
+		    return GeneratorDataRegistry.getInstance().getContext().getPackageName()+".bean";
+		}
+		
+		public static String getFormBeanName(MetaForm form){
+		    return StringUtils.capitalize(form.getId())+"AutoForm";
+		}
 }

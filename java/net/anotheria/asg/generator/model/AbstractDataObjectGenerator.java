@@ -102,7 +102,7 @@ public abstract class AbstractDataObjectGenerator extends AbstractGenerator{
 
 	protected List<MetaProperty> extractSortableProperties(MetaDocument doc){
 		List<MetaProperty> properties = new ArrayList<MetaProperty>();
-		properties.add(new MetaProperty("id","string"));
+		properties.add(new MetaProperty("id",MetaProperty.Type.STRING));
 		properties.addAll(doc.getProperties());
 		properties.addAll(doc.getLinks());
 

@@ -7,7 +7,7 @@ public class MetaGenericProperty extends MetaProperty{
 	
 	private List<MetaProperty> containedProperties;
 	
-	public MetaGenericProperty(String name, String type, MetaProperty... contained){
+	public MetaGenericProperty(String name, MetaProperty.Type type, MetaProperty... contained){
 		super(name, type);
 		containedProperties = new ArrayList<MetaProperty>();
 		for (MetaProperty p : contained)

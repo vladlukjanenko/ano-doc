@@ -5,7 +5,7 @@ import static junit.framework.Assert.*;
 
 public class MetaPropertyTest {
 	@Test public void testNaming(){
-		MetaProperty p = new MetaProperty("test", "string");
+		MetaProperty p = new MetaProperty("test", MetaProperty.Type.STRING);
 		
 		assertEquals("test", p.getName());
 		

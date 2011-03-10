@@ -1,4 +1,4 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.jsp;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +14,7 @@ import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SharedA
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
-public class JspMafMenuGenerator extends AbstractMafJSPGenerator {
+public class MenuJspGenerator extends AbstractJSPGenerator {
 
 	public FileEntry generate(List<MetaView> views , Context context) {
 		

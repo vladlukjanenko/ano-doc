@@ -16,7 +16,7 @@ public class MetaLink extends MetaProperty{
 	private String linkTarget; 
 	
 	public MetaLink(String name){
-		super(name, "string");
+		super(name, MetaProperty.Type.STRING);
 	}
 	/**
 	 * @return

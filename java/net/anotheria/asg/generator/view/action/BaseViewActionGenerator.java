@@ -1,4 +1,4 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +11,7 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
 import net.anotheria.asg.generator.view.meta.MetaCustomSection;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
@@ -21,7 +22,7 @@ import net.anotheria.util.StringUtils;
  * This generator generates the base action for a view.
  * @author another
  */
-public class BaseViewMafActionGenerator extends AbstractGenerator {
+public class BaseViewActionGenerator extends AbstractGenerator {
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
@@ -60,7 +61,7 @@ public class BaseViewMafActionGenerator extends AbstractGenerator {
 		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");
 
 		clazz.setAbstractClass(true);
-		clazz.setParent(BaseMafActionGenerator.getBaseMafActionName());
+		clazz.setParent(BaseActionGenerator.getBaseActionName());
 		clazz.setGeneric("T extends FormBean");
 		clazz.setName(getViewActionName(view));
 		
@@ -98,7 +99,7 @@ public class BaseViewMafActionGenerator extends AbstractGenerator {
 				for (int i=0; i<sections.size(); i++){
 						MetaSection section = (MetaSection)sections.get(i);
 						if (section instanceof MetaModuleSection)
-							appendStatement("subNavi.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(StrutsConfigGenerator.getPath(((MetaModuleSection)section).getDocument(), StrutsConfigGenerator.ACTION_SHOW))+"))");
+							appendStatement("subNavi.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)section).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_SHOW))+"))");
 						if (section instanceof MetaCustomSection)
 							appendStatement("subNavi.add(makeMenuItemBean("+quote(section.getTitle())+", "+quote(((MetaCustomSection)section).getPath())+"))");
 								

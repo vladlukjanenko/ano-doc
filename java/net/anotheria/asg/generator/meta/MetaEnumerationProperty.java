@@ -16,7 +16,7 @@ public class MetaEnumerationProperty extends MetaProperty{
 	 * @param aName
 	 * @param aType
 	 */
-	public MetaEnumerationProperty(String aName, String aType){
+	public MetaEnumerationProperty(String aName, MetaProperty.Type aType){
 		super(aName, aType);
 	}
 

@@ -18,7 +18,7 @@ import java.util.Map;
  */
 public class FederationServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 	
-	private final MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
+	private final MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", MetaProperty.Type.LONG);
 
 	
 	/**

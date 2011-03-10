@@ -27,11 +27,11 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 	/**
 	 * Id property. Most documents do not include id properties, but its required by the application and has to be added here.
 	 */
-	private final MetaProperty id = new MetaProperty("id","string");
+	private final MetaProperty id = new MetaProperty("id",MetaProperty.Type.STRING);
 	/**
 	 * Last update timestamp property.
 	 */
-	private final MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", "long");
+	private final MetaProperty lastUpdate = new MetaProperty("lastUpdateTimestamp", MetaProperty.Type.LONG);
 	
 	public List<FileEntry> generate(IGenerateable gdoc){
 		MetaDocument doc = (MetaDocument)gdoc;
@@ -275,7 +275,7 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 	
 	
 	private void generateListPropertyGetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		MetaProperty tmp = new MetaProperty(p.getName(), MetaProperty.Type.LIST);
 		generatePropertyGetterMethod(tmp);
 	}
 	
@@ -324,7 +324,7 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 	}
 
 	private void generateListPropertySetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaProperty(p.getName(), "list");
+		MetaProperty tmp = new MetaProperty(p.getName(), MetaProperty.Type.LIST);
 		generatePropertySetterMethod(tmp);
 	}
 

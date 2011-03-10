@@ -1,4 +1,4 @@
-package net.anotheria.asg.generator.view;
+package net.anotheria.asg.generator.view.action;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,7 @@ import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.Date;
 
@@ -16,7 +17,7 @@ import net.anotheria.util.Date;
  * 
  * @author abolbat
  */
-public class IndexPageMafActionGenerator extends AbstractGenerator {
+public class IndexPageActionGenerator extends AbstractGenerator {
 
 	
 	public List<FileEntry> generate(List<MetaView> views) {
@@ -77,7 +78,7 @@ public class IndexPageMafActionGenerator extends AbstractGenerator {
 		
 		
 		
-		clazz.setParent(BaseMafActionGenerator.getBaseMafActionName());
+		clazz.setParent(BaseActionGenerator.getBaseActionName());
 		clazz.setName(getIndexPageActionName());
 
 		startClassBody();
