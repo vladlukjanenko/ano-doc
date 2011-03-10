@@ -19,7 +19,7 @@ import net.anotheria.util.StringUtils;
  * 
  * @author another
  */
-public class ListJspGenerator extends AbstractJSPGenerator {
+public class ListPageJspGenerator extends AbstractJSPGenerator {
 
 	public GeneratedJSPFile generate(MetaModuleSection section, MetaDocument doc, MetaListProperty list) {
 		
@@ -112,10 +112,15 @@ public class ListJspGenerator extends AbstractJSPGenerator {
 			MetaDocument linkTarget = targetModule.getDocumentByName(link2p.getTargetDocumentName());
 			String targetLinkAction = SectionAction.EDIT.getMappingName(linkTarget);
 
-			appendString("<td><a href=<ano:tslink>" + quote(targetLinkAction + "?pId=<bean:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName())
-					+ "/></ano:tslink>") + "><bean:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></a></td>");
-			appendString("<td><a href=<ano:tslink>" + quote(targetLinkAction + "?pId=<bean:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName())
-					+ "/></ano:tslink>") + "><bean:write name=" + quote("element") + " property=" + quote("description") + " filter=\"true\"/></a></td>");
+			appendString("<td><a href=<ano:tslink>" + quote(targetLinkAction + "?pId=<bean:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + "/></ano:tslink>")
+					+ "><bean:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></a></td>");
+			appendString("<td><a href=<ano:tslink>" + quote(targetLinkAction + "?pId=<bean:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + "/></ano:tslink>")
+					+ "><bean:write name=\"element\" property=\"description\" filter=\"true\"/></a></td>");
+		} else if (p.getType() == MetaProperty.Type.IMAGE) {
+			String imageName = "<bean:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/>";
+			String imagePath = "getFile?pName=" + imageName;
+			appendString("<td><a href=" + quote(imagePath) + " target=\"_blank\"><img src=" + quote(imagePath) + "alt=" + quote(imageName) + " width=\"50\" height=\"50\" border=\"0\">" + "</a></td>");
+			appendString("<td>" + imageName + "<bean:write name=" + quote("element") + " property=" + quote("description") + " filter=\"true\"/></td>");
 		} else {
 			appendString("<td><bean:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></td>");
 			appendString("<td><bean:write name=" + quote("element") + " property=" + quote("description") + " filter=\"true\"/></td>");
@@ -185,7 +190,8 @@ public class ListJspGenerator extends AbstractJSPGenerator {
 		appendString("<input type=" + quote("hidden") + " name=" + quote("ownerId") + " value=\"<bean:write name=" + quote("ownerId") + "/>\">");
 		
 		if (p.isLinked() || (p instanceof MetaEnumerationProperty)) {
-			appendString("<em id=\"" + "Value\" name=\"" + list.getContainedProperty().getName().toLowerCase() + "\" class=\"selectBox fll mr_10\">&nbsp;none</em><div id=\"" + "ValuesSelector\"></div>");
+			String propertyName = list.getContainedProperty().getName();
+			appendString("<em id=" + quote(propertyName) + " name=" + quote(propertyName) + " class=\"selectBox fll mr_10\"></em><div id=\"" + propertyName + "Selector\"></div>");
 		} else if(p.getType() == MetaProperty.Type.IMAGE){ 
 			appendString(getImageEditor(p));
 		}else {
@@ -277,7 +283,8 @@ public class ListJspGenerator extends AbstractJSPGenerator {
 		decreaseIdent();
 		appendString("</logic:iterate>");
 		appendString("]};");
-		appendString("new YAHOO.anoweb.widget.ComboBox(" + quote("Value") + ",\"" + "ValuesSelector\"," + elName + "Json);");
+		String propertyName = list.getContainedProperty().getName();
+		appendString("new YAHOO.anoweb.widget.ComboBox(" + quote(propertyName) + ",\"" + propertyName + "Selector\"," + elName + "Json, {id:'',name:'none'});");
 
 		decreaseIdent();
 		appendString("</script>");

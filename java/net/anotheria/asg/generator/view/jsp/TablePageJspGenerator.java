@@ -15,7 +15,7 @@ import net.anotheria.util.StringUtils;
  * Generates the jsps for the edit view.
  * @author another
  */
-public class TableJspGenerator extends AbstractJSPGenerator {
+public class TablePageJspGenerator extends AbstractJSPGenerator {
 	
 	
 	

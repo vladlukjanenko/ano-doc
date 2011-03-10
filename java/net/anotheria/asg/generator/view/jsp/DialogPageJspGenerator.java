@@ -30,7 +30,7 @@ import net.anotheria.util.StringUtils;
  * 
  * @author another
  */
-public class DialogJspGenerator extends AbstractJSPGenerator {
+public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	
 	/**
 	 * Currently generated section.

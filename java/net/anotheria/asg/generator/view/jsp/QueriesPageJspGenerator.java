@@ -22,7 +22,7 @@ import net.anotheria.util.StringUtils;
  * Generator for the queries page. Currently obsolete.
  * @author another
  */
-public class QueriesJspGenerator extends AbstractJSPGenerator implements IGenerator{
+public class QueriesPageJspGenerator extends AbstractJSPGenerator implements IGenerator{
 	
 
 	/* (non-Javadoc)
