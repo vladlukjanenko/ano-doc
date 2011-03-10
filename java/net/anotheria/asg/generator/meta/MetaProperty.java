@@ -9,10 +9,40 @@ import net.anotheria.util.StringUtils;
  * @author another
  */
 public class MetaProperty implements Cloneable{
+	
+	public static enum Type{
+		STRING("string"),
+		TEXT("text"),
+		BOOLEAN("boolean"),
+		INT("int"),
+		LONG("long"),
+		DOUBLE("double"),
+		FLOAT("float"),
+		LIST("list"),
+		IMAGE("image");
+		
+
+		String name;
+		Type(String aName){
+			name = aName;
+		}
+		
+		public String getName(){
+			return name;
+		}
+		
+		public static Type findTypeByName(String name){
+			for(Type t: values())
+				if(t.getName().equals(name))
+					return t;
+			return null;
+		}
+	}
+	
 	/**
 	 * The type of the property as string.
 	 */
-	private String type;
+	private Type type;
 	/**
 	 * Name of the property.
 	 */
@@ -35,11 +65,11 @@ public class MetaProperty implements Cloneable{
 	 * @param aName
 	 * @param aType
 	 */
-	public MetaProperty(String aName, String aType){
+	public MetaProperty(String aName, Type aType){
 		this(aName, aType, false);
 	}
 	
-	public MetaProperty(String aName, String aType, boolean aMultilingual){
+	public MetaProperty(String aName, Type aType, boolean aMultilingual){
 		name = aName;
 		type = aType;
 		metaType = TypeFactory.createType(aType);
@@ -82,7 +112,7 @@ public class MetaProperty implements Cloneable{
 	/**
 	 * @return
 	 */
-	public String getType() {
+	public Type getType() {
 		return type;
 	}
 
@@ -93,13 +123,6 @@ public class MetaProperty implements Cloneable{
 		name = string;
 	}
 
-	/**
-	 * @param string
-	 */
-	public void setType(String string) {
-		type = string;
-	}
-	
 	public String toNameConstant(){
 		return "PROP_"+getNameConstantBase();
 	}

@@ -160,8 +160,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		}
 
 		ioffset = doc.getProperties().size() + doc.getLinks().size();
-		generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_CREATED, "long"), ioffset + 2);
-		generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_UPDATED, "long"), ioffset + 3);
+		generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_CREATED, MetaProperty.Type.LONG), ioffset + 2);
+		generateProperty2DBMappingPrivate(doc, new MetaProperty(VOGenerator.DAO_UPDATED, MetaProperty.Type.LONG), ioffset + 3);
 
 		appendStatement("return ret");
 		decreaseIdent();
@@ -351,9 +351,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		String constDecl = "public static final String ";
 		appendStatement(constDecl + "TABNAME = " + quote(getSQLTableName(doc)));
 		emptyline();
-		MetaProperty id = new MetaProperty("id", "string");
-		MetaProperty dao_created = new MetaProperty("dao_created", "long");
-		MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
+		MetaProperty id = new MetaProperty("id", MetaProperty.Type.STRING);
+		MetaProperty dao_created = new MetaProperty("dao_created",MetaProperty.Type.LONG);
+		MetaProperty dao_updated = new MetaProperty("dao_updated", MetaProperty.Type.LONG);
 
 		appendStatement(constDecl + getAttributeConst(id) + " = " + quote(getAttributeName(id)));
 		for (MetaProperty p : properties) {
@@ -966,7 +966,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			appendStatement("return");
 			append(closeBlock());
 		}
-		MetaProperty rawId = new MetaProperty("id", "long");
+		MetaProperty rawId = new MetaProperty("id", MetaProperty.Type.LONG);
 		appendString("if (" + getAttributeConst(id) + ".equals(property.getName())){");
 		increaseIdent();
 		appendStatement(getDB2PropertyCallMapping("property.getValue()", rawId, "position"));
@@ -1064,21 +1064,26 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 	 * @return
 	 */
 	private String getSQLPropertyType(MetaProperty p) {
-		if (p.getType().equals("string"))
+		
+		switch (p.getType()) {
+		case STRING:
 			return "varchar";
-		if (p.getType().equals("text"))
+		case TEXT:
 			return "varchar";
-		if (p.getType().equals("long"))
+		case LONG:
 			return "int8";
-		if (p.getType().equals("int"))
+		case INT:
 			return "int";
-		if (p.getType().equals("double"))
+		case DOUBLE:
 			return "double precision";
-		if (p.getType().equals("float"))
+		case FLOAT:
 			return "float4";
-		if (p.getType().equals("boolean"))
+		case BOOLEAN:
 			return "boolean";
-		return "UNKNOWN!";
+		default:
+			return "UNKNOWN!";
+		}
+		
 	}
 
 	private String getSQLTableName(MetaDocument doc) {

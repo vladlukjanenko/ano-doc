@@ -7,7 +7,7 @@ public class MetaDocumentTest {
 	@Test public void testPropertyUniqueness(){
 		MetaDocument d = new MetaDocument("test");
 		
-		d.addProperty(new MetaProperty("a", "string"));
+		d.addProperty(new MetaProperty("a", MetaProperty.Type.STRING));
 		d.addLink(new MetaLink("b"));
 		assertEquals(1, d.getProperties().size());
 		assertEquals(1, d.getLinks().size());
@@ -15,7 +15,7 @@ public class MetaDocumentTest {
 		String str = d.toString();
 
 		try{
-			d.addProperty(new MetaProperty("a", "string"));
+			d.addProperty(new MetaProperty("a", MetaProperty.Type.STRING));
 			fail("exception expected");
 		}catch(IllegalArgumentException e){}
 		assertEquals(1, d.getProperties().size());
@@ -41,9 +41,9 @@ public class MetaDocumentTest {
 	@Test public void testMultilinguality(){
 		MetaDocument d = new MetaDocument("Test");
 		assertFalse(d.isMultilingual());
-		d.addProperty(new MetaProperty("a","string"));
+		d.addProperty(new MetaProperty("a",MetaProperty.Type.STRING));
 		assertFalse(d.isMultilingual());
-		MetaProperty p = new MetaProperty("b", "string");
+		MetaProperty p = new MetaProperty("b", MetaProperty.Type.STRING);
 		p.setMultilingual(true);
 		d.addProperty(p);
 		assertTrue(d.isMultilingual());
@@ -71,7 +71,7 @@ public class MetaDocumentTest {
 	}
 	
 	@Test public void testGetField(){
-		MetaProperty p = new MetaProperty("property", "string");
+		MetaProperty p = new MetaProperty("property", MetaProperty.Type.STRING);
 		MetaLink l = new MetaLink("link");
 		MetaDocument d = new MetaDocument("Document");
 		try{

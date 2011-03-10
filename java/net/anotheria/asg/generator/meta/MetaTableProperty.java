@@ -19,7 +19,7 @@ public class MetaTableProperty extends MetaContainerProperty{
 	}
 	
 	public void addColumn(String columnName){
-		MetaProperty p = new MetaProperty(getName()+"_"+columnName,"list");
+		MetaProperty p = new MetaProperty(getName()+"_"+columnName,MetaProperty.Type.LIST);
 		columns.add(p);	
 	}
 	

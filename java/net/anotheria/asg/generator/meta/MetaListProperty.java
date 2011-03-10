@@ -13,11 +13,11 @@ public class MetaListProperty extends MetaContainerProperty{
 	private MetaProperty containedProperty;
 	
 	public MetaListProperty(String name){
-		super(name, "list");
+		super(name, MetaProperty.Type.LIST);
 	}
 
 	public MetaListProperty(String name, MetaProperty aContainedProperty){
-		super(name, "list");
+		super(name, MetaProperty.Type.LIST);
 		containedProperty = aContainedProperty;
 	}
 

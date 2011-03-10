@@ -8,10 +8,10 @@ public class MetaContainerProperty extends MetaProperty{
 	
 	
 	public MetaContainerProperty(String name){
-		super(name, "int");
+		super(name, MetaProperty.Type.INT);
 	}
 	
-	public MetaContainerProperty(String name, String type){
+	public MetaContainerProperty(String name, MetaProperty.Type type){
 		super(name, type);
 	}
 

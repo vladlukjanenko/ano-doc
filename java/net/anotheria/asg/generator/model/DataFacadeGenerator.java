@@ -31,7 +31,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	/**
 	 * The id property.
 	 */
-	private final MetaProperty id = new MetaProperty("id","string");
+	private final MetaProperty id = new MetaProperty("id",MetaProperty.Type.STRING);
 	
 	public List<FileEntry> generate(IGenerateable gdoc){
 		MetaDocument doc = (MetaDocument)gdoc;
@@ -274,7 +274,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 			return;
 		}
 		
-		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", null, object.get"+p.getAccesserName()+"()	))");
+		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType().getName())+"Value("+quote(p.getName())+", null, object.get"+p.getAccesserName()+"()	))");
 	}
 	
 	
@@ -286,11 +286,11 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 				callArr += ", ";
 			callArr += "object.get"+p.getAccesserName(l)+"()";
 		}
-		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType())+"Value("+quote(p.getName())+", languages , "+callArr+"	))");
+		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeFor"+StringUtils.capitalize(p.getType().getName())+"Value("+quote(p.getName())+", languages , "+callArr+"	))");
 	}
 	
 	private void generateListPropertyToXMLMethods(MetaListProperty p){
-		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeForListValue("+quote(p.getName())+", " + quote(p.getContainedProperty().getType()) + ", object.get"+p.getAccesserName()+"()))");
+		appendStatement("ret.addChildNode(XMLHelper.createXMLNodeForListValue("+quote(p.getName())+", " + quote(p.getContainedProperty().getType().getName()) + ", object.get"+p.getAccesserName()+"()))");
 		
 		//Alternative variant to maintain current approach:
 		//XMLHelper.createXMLNodeForXXXValue methods to XMLHelper must be added
@@ -525,12 +525,12 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	
 	
 	private void generateBuilderListPropertyGetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), MetaProperty.Type.LIST, p.getContainedProperty());
 		generateBuilderPropertyGetterMethod(tmp);
 	}
 	
 	private void generateListPropertyGetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), MetaProperty.Type.LIST, p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
 		generatePropertyGetterMethod(tmp);
@@ -597,14 +597,14 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 
 	private void generateListPropertySetterMethods(MetaListProperty p){
-		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), MetaProperty.Type.LIST, p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
 		generatePropertySetterMethod(tmp);
 	}
 
 	private void generateBuilderListPropertySetterMethods(MetaDocument doc, MetaListProperty p){
-		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), MetaProperty.Type.LIST, p.getContainedProperty());
 		generateBuilderPropertySetterMethod(doc, tmp);
 	} 
 

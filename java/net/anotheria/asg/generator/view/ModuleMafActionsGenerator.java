@@ -38,7 +38,6 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.types.EnumTypeGenerator;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 import net.anotheria.asg.generator.util.DirectLink;
-import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SectionAction;
 import net.anotheria.asg.generator.view.meta.MetaDecorator;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
@@ -560,7 +559,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			if (elem instanceof MetaFieldElement){
 				MetaFieldElement field = (MetaFieldElement)elem;
 				MetaProperty p = doc.getField(field.getName());
-				if (p.getType().equals("image")){
+				if (p.getType() == MetaProperty.Type.IMAGE){
 					clazz.addImport("net.anotheria.webutils.filehandling.actions.FileStorage");
 					clazz.addImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
 					break;
@@ -1057,13 +1056,13 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 
          //adding additional Lock properties
         if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
-            MetaProperty prop = new MetaProperty(LockableObject.INT_LOCK_PROPERTY_NAME,"boolean");
+            MetaProperty prop = new MetaProperty(LockableObject.INT_LOCK_PROPERTY_NAME,MetaProperty.Type.BOOLEAN);
             String propertyCopy = "bean."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").isLocked())";
             appendStatement(propertyCopy);
-            prop =  new MetaProperty(LockableObject.INT_LOCKER_ID_PROPERTY_NAME,"string");
+            prop =  new MetaProperty(LockableObject.INT_LOCKER_ID_PROPERTY_NAME,MetaProperty.Type.STRING);
             propertyCopy = "bean."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").getLockerId())";
             appendStatement(propertyCopy);
-            prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,"string");
+            prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,MetaProperty.Type.STRING);
             propertyCopy = "bean."+prop.toBeanSetter()+"(NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()) +" +
 					" \" till: \" + NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout()))";
             appendStatement(propertyCopy);
@@ -1402,7 +1401,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 			if (elem instanceof MetaFieldElement){
 				MetaFieldElement field = (MetaFieldElement)elem;
 				MetaProperty p = doc.getField(field.getName());
-				if (p.getType().equals("image")){
+				if (p.getType() == MetaProperty.Type.IMAGE){
 					clazz.addImport("net.anotheria.webutils.filehandling.actions.FileStorage");
 					clazz.addImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
 					break;
@@ -1464,7 +1463,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 				}else{
 					MetaProperty p = doc.getField(field.getName());
 					//handle images.
-					if (p.getType().equals("image")){
+					if (p.getType() == MetaProperty.Type.IMAGE){
 						//will work only with one image.
 						appendString( "//handle image");
 						appendStatement("TemporaryFileHolder holder = FileStorage.getTemporaryFile(req)");
@@ -1794,13 +1793,13 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
         //adding additional Lock properties
 
 		if(isCMS){
-            MetaProperty prop = new MetaProperty(LockableObject.INT_LOCK_PROPERTY_NAME,"boolean");
+            MetaProperty prop = new MetaProperty(LockableObject.INT_LOCK_PROPERTY_NAME,MetaProperty.Type.BOOLEAN);
             String propertyCopy = "form."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").isLocked())";
             appendStatement(propertyCopy);
-            prop =  new MetaProperty(LockableObject.INT_LOCKER_ID_PROPERTY_NAME,"string");
+            prop =  new MetaProperty(LockableObject.INT_LOCKER_ID_PROPERTY_NAME,MetaProperty.Type.STRING);
             propertyCopy = "form."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").getLockerId())";
             appendStatement(propertyCopy);
-            prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,"string");
+            prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,MetaProperty.Type.STRING);
 		    propertyCopy = "form."+prop.toBeanSetter()+"(net.anotheria.util.NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()) +" +
 					" \" automatic unlock expected AT : \" + net.anotheria.util.NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout()))";
 
@@ -3153,7 +3152,7 @@ public class ModuleMafActionsGenerator extends AbstractGenerator implements IGen
 		clazz.addImport("net.anotheria.communication.service.MessagingServiceFactory");
 
 		clazz.setName(getFormActionName(form));
-		clazz.setParent(BaseActionGenerator.getBaseActionName());
+		clazz.setParent(BaseMafActionGenerator.getBaseActionName());
 
 		startClassBody();
 		appendStatement("private IMessagingService service = MessagingServiceFactory.getMessagingService()"); 

@@ -36,15 +36,15 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 	/**
 	 * The id property.
 	 */
-	MetaProperty id = new MetaProperty("id","string");
+	MetaProperty id = new MetaProperty("id",MetaProperty.Type.STRING);
 	/**
 	 * The dao created property (not included in document property set).
 	 */
-	MetaProperty daoCreated = new MetaProperty(DAO_CREATED, "long");
+	MetaProperty daoCreated = new MetaProperty(DAO_CREATED, MetaProperty.Type.LONG);
 	/**
 	 * The dao created property (not included in document property set).
 	 */
-	MetaProperty daoUpdated = new MetaProperty(DAO_UPDATED, "long");
+	MetaProperty daoUpdated = new MetaProperty(DAO_UPDATED, MetaProperty.Type.LONG);
 	
 	public List<FileEntry> generate(IGenerateable gdoc){
 		MetaDocument doc = (MetaDocument)gdoc;
@@ -206,7 +206,7 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 	}
 	
 	private MetaProperty getMetaGenericProperty(MetaListProperty p){
-		MetaProperty tmp = new MetaGenericProperty(p.getName(), "list", p.getContainedProperty());
+		MetaProperty tmp = new MetaGenericProperty(p.getName(), MetaProperty.Type.LIST, p.getContainedProperty());
 		if (p.isMultilingual())
 			tmp.setMultilingual(true);
 		return tmp;

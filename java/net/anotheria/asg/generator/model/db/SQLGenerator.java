@@ -40,8 +40,8 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		GeneratedSQLFile allCreate = new GeneratedSQLFile("create_all");
 		GeneratedSQLFile allDelete = new GeneratedSQLFile("delete_all");
 
-		MetaProperty dao_created = new MetaProperty("dao_created", "long");
-	    MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
+		MetaProperty dao_created = new MetaProperty("dao_created", MetaProperty.Type.LONG);
+	    MetaProperty dao_updated = new MetaProperty("dao_updated", MetaProperty.Type.LONG);
 
 		String tableNames = "";
 		for (MetaDocument doc : documents){
@@ -90,8 +90,8 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		startNewJob(file);
 		
 		
-	    MetaProperty dao_created = new MetaProperty("dao_created", "long");
-	    MetaProperty dao_updated = new MetaProperty("dao_updated", "long");
+	    MetaProperty dao_created = new MetaProperty("dao_created", MetaProperty.Type.LONG);
+	    MetaProperty dao_updated = new MetaProperty("dao_updated", MetaProperty.Type.LONG);
 
 		generateSQLCreate(doc, dao_created, dao_updated);
 		
@@ -130,23 +130,27 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 	 * @return
 	 */
 	private String getSQLPropertyType(MetaProperty p){
-		if (p.getType().equals("string"))
+		
+		switch (p.getType()) {
+		case STRING:
 			return "varchar";
-		if (p.getType().equals("text"))
+		case TEXT:
 			return "varchar";
-		if (p.getType().equals("long"))
+		case LONG:
 			return "int8";
-		if (p.getType().equals("int"))
+		case INT:
 			return "int";
-		if (p.getType().equals("double"))
+		case DOUBLE:
 			return "double precision";
-		if (p.getType().equals("float"))
+		case FLOAT:
 			return "float4";
-		if (p.getType().equals("boolean"))
+		case BOOLEAN:
 			return "boolean";
-		if (p instanceof MetaListProperty)
+		case LIST:
 			return getSQLPropertyType(((MetaListProperty)p).getContainedProperty()) + "[]";
-		return "UNKNOWN!";
+		default:
+			return "UNKNOWN!";
+		}
 	}
 
 	private String getSQLTableName(MetaDocument doc){

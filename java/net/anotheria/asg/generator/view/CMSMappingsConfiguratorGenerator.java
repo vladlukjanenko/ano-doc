@@ -15,6 +15,7 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.view.jsp.JspMafGenerator;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
@@ -122,7 +123,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		public String getViewPath(MetaModuleSection section){
-			return "/" + FileEntry.package2path(JspMafViewGenerator.getPackage(section.getModule())) + "/";
+			return "/" + FileEntry.package2path(JspMafGenerator.getPackage(section.getModule())) + "/";
 		}
 		
 		public String getViewFullName(MetaModuleSection section){
@@ -213,7 +214,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		public String getViewName(MetaDocument doc, MetaContainerProperty container){
-			return JspMafViewGenerator.getContainerPageName(doc, container);
+			return JspMafGenerator.getContainerPageName(doc, container);
 		}
 		
 	}
@@ -370,7 +371,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 			return;
 		MetaDocument doc = section.getDocument();
 		String actionsPackage = ModuleMafActionsGenerator.getPackage(doc);
-		String jspPath = FileEntry.package2fullPath(JspMafViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspMafViewGenerator.getPackage(doc)).indexOf('/'))+"/";
+		String jspPath = FileEntry.package2fullPath(JspMafGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspMafGenerator.getPackage(doc)).indexOf('/'))+"/";
 		
 		
 		for(ContainerAction action: ContainerAction.values()){

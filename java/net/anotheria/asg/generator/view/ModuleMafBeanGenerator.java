@@ -150,10 +150,10 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 		}
 		
 		List<MetaProperty> elements = new ArrayList<MetaProperty>();
-		elements.add(new MetaProperty("ownerId","string"));
-		elements.add(new MetaProperty("position","int"));
+		elements.add(new MetaProperty("ownerId",MetaProperty.Type.STRING));
+		elements.add(new MetaProperty("position",MetaProperty.Type.INT));
 		elements.add(list.getContainedProperty());
-		elements.add(new MetaProperty("description","string"));
+		elements.add(new MetaProperty("description",MetaProperty.Type.STRING));
 
 		clazz.setName(getContainerEntryFormName(list));
 		clazz.addInterface("FormBean");
@@ -163,7 +163,7 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 			MetaProperty p = elements.get(i);
 			appendStatement("private "+p.toJavaType()+" "+p.getName());
 			if (p.isLinked() || p instanceof MetaEnumerationProperty){
-				MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
+				MetaProperty collection = new MetaProperty(p.getName()+"Collection",MetaProperty.Type.LIST);
 				appendString("@SuppressWarnings(\"unchecked\")");
 				appendStatement("private "+collection.toJavaType()+" "+collection.getName());
 			}
@@ -211,8 +211,8 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 
 		startClassBody();
 		List<MetaProperty> columns = (List<MetaProperty>)((ArrayList)p.getColumns()).clone();
-		columns.add(0, new MetaProperty(p.getName()+"_ownerId", "string"));
-		columns.add(0, new MetaProperty(p.getName()+"_position", "int"));
+		columns.add(0, new MetaProperty(p.getName()+"_ownerId", MetaProperty.Type.STRING));
+		columns.add(0, new MetaProperty(p.getName()+"_position", MetaProperty.Type.INT));
 		for (MetaProperty pr : columns)
 			appendStatement("private String "+p.extractSubName(pr));
 		
@@ -283,16 +283,16 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 				String lang = getElementLanguage(field);
 				
 				MetaProperty p = doc.getField(field.getName());
-				MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
+				MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),MetaProperty.Type.INT): p;
 				appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
 				if (p.isLinked()){
-					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),"list");
+					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),MetaProperty.Type.LIST);
 					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
 					appendStatement("private String "+p.getName()+"CurrentValue"+(lang==null?"":lang));
 				}
 				
 				if (p instanceof MetaEnumerationProperty){
-					MetaProperty collection = new MetaProperty(p.getName()+"Collection","list");
+					MetaProperty collection = new MetaProperty(p.getName()+"Collection",MetaProperty.Type.LIST);
 					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
 					appendStatement("private String "+p.getName()+"CurrentValue");
 				}
@@ -313,9 +313,9 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 			generateFieldMethodsInDialog(multilingualInstanceDisabledElement, doc);
 		}
         // add fields!!!! Lock!!!
-        generateAdditionalFields(doc,"locked","boolean","LockableObject \"locked\" property. For object Locking.");
-        generateAdditionalFields(doc,"lockerId","string","LockableObject \"lockerId\" property. For userName containing.");
-        generateAdditionalFields(doc,"lockingTime","string","LockableObject \"lockingTime\" property.");
+        generateAdditionalFields(doc,"locked",MetaProperty.Type.BOOLEAN,"LockableObject \"locked\" property. For object Locking.");
+        generateAdditionalFields(doc,"lockerId",MetaProperty.Type.STRING,"LockableObject \"lockerId\" property. For userName containing.");
+        generateAdditionalFields(doc,"lockingTime",MetaProperty.Type.STRING,"LockableObject \"lockingTime\" property.");
         
         emptyline();
 		
@@ -354,14 +354,14 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
 			if (p.isMultilingual()){
 				String l = getElementLanguage(element);
 				generateMethods(new MultilingualFieldElement(l, pColl), new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
-				generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", "string"));
+				generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", MetaProperty.Type.STRING));
 			}else{
 				generateMethods(pColl, new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
-				generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", "string"));
+				generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", MetaProperty.Type.STRING));
 			}
 			
 		}
-		MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),"int"): p;
+		MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),MetaProperty.Type.INT): p;
 		generateMethods(element, tmp);
 	}
 	
@@ -372,7 +372,7 @@ public class ModuleMafBeanGenerator extends AbstractGenerator implements IGenera
      * @param fieldType field type
      * @param comment comment for the field
      */
-    private void generateAdditionalFields(MetaDocument doc, String fieldName, String fieldType, String comment) {
+    private void generateAdditionalFields(MetaDocument doc, String fieldName, MetaProperty.Type fieldType, String comment) {
         if (doc.getParentModule().getStorageType().equals(StorageType.CMS)) {
             MetaFieldElement fieldElement = new MetaFieldElement(fieldName);
             MetaProperty maField = new MetaProperty(fieldElement.getName(),fieldType);
@@ -617,9 +617,9 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 		
 
         // add fields!!!! Lock!!!
-        generateAdditionalFields(doc, "locked", "boolean", "LockableObject \"locked\" property. For object Locking.");
-        generateAdditionalFields(doc, "lockerId", "string", "LockableObject \"lockerId\" property. For userName containing.");
-        generateAdditionalFields(doc, "lockingTime", "string", "LockableObject \"lockingTime\" property.");
+        generateAdditionalFields(doc, "locked", MetaProperty.Type.BOOLEAN, "LockableObject \"locked\" property. For object Locking.");
+        generateAdditionalFields(doc, "lockerId", MetaProperty.Type.STRING, "LockableObject \"lockerId\" property. For userName containing.");
+        generateAdditionalFields(doc, "lockingTime", MetaProperty.Type.STRING, "LockableObject \"lockingTime\" property.");
 
 
         if (containsComparable){
@@ -636,7 +636,7 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 	}
 
 	private void generateFunctionMethods(MetaFunctionElement function){
-		generateMethods(function, new MetaProperty(function.getPropertyName(), "string"));
+		generateMethods(function, new MetaProperty(function.getPropertyName(), MetaProperty.Type.STRING));
 	}
 
 	private void generateCompareMethod(MetaDocument doc, List<MetaViewElement> elements){
@@ -676,7 +676,7 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 		
 		MetaProperty p = doc.getField(element.getName());
 		if (p instanceof MetaEnumerationProperty){
-			MetaProperty tmp = new MetaProperty(p.getName(), "string");
+			MetaProperty tmp = new MetaProperty(p.getName(), MetaProperty.Type.STRING);
 			generateMethods(element, tmp);
 			return;
 		}
@@ -694,7 +694,7 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 			tmpForSorting.setName(tmpForSorting.getName()+"ForSorting");
 			generateMethods(element, tmpForSorting);
 			//if this field has a decorator we have to generate string methods instaed of original methods.
-			p = new MetaProperty(p.getName(), "string", p.isMultilingual());
+			p = new MetaProperty(p.getName(), MetaProperty.Type.STRING, p.isMultilingual());
 		}
 		
 		generateMethods(element, p);
@@ -726,7 +726,7 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 		private void generateMethodsMultilinguage(MultilingualFieldElement element, MetaProperty p){
 		
 		//System.out.println("--- m "+p+", "+p.getType());
-		if (p.getType().equals("list"))
+		if (p.getType() == MetaProperty.Type.LIST)
 			appendString("@SuppressWarnings(\"unchecked\")");
 		appendString("public void "+p.toBeanSetter(element.getLanguage())+"("+p.toJavaType()+" "+p.getName()+" ){");
 		increaseIdent();
@@ -734,7 +734,7 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 		append(closeBlock());			
 		emptyline();
 			
-		if (p.getType().equals("list"))
+		if (p.getType() == MetaProperty.Type.LIST)
 			appendString("@SuppressWarnings(\"unchecked\")");
 		appendString("public "+p.toJavaType()+" "+p.toBeanGetter(element.getLanguage())+"(){");
 		increaseIdent();

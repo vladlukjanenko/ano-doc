@@ -9,8 +9,6 @@ import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.Generator;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.forms.meta.MetaForm;
 import net.anotheria.asg.generator.meta.MetaContainerProperty;
 import net.anotheria.asg.generator.meta.MetaDocument;
@@ -18,7 +16,6 @@ import net.anotheria.asg.generator.meta.MetaListProperty;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
-import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
@@ -30,7 +27,8 @@ import net.anotheria.util.StringUtils;
  * Generator for the 'struts-config.xml' files.
  * @author another
  */
-public class StrutsConfigGenerator extends AbstractGenerator implements IGenerator {
+public class StrutsConfigGenerator extends AbstractGenerator{
+	
 	/**
 	 * Placeholder in the struts-config.xml where to place the mappings.
 	 */
@@ -157,34 +155,6 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	 * The view which is being generated.
 	 */
 	private MetaView view;
-
-	/* (non-Javadoc)
-	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)
-	 */
-	public List<FileEntry> generate(IGenerateable g) {
-		List<FileEntry> files = new ArrayList<FileEntry>();
-	
-		view = (MetaView)g;
-		
-		String mappings = generateMappings(view);
-		String file = "";
-		try{
-			file = IOUtils.readFileAtOnceAsString(Generator.getBaseDir()+TEMPLATE);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		String fileContent = StringUtils.replaceOnce(file, MAPPINGS_PLACEHOLDER, mappings);
-		
-		//forms
-		String forms = generateForms(view);
-		fileContent = StringUtils.replaceOnce(fileContent, FORMS_PLACEHOLDER, forms); 
-	
-		FileEntry entry = new FileEntry("/etc/appdata", getConfigFileName(view), fileContent);
-		entry.setType(".xml");
-		files.add(entry);
-		
-		return files;
-	}
 	
 	/**
 	 * UserSettings struts configuration generator
@@ -326,34 +296,6 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	}
 	
 	
-	
-	private String generateMappings(MetaView view){
-		increaseIdent();
-		increaseIdent();
-		String ret = "";
-		
-		List<MetaSection> sections = view.getSections();
-		for (int i=0; i<sections.size(); i++){
-			MetaSection s = sections.get(i);
-			if (!(s instanceof MetaModuleSection))
-				continue;
-			MetaModuleSection section = (MetaModuleSection)s;
-			ret += generateMappingsForSection(section);
-			MetaDocument doc = section.getDocument();
-			for (int p=0; p<doc.getProperties().size(); p++){
-				MetaProperty pp = doc.getProperties().get(p);
-				if (pp instanceof MetaContainerProperty){
-					ret += generateContainerMappings(doc, (MetaContainerProperty)pp);
-				}
-			}
-		}
-		
-		decreaseIdent();
-		decreaseIdent();
-		
-		return ret;
-	}
-	
 	/**
 	 * UserSettings mappings generator
 	 */
@@ -417,264 +359,6 @@ public class StrutsConfigGenerator extends AbstractGenerator implements IGenerat
 	    return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(property.getName())+nameAddy+"Form";
 	}
 
-	private String generateContainerMappings(MetaDocument doc, MetaContainerProperty container){
-	    String ret = "";
-	    
-	    if (ModuleActionsGenerator.USE_MULTIOP_ACTIONS){
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_SHOW),
-		            ModuleActionsGenerator.getPackage(doc)+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-		            );
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_DELETE),
-		            ModuleActionsGenerator.getPackage(doc)+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-		            );
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_MOVE),
-		            ModuleActionsGenerator.getPackage(doc )+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-		            );
-		
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_ADD),
-		            ModuleActionsGenerator.getPackage(doc)+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-		            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-		            getContainerEntryFormName(doc, container)
-		            );
-		    
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_QUICK_ADD),
-		            ModuleActionsGenerator.getPackage(doc)+"."+ModuleActionsGenerator.getContainerMultiOpActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-		            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-		            getContainerQuickAddFormName(doc, container)
-		            );
-	    }else{
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_SHOW),
-		            ModuleActionsGenerator.getPackage( doc)+"."+ModuleActionsGenerator.getContainerShowActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage( doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-		            );
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_DELETE),
-		            ModuleActionsGenerator.getPackage(doc)+"."+ModuleActionsGenerator.getContainerDeleteEntryActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-		            );
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_MOVE),
-		            ModuleActionsGenerator.getPackage(doc )+"."+ModuleActionsGenerator.getContainerMoveEntryActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp"
-		            );
-		
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_ADD),
-		            ModuleActionsGenerator.getPackage(doc)+"."+ModuleActionsGenerator.getContainerAddEntryActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-		            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-		            getContainerEntryFormName(doc, container)
-		            );
-		    
-		    ret += generateActionMapping(
-		            "/"+getContainerPath(doc, container, ACTION_QUICK_ADD),
-		            ModuleActionsGenerator.getPackage(doc)+"."+ModuleActionsGenerator.getContainerQuickAddActionName(doc, container),
-		            "success",
-		            FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(doc)).indexOf('/'))+"/"+JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-		            JspViewGenerator.getContainerPageName(doc, container)+".jsp",
-		            getContainerQuickAddFormName(doc, container)
-		            );
-	    }
-	    return ret;
-	}
-	
-	private String generateMappingsForSection(MetaModuleSection section){
-		String ret = "";
-
-		MetaModule module = section.getModule();
-		MetaDocument doc  = section.getDocument();
-		
-		ret += writeEmptyline();
-		ret += writeString("<!-- Generating mapping for "+module.getName()+"."+doc.getName()+" -->");
-		ret += writeEmptyline();
-		
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_SHOW), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getShowActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
-			);
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_SEARCH), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getSearchActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(MetaModule.SHARED)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getSearchResultPageName()+".jsp"
-			);
-		
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_EXPORT+SUFFIX_CSV), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getExportActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getExportAsCSVPageName(doc)+".jsp"
-			);
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_EXPORT+SUFFIX_XML), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getExportActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getExportAsXMLPageName(doc)+".jsp"
-			);
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_DELETE), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
-			);
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_DUPLICATE), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
-			);
-		ret += generateActionMapping(
-				"/"+getPath(doc, ACTION_LINKS_TO_ME), 
-				ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getEditActionName(section),
-				"success",
-				FileEntry.package2fullPath(JspViewGenerator.getPackage( module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getLinksToMePageName(doc)+".jsp"
-				);
-
-
-		if (doc.getLinks().size()>0){
-			ret += generateActionMapping(
-					"/"+getPath(doc, ACTION_SHOW_QUERIES), 
-					ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getShowQueryActionName(section),
-					"success",
-					FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowQueriesPageName(doc)+".jsp"
-					);
-			ret += generateActionMapping(
-					"/"+getPath(doc, ACTION_EXECUTE_QUERY), 
-					ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getExecuteQueryActionName(section),
-					"success",
-					FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
-					);
-		}
-		
-		boolean generateWithForms = false;
-		MetaDialog dialog = null;
-		if (section instanceof MetaModuleSection){
-			MetaModuleSection m = (MetaModuleSection)section;
-			List<MetaDialog> dialogs = m.getDialogs();
-			if (dialogs.size()>0){
-				generateWithForms = true;
-				dialog = dialogs.get(0);
-			}
-				
-		}
-		
-		if (generateWithForms){
-			ret += generateActionMapping(
-				"/"+getPath(doc, ACTION_CREATE), 
-				ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getCreateActionName(section),
-				"success",
-				FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp",
-				JspViewGenerator.getEditPageName(doc)+".jsp",
-				getDialogFormName(dialog, doc)				
-				);
-			ret += generateActionMapping(
-				"/"+getPath(doc, ACTION_UPDATE), 
-				ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-				"success",
-				FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp",
-				JspViewGenerator.getEditPageName(doc)+".jsp",
-				getDialogFormName(dialog, doc)				
-				);
-		}else{
-			ret += generateActionMapping(
-				"/"+getPath(doc, ACTION_CREATE), 
-				ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getCreateActionName(section),
-				"success",
-				FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
-				);
-			ret += generateActionMapping(
-				"/"+getPath(doc, ACTION_UPDATE), 
-				ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-				"success",
-				FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
-				);
-			
-		}
-		
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_NEW), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getNewActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
-			);
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_EDIT), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getEditActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
-			);
-
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_CLOSE), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getShowPageName(doc)+".jsp"
-			);
-
-         //lock && unlock actions
-		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
-           ret+=generateActionMapping("/"+getPath(doc,ACTION_LOCK),
-                   ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-                   "success",
-                   FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp");
-
-            ret+=generateActionMapping("/"+getPath(doc,ACTION_UNLOCK),
-                   ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-                   "success",
-                   FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp");
-        }
-		
-		if (GeneratorDataRegistry.hasLanguageCopyMethods(doc)){
-			ret += generateActionMapping(
-					"/"+getPath(doc, ACTION_COPY_LANG), 
-					ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-					"success",
-					FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
-					);
-			ret += generateActionMapping(
-					"/"+getPath(doc, ACTION_SWITCH_MULTILANGUAGE_INSTANCE), 
-					ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-					"success",
-					FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getEditPageName(doc)+".jsp"
-					);
-		}
-		
-		ret += generateActionMapping(
-			"/"+getPath(doc, ACTION_VERSIONINFO), 
-			ModuleActionsGenerator.getPackage(module)+"."+ModuleActionsGenerator.getMultiOpDialogActionName(section),
-			"success",
-			FileEntry.package2fullPath(JspViewGenerator.getPackage(MetaModule.SHARED)).substring(FileEntry.package2fullPath(JspViewGenerator.getPackage(module)).indexOf('/'))+"/"+JspViewGenerator.getVersionInfoPageName(doc)+".jsp"
-			);
-		
-		ret += writeEmptyline();
-		ret += writeString("<!-- Finished mapping for "+module.getName()+"."+doc.getName()+" -->");
-		ret += writeEmptyline();
-
-		
-		return ret;
-	}
 	
 	/**
 	 * Creates an action mapping.
