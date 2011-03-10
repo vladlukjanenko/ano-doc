@@ -5,14 +5,11 @@ import java.io.IOException;
 import java.util.List;
 
 import net.anotheria.asg.generator.apputil.AppUtilGenerator;
-import net.anotheria.asg.generator.forms.FormsGenerator;
-import net.anotheria.asg.generator.forms.meta.MetaForm;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.parser.XMLContextParser;
 import net.anotheria.asg.generator.parser.XMLDataParser;
 import net.anotheria.asg.generator.parser.XMLDecoratorsParser;
 import net.anotheria.asg.generator.parser.XMLFiltersParser;
-import net.anotheria.asg.generator.parser.XMLFormParser;
 import net.anotheria.asg.generator.parser.XMLPreprocessor;
 import net.anotheria.asg.generator.parser.XMLTypesParser;
 import net.anotheria.asg.generator.parser.XMLViewParser;
@@ -119,21 +116,8 @@ public class Generator {
 			System.out.println("VIEW_CONTENT = NULL");
 		}
 		
-		long s9 = System.currentTimeMillis();
-		
-		
-		try{
-			String formContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/forms_def.xml"));
-			List<MetaForm> forms = XMLFormParser.parseForms(formContent);
-			FormsGenerator fg = new FormsGenerator();
-			fg.generate("java", forms);
-			//System.out.println(forms); 
-		}catch(Exception e){}
-		
-		long s10 = System.currentTimeMillis();
-
 		System.out.println("DONE.");
-		printTime("Total ", s10, s1);
+		printTime("Total ", s8, s1);
 		
 		if (false){
 			printTime("Till s2", s2, s1);
@@ -143,8 +127,6 @@ public class Generator {
 			printTime("Till s6", s6, s1);
 			printTime("Till s7", s7, s1);
 			printTime("Till s8", s8, s1);
-			printTime("Till s9", s9, s1);
-			printTime("Till s10", s10, s1);
 			
 			printTime("s2", s2, s1);
 			printTime("s3", s3, s2);
@@ -153,8 +135,6 @@ public class Generator {
 			printTime("s6", s6, s5);
 			printTime("s7", s7, s6);
 			printTime("s8", s8, s7);
-			printTime("s9", s9, s8);
-			printTime("s10", s10, s9);
 		}
 		// */
 	}
