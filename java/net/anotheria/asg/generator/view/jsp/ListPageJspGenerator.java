@@ -84,7 +84,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<h2>Add new item</h2>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 
-		appendString("<table class=\"pages_table\" width=" + quote("100%") + " cellspacing=" + quote("1") + " cellpadding=" + quote("1") + " border="
+		appendString("<table class=\"cmsList pages_table\" width=" + quote("100%") + " cellspacing=" + quote("1") + " cellpadding=" + quote("1") + " border="
 				+ quote("0") + ">");
 		appendString("<thead>");
 		appendString("<tr class=" + quote("lineCaptions") + ">");
@@ -99,7 +99,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<logic:iterate name=" + quote("elements") + " id=" + quote("element") + " type="
 				+ quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, list)) + " indexId=" + quote("ind") + ">");
 		increaseIdent();
-		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
+		appendString("<tr class=\"cmsElement<%=ind.intValue()%2==0 ? \" lineLight\" : \" lineDark\"%> highlightable\">");
 		increaseIdent();
 		appendString("<td><bean:write name=" + quote("element") + " property=" + quote("position") + " filter=\"true\"/></td>");
 
@@ -119,7 +119,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		} else if (p.getType() == MetaProperty.Type.IMAGE) {
 			String imageName = "<bean:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/>";
 			String imagePath = "getFile?pName=" + imageName;
-			appendString("<td><a href=" + quote(imagePath) + " target=\"_blank\"><img src=" + quote(imagePath) + "alt=" + quote(imageName) + " width=\"50\" height=\"50\" border=\"0\">" + "</a></td>");
+			appendString("<td><a href=" + quote(imagePath) + " target=\"_blank\"><img src=" + quote(imagePath) + "alt=" + quote(imageName) + " class=\"thumbnail\">" + "</a></td>");
 			appendString("<td>" + imageName + "<bean:write name=" + quote("element") + " property=" + quote("description") + " filter=\"true\"/></td>");
 		} else {
 			appendString("<td><bean:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></td>");
@@ -205,12 +205,12 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 
 	private String getImageEditor(MetaProperty p){
 		String ret ="";
-		ret += "<div id=\"file-uploader-" + p.getName() + "\"><!-- --></div>\r";
+		ret += "<div id=\"file-uploader-" + p.getName() + "\" class=\"image_uploader\"><!-- --></div>\r";
 		ret += "<script>\r";
 		ret += "$(document).ready(function() {\r";
 		ret += "	var uploader = new qq.FileUploader({\r";
 		ret += "	    element: document.getElementById('file-uploader-" + p.getName() +"'),\r";
-		ret += "	    action: '/blackstone/cms/fileUpload',\r";
+		ret += "	    action: '${pageContext.request.contextPath}/cms/fileUpload',\r";
 		ret += "	    params: {\r";
 		ret += "	    	property: '" + p.getName() + "'\r";
 	    ret += "	    }\r";

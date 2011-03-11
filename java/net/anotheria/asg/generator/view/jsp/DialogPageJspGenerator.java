@@ -255,7 +255,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			appendString("</logic:equal>");
 		}
 
-		appendString("<form name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()))
+		appendString("<form class=\"cmsDialog\" name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()))
 				+ " method=\"post\" action=" + quote(CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_UPDATE)) + ">");
 		appendIncreasedString("<input type=" + quote("hidden") + " name=" + quote("_ts") + " value=" + quote("<%=System.currentTimeMillis()%>") + ">");
 		appendIncreasedString("<input type=" + quote("hidden") + " name=" + quote(ModuleBeanGenerator.FLAG_FORM_SUBMITTED) + " value=" + quote("true") + ">");
@@ -338,7 +338,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 						+ "\" value=\"false\">style=\"display:none\"</logic:equal> class=\"lang_hide lang_" + multilangualElement.getLanguage() + "\"";
 			}
 
-			appendString("<tr " + displayLanguageCheck + ">");
+			appendString("<tr class=\"cmsProperty\"" + displayLanguageCheck + ">");
 			increaseIdent();
 			increaseIdent();
 			appendString("<td align=\"right\">");
@@ -572,13 +572,20 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	
 
 	private String getImageEditor(MetaFieldElement element, MetaProperty p){
+		String beanName = CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument());
+		String propertyWriter = "<bean:write name="+quote(beanName)+" property="+quote(p.getName()) + "/>";
 		String ret ="";
-		ret += "<div id=\"file-uploader-" + p.getName() + "\"><!-- --></div>\r";
+		ret += "<logic:present name="+quote(beanName)+" property="+quote(p.getName()) + ">\r";
+		ret += "<a target=\"_blank\" href=\"getFile?pName=" + propertyWriter + "\"><img class=\"thumbnail\" alt=" + quote(propertyWriter) + " src=\"getFile?pName=" + propertyWriter + "\"></a>\r";
+		ret += "</logic:present>\r";
+		ret += "&nbsp;<i><bean:write name=\"description." + p.getName() + "\" ignore=\"true\"/></i>\r";
+		
+		ret += "<div id=\"file-uploader-" + p.getName() + "\" class=\"image_uploader\"><!-- --></div>\r";
 		ret += "<script>\r";
 		ret += "$(document).ready(function() {\r";
 		ret += "	var uploader = new qq.FileUploader({\r";
 		ret += "	    element: document.getElementById('file-uploader-" + p.getName() +"'),\r";
-		ret += "	    action: '/blackstone/cms/fileUpload',\r";
+		ret += "	    action: '${pageContext.request.contextPath}/cms/fileUpload',\r";
 		ret += "	    params: {\r";
 		ret += "	    	property: '" + p.getName() + "'\r";
 	    ret += "	    }\r";
@@ -610,8 +617,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			ret += "checked</logic:equal>";
 		}
 		else {
-			ret += " value=\"<bean:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang));
-			ret += "/>\"";
+			ret += " value=\"<bean:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang)) + "/>\"";
 		}
 		if (element.isReadonly())
 			ret += " readonly="+quote("true");

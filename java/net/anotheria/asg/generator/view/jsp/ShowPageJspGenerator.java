@@ -199,7 +199,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		
 	//main table start
 		appendString("<div class=\"scroll_x\">");
-		appendString("<table cellspacing=\"1\" cellpadding=\"1\" width=\"100%\" border=\"0\" class=\"pages_table\">");
+		appendString("<table cellspacing=\"1\" cellpadding=\"1\" width=\"100%\" border=\"0\" class=\"cmsShow pages_table\">");
 		increaseIdent();
 			appendString("<thead>");
 			appendString("<tr class=\"lineCaptions\">");
@@ -222,7 +222,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 				String entryName = doc.getName().toLowerCase();
 				appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+" indexId=\"ind\">");
 				increaseIdent();
-					appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
+					appendString("<tr class=\"cmsDocument <%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
 					opened = false;
 				        for (int i = 0; i < elements.size(); i++) {
 				            MetaViewElement element = elements.get(i);
@@ -394,7 +394,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		ret += "</logic:equal>";
 		ret += "<logic:notEqual name="+quote(entryName)+" property="+quote(element.getName())+" value="+quote("")+">";
 		String imagePath = "getFile?pName=<bean:write name="+quote(entryName)+" property="+quote(element.getName())+"/>";
-		ret += "<a href="+quote(imagePath)+" target="+quote("_blank")+"><img src="+quote(imagePath)+ " width="+quote(50)+" height="+quote(50)+" border="+quote(0)+"></a>";
+		ret += "<a href="+quote(imagePath)+" target="+quote("_blank")+"><img src="+quote(imagePath)+ " class=\"thumbnail\"></a>";
 		ret += "</logic:notEqual>";
 		ret += "</td>";
 		return ret;
