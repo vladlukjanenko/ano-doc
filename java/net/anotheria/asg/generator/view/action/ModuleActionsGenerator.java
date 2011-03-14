@@ -1677,6 +1677,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 		clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
+		clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperRegistry");
 		if (doc.isMultilingual())
 			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
 		
@@ -1876,13 +1877,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
 		
 		//add field descriptions ...
-		appendStatement("String fieldDescription = null");
-		for (MetaProperty p : doc.getProperties()){
-			appendStatement("fieldDescription = CMSViewHelperUtil.getFieldExplanation("+quote(doc.getParentModule().getName()+"."+doc.getName())+ ", "+doc.getVariableName()+", "+quote(p.getName())+")");
-			appendString( "if (fieldDescription!=null && fieldDescription.length()>0)");
-			appendIncreasedStatement("req.setAttribute("+quote("description."+p.getName())+", fieldDescription)");
-		}
-	
+		emptyline();
+		appendStatement("addFieldExplanations(req, "+doc.getVariableName()+")");
+		emptyline();
+		
 	    if (backlinks.size()>0){
 			emptyline();
 			appendCommentLine("Generating back link handling...");
@@ -1894,6 +1892,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		appendStatement("return mapping.findForward(\"success\")");
 		append(closeBlock()); 
+		emptyline();
+		
+		appendAddFieldExplanationsMethod(doc);
 		emptyline();
 		
 		Context context = GeneratorDataRegistry.getInstance().getContext();
@@ -2054,6 +2055,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//write imports...
 		addStandardActionImports(clazz);
 		clazz.addImport(ModuleBeanGenerator.getDialogBeanImport(dialog, doc));
+		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
+		clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
+		clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperRegistry");
 	    
 		//check if we have to import list.
 		for (MetaViewElement element : elements) {
@@ -2144,11 +2148,35 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
 		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+" , "+quote("Apply")+")");
 		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
-
+		
+		//add field descriptions ...
+		emptyline();
+		appendStatement("addFieldExplanations(req, null)");	
+		emptyline();
+		
 		appendStatement("return mapping.findForward(\"success\")");
-		append(closeBlock());
-
+		closeBlock("");
+		
+		emptyline();
+		appendAddFieldExplanationsMethod(doc);
+		
 		return clazz;
+	}
+	
+	private void appendAddFieldExplanationsMethod(MetaDocument doc) {
+		appendString("private void addFieldExplanations(HttpServletRequest req, "+doc.getName()+" "+doc.getVariableName()+") {");
+		increaseIdent();
+		appendString("if (!CMSViewHelperRegistry.getCMSViewHelpers("+quote(doc.getParentModule().getName()+"."+doc.getName())+").isEmpty()) {");
+		increaseIdent();
+		appendStatement("String fieldDescription = null");
+		for (MetaProperty p : doc.getProperties()) {
+			appendStatement("fieldDescription = CMSViewHelperUtil.getFieldExplanation("+quote(doc.getParentModule().getName()+"."+doc.getName())+ ", "+doc.getVariableName()+", "+quote(p.getName())+")");
+			appendString( "if (fieldDescription!=null && fieldDescription.length()>0)");
+			appendIncreasedStatement("req.setAttribute("+quote("description."+p.getName())+", fieldDescription)");
+		}
+		closeBlock("");
+		closeBlock("addFieldExplanations END");
+		emptyline();
 	}
 
 	/**
