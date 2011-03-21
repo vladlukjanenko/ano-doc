@@ -28,7 +28,7 @@ public class SimpleContainsStringQueryTest {
 
 		assertEquals(7, doc.getProperties().size());
 
-		DocumentQuery query = new ContainsWordsQuery(criteria);
+		DocumentQuery query = new SimpleContainsStringQuery(criteria);
 		List<QueryResultEntry> result = query.match(doc);
 		assertEquals(5, result.size());
 		

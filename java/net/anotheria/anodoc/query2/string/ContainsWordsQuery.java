@@ -3,22 +3,97 @@ package net.anotheria.anodoc.query2.string;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
 
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Property;
+import net.anotheria.anodoc.data.StringProperty;
 import net.anotheria.anodoc.query2.DocumentQuery;
 import net.anotheria.anodoc.query2.QueryResultEntry;
 import net.anotheria.asg.data.DataObject;
+import net.anotheria.util.IOUtils;
 import net.anotheria.util.StringUtils;
 
-public class ContainsWordsQuery implements DocumentQuery{
+import org.apache.log4j.Logger;
 
-	public static final int OFFSET = 40;
+public class ContainsWordsQuery implements DocumentQuery{
+	
+	public static class Index{
+		Map<String, Occurrenece> index = new HashMap<String, ContainsWordsQuery.Occurrenece>();
+		int size = 0;
+		
+		public void indexWord(String word, int position){
+			if(index.containsKey(word))
+				index.get(word).addOccurrence(position);
+			else
+				index.put(word, new Occurrenece(position));
+			size = Math.max(size, position);
+		}
+		
+		public boolean containsWord(String word){
+			return index.containsKey(word);
+		}
+		
+		public Occurrenece getWordOccuerrence(String word){
+			return index.get(word);
+		}
+		
+		public String rebuildText(){
+			StringBuilder builder = new StringBuilder();
+			for(int i = 1; i <= size; i++){
+				for(String word: index.keySet()){
+					Occurrenece occurrenece = index.get(word);
+					if(occurrenece.containsPosistion(i))
+						builder.append(word).append(" ");
+				}
+			}
+			return builder.toString();
+		}
+		
+		@Override
+		public String toString() {
+			return "Index [size=" + size + ", index=" + index + "]";
+		}
+	}
+	
+	private static class Occurrenece{
+		private Set<Integer> positions = new HashSet<Integer>();
+
+		public Occurrenece(int aFirstPosition){
+			positions.add(aFirstPosition);
+		}
+		
+		
+		public void addOccurrence(int position){
+			positions.add(position);
+		}
+
+		public boolean containsPosistion(int position){
+			return positions.contains(position);
+		}
+
+		@Override
+		public String toString() {
+			return "Occurrenece [positions=" + positions + "]";
+		}
+		
+	}
+	
+	public static final Map<String, String> WORDS_SEPARATORS = new HashMap<String, String>();
+	static{
+		WORDS_SEPARATORS.put("\n", " ");
+		WORDS_SEPARATORS.put("\t", " ");
+		WORDS_SEPARATORS.put(".", " ");
+		WORDS_SEPARATORS.put(",", " ");
+		WORDS_SEPARATORS.put("!", " ");
+		WORDS_SEPARATORS.put("?", " ");
+		WORDS_SEPARATORS.put("-", " ");
+		WORDS_SEPARATORS.put("_", " ");
+	}
 	
 	private static final Logger log = Logger.getLogger(ContainsWordsQuery.class);
 
@@ -30,7 +105,9 @@ public class ContainsWordsQuery implements DocumentQuery{
 	}
 	
 	public ContainsWordsQuery(String aCriteria, String... aPropertiesToSearch){
-		criteria = StringUtils.tokenize(aCriteria.toLowerCase(),' ');
+		aCriteria = aCriteria.toLowerCase().trim();
+		aCriteria = StringUtils.replace(aCriteria, WORDS_SEPARATORS);
+		criteria = StringUtils.tokenize(aCriteria,' ');
 		propertiesToSearch = new HashSet<String>();
 		for(String prop: aPropertiesToSearch)
 			propertiesToSearch.add(prop);
@@ -39,59 +116,85 @@ public class ContainsWordsQuery implements DocumentQuery{
   
 	public List<QueryResultEntry> match(DataObject obj) {
 		log.debug("Match DataObject  " + obj.getDefinedName() + " with ID " + obj.getId() + "." + this);
-		List<QueryResultEntry> ret = new ArrayList<QueryResultEntry>();
 		if (!(obj instanceof Document))
 			throw new AssertionError("Supports only search in a Document instance!");
-		Document doc = (Document)obj;
+		return match((Document)obj);
+	}
+	
+	public List<QueryResultEntry> match(Document doc) {
+		List<QueryResultEntry> ret = new ArrayList<QueryResultEntry>();
 		List<Property> properties = doc.getProperties();
-			
+		
+		Set<String> matchRegression = new HashSet<String>(Arrays.asList(criteria));
+		int i = 0;
 		for (Property p: properties){
-			QueryResultEntry entry = matchProperty(doc, p);
-			if(entry != null)
-				ret.add(entry);
+			i++;
+			Index propertyIndex = buildPropertyIndex(p);
+			Set<String> toRemove = new HashSet<String>();
+			for(String match: matchRegression)
+				if(propertyIndex.containsWord(match))
+					toRemove.add(match);
+			matchRegression.removeAll(toRemove);
+			
+			if(matchRegression.isEmpty()){
+				QueryResultEntry res = new QueryResultEntry();
+				res.setMatchedDocument(doc);
+				res.setMatchedProperty(p);
+				//TODO: sophisticated relevance calculation
+				res.setRelevance(100/i);
+				ret.add(res);
+				return ret;
+			}
 		}
 		return ret;
 	}
-
-	private QueryResultEntry matchProperty(Document doc, Property p){
-		//If is not property to search then check next property. Empty properties to search is any.
-		if(propertiesToSearch.size() > 0 && !propertiesToSearch.contains(p.getId()))
-			return null;
+	
+	private Index buildPropertyIndex(Property p){
+		Index ret = new Index();
+		String valueStr = p.getValue().toString().toLowerCase().trim();
+		if(StringUtils.isEmpty(valueStr))
+			return ret;
 		
-		if(p == null || p.getValue() == null){
-			log.debug("Wrong property: " + p);
-			return null;
+		valueStr = StringUtils.removeChar(valueStr, '\r');
+		valueStr = StringUtils.replace(valueStr, WORDS_SEPARATORS);
+		String[] wordTokens = StringUtils.tokenize(valueStr, true, ' ');
+		
+		for(int i = 0; i < wordTokens.length; i++){
+			String word = wordTokens[i];
+			ret.indexWord(word, i + 1);
 		}
 		
-		String value = p.getValue().toString();
-		log.trace("Value: " + value);
-		
-		int preIndex = Integer.MAX_VALUE;
-		int postIndex = -1;
-		for(String c:criteria){
-			int i = value.toLowerCase().indexOf(c);
-			if(i == -1)
-				//criteria not found!
-				return null;
-			postIndex = Math.max(postIndex, i + c.length());
-			preIndex = Math.min(preIndex, i);
-		}
-		
-		QueryResultEntry e = new QueryResultEntry();
-		e.setMatchedDocument(doc);
-		e.setMatchedProperty(p);
-		
-		String pre = value.substring(Math.max(0, preIndex - OFFSET), preIndex);
-		String post = value.substring(postIndex, Math.min(value.length(), postIndex + OFFSET));
-		
-		e.setInfo(new StringMatchingInfo(pre, value.substring(preIndex, postIndex), post));
-		
-		return e;
+		return ret;
 	}
 	
 	@Override
 	public String toString() {
 		return "ContainsAllQuery [criteria=" + Arrays.toString(criteria) + ", propertiesToSearch=" + propertiesToSearch + "]";
+	}
+
+	//TODO: write Unit Tests
+	public static void main(String[] args) throws Exception{
+		ContainsWordsQuery query = new ContainsWordsQuery("search query indexing matrix Ноутбук");
+		
+		Document doc = new Document("sample");
+
+		String sample = IOUtils.readInputStreamBufferedAsString(query.getClass().getClassLoader().getResourceAsStream("sampletext.txt"), "utf-8");
+		StringProperty p = new StringProperty("sampleProp1");
+		p.setValue(sample);
+		doc.putStringProperty(p);
+		
+		sample = IOUtils.readInputStreamBufferedAsString(query.getClass().getClassLoader().getResourceAsStream("sampletext2.txt"), "utf-8");
+		p = new StringProperty("sampleProp2");
+		p.setValue(sample);
+		doc.putStringProperty(p);
+		
+		p = new StringProperty("sampleProp3");
+		p.setValue(null);
+		doc.putStringProperty(p);
+		
+		System.out.println("** RESULT: **");
+		List<QueryResultEntry> result = query.match(doc);
+		System.out.println(result);
 	}
 	
 }

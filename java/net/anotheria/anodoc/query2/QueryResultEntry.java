@@ -2,13 +2,15 @@ package net.anotheria.anodoc.query2;
 
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Property;
+import net.anotheria.util.BasicComparable;
+import net.anotheria.util.sorter.IComparable;
 
 /**
  * An entry in a query result list.
  * @author lrosenberg
  *
  */
-public class QueryResultEntry {
+public class QueryResultEntry implements IComparable{
 	/**
 	 * Link to the matched document.
 	 */
@@ -17,6 +19,9 @@ public class QueryResultEntry {
 	 * Link to the matched property.
 	 */
 	private Property matchedProperty;
+	
+	private int relevance;
+	
 	/**
 	 * Info what matched and how.
 	 */
@@ -40,7 +45,20 @@ public class QueryResultEntry {
 		this.matchedProperty = matchedProperty;
 	}
 	
+	public int getRelevance() {
+		return relevance;
+	}
+	public void setRelevance(int relevance) {
+		this.relevance = relevance;
+	}
+	
+	
 	@Override public String toString(){
-		return "Doc: "+getMatchedDocument()+", prop: "+getMatchedProperty()+", matchinfo: "+getInfo();
+		return "Rel:" + relevance + ", doc: "+getMatchedDocument()+", prop: "+getMatchedProperty()+", matchinfo: "+getInfo();
+	}
+	@Override
+	public int compareTo(IComparable anotherObject, int method) {
+		QueryResultEntry anotherEntry = (QueryResultEntry)anotherObject;
+		return BasicComparable.compareInt(relevance, anotherEntry.relevance);
 	}
 }
