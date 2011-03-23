@@ -132,7 +132,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		appendIncreasedString("<a href=" + quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=top&" + parameter) + ">" + getTopImage("move to top") + "</a>");
 		appendIncreasedString("<a href=" + quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=up&" + parameter) + ">" + getUpImage("move up") + "</a>");
 		appendIncreasedString("<a href=" + quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=down&" + parameter) + ">" + getDownImage("move down") + "</a>");
-		appendIncreasedString("<a href=" + quote(ContainerAction.MOVE.getMappingName(doc, list) + "?=bottom&" + parameter) + ">" + getBottomImage("move to bottom") + "</a>");
+		appendIncreasedString("<a href=" + quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=bottom&" + parameter) + ">" + getBottomImage("move to bottom") + "</a>");
 		appendIncreasedString("<a href=" + quote(ContainerAction.DELETE.getMappingName(doc, list) + "?" + parameter) + ">" + getDeleteImage("delete row") + "</a>");
 		appendString("</td>");
 		decreaseIdent();
