@@ -679,7 +679,9 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("mode : \"exact\",");
 		String allRichTextElements = "elements:\"";
 		for (int i=0; i<richTextElements.size(); i++){
-			allRichTextElements+=richTextElements.get(i).getName()+getElementLanguage(richTextElements.get(i))+"_ID";
+			String language = getElementLanguage(richTextElements.get(i));
+			if (language == null) language = "";//allow tinyMCE for single language fields 
+			allRichTextElements+=richTextElements.get(i).getName()+language+"_ID";
 			if (i+1!=richTextElements.size())
 				allRichTextElements+=", ";
 		}
