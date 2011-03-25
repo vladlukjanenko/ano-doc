@@ -179,6 +179,10 @@ public final class XMLViewParser {
 		if (!StringUtils.isEmpty(fieldCaption)) {
 			element.setCaption(fieldCaption);
 		}
+		String description = elem.getChildText("description");
+		if (!StringUtils.isEmpty(description)) {
+			element.setDescription(description);
+		}
 		
 		try{
 			Element decElement = elem.getChild("decorator");

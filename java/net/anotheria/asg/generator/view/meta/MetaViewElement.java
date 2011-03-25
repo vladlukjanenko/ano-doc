@@ -19,6 +19,10 @@ public class MetaViewElement {
 	 */
 	private String caption;
 	/**
+	 * The description of the element. 
+	 */
+	private String description;
+	/**
 	 * If true the element is comparable.
 	 */
 	private boolean comparable;
@@ -121,5 +125,13 @@ public class MetaViewElement {
 
 	public String getCaption() {
 		return caption;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 }

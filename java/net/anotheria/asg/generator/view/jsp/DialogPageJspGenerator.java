@@ -89,9 +89,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		// *** CMS2.0 FINISH ***
 
 		// *** CMS3.0 START ***
-		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.4.min.js") + "\"></script>");
+//		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.4.min.js") + "\"></script>");
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.5.1.min.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("anofunctions.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("fileuploader.js") + "\"></script>");
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("cms-tooltip.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("tiny_mce/tiny_mce.js") + "\"></script>");
 		// *** CMS3.0 FINISH ***
 
@@ -318,6 +320,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 					name = "&nbsp;";
 				String caption = element.getCaption() != null ? element.getCaption() + "(<b>DEF</b>)" : name;
 				appendString(caption);
+				if (element.getDescription() != null)
+					append("<a href=\"#\" class=\"showTooltip\"><img src=\"../cms_static/img/tooltip.gif\" alt=\"\">",element.getDescription(),"</a>");
 				decreaseIdent();
 				appendString("</td>");
 				appendString("<td align=\"left\">&nbsp;");
@@ -356,6 +360,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				caption += "("+StringUtils.capitalize(lang)+")";
 			}
 			appendString(caption);
+			if (element.getDescription() != null)
+				append("<a href=\"#\" class=\"showTooltip\"><img src=\"../cms_static/img/tooltip.gif\" alt=\"\">",element.getDescription(),"</a>");
 			decreaseIdent();
 			if (element.isRich()) {
 				appendString("<div class=\"clear\"></div>");
