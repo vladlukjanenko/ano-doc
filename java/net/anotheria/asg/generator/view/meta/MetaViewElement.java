@@ -14,6 +14,11 @@ public class MetaViewElement {
 	 */
 	private String name;
 	/**
+	 * The caption of the element. 
+	 * Will be displayed in CMS instead of name.
+	 */
+	private String caption;
+	/**
 	 * If true the element is comparable.
 	 */
 	private boolean comparable;
@@ -108,5 +113,13 @@ public class MetaViewElement {
 
 	public void setRich(boolean rich) {
 		this.rich = rich;
+	}
+
+	public void setCaption(String caption) {
+		this.caption = caption;
+	}
+
+	public String getCaption() {
+		return caption;
 	}
 }

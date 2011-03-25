@@ -175,6 +175,11 @@ public final class XMLViewParser {
 			section.setDefaultSortable(element);
 		}
 		
+		String fieldCaption = elem.getAttributeValue("caption");
+		if (!StringUtils.isEmpty(fieldCaption)) {
+			element.setCaption(fieldCaption);
+		}
+		
 		try{
 			Element decElement = elem.getChild("decorator");
 			if (decElement!=null){

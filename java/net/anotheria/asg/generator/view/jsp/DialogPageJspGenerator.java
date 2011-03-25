@@ -115,16 +115,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		for (int i = 0; i < elements.size(); i++) {
 			MetaViewElement element = elements.get(i);
 			while (elements.get(i) instanceof MultilingualFieldElement) {
+				String caption = element.getCaption() != null ? element.getCaption() : element.getName();
 				appendString("<logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
-				appendString("<li><a href=\"#" + element.getName() + "DEF" + "\">" + element.getName() + "DEF" + "</a></li>");
+				appendString("<li><a href=\"#" + element.getName() + "DEF" + "\">" + caption + "</a></li>");
 				appendString("</logic:equal>");
 				appendString("<logic:notEqual name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
 				appendString("<li>");
 				increaseIdent();
 				String lang = getElementLanguage(element);
-				appendString("<a href=\"#" + section.getDocument().getField(element.getName()).getName(lang) + "\">" + element.getName()
+				appendString("<a href=\"#" + section.getDocument().getField(element.getName()).getName(lang) + "\">" + caption
 						+ "</a><a href=\"javascript:void(0);\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
 				appendString("<div class=\"pop_up\">");
 				increaseIdent();
@@ -163,7 +164,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				appendString("</logic:notEqual>");
 			}
 			if (element instanceof MetaFieldElement) {
-				appendString("<li><a href=\"#" + element.getName() + "\">" + element.getName() + "</a></li>");
+				String caption = element.getCaption() != null ? element.getCaption() : element.getName();
+				appendString("<li><a href=\"#" + element.getName() + "\">" + caption + "</a></li>");
 			}
 		}
 		decreaseIdent();
@@ -314,7 +316,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				String name = section.getDocument().getField(element.getName()).getName() + "<b>DEF</b>";
 				if (name == null || name.length() == 0)
 					name = "&nbsp;";
-				appendString(name);
+				String caption = element.getCaption() != null ? element.getCaption() + "(<b>DEF</b>)" : name;
+				appendString(caption);
 				decreaseIdent();
 				appendString("</td>");
 				appendString("<td align=\"left\">&nbsp;");
@@ -346,7 +349,13 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			if (name == null || name.length() == 0)
 				name = "&nbsp;";
 			appendString("<a id=\"" + name + "\" name=\"" + name + "\"></a>");
-			appendString(name);
+			String caption = element.getCaption();
+			if (caption == null) {
+				caption = name;
+			} else if (lang != null) {
+				caption += "("+StringUtils.capitalize(lang)+")";
+			}
+			appendString(caption);
 			decreaseIdent();
 			if (element.isRich()) {
 				appendString("<div class=\"clear\"></div>");
