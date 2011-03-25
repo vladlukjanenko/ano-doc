@@ -1466,14 +1466,16 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					MetaProperty p = doc.getField(field.getName());
 					//handle images.
 					if (p.getType() == MetaProperty.Type.IMAGE){
-						//will work only with one image.
+						//will work with multiple images.
+						String varName = p.getName();
+						String holderName = "holder_"+varName;
 						appendString( "//handle image");
-						appendStatement("TemporaryFileHolder holder = FileStorage.getTemporaryFile(req)");
-						appendString( "if (holder!=null && holder.getData()!=null){");
+						appendStatement("TemporaryFileHolder "+holderName+" = FileStorage.getTemporaryFile(req,\""+varName+"\")");
+						appendString( "if ("+holderName+"!=null && "+holderName+".getData()!=null){");
 						increaseIdent();
-						appendStatement("FileStorage.storeFilePermanently(req, holder.getFileName())");
-						appendStatement(doc.getVariableName()+"."+p.toSetter()+"(holder.getFileName())");
-						appendStatement("FileStorage.removeTemporaryFile(req)");
+						appendStatement("FileStorage.storeFilePermanently(req, "+holderName+".getFileName(),\""+varName+"\")");
+						appendStatement(doc.getVariableName()+"."+p.toSetter()+"("+holderName+".getFileName())");
+						appendStatement("FileStorage.removeTemporaryFile(req,\""+varName+"\")");
 						append(closeBlock());
 						continue;
 					}
@@ -2609,14 +2611,15 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//handle images.
 		
 		if (p.getType() == MetaProperty.Type.IMAGE){
-			//will work only with one image.
+			//will work with multiple images.
+			String varName = p.getName();
 			appendString( "//handle image");
-			appendStatement("TemporaryFileHolder holder = FileStorage.getTemporaryFile(req)");
+			appendStatement("TemporaryFileHolder holder = FileStorage.getTemporaryFile(req, \""+varName+"\")");
 			appendString( "if (holder!=null && holder.getData()!=null){");
 			increaseIdent();
-			appendStatement("FileStorage.storeFilePermanently(req, holder.getFileName())");
+			appendStatement("FileStorage.storeFilePermanently(req, holder.getFileName(), \""+varName+"\")");
 			appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"(holder.getFileName())");
-			appendStatement("FileStorage.removeTemporaryFile(req)");
+			appendStatement("FileStorage.removeTemporaryFile(req, \""+varName+"\")");
 			append(closeBlock());
 		} else {
 			String getter = "form."+p.toBeanGetter()+"()";
