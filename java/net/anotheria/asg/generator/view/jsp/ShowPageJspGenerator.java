@@ -342,15 +342,34 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 	private String generateFieldHeader(MetaFieldElement element){		
 		String name = element instanceof MultilingualFieldElement ? element.getVariableName() : element.getName();
 		String header =  "";
+		String caption;//field caption to show on table header;
+		if (element.getCaption() == null) {
+			caption = StringUtils.capitalize(name);
+		} else {
+			caption = element.getCaption(); 
+			if (element instanceof MultilingualFieldElement) {
+				caption += "("+((MultilingualFieldElement)element).getLanguage().toUpperCase() + ")";
+			}
+		}
 		if (element.isComparable()){
-			
 			String action = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_SHOW);
 			action = action+"?"+ViewConstants.PARAM_SORT_TYPE_NAME+"="+name;
 			String actionAZ = action + "&" + ViewConstants.PARAM_SORT_ORDER + "="+ViewConstants.VALUE_SORT_ORDER_ASC; 
 			String actionZA = action + "&" + ViewConstants.PARAM_SORT_ORDER + "="+ViewConstants.VALUE_SORT_ORDER_DESC; 
-			header += "<logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+"><a href="+quote(generateTimestampedLinkPath(actionZA))+"class=\"down\">"+StringUtils.capitalize(name)+"</a></logic:equal><logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+"><a href="+quote(generateTimestampedLinkPath(actionAZ))+"class=\"up\">"+StringUtils.capitalize(name)+"</a></logic:equal><logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+"><logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+"><a href="+quote(generateTimestampedLinkPath(actionAZ))+">"+StringUtils.capitalize(name)+"</a></logic:notEqual></logic:notEqual>";
+			header += "<logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+">"+
+						"<a href="+quote(generateTimestampedLinkPath(actionZA))+"class=\"down\">"+caption+"</a>"+
+					"</logic:equal>"+
+					"<logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+">"+
+						"<a href="+quote(generateTimestampedLinkPath(actionAZ))+"class=\"up\">"+caption+"</a>"+
+					"</logic:equal>"+
+					"<logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+">"+
+						"<logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+">"+
+							"<a href="+quote(generateTimestampedLinkPath(actionAZ))+">"+caption+"</a>"+
+						"</logic:notEqual>"+
+					"</logic:notEqual>";
+		} else {
+			header = caption;//StringUtils.capitalize(name);
 		}
-		else {header =  StringUtils.capitalize(name);}
 		String displayLanguageCheck = "";
 		if(element instanceof MultilingualFieldElement) {
 			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
