@@ -20,6 +20,10 @@ public class MetaDialog {
 	 * Elements of the dialog.
 	 */
 	private List<MetaViewElement> elements;
+	/** 
+	 * Link to customization javascript
+	 */
+	private String javascript;
 	/**
 	 * Creates a new dialog with the given name.
 	 * @param aName the name of the dialog.
@@ -80,6 +84,16 @@ public class MetaDialog {
 	
 	@Override public String toString(){
 		return name+" "+elements;
+	}
+
+
+	public String getJavascript() {
+		return javascript;
+	}
+
+
+	public void setJavascript(String javascript) {
+		this.javascript = javascript;
 	}
 
 }

@@ -97,6 +97,10 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("tiny_mce/tiny_mce.js") + "\"></script>");
 		// *** CMS3.0 FINISH ***
 
+		if(dialog.getJavascript() != null) {
+			appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath(dialog.getJavascript()) + "\"></script>");
+		}
+		
 		decreaseIdent();
 		appendString("</head>");
 		appendString("<body>");

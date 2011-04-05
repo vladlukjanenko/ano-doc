@@ -123,6 +123,7 @@ public final class XMLViewParser {
 			Element d = dialogs.get(i);
 			MetaDialog dialog = new MetaDialog(d.getAttributeValue("name"));
 			dialog.setTitle(d.getAttributeValue("title"));
+			dialog.setJavascript(d.getAttributeValue("javascript"));
 			@SuppressWarnings("unchecked")List<Element> dialogElements = d.getChild("elements").getChildren();
 			for (int e=0; e<dialogElements.size(); e++){
 				MetaViewElement element = parseViewElement(null, dialogElements.get(e));
