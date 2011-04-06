@@ -56,7 +56,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	/**
 	 * Period for checking file in milliseconds.
 	 */
-	private static final long FILE_CHECK_PERIOD = 60*1000; //todo make it configureable by ConfigureMe
+	private static final long FILE_CHECK_PERIOD = 5*1000; //todo make it configureable by ConfigureMe
 	/**
 	 * Task for file's changes watching.
 	 */
