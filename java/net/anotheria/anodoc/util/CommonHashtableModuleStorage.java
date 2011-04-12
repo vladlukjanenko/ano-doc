@@ -261,11 +261,8 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 
 			for (String key : storage.keySet()){
 				Module module = storage.get(key);
-				//module.fillFromContainer(new Hashtable());
-
 				Module createdModule = factory.createModule(module.getOwnerId(), module.getCopyId());
 				createdModule.setModuleFactory(factory);
-
 				storage.put(key, createdModule);
 			}
 
