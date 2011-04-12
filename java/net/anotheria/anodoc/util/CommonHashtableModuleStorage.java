@@ -193,6 +193,8 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 
 	@SuppressWarnings("unchecked")
 	private void save(){
+		log.info("Saving modules...");
+
 		//erstmal konvertieren
 		Enumeration<String> allKeys = storage.keys();
 		Hashtable<String,Hashtable> toSave = new Hashtable<String,Hashtable>(storage.size());
@@ -223,8 +225,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 
 	@SuppressWarnings("unchecked")
 	private void load(){
-		
-		storage.clear();
+
 		ObjectInputStream oIn = null;
 		try{
 			oIn = new ObjectInputStream(new FileInputStream(getFile(filename)));
@@ -233,7 +234,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 			//now convert...
 			//System.err.println("Current storage ==="+filename+"===:");
 			//System.err.println(convertedStorage);
-		
+			storage.clear();
 			Enumeration e = convertedStorage.keys();
 			while(e.hasMoreElements()){
 				String aKey = (String)e.nextElement();
@@ -257,6 +258,19 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 			if (log.isEnabledFor(Priority.INFO)) {
 				log.info("FileNotFound "+filename+", assuming new installation");
 			}
+
+			for (String key : storage.keySet()){
+				Module module = storage.get(key);
+				//module.fillFromContainer(new Hashtable());
+
+				Module createdModule = factory.createModule(module.getOwnerId(), module.getCopyId());
+				createdModule.setModuleFactory(factory);
+
+				storage.put(key, createdModule);
+			}
+
+			save();
+
 		}catch(Exception e){
 			if (log.isEnabledFor(Priority.ERROR)) {
 				log.error("load", e);
