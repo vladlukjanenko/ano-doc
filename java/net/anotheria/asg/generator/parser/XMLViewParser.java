@@ -18,6 +18,7 @@ import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
 import net.anotheria.asg.generator.view.meta.MetaListElement;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
+import net.anotheria.asg.generator.view.meta.MetaValidator;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
@@ -183,6 +184,20 @@ public final class XMLViewParser {
 		String description = elem.getChildText("description");
 		if (!StringUtils.isEmpty(description)) {
 			element.setDescription(description);
+		}
+		String validatorsName = elem.getAttributeValue("validator"); 
+		if (validatorsName != null ) {
+			String[] validators = validatorsName.split(",");
+			List<MetaValidator> metaValidators = new ArrayList<MetaValidator>(validators.length);
+			for (String validatorName : validators) {
+				MetaValidator validator = GeneratorDataRegistry.getInstance().getValidator(validatorName);
+				metaValidators.add(validator);
+				if (validator == null) {
+					throw new IllegalArgumentException("Uknown validator <" + validatorName + "> for view element def " + elem+
+					". Check that you have validators-def.xml in classpath and validator definition is present there.");
+				}
+			}
+			element.setValidators(metaValidators);
 		}
 		
 		try{

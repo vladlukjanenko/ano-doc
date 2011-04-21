@@ -12,12 +12,14 @@ import net.anotheria.asg.generator.parser.XMLDecoratorsParser;
 import net.anotheria.asg.generator.parser.XMLFiltersParser;
 import net.anotheria.asg.generator.parser.XMLPreprocessor;
 import net.anotheria.asg.generator.parser.XMLTypesParser;
+import net.anotheria.asg.generator.parser.XMLValidatorsParser;
 import net.anotheria.asg.generator.parser.XMLViewParser;
 import net.anotheria.asg.generator.types.TypesGenerator;
 import net.anotheria.asg.generator.types.meta.DataType;
 import net.anotheria.asg.generator.view.ViewGenerator;
 import net.anotheria.asg.generator.view.meta.MetaDecorator;
 import net.anotheria.asg.generator.view.meta.MetaFilter;
+import net.anotheria.asg.generator.view.meta.MetaValidator;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.NumberUtils;
 
@@ -88,22 +90,29 @@ public class Generator {
 			List<MetaFilter> filters = XMLFiltersParser.parseFilters(filtersContent);
 			//System.out.println("parsed filters: "+filters);
 			GeneratorDataRegistry.getInstance().addFilters(filters);
-			//System.out.println(decorators); 
+			//System.out.println(filters); 
 		}catch(Exception e){}
 
 		long s6 = System.currentTimeMillis();
+		try{
+			String filtersContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/validators-def.xml"));
+			List<MetaValidator> filters = XMLValidatorsParser.parseValidators(filtersContent);
+			GeneratorDataRegistry.getInstance().addValidators(filters);
+		}catch(Exception e){}
+		
+		long s7 = System.currentTimeMillis();
 		List<MetaModule> modules = XMLDataParser.parseModules(dataContent);
 		GeneratorDataRegistry.getInstance().addModules(modules);
 		
 		AppUtilGenerator utilGen = new AppUtilGenerator(c);
 		utilGen.generate(modules);
 
-		long s7 = System.currentTimeMillis();
+		long s8 = System.currentTimeMillis();
 		
 		DataGenerator g = new DataGenerator();
 		g.generate("java", modules);
 
-		long s8 = System.currentTimeMillis();
+		long s9 = System.currentTimeMillis();
 		
 		
 		if(viewContent!=null){
@@ -117,7 +126,7 @@ public class Generator {
 		}
 		
 		System.out.println("DONE.");
-		printTime("Total ", s8, s1);
+		printTime("Total ", s9, s1);
 		
 		if (false){
 			printTime("Till s2", s2, s1);
@@ -127,6 +136,7 @@ public class Generator {
 			printTime("Till s6", s6, s1);
 			printTime("Till s7", s7, s1);
 			printTime("Till s8", s8, s1);
+			printTime("Till s9", s9, s1);
 			
 			printTime("s2", s2, s1);
 			printTime("s3", s3, s2);
@@ -135,6 +145,7 @@ public class Generator {
 			printTime("s6", s6, s5);
 			printTime("s7", s7, s6);
 			printTime("s8", s8, s7);
+			printTime("s9", s9, s8);
 		}
 		// */
 	}

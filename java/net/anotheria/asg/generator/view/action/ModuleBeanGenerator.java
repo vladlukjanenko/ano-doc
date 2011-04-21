@@ -20,10 +20,12 @@ import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.meta.ObjectType;
 import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.meta.MetaProperty.Type;
 import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaFieldElement;
 import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
+import net.anotheria.asg.generator.view.meta.MetaValidator;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
 import net.anotheria.util.ExecutionTimer;
@@ -289,6 +291,22 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 				
 				MetaProperty p = doc.getField(field.getName());
 				MetaProperty tmp = p instanceof MetaListProperty? new MetaProperty(p.getName(),MetaProperty.Type.INT): p;
+				if (element.isValidated()) {	//TODO what about list validation?
+					for (MetaValidator validator : element.getValidators()){
+						clazz.addImport(validator.getClassName());
+						String key = StringUtils.isEmpty(validator.getKey())? "" : validator.getKey();
+						String message = StringUtils.isEmpty(validator.getDefaultError())? "" : validator.getDefaultError();
+						if(validator.isCustomValidator()) {
+							clazz.addImport("net.anotheria.maf.validation.annotations.ValidateCustom");
+							appendString("@ValidateCustom(validator=" + validator.getClassNameOnly()+".class, key=\""+key+"\", message=\""+message+"\")");
+						} else if (validator.isNumericValidator()){
+							boolean fractional = p.getType() == Type.FLOAT || p.getType() == Type.DOUBLE;
+							appendString("@"+validator.getClassNameOnly()+"(key=\""+key+"\", message=\""+message+"\", fractional="+fractional+")");
+						} else {
+							appendString("@"+validator.getClassNameOnly()+"(key=\""+key+"\", message=\""+message+"\")");
+						}
+					}
+				}
 				appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
 				if (p.isLinked()){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),MetaProperty.Type.LIST);

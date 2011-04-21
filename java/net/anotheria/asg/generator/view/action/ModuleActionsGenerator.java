@@ -554,7 +554,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && doc.isMultilingual())
 			clazz.addImport("net.anotheria.asg.data.MultilingualObject");
 
-	    
+	    boolean validationAwareAction = false;
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc);
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement elem = elements.get(i);
@@ -565,6 +565,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					clazz.addImport("net.anotheria.webutils.filehandling.actions.FileStorage");
 					clazz.addImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
 					break;
+				}
+				if (elem.isValidated()) {
+					validationAwareAction = true;
+					clazz.addInterface("net.anotheria.maf.validation.ValidationAware");
+					clazz.addImport("net.anotheria.maf.validation.ValidationError");
+					clazz.addImport(List.class);
 				}
 			}
 		}
@@ -620,8 +626,113 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         }
 		generateCloseAction(section, CMSMappingsConfiguratorGenerator.getPath(doc,CMSMappingsConfiguratorGenerator.ACTION_CLOSE));
 		emptyline();
+		
+		if (validationAwareAction) {
+			clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperUtil");
+			clazz.addImport("net.anotheria.asg.util.helper.cmsview.CMSViewHelperRegistry");
+			clazz.addImport("java.util.Map");
+			clazz.addImport("java.util.HashMap");
+			clazz.addImport("net.anotheria.maf.validation.ValidationError");
+			//check if we have to import list.
+			for (MetaViewElement element : elements) {
+				if (element instanceof MetaFieldElement) {
+					MetaFieldElement field = (MetaFieldElement) element;
+					MetaProperty p = doc.getField(field.getName());
+					if (p.isLinked() || p instanceof MetaEnumerationProperty) {
+						clazz.addImport("java.util.List");
+						clazz.addImport("java.util.ArrayList");
+						clazz.addImport("net.anotheria.webutils.bean.LabelValueBean");
+					}
+					if (p instanceof MetaEnumerationProperty) {
+	                    MetaEnumerationProperty mep = (MetaEnumerationProperty) p;
+	                    EnumerationType type = (EnumerationType) GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
+	                    clazz.addImport(EnumTypeGenerator.getEnumImport(type));
+	                }
+				}
+			}
+
+			generateExecuteOnValidationErrorMethod(section, doc, dialog, elements);
+			emptyline();
+		}
 	    
 	    return clazz;
+	}
+	
+	private void generateExecuteOnValidationErrorMethod(MetaModuleSection section, MetaDocument doc, MetaDialog dialog, List<MetaViewElement> elements) {
+		appendString("public ActionForward executeOnValidationError(ActionMapping mapping, FormBean formBean, List<ValidationError> errors, HttpServletRequest req, HttpServletResponse res) throws Exception {");
+		increaseIdent();
+		
+		appendString("Map<String, ValidationError> errorsMap = new HashMap<String,ValidationError>();");
+		appendString("for (ValidationError error : errors) {");
+		increaseIdent();
+		appendString("errorsMap.put(error.getField(), error);");
+		closeBlock("errorsMap ready");
+		String formClassName = ModuleBeanGenerator.getDialogBeanName(dialog, doc);
+		appendString(formClassName+" form = ("+formClassName+")formBean;");
+		appendPrepareFormForEditView(elements, doc, false);
+		appendString("if (form.getId() == null || form.getId().isEmpty()) {");
+			increaseIdent();
+			decreaseIdent();
+		appendString("} else {");
+			increaseIdent();
+			//add locking/ML/checks
+			appendStatement("String id = form.getId()");
+			appendStatement(doc.getName()," ",doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
+
+			if (doc.isMultilingual()){
+				MetaProperty p = doc.getField(ModuleBeanGenerator.FIELD_ML_DISABLED);
+				String propertyCopy = "form."+p.toBeanSetter()+"(((MultilingualObject)"+doc.getVariableName()+").isMultilingualDisabledInstance())";
+				appendStatement(propertyCopy);
+			}
+
+	        //adding additional Lock properties
+			final boolean isCMS = StorageType.CMS.equals(doc.getParentModule().getStorageType());
+			if(isCMS){
+	            MetaProperty prop = new MetaProperty(LockableObject.INT_LOCK_PROPERTY_NAME,MetaProperty.Type.BOOLEAN);
+	            String propertyCopy = "form."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").isLocked())";
+	            appendStatement(propertyCopy);
+	            prop =  new MetaProperty(LockableObject.INT_LOCKER_ID_PROPERTY_NAME,MetaProperty.Type.STRING);
+	            propertyCopy = "form."+prop.toBeanSetter()+"(((LockableObject)"+doc.getVariableName()+").getLockerId())";
+	            appendStatement(propertyCopy);
+	            prop =  new MetaProperty(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME,MetaProperty.Type.STRING);
+			    propertyCopy = "form."+prop.toBeanSetter()+"(net.anotheria.util.NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime()) +" +
+						" \" automatic unlock expected AT : \" + net.anotheria.util.NumberUtils.makeISO8601TimestampString(((LockableObject)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout()))";
+
+	            appendStatement(propertyCopy);
+	        }
+			//add container sizes
+			for (MetaViewElement element : elements) {
+				if (element instanceof MetaFieldElement) {
+					MetaFieldElement field = (MetaFieldElement) element;
+					MetaProperty p = doc.getField(field.getName());
+					if (p instanceof MetaContainerProperty){
+						appendString( "// "+p.getName()+" is a table, storing size only");
+						String lang = getElementLanguage(element);
+//						appendString("if (form.getId()!=null && !form.getId().isEmpty())");
+						appendStatement("form."+p.toBeanSetter(lang)+"("+doc.getVariableName()+"."+DataFacadeGenerator.getContainerSizeGetterName((MetaContainerProperty)p, lang)+"())");
+					}
+				}
+			}
+			
+		closeBlock("form prepared");
+		
+		appendString("addBeanToRequest(req, \"validationErrors\" , errorsMap);");
+		
+		appendString("addBeanToRequest(req, "+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(dialog, doc))+" , formBean);");
+		appendString("addBeanToRequest(req, \"save.label.prefix\", \"Save\");");
+		appendString("addBeanToRequest(req, \"apply.label.prefix\" , \"Apply\");");
+		appendString("addBeanToRequest(req, \"objectInfoString\" , \"none\");");
+		
+		//add field descriptions ...
+		emptyline();
+		appendStatement("addFieldExplanations(req, null)");	
+		emptyline();
+		
+		appendString("return mapping.findForward(\"validationError\");");
+		closeBlock("executeOnValidationError");
+
+		emptyline();
+		appendAddFieldExplanationsMethod(doc);
 	}
 	
 	private void generateExecuteMethod(GeneratedClass clazz, MetaDialog dialog, MetaDocument document){
@@ -2050,7 +2161,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//List<MetaViewElement> elements = dialog.getElements();
 		List<MetaViewElement> elements = createMultilingualList(dialog.getElements(), doc);
 		
-		EnumerationPropertyGenerator enumPropGen = new EnumerationPropertyGenerator(doc);
+//		EnumerationPropertyGenerator enumPropGen = new EnumerationPropertyGenerator(doc);
 		
 		clazz.setPackageName(getPackage(section.getModule()));
 	    
@@ -2101,8 +2212,74 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(ModuleBeanGenerator.getDialogBeanName(dialog, doc)+" form = new "+ModuleBeanGenerator.getDialogBeanName(dialog, doc)+"() ");	
 		appendStatement("form.setId("+quote("")+")");
 		
+//		Set<String> linkTargets = new HashSet<String>();
+//
+//		for (MetaViewElement element : elements) {
+//			if (element instanceof MetaFieldElement) {
+//				MetaFieldElement field = (MetaFieldElement) element;
+//				MetaProperty p = doc.getField(field.getName());
+//				if (p.isLinked()) {
+//					MetaLink link = (MetaLink) p;
+//
+//					MetaModule targetModule = link.isRelative() ?
+//							doc.getParentModule() :
+//							GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
+//					String tDocName = link.getTargetDocumentName();
+//					MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
+//					String listName = targetDocument.getMultiple().toLowerCase();
+//					emptyline();
+//
+//					if (linkTargets.contains(link.getLinkTarget())) {
+//						appendString("//link " + link.getName() + " to " + link.getLinkTarget() + " reuses collection.");
+//					} else {
+//						appendString("//link " + link.getName() + " to " + link.getLinkTarget());
+//						appendStatement("List<" + DataFacadeGenerator.getDocumentImport(targetDocument) + "> " + listName + " = " + getServiceGetterCall(targetModule) + ".get" + targetDocument.getMultiple() + "()");
+//						appendStatement("List<LabelValueBean> " + listName + "Values = new ArrayList<LabelValueBean>(" + listName + ".size()+1)");
+//						appendStatement(listName + "Values.add(new LabelValueBean(" + quote("") + ", \"-----\"))");
+//						appendString("for (" + (DataFacadeGenerator.getDocumentImport(targetDocument)) + " " + targetDocument.getVariableName() + " : " + listName + "){");
+//						increaseIdent();
+//
+//						appendStatement("LabelValueBean bean = new LabelValueBean(" + targetDocument.getVariableName() + ".getId(), " + targetDocument.getVariableName() + ".getName() )");
+//						appendStatement(listName + "Values.add(bean)");
+//						append(closeBlock());
+//					}
+//
+//					String lang = getElementLanguage(element);
+//					appendStatement("form." + p.toBeanSetter() + "Collection" + (lang == null ? "" : lang) + "(" + listName + "Values" + ")");
+//					linkTargets.add(link.getLinkTarget());
+//				}//...end if (p.isLinked())
+//
+//				if (p instanceof MetaEnumerationProperty) {
+//					enumPropGen.generateEnumerationPropertyHandling((MetaEnumerationProperty) p, false);
+//				}
+//
+//			}
+//		}
+		appendPrepareFormForEditView(elements, doc, true);
+		
+		emptyline();
+		appendStatement("addBeanToRequest(req, "+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(dialog, doc))+" , form)");
+		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
+		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+" , "+quote("Apply")+")");
+		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
+		
+		//add field descriptions ...
+		emptyline();
+		appendStatement("addFieldExplanations(req, null)");	
+		emptyline();
+		
+		appendStatement("return mapping.findForward(\"success\")");
+		closeBlock("");
+		
+		emptyline();
+		appendAddFieldExplanationsMethod(doc);
+		
+		return clazz;
+	}
+	
+	private void appendPrepareFormForEditView(List<MetaViewElement> elements, MetaDocument doc, boolean newDocument) {
 		Set<String> linkTargets = new HashSet<String>();
-
+		EnumerationPropertyGenerator enumPropGen = new EnumerationPropertyGenerator(doc);
 		for (MetaViewElement element : elements) {
 			if (element instanceof MetaFieldElement) {
 				MetaFieldElement field = (MetaFieldElement) element;
@@ -2135,34 +2312,33 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 					String lang = getElementLanguage(element);
 					appendStatement("form." + p.toBeanSetter() + "Collection" + (lang == null ? "" : lang) + "(" + listName + "Values" + ")");
+					if (!newDocument){//if it is not new document (validation errors,etc) - set "current value"
+						appendString( "try{");
+						increaseIdent();
+						String getter = getServiceGetterCall(targetModule)+".get"+targetDocument.getName()+"(form."+p.toBeanGetter(lang)+"()).getName()";
+						appendStatement("form."+p.toBeanSetter()+"CurrentValue"+(lang==null ? "":lang)+"("+getter+")");
+						decreaseIdent();
+						appendString( "}catch(Exception e){");
+						appendIncreasedStatement("form."+p.toBeanSetter()+"CurrentValue"+(lang==null ? "":lang)+"("+quote("none")+")");
+						appendString( "}");
+					}
 					linkTargets.add(link.getLinkTarget());
 				}//...end if (p.isLinked())
 
 				if (p instanceof MetaEnumerationProperty) {
 					enumPropGen.generateEnumerationPropertyHandling((MetaEnumerationProperty) p, false);
+					if (!newDocument){//if it is not new document (validation errors,etc) - set "current value"
+						MetaEnumerationProperty mep = (MetaEnumerationProperty) p;
+						EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(mep.getEnumeration());
+						openTry();
+						appendStatement("form."+mep.toBeanSetter()+"CurrentValue("+EnumTypeGenerator.getEnumClassName(type)+".getConstantByValue(form."+mep.toBeanGetter()+"()).name())");
+						appendCatch(ConstantNotFoundException.class);
+						closeBlock("try");
+					}
 				}
 
 			}
 		}
-
-		emptyline();
-		appendStatement("addBeanToRequest(req, "+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(dialog, doc))+" , form)");
-		appendStatement("addBeanToRequest(req, "+quote("save.label.prefix")+", "+quote("Save")+")");
-		appendStatement("addBeanToRequest(req, "+quote("apply.label.prefix")+" , "+quote("Apply")+")");
-		appendStatement("addBeanToRequest(req, "+quote("objectInfoString")+" , "+quote("none")+")");
-		
-		//add field descriptions ...
-		emptyline();
-		appendStatement("addFieldExplanations(req, null)");	
-		emptyline();
-		
-		appendStatement("return mapping.findForward(\"success\")");
-		closeBlock("");
-		
-		emptyline();
-		appendAddFieldExplanationsMethod(doc);
-		
-		return clazz;
 	}
 	
 	private void appendAddFieldExplanationsMethod(MetaDocument doc) {

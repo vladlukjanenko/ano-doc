@@ -1,5 +1,10 @@
 package net.anotheria.asg.generator.view.meta;
 
+import java.util.List;
+
+import net.anotheria.util.StringUtils;
+
+
 /**
  * Represents an element of the view.
  * @author another
@@ -35,6 +40,10 @@ public class MetaViewElement {
 	 * The decorator for the element.
 	 */
 	private MetaDecorator decorator;
+	/**
+	 * Validators that will validate sumbitted value.
+	 */
+	private List<MetaValidator> validators;
 	
 	/**
 	 * Creates a new meta view element.
@@ -134,4 +143,28 @@ public class MetaViewElement {
 	public String getDescription() {
 		return description;
 	}
+
+	public void setValidators(List<MetaValidator> validator) {
+		this.validators = validator;
+	}
+
+	public List<MetaValidator> getValidators() {
+		return validators;
+	}
+	
+	public boolean isValidated() {
+		return validators != null && !validators.isEmpty();
+	}
+	
+	public boolean isJSValidated() {
+		if (isValidated()) {
+			for (MetaValidator validator : validators){
+				if (!StringUtils.isEmpty(validator.getJsValidation())){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 }

@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.FederatedDocumentMapping;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
@@ -17,6 +18,7 @@ import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.meta.ModuleParameter;
 import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.view.meta.MetaValidator;
 import net.anotheria.util.StringUtils;
 
 import org.jdom.Document;
@@ -182,6 +184,15 @@ public final class XMLDataParser {
 		String multilingual = p.getAttributeValue("multilingual");
 		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
 			ret.setMultilingual(true);
+//		String validatorName = p.getAttributeValue("validator"); 
+//		if (validatorName != null ) {
+//			MetaValidator validator = GeneratorDataRegistry.getInstance().getValidator(validatorName);
+//			if (validator == null) {
+//				throw new IllegalArgumentException("Uknown validator <" + validatorName + "> for property def " + p+
+//						". Check that you have validators-def.xml in classpath and validator is present there.");
+//			}
+//			ret.setValidator(validator);
+//		}
 		return ret;
 	}
 	

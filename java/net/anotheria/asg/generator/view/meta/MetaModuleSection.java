@@ -147,5 +147,18 @@ public class MetaModuleSection extends MetaSection{
 		this.filters = filters;
 	}
 	
+	public boolean isValidatedOnSave() {
+		if (dialogs != null && dialogs.size() > 0){
+			List<MetaViewElement> dialogElements = dialogs.get(0).getElements(); 
+			if (dialogElements != null) {
+				for (MetaViewElement element : dialogElements){
+					if (element.isValidated()) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 	
 }

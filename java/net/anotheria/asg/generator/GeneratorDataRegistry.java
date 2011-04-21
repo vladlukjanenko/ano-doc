@@ -16,6 +16,7 @@ import net.anotheria.asg.generator.view.meta.MetaDecorator;
 import net.anotheria.asg.generator.view.meta.MetaFilter;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
+import net.anotheria.asg.generator.view.meta.MetaValidator;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
 /**
@@ -50,6 +51,10 @@ public final class GeneratorDataRegistry {
 	 * Parsed filters.
 	 */
 	private Map<String, MetaFilter> filters;
+	/**
+	 * Parsed validators. 
+	 */
+	private Map<String, MetaValidator> validators;
 	
 	/**
 	 * Default generation options. Used if no other options are specified.
@@ -68,6 +73,7 @@ public final class GeneratorDataRegistry {
 		types   = new HashMap<String,DataType>();
 		decorators = new HashMap<String,MetaDecorator>();
 		filters = new HashMap<String, MetaFilter>();
+		validators = new HashMap<String, MetaValidator>();
 		options = defaultOptions;
 	}
 	
@@ -255,6 +261,23 @@ public final class GeneratorDataRegistry {
 		MetaFilter ret = (MetaFilter)blueprint.clone();
 		ret.setFieldName(fieldName);
 		return ret;
+	}
+	
+	public void addValidator(MetaValidator validator) {
+		validators.put(validator.getName(), validator);
+	}
+	
+	public void addValidators(List<MetaValidator> validators) {
+		for (MetaValidator validator : validators)
+			addValidator(validator);
+	}
+	
+	public MetaValidator getValidator(String name) {
+		MetaValidator result = validators.get(name);
+		if (result == null) {
+			throw new RuntimeException("No such validator: " + name);
+		}
+		return result;
 	}
 	
 	/**

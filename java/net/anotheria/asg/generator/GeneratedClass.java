@@ -143,7 +143,8 @@ public class GeneratedClass extends GeneratedArtefact{
 	}
 
 	public void addInterface(String anInterface){
-		interfaces.add(anInterface);
+		if (!interfaces.contains(anInterface))
+			interfaces.add(anInterface);
 	}
 	
 	public void addInterface(Class<?> anInterfaceClazz){

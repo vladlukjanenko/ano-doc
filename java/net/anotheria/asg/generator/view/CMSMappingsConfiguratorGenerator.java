@@ -344,6 +344,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	private void generateSectionMappings(GeneratedClass clazz, MetaModuleSection section){
 		MetaModule module = section.getModule();
 		String actionsPackage = ModuleActionsGenerator.getPackage(module);
+		boolean validatedUpdateAction = section.isValidatedOnSave();
 		for(SectionAction action: SectionAction.values()){
 			if(action.isIgnoreForSection(section))
 				continue;
@@ -351,6 +352,9 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 //			clazz.addImport(actionsPackage + "." + actionName);
 			String actionName = actionsPackage + "." + action.getClassName(section);
 			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName(section)+".jsp") + "))");
+			if (validatedUpdateAction && action.equals(SectionAction.UPDATE)) {
+				appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"validationError\"," + quote(SectionAction.NEW.getViewFullName(section)+".jsp") + "))");
+			}
 		}
 
 	}

@@ -1,5 +1,7 @@
 package net.anotheria.asg.generator.view.meta;
 
+import java.util.List;
+
 import net.anotheria.util.StringUtils;
 
 /**
@@ -60,6 +62,21 @@ public class MultilingualFieldElement extends MetaFieldElement{
 	@Override 
 	public String getDescription() {
 		return mappedElement.getDescription();
+	}
+	
+	@Override 
+	public List<MetaValidator> getValidators() {
+		return mappedElement.getValidators();
+	}
+	
+	@Override 
+	public boolean isValidated() {
+		return mappedElement.isValidated();
+	}
+	
+	@Override 
+	public boolean isJSValidated() {
+		return mappedElement.isJSValidated();
 	}
 	
 	@Override
