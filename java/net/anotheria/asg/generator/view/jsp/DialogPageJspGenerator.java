@@ -293,6 +293,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		List<String> linkElementsRegistry = new ArrayList<String>();
 		// *** CMS2.0 FINISH ***
 
+		MetaDocument document = ((MetaModuleSection) metaSection).getDocument();
 		for (int i = 0; i < elements.size(); i++) {
 			MetaViewElement element = elements.get(i);
 			// *** CMS2.0 START ***
@@ -302,11 +303,9 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				continue;
 			}
 			if (element instanceof MetaFieldElement) {
-				MetaDocument doc = ((MetaModuleSection) metaSection).getDocument();
-				MetaProperty p = doc.getField(element.getName());
-				if (element.isRich())
-					if (p.getType() == MetaProperty.Type.TEXT)
-						richTextElementsRegistry.add(element);
+				MetaProperty p = document.getField(element.getName());
+				if (element.isRich() && p.getType() == MetaProperty.Type.TEXT)
+					richTextElementsRegistry.add(element);
 
 				if (p.isLinked())
 					linkElementsRegistry.add(element.getName());
@@ -322,16 +321,21 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
 				appendString("<td align=\"right\"> <a id=\"" + element.getName() + "DEF\" name=\"" + element.getName() + "DEF\"></a>");
 				increaseIdent();
-				String name = section.getDocument().getField(element.getName()).getName() + "<b>DEF</b>";
-				if (name == null || name.length() == 0)
-					name = "&nbsp;";
-				String caption = element.getCaption() != null ? element.getCaption() + "(<b>DEF</b>)" : name;
+				String name = section.getDocument().getField(element.getName()).getName();
+//				if (name == null || name.length() == 0)
+//					name = "&nbsp;";
+				String caption = (element.getCaption() != null ? element.getCaption() : name) + "(<b>DEF</b>)";
 				appendString(caption);
 				if (element.getDescription() != null)
 					append("<a href=\"#\" class=\"showTooltip\"><img src=\"../cms_static/img/tooltip.gif\" alt=\"\">",element.getDescription(),"</a>");
 				decreaseIdent();
+				append("&nbsp;");
 				appendString("</td>");
-				appendString("<td align=\"left\">&nbsp;");
+				appendString("<td align=\"left\">");
+				if (element.getName() != null){
+					String inputName = section.getDocument().getField(element.getName()).getName(lang);
+					generateValidationParts(element, inputName, document.getField(element.getName()));
+				}
 				append(getElementEditor(section.getDocument(), element));
 				appendString("&nbsp;<i><bean:write name=\"description." + element.getName() + "\" ignore=\"true\"/></i>");
 				appendString("</td>");
@@ -356,7 +360,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			increaseIdent();
 			increaseIdent();
 			appendString("<td align=\"right\">");
-			String name = lang == null ? element.getName() : section.getDocument().getField(element.getName()).getName(lang);
+			String name = (lang == null) ? element.getName() : section.getDocument().getField(element.getName()).getName(lang);
 			if (name == null || name.length() == 0)
 				name = "&nbsp;";
 			appendString("<a id=\"" + name + "\" name=\"" + name + "\"></a>");
@@ -382,36 +386,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			appendString("</td>");
 			appendString("<td align=\"left\">");
 			increaseIdent();
-			if (element.isJSValidated()){
-				appendString("<script type=\"text/javascript\">");
-				appendString("var temp = {validate : function(){ try{");
-				appendString("var value = ", element.isRich() ? getRichTextValueSelector(name) : getValueSelector(name));
-				for (MetaValidator validator : element.getValidators()){
-					String jsValidation = validator.getJsValidation();
-					if (StringUtils.isEmpty(jsValidation)) 
-						continue;
-					jsValidation = jsValidation.trim();
-					if (jsValidation.endsWith(";")) 
-						jsValidation =jsValidation.substring(0, jsValidation.length() - 1);
-					appendString("if (!("+jsValidation+")) {");
-					increaseIdent();
-					appendString("$('#showError"+name+" span').text(\""+validator.getDefaultError()+"\");");
-					appendString("$('#showError"+name+"').show();");
-					appendString("return false;");
-					decreaseIdent();
-					appendString("} else {");
-					increaseIdent();
-					appendString("$('#showError"+name+"').hide();");
-					closeBlock("validation end");
-				}
-				appendString("}catch(e){}return true;}};");
-				appendString("if(validators instanceof Array){validators[validators.length] = temp;}");
-				appendString("</script>");
-			}
-			appendString("<div class=\"showError\" id=\"showError"+name+"\"<ano-tags:notPresent name=\"validationErrors\" property=\""+name+"\"> style=\"display:none\"</ano-tags:notPresent>><div>");
-			appendString("<span>${validationErrors[\""+name+"\"].message}</span>");
-			appendString("<img alt=\"\" src=\"../cms_static/img/error_arrow.gif\">");
-			appendString("</div></div>");
+			if (element.getName() != null)
+				generateValidationParts(element, name, document.getField(element.getName()));
 			append(getElementEditor(section.getDocument(), element));
 			appendString("&nbsp;<i><bean:write name=\"description." + element.getName() + "\" ignore=\"true\"/></i>");
 			decreaseIdent();
@@ -493,11 +469,45 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		return jsp;
 	}
 	
+	private void generateValidationParts(MetaViewElement element, String name, MetaProperty p) {
+		if (element.isJSValidated()){
+			boolean isTextField = element.isRich() || p.getType() == MetaProperty.Type.TEXT;
+			appendString("<script type=\"text/javascript\">");
+			appendString("var temp = {validate : function(){ try{");
+			appendString("var value = ", isTextField ? getTextValueSelector(name) : getValueSelector(name));
+			for (MetaValidator validator : element.getValidators()){
+				String jsValidation = validator.getJsValidation();
+				if (StringUtils.isEmpty(jsValidation)) 
+					continue;
+				jsValidation = jsValidation.trim();
+				if (jsValidation.endsWith(";")) 
+					jsValidation =jsValidation.substring(0, jsValidation.length() - 1);
+				appendString("if (!("+jsValidation+")) {");
+				increaseIdent();
+				appendString("$('#showError"+name+" span').text(\""+validator.getDefaultError()+"\");");
+				appendString("$('#showError"+name+"').show();");
+				appendString("return false;");
+				decreaseIdent();
+				appendString("} else {");
+				increaseIdent();
+				appendString("$('#showError"+name+"').hide();");
+				closeBlock("validation end");
+			}
+			appendString("}catch(e){}return true;}};");
+			appendString("if(validators instanceof Array){validators[validators.length] = temp;}");
+			appendString("</script>");
+		}
+		appendString("<div class=\"showError\" id=\"showError"+name+"\"<ano-tags:notPresent name=\"validationErrors\" property=\""+name+"\"> style=\"display:none\"</ano-tags:notPresent>><div>");
+		appendString("<span>${validationErrors[\""+name+"\"].message}</span>");
+		appendString("<img alt=\"\" src=\"../cms_static/img/error_arrow.gif\">");
+		appendString("</div></div>");
+	}
+	
 	private String getValueSelector(String fieldName) {
 		return "$('input[name="+fieldName+"]').val();";
 	}
-	private String getRichTextValueSelector(String fieldName) {
-		return "tinyMCE.get('"+fieldName+"_ID').isHidden() ? $('textarea[name="+fieldName+"]').val() : tinyMCE.get('"+fieldName+"_ID').getContent();";
+	private String getTextValueSelector(String fieldName) {
+		return "(tinyMCE.get('"+fieldName+"_ID') == null || tinyMCE.get('"+fieldName+"_ID').isHidden()) ? $('textarea[name="+fieldName+"]').val() : tinyMCE.get('"+fieldName+"_ID').getContent();";
 	}
 	
 	private String getElementEditor(MetaDocument doc, MetaViewElement element){
