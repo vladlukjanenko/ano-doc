@@ -262,7 +262,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 
 	private void generateEditorJS(MetaDocument doc, MetaListProperty list, String elName) {
 		MetaProperty p = list.getContainedProperty();
-		if (!p.isLinked())
+		if (!(p.isLinked() || p instanceof MetaEnumerationProperty))
 			return;
 
 		appendString("<script type=\"text/javascript\" src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");

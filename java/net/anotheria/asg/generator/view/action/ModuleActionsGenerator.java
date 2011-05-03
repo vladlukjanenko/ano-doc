@@ -3220,19 +3220,22 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		
 		if(list.getContainedProperty() instanceof MetaEnumerationProperty){
+			MetaEnumerationProperty enumeration = (MetaEnumerationProperty)list.getContainedProperty();
 			EnumerationType type = (EnumerationType )GeneratorDataRegistry.getInstance().getType(((MetaEnumerationProperty) list.getContainedProperty()).getEnumeration());
 			emptyline();
 			String arrName = type.getName()+"_values";
-		    String listName = arrName+"List";
+//		    String listName = arrName+"List";
+		    String listName = enumeration.getName().toLowerCase() + "ValuesCollection";
 		    appendString("//enumeration "+type.getName());
 		    appendStatement(EnumTypeGenerator.getEnumClassName(type) + "[] " + arrName + " = "+ EnumTypeGenerator.getEnumClassName(type) +".values()");
-		    appendStatement("List<LabelValueBean> "+listName+"Values"+" = new ArrayList<LabelValueBean>("+arrName+".length)");
+		    appendStatement("List<LabelValueBean> "+listName+" = new ArrayList<LabelValueBean>("+arrName+".length)");
 		    appendString("for ("+EnumTypeGenerator.getEnumClassName(type)+" element : " + arrName + ") {");
 		    increaseIdent();
 		
 		    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+" + "element.getValue(), element.name())");
-		    appendStatement(listName+"Values"+".add(bean)");
+		    appendStatement(listName+".add(bean)");
 		    append(closeBlock());
+		    appendStatement("addBeanToRequest(req, "+quote(listName)+", " + listName +")");
 		}
 		
 		appendString( "// generate list ...");
