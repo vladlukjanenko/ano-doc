@@ -553,7 +553,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		 */
 		
 		//*** CMS2.0 START ***
-		ret += "<em id="+quote(StringUtils.capitalize(p.getName()))+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
+		ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
 		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
 		//*** CMS2.0 FINISH ***
 		
@@ -734,7 +734,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			appendString("id:'<bean:write name="+quote(beanName)+" property="+quote(elName)+"/>',name:'<bean:write name="+quote(beanName)+" property="+quote(elName + "CurrentValue")+"/>'");
 			decreaseIdent();
 			appendString("};");
-			appendString("new YAHOO.anoweb.widget.ComboBox("+quote(elCapitalName)+",\""+elCapitalName+"Selector\","+elName+"Json,selection"+elCapitalName+"Json);");
+			appendString("new YAHOO.anoweb.widget.ComboBox("+quote(elCapitalName+"CurrentValue")+",\""+elCapitalName+"Selector\","+elName+"Json,selection"+elCapitalName+"Json);");
 		}
 		decreaseIdent();
 		appendString("</script>");
