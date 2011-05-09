@@ -125,14 +125,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				String caption = element.getCaption() != null ? element.getCaption() : element.getName();
 				appendString("<logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
-				appendString("<li><a href=\"#" + element.getName() + "DEF" + "\">" + caption + "</a></li>");
+				//please don't add any style to this <a> tag - JS validation can remove it
+				appendString("<li><a href=\"#" + element.getName() + "DEF" + "\" id=\""+element.getName()+"Anchor\" ${validationErrors."+element.getName()+" eq null ? '':'style=\"color:red\"'}>" + caption + "</a></li>");
 				appendString("</logic:equal>");
 				appendString("<logic:notEqual name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
 				appendString("<li>");
 				increaseIdent();
 				String lang = getElementLanguage(element);
-				appendString("<a href=\"#" + section.getDocument().getField(element.getName()).getName(lang) + "\">" + caption
+				String nameWithLang = section.getDocument().getField(element.getName()).getName(lang);
+				//please don't add any style to this <a> tag - JS validation can remove it
+				appendString("<a href=\"#" + nameWithLang + "\" id=\""+nameWithLang+"Anchor\" ${validationErrors."+element.getName()+" eq null ? '':'style=\"color:red\"'}>" + caption
 						+ "</a><a href=\"javascript:void(0);\" class=\"open_pop\">&nbsp;&nbsp;&nbsp;</a>");
 				appendString("<div class=\"pop_up\">");
 				increaseIdent();
@@ -172,7 +175,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			}
 			if (element instanceof MetaFieldElement) {
 				String caption = element.getCaption() != null ? element.getCaption() : element.getName();
-				appendString("<li><a href=\"#" + element.getName() + "\">" + caption + "</a></li>");
+				//please don't add any style to this <a> tag - JS validation can remove it
+				appendString("<li><a href=\"#" + element.getName() + "\" id=\""+element.getName()+"Anchor\" ${validationErrors."+element.getName()+" eq null ? '':'style=\"color:red\"'}>" + caption + "</a></li>");
 			}
 		}
 		decreaseIdent();
@@ -486,18 +490,20 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				increaseIdent();
 				appendString("$('#showError"+name+" span').text(\""+validator.getDefaultError()+"\");");
 				appendString("$('#showError"+name+"').show();");
+				appendString("$('#"+name+"Anchor').css('color','red');");
 				appendString("return false;");
 				decreaseIdent();
 				appendString("} else {");
 				increaseIdent();
 				appendString("$('#showError"+name+"').hide();");
+				appendString("$('#"+name+"Anchor').removeAttr('style');");
 				closeBlock("validation end");
 			}
 			appendString("}catch(e){}return true;}};");
 			appendString("if(validators instanceof Array){validators[validators.length] = temp;}");
 			appendString("</script>");
 		}
-		appendString("<div class=\"showError\" id=\"showError"+name+"\"<ano-tags:notPresent name=\"validationErrors\" property=\""+name+"\"> style=\"display:none\"</ano-tags:notPresent>><div>");
+		appendString("<div class=\"showError\" id=\"showError"+name+"\" ${validationErrors."+name+" eq null ? 'style=\"display:none\"' : ''}><div>");
 		appendString("<span>${validationErrors[\""+name+"\"].message}</span>");
 		appendString("<img alt=\"\" src=\"../cms_static/img/error_arrow.gif\">");
 		appendString("</div></div>");
