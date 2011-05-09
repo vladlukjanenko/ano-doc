@@ -357,10 +357,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			if (element instanceof MultilingualFieldElement) {
 				MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
 				displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage()
-						+ "\" value=\"false\">style=\"display:none\"</logic:equal> class=\"lang_hide lang_" + multilangualElement.getLanguage() + "\"";
+						+ "\" value=\"false\"> style=\"display:none\"</logic:equal>";
+				appendString("<tr class=\"cmsProperty lang_hide lang_" + multilangualElement.getLanguage() + "\"" + displayLanguageCheck + ">");
+			} else {
+				appendString("<tr class=\"cmsProperty\">");
 			}
-
-			appendString("<tr class=\"cmsProperty\"" + displayLanguageCheck + ">");
 			increaseIdent();
 			increaseIdent();
 			appendString("<td align=\"right\">");
