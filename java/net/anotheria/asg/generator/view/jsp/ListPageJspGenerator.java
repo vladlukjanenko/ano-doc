@@ -36,7 +36,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 
 		append(getBaseJSPHeader());
 
-		appendString("<html:html>");
+		appendString("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
 		increaseIdent();
 		appendString("<head>");
 		increaseIdent();
@@ -171,7 +171,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 
 		appendString("</body>");
 		decreaseIdent();
-		appendString("</html:html>");
+		appendString("</html>");
 
 		generateEditorJS(doc, list, name.toLowerCase() + "ValuesCollection");
 

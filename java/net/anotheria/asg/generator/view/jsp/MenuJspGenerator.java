@@ -66,7 +66,7 @@ public class MenuJspGenerator extends AbstractJSPGenerator {
 							appendString("<li><input type=\"radio\" id=\"r1\" value=\"view\" <logic:equal name=\"searchScope\" value=\"view\">CHECKED</logic:equal> name=\"searchArea\"/><label for=\"r1\">Current page</label></li>");
 							appendString("<li><input type=\"radio\" id=\"r2\" value=\"section\" <logic:equal name=\"searchScope\" value=\"section\">CHECKED</logic:equal> name=\"searchArea\"/><label for=\"r2\">Current section</label></li>");
 						decreaseIdent();
-						appendString("<ul>");
+						appendString("</ul>");
 						appendString("<input type=\"hidden\" value=\"<bean:write name=\"moduleName\" />\" name=\"module\"/>");
 						appendString("<input type=\"hidden\" value=\"<bean:write name=\"documentName\" />\" name=\"document\"/>");
 						appendString("<a href=\"#\" class=\"button\" onClick=\"document.Search.submit();return false\"><span>Search</span></a>");
