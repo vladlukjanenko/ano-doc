@@ -482,7 +482,15 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			boolean isTextField = element.isRich() || p.getType() == MetaProperty.Type.TEXT;
 			appendString("<script type=\"text/javascript\">");
 			appendString("var temp = {validate : function(){ try{");
-			appendString("var value = ", isTextField ? getTextValueSelector(name) : getValueSelector(name));
+			String valueSelector;
+			if (isTextField) {
+				valueSelector = getTextValueSelector(name);
+			} else if (p.isLinked()) {
+				valueSelector = getLinkValueSelector(name);
+			} else { 
+				valueSelector = getValueSelector(name);
+			}
+			appendString("var value = ", valueSelector);
 			for (MetaValidator validator : element.getValidators()){
 				String jsValidation = validator.getJsValidation();
 				if (StringUtils.isEmpty(jsValidation)) 
@@ -516,6 +524,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	private String getValueSelector(String fieldName) {
 		return "$('input[name="+fieldName+"]').val();";
 	}
+	
+	private String getLinkValueSelector(String fieldName) {
+		return "$('input[id="+StringUtils.capitalize(fieldName)+"CurrentValueInput]').val();";
+	}
+	
 	private String getTextValueSelector(String fieldName) {
 		return "(tinyMCE.get('"+fieldName+"_ID') == null || tinyMCE.get('"+fieldName+"_ID').isHidden()) ? $('textarea[name="+fieldName+"]').val() : tinyMCE.get('"+fieldName+"_ID').getContent();";
 	}
@@ -564,7 +577,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		
 		//*** CMS2.0 START ***
 		//quoted "name" attr in em, cause w3c validation says it's error 
-		ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+/*" name="+quote(p.getName())+*/" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
+		ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
 		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
 		//*** CMS2.0 FINISH ***
 		
