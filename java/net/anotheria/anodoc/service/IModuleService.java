@@ -2,9 +2,6 @@ package net.anotheria.anodoc.service;
 
 import net.anotheria.anodoc.data.Module;
 import net.anotheria.asg.util.listener.IModuleListener;
-import net.anotheria.asg.util.listener.IServiceListener;
-
-import java.util.List;
 
 /**
  * This interface describes the locally available service for Module management.<br>

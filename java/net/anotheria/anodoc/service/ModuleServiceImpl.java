@@ -268,10 +268,15 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 	}
 
 	@Override public void storeModule(Module module) throws NoStorageForModuleException, StorageFailureException{
-		putInCacheDirty(module);
-		if (!module.getId().equals(IStatisticsConstants.MODULE_STATISTICS)){
-			updateStatistics(module);
+		try{
+			LockHolder.prepareForSave();
+			putInCacheDirty(module);
+		}finally{
+			LockHolder.notifySaved();
 		}
+			if (!module.getId().equals(IStatisticsConstants.MODULE_STATISTICS)){
+				updateStatistics(module);
+			}
 	}
 	
 	/**
