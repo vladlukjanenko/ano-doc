@@ -4,10 +4,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.anotheria.anodoc.data.Module;
-import net.anotheria.anodoc.stats.IStatisticsConstants;
-import net.anotheria.anodoc.stats.ModuleStatistics;
-import net.anotheria.anodoc.stats.StatisticsFactory;
-import net.anotheria.anodoc.util.CommonHashtableModuleStorage;
 
 import net.anotheria.asg.util.listener.IModuleListener;
 import org.apache.log4j.Logger;
@@ -83,9 +79,6 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 		if (log.isDebugEnabled()) {
 			log.debug("Created new ModuleServiceImplementation");
 		}
-
-		//attach statistic module
-		attachStatistics();
 
 		ConfigurationManager.INSTANCE.configure(this);
 	}
@@ -274,9 +267,6 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 		}finally{
 			LockHolder.notifySaved();
 		}
-			if (!module.getId().equals(IStatisticsConstants.MODULE_STATISTICS)){
-				updateStatistics(module);
-			}
 	}
 	
 	/**
@@ -308,36 +298,6 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 		deleteModule(ownerId, moduleId, DEFAULT_COPY_ID);
 	}
 
-	/**
-	 * Configures and attaches the statistics module
-	 *
-	 */
-	private void attachStatistics(){
-		//now configure myself for statistics.
-		AbstractModuleFactory factory = new StatisticsFactory();
-		String moduleId = IStatisticsConstants.MODULE_STATISTICS;
-		attachModuleFactory(moduleId, factory);
-		attachModuleStorage(moduleId, new CommonHashtableModuleStorage(moduleId+".dat", factory));
-	}
-	
-	/**
-	 * Updates statistics with the statistical information from the given module. Also updates the size of the module 
-	 * in the statistic module for quota calculation. 
-	 */
-	private void updateStatistics(Module module){
-		String ownerId = module.getOwnerId();
-		String copyId  = module.getCopyId();
-
-		try{		
-			ModuleStatistics stats = (ModuleStatistics)getModule(ownerId, IStatisticsConstants.MODULE_STATISTICS, copyId, true);
-			if (module.getStatisticalInformation()!=IStatisticsConstants.NO_STATS)
-				stats.updateStatisticValue(module.getId(), module.getStatisticalInformation());
-			stats.updateSizeValue(module.getId(), module.getSizeInBytes());
-			storeModule(stats);
-		}catch(Exception e){
-			log.error("updateStatistics", e);
-		}
-	}
 
 	/**
 	 * Removes changed module from cache and fires moduleLoaded event of registered listener.
