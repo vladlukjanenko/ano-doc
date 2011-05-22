@@ -6,6 +6,11 @@ package net.anotheria.anodoc.data;
  */
 public class NoSuchDocumentException extends RuntimeException{
 	/**
+	 * SerialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Creates a new instance.
 	 * @param name
 	 */

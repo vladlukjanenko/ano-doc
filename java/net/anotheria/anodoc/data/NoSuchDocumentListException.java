@@ -6,6 +6,11 @@ package net.anotheria.anodoc.data;
  */
 public class NoSuchDocumentListException extends RuntimeException{
 	/**
+	 * SerialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Creates a new exception instance.
 	 * @param name
 	 */

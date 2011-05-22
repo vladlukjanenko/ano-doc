@@ -7,6 +7,11 @@ package net.anotheria.anodoc.data;
  */
 public class NoSuchPropertyException extends RuntimeException{
 	/**
+	 * SerialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Creates a new instance.
 	 * @param name name of the property.
 	 * @param type type of the property.
