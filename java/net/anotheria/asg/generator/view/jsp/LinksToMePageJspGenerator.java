@@ -26,7 +26,7 @@ public class LinksToMePageJspGenerator extends AbstractJSPGenerator{
 		increaseIdent();
 		appendString("<head>");
 		increaseIdent();
-		appendString("<title>Direct links to the "+section.getDocument().getName()+"[<bean:write name=\"objectId\"/>]</title>");
+		appendString("<title>Direct links to the "+section.getDocument().getName()+"[<ano:write name=\"objectId\"/>]</title>");
 		generatePragmas(view);
 		appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		decreaseIdent();
@@ -34,33 +34,33 @@ public class LinksToMePageJspGenerator extends AbstractJSPGenerator{
 		appendString("<body>");
 		increaseIdent();		
 		
-		appendString("<logic:present name="+quote("linksToMe")+" scope="+quote("request")+">");
+		appendString("<ano:present name="+quote("linksToMe")+" scope="+quote("request")+">");
 		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();
 		appendString("<tr>");
 		increaseIdent();
-		appendString("<td>Direct links to the "+section.getDocument().getName()+"[<bean:write name=\"objectId\"/>]</td>");
+		appendString("<td>Direct links to the "+section.getDocument().getName()+"[<ano:write name=\"objectId\"/>]</td>");
 		decreaseIdent();
 		appendString("</tr>");
-		appendString("<logic:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
+		appendString("<ano:iterate name="+quote("linksToMe")+" id="+quote("linkToMe")+" type="+quote("net.anotheria.asg.util.bean.LinkToMeBean")+" >");
 		increaseIdent();
 		appendString("<tr>");
 		increaseIdent();
 	
-		String docDescriptionStatement = "Type: <bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentType")+"/>";
-		docDescriptionStatement += ", Id: <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentId")+"/></a>";
-		docDescriptionStatement += "<logic:equal name="+quote("linkToMe")+" property="+quote("descriptionAvailable") +" value="+quote("true")+">, Name: <b> <a href="+quote("<bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentDescription")+"/></a></b></logic:equal>";
-		docDescriptionStatement += ", in <b><bean:write name="+quote("linkToMe")+" property="+quote("targetDocumentProperty")+"/></b>.";
+		String docDescriptionStatement = "Type: <ano:write name="+quote("linkToMe")+" property="+quote("targetDocumentType")+"/>";
+		docDescriptionStatement += ", Id: <a href="+quote("<ano:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><ano:write name="+quote("linkToMe")+" property="+quote("targetDocumentId")+"/></a>";
+		docDescriptionStatement += "<ano:equal name="+quote("linkToMe")+" property="+quote("descriptionAvailable") +" value="+quote("true")+">, Name: <b> <a href="+quote("<ano:write name="+quote("linkToMe")+" property="+quote("targetDocumentLink")+"/>")+" ><ano:write name="+quote("linkToMe")+" property="+quote("targetDocumentDescription")+"/></a></b></ano:equal>";
+		docDescriptionStatement += ", in <b><ano:write name="+quote("linkToMe")+" property="+quote("targetDocumentProperty")+"/></b>.";
 		appendString("<td>"+docDescriptionStatement+"</td>");
 		decreaseIdent();
 		appendString("</tr>");
 		decreaseIdent();
-		appendString("</logic:iterate>");
+		appendString("</ano:iterate>");
 		appendString("</table>");
 		
 		appendString("<br/>");
 		appendString("<br/>");
-		appendString("</logic:present>");
+		appendString("</ano:present>");
 		appendString("<!-- ");
 		appendString("<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">");
 		increaseIdent();

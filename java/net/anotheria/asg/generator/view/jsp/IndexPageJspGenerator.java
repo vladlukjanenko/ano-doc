@@ -70,7 +70,7 @@ public class IndexPageJspGenerator extends AbstractJSPGenerator {
 			appendString("<div class=\"c_r\"><!-- --></div>");
 			appendString("<div class=\"c_b_l\"><!-- --></div>");
 			appendString("<div class=\"c_b_r\"><!-- --></div>");
-			appendString("<h1>Welcome, <bean:write name=\"currentUserId\"/>!</h1>");
+			appendString("<h1>Welcome, <ano:write name=\"currentUserId\"/>!</h1>");
 			
 			appendString("<table cellpadding=\"0\" cellspacing=\"0\" width=\"48.8%\" class=\"pages_table welcome_table\">");
 			appendString("<thead>");
@@ -85,14 +85,14 @@ public class IndexPageJspGenerator extends AbstractJSPGenerator {
 			appendString("</tr>");
 			appendString("</thead>");
 			appendString("<tbody>");
-			appendString("<logic:iterate name=\"changes\" id=\"change\" type=\"net.anotheria.anosite.gen.shared.bean.DocumentChangeFB\" indexId="+quote("ind")+">");
+			appendString("<ano:iterate name=\"changes\" id=\"change\" type=\"net.anotheria.anosite.gen.shared.bean.DocumentChangeFB\" indexId="+quote("ind")+">");
 			appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
-			appendString("<td><a href=\"<bean:write name=\"change\" property=\"parentName\"/><bean:write name=\"change\" property=\"documentName\"/>Edit?pId=<bean:write name=\"change\" property=\"id\"/>\"><bean:write name=\"change\" property=\"documentName\"/></a></td>");
-			appendString("<td><bean:write name=\"change\" property=\"action\"/></td>");
-			appendString("<td><bean:write name=\"change\" property=\"userName\"/></td>");
-			appendString("<td><bean:write name=\"change\" property=\"date\"/></td>");
+			appendString("<td><a href=\"<ano:write name=\"change\" property=\"parentName\"/><ano:write name=\"change\" property=\"documentName\"/>Edit?pId=<ano:write name=\"change\" property=\"id\"/>\"><ano:write name=\"change\" property=\"documentName\"/></a></td>");
+			appendString("<td><ano:write name=\"change\" property=\"action\"/></td>");
+			appendString("<td><ano:write name=\"change\" property=\"userName\"/></td>");
+			appendString("<td><ano:write name=\"change\" property=\"date\"/></td>");
 			appendString("</tr>");
-			appendString("</logic:iterate>");
+			appendString("</ano:iterate>");
 			appendString("</tbody>");
 			appendString("</table>");
 			

@@ -68,7 +68,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		decreaseIdent();
 
 		String backButtonHref = SectionAction.EDIT.getMappingName(section);
-		backButtonHref += "?pId=<bean:write name=\"ownerId\"/>";
+		backButtonHref += "?pId=<ano:write name=\"ownerId\"/>";
 		appendString("<a href=" + backButtonHref + " class=\"button\"><span>Back to " + section.getDocument().getName() + "</span></a>");
 
 		// SAVE AND CLOSE BUTTONS SHOULD BE HERE
@@ -96,12 +96,12 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 
 		appendString("</thead>");
 		appendString("<tbody>");
-		appendString("<logic:iterate name=" + quote("elements") + " id=" + quote("element") + " type="
+		appendString("<ano:iterate name=" + quote("elements") + " id=" + quote("element") + " type="
 				+ quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, list)) + " indexId=" + quote("ind") + ">");
 		increaseIdent();
 		appendString("<tr class=\"cmsElement<%=ind.intValue()%2==0 ? \" lineLight\" : \" lineDark\"%> highlightable\">");
 		increaseIdent();
-		appendString("<td><bean:write name=" + quote("element") + " property=" + quote("position") + " filter=\"true\"/></td>");
+		appendString("<td><ano:write name=" + quote("element") + " property=" + quote("position") + " filter=\"true\"/></td>");
 
 		if (p.isLinked()) {
 
@@ -112,22 +112,22 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 			MetaDocument linkTarget = targetModule.getDocumentByName(link2p.getTargetDocumentName());
 			String targetLinkAction = SectionAction.EDIT.getMappingName(linkTarget);
 
-			appendString("<td><a href=<ano:tslink>" + quote(targetLinkAction + "?pId=<bean:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + "/></ano:tslink>")
-					+ "><bean:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></a></td>");
-			appendString("<td><a href=<ano:tslink>" + quote(targetLinkAction + "?pId=<bean:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + "/></ano:tslink>")
-					+ "><bean:write name=\"element\" property=\"description\" filter=\"true\"/></a></td>");
+			appendString("<td><a href=<anoweb:tslink>" + quote(targetLinkAction + "?pId=<ano:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + "/></anoweb:tslink>")
+					+ "><ano:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></a></td>");
+			appendString("<td><a href=<anoweb:tslink>" + quote(targetLinkAction + "?pId=<ano:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + "/></anoweb:tslink>")
+					+ "><ano:write name=\"element\" property=\"description\" filter=\"true\"/></a></td>");
 		} else if (p.getType() == MetaProperty.Type.IMAGE) {
-			String imageName = "<bean:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/>";
+			String imageName = "<ano:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/>";
 			String imagePath = "getFile?pName=" + imageName;
 			appendString("<td><a href=" + quote(imagePath) + " target=\"_blank\"><img src=" + quote(imagePath) + "alt=" + quote(imageName) + " class=\"thumbnail\">" + "</a></td>");
-			appendString("<td>" + imageName + "<bean:write name=" + quote("element") + " property=" + quote("description") + " filter=\"true\"/></td>");
+			appendString("<td>" + imageName + "<ano:write name=" + quote("element") + " property=" + quote("description") + " filter=\"true\"/></td>");
 		} else {
-			appendString("<td><bean:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></td>");
-			appendString("<td><bean:write name=" + quote("element") + " property=" + quote("description") + " filter=\"true\"/></td>");
+			appendString("<td><ano:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></td>");
+			appendString("<td><ano:write name=" + quote("element") + " property=" + quote("description") + " filter=\"true\"/></td>");
 		}
 
-		String parameter = "ownerId=<bean:write name=" + quote("element") + " property=" + quote("ownerId") + "/>";
-		parameter += "&pPosition=<bean:write name=" + quote("element") + " property=" + quote("position") + "/>";
+		String parameter = "ownerId=<ano:write name=" + quote("element") + " property=" + quote("ownerId") + "/>";
+		parameter += "&pPosition=<ano:write name=" + quote("element") + " property=" + quote("position") + "/>";
 		appendString("<td>");
 		appendIncreasedString("<a href=" + quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=top&" + parameter) + ">" + getTopImage("move to top") + "</a>");
 		appendIncreasedString("<a href=" + quote(ContainerAction.MOVE.getMappingName(doc, list) + "?dir=up&" + parameter) + ">" + getUpImage("move up") + "</a>");
@@ -138,7 +138,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		decreaseIdent();
 		appendString("</tr>");
 		decreaseIdent();
-		appendString("</logic:iterate>");
+		appendString("</ano:iterate>");
 		decreaseIdent();
 		appendString("</tbody>");
 		appendString("</table>");
@@ -187,7 +187,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		String addFormName = addFormAction + "ElementForm";
 		
 		appendString("<form name=" + quote(addFormName) + " action=" + quote(addFormAction) + " method=\"post\">");
-		appendString("<input type=" + quote("hidden") + " name=" + quote("ownerId") + " value=\"<bean:write name=" + quote("ownerId") + "/>\">");
+		appendString("<input type=" + quote("hidden") + " name=" + quote("ownerId") + " value=\"<ano:write name=" + quote("ownerId") + "/>\">");
 		
 		if (p.isLinked() || (p instanceof MetaEnumerationProperty)) {
 			String propertyName = list.getContainedProperty().getName();
@@ -239,7 +239,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 			appendString("<td align=\"left\">");
 			appendString("<form name=" + quote(quickAddFormName) + " action=" + quote(quickAddFormAction) + " method=\"post\">");
 			increaseIdent();
-			appendString("<input type=" + quote("hidden") + " name=" + quote("ownerId") + " value=\"<bean:write name=" + quote("ownerId") + "/>\">");
+			appendString("<input type=" + quote("hidden") + " name=" + quote("ownerId") + " value=\"<ano:write name=" + quote("ownerId") + "/>\">");
 
 			p = list.getContainedProperty();
 
@@ -276,12 +276,12 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 
 		appendString("//Initializing items for " + elName);
 		appendString("var " + elName + "Json = {items:[");
-		appendString("<logic:iterate id=\"item\" name=\"" + elName + "\" type=\"net.anotheria.webutils.bean.LabelValueBean\">");
+		appendString("<ano:iterate id=\"item\" name=\"" + elName + "\" type=\"net.anotheria.webutils.bean.LabelValueBean\">");
 		increaseIdent();
-		appendString("{id:\"<bean:write name=\"item\" property=\"value\" filter=\"true\"/>\",name:\"<bean:write name=\"item\" property=\"label\" filter=\"true\"/>\"},");
+		appendString("{id:\"<ano:write name=\"item\" property=\"value\" filter=\"true\"/>\",name:\"<ano:write name=\"item\" property=\"label\" filter=\"true\"/>\"},");
 		// appendString("{id:\"${item.value}\",name:\"${item.label}\"},");
 		decreaseIdent();
-		appendString("</logic:iterate>");
+		appendString("</ano:iterate>");
 		appendString("]};");
 		String propertyName = list.getContainedProperty().getName();
 		appendString("new YAHOO.anoweb.widget.ComboBox(" + quote(propertyName) + ",\"" + propertyName + "Selector\"," + elName + "Json, {id:'',name:'none'});");

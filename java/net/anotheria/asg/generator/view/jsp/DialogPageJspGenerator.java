@@ -123,12 +123,12 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			MetaViewElement element = elements.get(i);
 			while (elements.get(i) instanceof MultilingualFieldElement) {
 				String caption = element.getCaption() != null ? element.getCaption() : element.getName();
-				appendString("<logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument())) + " property="
+				appendString("<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
 				//please don't add any style to this <a> tag - JS validation can remove it
 				appendString("<li><a href=\"#" + element.getName() + "DEF" + "\" id=\""+element.getName()+"Anchor\" ${validationErrors."+element.getName()+" eq null ? '':'style=\"color:red\"'}>" + caption + "</a></li>");
-				appendString("</logic:equal>");
-				appendString("<logic:notEqual name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument())) + " property="
+				appendString("</ano:equal>");
+				appendString("<ano:notEqual name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
 				appendString("<li>");
 				increaseIdent();
@@ -171,7 +171,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				appendString("</div>");
 				decreaseIdent();
 				appendString("</li>");
-				appendString("</logic:notEqual>");
+				appendString("</ano:notEqual>");
 			}
 			if (element instanceof MetaFieldElement) {
 				String caption = element.getCaption() != null ? element.getCaption() : element.getName();
@@ -235,37 +235,37 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<div class=\"c_b_r\"><!-- --></div>");
 
 		String entryName = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()));
-		String result = "<logic:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
+		String result = "<ano:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) metaSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LOCK);
-		path += "?pId=<bean:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
+		path += "?pId=<ano:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
 		result += "<a href=\"#\" onClick= "
 				+ quote("lightbox('All unsaved data will be lost!!!<br /> Really lock  "
 						+ CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())
-						+ " with id: <bean:write name=" + entryName + " property=\"id\"/>?','<ano:tslink>" + path + "</ano:tslink>');") + ">" + getLockImage()
+						+ " with id: <ano:write name=" + entryName + " property=\"id\"/>?','<anoweb:tslink>" + path + "</anoweb:tslink>');") + ">" + getLockImage()
 				+ "&nbsp;Lock</a>";
-		result += "</logic:equal>";
+		result += "</ano:equal>";
 		appendString(result);
 
 		if (StorageType.CMS.equals(((MetaModuleSection) metaSection).getDocument().getParentModule().getStorageType())) {
-			appendString("<logic:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">");
+			appendString("<ano:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">");
 
 			path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) metaSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_UNLOCK);
-			path += "?pId=<bean:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
+			path += "?pId=<ano:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
 
-			String alt = ((MetaModuleSection) metaSection).getDocument().getName() + " is locked by: <bean:write name=" + entryName + " property="
-					+ quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + "/>, at: <bean:write name=" + entryName + " property="
+			String alt = ((MetaModuleSection) metaSection).getDocument().getName() + " is locked by: <ano:write name=" + entryName + " property="
+					+ quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + "/>, at: <ano:write name=" + entryName + " property="
 					+ quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME) + "/>";
 
 			appendString("<a href=\"#\" onClick= "
 					+ quote("lightbox('" + alt + "<br /> Unlock " + ((MetaModuleSection) metaSection).getDocument().getName()
-							+ " with id: <bean:write name=" + entryName + " property=\"id\"/>?','<ano:tslink>" + path + "</ano:tslink>');") + ">"
-					+ getUnLockImage(alt) + "" + " Unlock</a><span>&nbsp;Locked by <b><bean:write name="
+							+ " with id: <ano:write name=" + entryName + " property=\"id\"/>?','<anoweb:tslink>" + path + "</anoweb:tslink>');") + ">"
+					+ getUnLockImage(alt) + "" + " Unlock</a><span>&nbsp;Locked by <b><ano:write name="
 					+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 					+ quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + "/></b>");
-			appendString("at:  <b><bean:write name="
+			appendString("at:  <b><ano:write name="
 					+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 					+ quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME) + "/></b></span>");
-			appendString("</logic:equal>");
+			appendString("</ano:equal>");
 		}
 
 		appendString("<form class=\"cmsDialog\" name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()))
@@ -279,13 +279,13 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\" border=\"0\">");
 		appendString("<tbody>");
 		increaseIdent();
-		appendString("<bean:write name=\"description.null\" ignore=\"true\"/>");
+		appendString("<ano:write name=\"description.null\" ignore=\"true\"/>");
 		decreaseIdent();
 		appendString("<tr>");
 		increaseIdent();
 		appendString("<td align=\"left\">");
 		appendString("<div class=\"clear\"><!-- --></div>");
-		// appendString("</logic:equal>");
+		// appendString("</ano:equal>");
 		// UNLOCK HERE!!!!!
 		appendString("</td>");
 		decreaseIdent();
@@ -320,7 +320,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 			// ALTERNATIVE EDITOR FOR DISABLED MODE
 			if (lang != null && lang.equals(GeneratorDataRegistry.getInstance().getContext().getDefaultLanguage())) {
-				appendString("<logic:equal name="
+				appendString("<ano:equal name="
 						+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("true") + ">");
 				appendString("<td align=\"right\"> <a id=\"" + element.getName() + "DEF\" name=\"" + element.getName() + "DEF\"></a>");
@@ -341,14 +341,14 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 					generateValidationParts(element, inputName, document.getField(element.getName()));
 				}
 				append(getElementEditor(section.getDocument(), element));
-				appendString("&nbsp;<i><bean:write name=\"description." + element.getName() + "\" ignore=\"true\"/></i>");
+				appendString("&nbsp;<i><ano:write name=\"description." + element.getName() + "\" ignore=\"true\"/></i>");
 				appendString("</td>");
 				appendString("</tr>");
-				appendString("</logic:equal>");
+				appendString("</ano:equal>");
 			}// END ALTERNATIVE EDITOR FOR MULTILANG DISABLED FORM
 
 			if (lang != null)
-				appendString("<logic:equal name="
+				appendString("<ano:equal name="
 						+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 						+ quote(ModuleBeanGenerator.FIELD_ML_DISABLED) + " value=" + quote("false") + ">");
 
@@ -356,8 +356,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			String displayLanguageCheck = "";
 			if (element instanceof MultilingualFieldElement) {
 				MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
-				displayLanguageCheck = "<logic:equal name=\"display" + multilangualElement.getLanguage()
-						+ "\" value=\"false\"> style=\"display:none\"</logic:equal>";
+				displayLanguageCheck = "<ano:equal name=\"display" + multilangualElement.getLanguage()
+						+ "\" value=\"false\"> style=\"display:none\"</ano:equal>";
 				appendString("<tr class=\"cmsProperty lang_hide lang_" + multilangualElement.getLanguage() + "\"" + displayLanguageCheck + ">");
 			} else {
 				appendString("<tr class=\"cmsProperty\">");
@@ -397,14 +397,14 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			if (element.getName() != null)
 				generateValidationParts(element, name, document.getField(element.getName()));
 			append(getElementEditor(section.getDocument(), element));
-			appendString("&nbsp;<i><bean:write name=\"description." + element.getName() + "\" ignore=\"true\"/></i>");
+			appendString("&nbsp;<i><ano:write name=\"description." + element.getName() + "\" ignore=\"true\"/></i>");
 			decreaseIdent();
 			appendString("</td>");
 			decreaseIdent();
 			appendString("</tr>");
 
 			if (lang != null)
-				appendString("</logic:equal>");
+				appendString("</ano:equal>");
 		}
 		appendString("<tr>");
 		appendString("</tr>");
@@ -421,14 +421,14 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("</form>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 
-		appendString("<div class=\"generated\"><span><bean:write name=" + quote("objectInfoString") + "/></span>");
+		appendString("<div class=\"generated\"><span><ano:write name=" + quote("objectInfoString") + "/></span>");
 
 		// Link to the Links to Me page
-		appendString("<logic:present name=" + quote("linksToMe") + " scope=" + quote("request") + ">");
-		String linksToMePagePath = CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LINKS_TO_ME) + "?pId=<bean:write name="
+		appendString("<ano:present name=" + quote("linksToMe") + " scope=" + quote("request") + ">");
+		String linksToMePagePath = CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LINKS_TO_ME) + "?pId=<ano:write name="
 				+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property=\"id\"/>";
-		appendString("<a href=" + quote("<ano:tslink>" + linksToMePagePath + "</ano:tslink>") + ">Show direct links to  this document</a>");
-		appendString("</logic:present>");
+		appendString("<a href=" + quote("<anoweb:tslink>" + linksToMePagePath + "</anoweb:tslink>") + ">Show direct links to  this document</a>");
+		appendString("</ano:present>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		appendString("</div>");
 		appendString("</div>");
@@ -572,13 +572,13 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		ret += "<html:optionsCollection property="+quote(p.getName()+"Collection"+(lang==null ? "":lang))+" filter=\"false\"/>";
 		ret += "</html:select>";
 		ret += "&nbsp;";
-		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
+		ret += "(<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 		 */
 		
 		//*** CMS2.0 START ***
 		//quoted "name" attr in em, cause w3c validation says it's error 
 		ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
-		ret += " (<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";			
+		ret += " (<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 		//*** CMS2.0 FINISH ***
 		
 		return ret;
@@ -589,14 +589,14 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		String lang = getElementLanguage(element); 
 		
 		ret += "<select name=\""+p.getName(lang)+"\">";
-		ret += "<logic:iterate indexId=\"index\" id=\"element\" property=\""+ p.getName() +"Collection\" name=\""+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\">";
-		ret += "<option value=\"<bean:write name=\"element\" property=\"value\"/>\" <logic:equal name=\""+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\" property=\""+p.getName()+"CurrentValue"+(lang==null ? "":lang)+"\" value=\"${element.label}\">selected</logic:equal>><bean:write name=\"element\" property=\"label\"/></option>";
-		ret += "</logic:iterate>";
+		ret += "<ano:iterate indexId=\"index\" id=\"element\" property=\""+ p.getName() +"Collection\" name=\""+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\">";
+		ret += "<option value=\"<ano:write name=\"element\" property=\"value\"/>\" <ano:equal name=\""+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\" property=\""+p.getName()+"CurrentValue"+(lang==null ? "":lang)+"\" value=\"${element.label}\">selected</ano:equal>><ano:write name=\"element\" property=\"label\"/></option>";
+		ret += "</ano:iterate>";
 		ret += "</select>";
 		
 		
 		ret += "&nbsp;";
-		ret += "(<i>old:</i>&nbsp;<bean:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
+		ret += "(<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 		
 		return ret;
 	}
@@ -644,21 +644,21 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		String ret = "";
 		String lang = getElementLanguage(element); 
 		String name = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()));
-		ret += "<logic:equal name="+name+" property="+quote("id")+" value="+quote("")+">";
+		ret += "<ano:equal name="+name+" property="+quote("id")+" value="+quote("")+">";
 		ret += "none";
-		ret += "</logic:equal>";
-		ret += "<logic:notEqual name="+name+" property="+quote("id")+" value="+quote("")+">";
-		ret += "<bean:write name="+name+" property="+quote(p.getName(lang))+"/>";
+		ret += "</ano:equal>";
+		ret += "<ano:notEqual name="+name+" property="+quote("id")+" value="+quote("")+">";
+		ret += "<ano:write name="+name+" property="+quote(p.getName(lang))+"/>";
 		ret += "&nbsp;";
 		ret += "element";
-		ret += "<logic:notEqual name="+name+" property="+quote(p.getName(lang))+" value="+quote("1")+">";
+		ret += "<ano:notEqual name="+name+" property="+quote(p.getName(lang))+" value="+quote("1")+">";
 		ret += "s";
-		ret += "</logic:notEqual>";
+		ret += "</ano:notEqual>";
 		ret += "&nbsp;";
 		String actionName = CMSMappingsConfiguratorGenerator.getContainerPath(((MetaModuleSection)currentSection).getDocument(), p, CMSMappingsConfiguratorGenerator.ACTION_SHOW);
-		actionName += "?ownerId=<bean:write name="+name+" property="+quote("id")+"/>";
+		actionName += "?ownerId=<ano:write name="+name+" property="+quote("id")+"/>";
 		ret += "<a href="+quote(actionName)+">&nbsp;&raquo&nbsp;Edit&nbsp;</a>";
-		ret += "</logic:notEqual>";
+		ret += "</ano:notEqual>";
 		
 		return ret;
 	}
@@ -667,12 +667,12 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 	private String getImageEditor(MetaFieldElement element, MetaProperty p){
 		String beanName = CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument());
-		String propertyWriter = "<bean:write name="+quote(beanName)+" property="+quote(p.getName()) + "/>";
+		String propertyWriter = "<ano:write name="+quote(beanName)+" property="+quote(p.getName()) + "/>";
 		String ret ="";
-		ret += "<logic:present name="+quote(beanName)+" property="+quote(p.getName()) + ">\r";
+		ret += "<ano:present name="+quote(beanName)+" property="+quote(p.getName()) + ">\r";
 		ret += "<a target=\"_blank\" href=\"getFile?pName=" + propertyWriter + "\"><img class=\"thumbnail\" alt=" + quote(propertyWriter) + " src=\"getFile?pName=" + propertyWriter + "\"/></a>\r";
-		ret += "</logic:present>\r";
-		ret += "&nbsp;<i><bean:write name=\"description." + p.getName() + "\" ignore=\"true\"/></i>\r";
+		ret += "</ano:present>\r";
+		ret += "&nbsp;<i><ano:write name=\"description." + p.getName() + "\" ignore=\"true\"/></i>\r";
 		
 		ret += "<div id=\"file-uploader-" + p.getName() + "\" class=\"image_uploader\"><!-- --></div>\r";
 		ret += "<script>\r";
@@ -706,12 +706,12 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		
 		//ret += "<html:text filter=\"false\" property="+quote(element.getName());
 		if (inputType.equalsIgnoreCase("checkbox"))	{
-			ret += " <logic:equal name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" value=\"true\""; 
+			ret += " <ano:equal name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" value=\"true\"";
 			ret += ">";
-			ret += "checked</logic:equal>";
+			ret += "checked</ano:equal>";
 		}
 		else {
-			ret += " value=\"<bean:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang)) + "/>\"";
+			ret += " value=\"<ano:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang)) + "/>\"";
 		}
 		if (element.isReadonly())
 			ret += " readonly="+quote("readonly");
@@ -729,7 +729,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		
 		ret += "<textarea cols=\"\" rows=\"16\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
 		ret += ">";
-		ret += "<bean:write filter=\"false\" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
+		ret += "<ano:write filter=\"false\" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
 		ret += "</textarea>";
 
 		return ret;
@@ -746,16 +746,16 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			
 			appendString("//Initializing items for " + elName);
 			appendString("var " +elName+ "Json = {items:[");
-			appendString("<logic:iterate id=\"item\" name="+quote(beanName)+" property=\""+elName+"Collection\" type=\"net.anotheria.webutils.bean.LabelValueBean\">");
+			appendString("<ano:iterate id=\"item\" name="+quote(beanName)+" property=\""+elName+"Collection\" type=\"net.anotheria.webutils.bean.LabelValueBean\">");
 			increaseIdent();
-			appendString("{id:\"<bean:write name=\"item\" property=\"value\" filter=\"true\"/>\",name:\"<bean:write name=\"item\" property=\"label\" filter=\"true\"/>\"},");
+			appendString("{id:\"<ano:write name=\"item\" property=\"value\" filter=\"true\"/>\",name:\"<ano:write name=\"item\" property=\"label\" filter=\"true\"/>\"},");
 			//appendString("{id:\"${item.value}\",name:\"${item.label}\"},");
 			decreaseIdent();
-			appendString("</logic:iterate>");
+			appendString("</ano:iterate>");
 			appendString("]};");
 			appendString("var selection"+elCapitalName+"Json = {");
 			increaseIdent();
-			appendString("id:'<bean:write name="+quote(beanName)+" property="+quote(elName)+"/>',name:'<bean:write name="+quote(beanName)+" property="+quote(elName + "CurrentValue")+"/>'");
+			appendString("id:'<ano:write name="+quote(beanName)+" property="+quote(elName)+"/>',name:'<ano:write name="+quote(beanName)+" property="+quote(elName + "CurrentValue")+"/>'");
 			decreaseIdent();
 			appendString("};");
 			appendString("new YAHOO.anoweb.widget.ComboBox("+quote(elCapitalName+"CurrentValue")+",\""+elCapitalName+"Selector\","+elName+"Json,selection"+elCapitalName+"Json);");
@@ -799,7 +799,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		if (element.getName().equals("cancel")) {
 			String onClick = "return confirm('All unsaved data will be lost!!!. Document will be unlocked"; 
 			String cancel = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_CLOSE);
-			cancel += "?pId=<bean:write name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>";
+			cancel += "?pId=<ano:write name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>";
 			return "<a href=\"" + cancel + "\" class=\"button\" onClick=\""+onClick+"\"><span>Close</span></a>";
 		}
 		if (element.getName().equals("update")) {
@@ -830,42 +830,42 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
     private String getUpdateAndStayFunction(MetaDocument doc, MetaFunctionElement element){
 		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
 			//creating logic for hiding or showing current operation link in Locking CASE!!!!!
-			String result = "<logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
+			String result = "<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
-			result+="  <logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
+			result+="  <ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
 			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-					".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"apply.label.prefix\"/></span></a> \n";
-			result+="  </logic:equal> \n";
-			result+="</logic:equal> \n";
-			result+="<logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
+					".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a> \n";
+			result+="  </ano:equal> \n";
+			result+="</ano:equal> \n";
+			result+="<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
 			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-					".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"apply.label.prefix\"/></span></a>\n";
-			result+="</logic:equal> \n";
+					".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>\n";
+			result+="</ano:equal> \n";
 			return result;
 		}
 		return "<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-				".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"apply.label.prefix\"/></span></a>";
+				".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>";
 	}
 	private String getUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
 		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
 			//creating logic for hiding or showing current operation link in Locking CASE!!!!!
-			String result = "<logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
+			String result = "<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + "> \n";
-			result+="  <logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
+			result+="  <ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
 			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-					".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"save.label.prefix\"/></span></a> \n";
-			result+="  </logic:equal> \n";
-			result+="</logic:equal> \n";
-			result+="<logic:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
+					".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
+			result+="  </ano:equal> \n";
+			result+="</ano:equal> \n";
+			result+="<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
 			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-					".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"save.label.prefix\"/></span></a> \n";
-			result+="</logic:equal> \n";
+					".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
+			result+="</ano:equal> \n";
 			return result;
 		}
 		return "<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-				".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><bean:write name=\"save.label.prefix\"/></span></a>";
+				".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"save.label.prefix\"/></span></a>";
 	}	
 
 	/**
@@ -874,13 +874,13 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	 * @param colspan
 	 */
 	private void addMultilanguageOperations(MetaModuleSection section, int colspan) {
-		appendString("<logic:equal name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
+		appendString("<ano:equal name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("false")+">");
 		increaseIdent();
-		appendString("<logic:notEqual name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
+		appendString("<ano:notEqual name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+" value="+quote("")+">");
 		increaseIdent();
 		appendString("<form name=\"CopyLang\" id=\"CopyLang\" method=\"get\" action=\""+CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_COPY_LANG)+"\">");
 		increaseIdent();
-		appendString("<input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+		appendString("<input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<ano:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
 		appendString("<div>");
 		increaseIdent();
 		appendString("Copy <select name=\"pSrcLang\">");
@@ -909,25 +909,25 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
 		increaseIdent();
 		appendString("<div>");
-		appendString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+		appendString("<input type=\"hidden\" name=\"value\" value=\"true\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<ano:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
 		decreaseIdent();
 		appendString("</div>");
 		appendString("<a href=\"#\" class=\"button\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\"><span>Disable languages</span></a>");
 		appendString("</form>");
 		decreaseIdent();
-		appendString("</logic:notEqual>");
+		appendString("</ano:notEqual>");
 		decreaseIdent();
-		appendString("</logic:equal>");
-		appendString("<logic:equal name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
+		appendString("</ano:equal>");
+		appendString("<ano:equal name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" value="+quote("true")+">");
 		increaseIdent();
 		appendString("<div>");
 		appendString("<form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" method=\"get\" action=\""+CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
-		appendString("<input type=\"hidden\" name=\"value\" value=\"false\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<bean:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
+		appendString("<input type=\"hidden\" name=\"value\" value=\"false\"/><input type=\"hidden\" name=\"ts\" value=\"<%=System.currentTimeMillis()%>\"/><input type=\"hidden\" name=\"pId\" value=\"<ano:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, section.getDocument()))+" property="+quote("id")+"/>\"/>");
 		appendString("<a href=\"#\" class=\"button\" onclick=\"document."+ModuleBeanGenerator.FIELD_ML_DISABLED+".submit(); return false\"><span>Enable languages</span></a>");
 		decreaseIdent();
 		appendString("</div>");
 		appendString("</form>");
-		appendString("</logic:equal>");
+		appendString("</ano:equal>");
 	}
 
 }

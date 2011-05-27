@@ -38,13 +38,13 @@ public class SharedFooterJspGenerator extends AbstractJSPGenerator {
 		if (views.size()>1){
 		
 			String viewSwitcher = "";
-			viewSwitcher += "<bean:size id="+quote("listsize")+" name="+quote("views")+"/>";
-			viewSwitcher +="<logic:iterate name="+quote("views")+" type="+quote("net.anotheria.webutils.bean.MenuItemBean")+" id="+quote("v")+" indexId="+quote("ind")+" >";
-			viewSwitcher += "<a href="+quote("<ano:tslink><bean:write name="+quote("v")+" property="+quote("link")+"/></ano:tslink>")+">";
-			viewSwitcher += "<bean:write name="+quote("v")+" property="+quote("caption")+"/>";
+			viewSwitcher += "<ano:size id="+quote("listsize")+" name="+quote("views")+"/>";
+			viewSwitcher +="<ano:iterate name="+quote("views")+" type="+quote("net.anotheria.webutils.bean.MenuItemBean")+" id="+quote("v")+" indexId="+quote("ind")+" >";
+			viewSwitcher += "<a href="+quote("<anoweb:tslink><ano:write name="+quote("v")+" property="+quote("link")+"/></anoweb:tslink>")+">";
+			viewSwitcher += "<ano:write name="+quote("v")+" property="+quote("caption")+"/>";
 			viewSwitcher += "</a>";
-			viewSwitcher += "<logic:notEqual name="+quote("ind")+" value="+quote("<%"+QUOTE+"+(listsize-1)%>")+">&nbsp;|&nbsp;</logic:notEqual>";
-			viewSwitcher += "</logic:iterate>";
+			viewSwitcher += "<ano:notEqual name="+quote("ind")+" value="+quote("<%"+QUOTE+"+(listsize-1)%>")+">&nbsp;|&nbsp;</ano:notEqual>";
+			viewSwitcher += "</ano:iterate>";
 			viewSwitcher = "Views:&nbsp;" + viewSwitcher;
 			
 			ret += writeString(viewSwitcher);

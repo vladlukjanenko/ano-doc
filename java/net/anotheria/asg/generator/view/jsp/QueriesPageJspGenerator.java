@@ -122,9 +122,9 @@ public class QueriesPageJspGenerator extends AbstractJSPGenerator implements IGe
 			increaseIdent();
 			
 			appendString("<option value=\"\">none</option>");
-			appendString("<logic:iterate name="+quote(targetDocument.getMultiple().toLowerCase())+" type="+quote("net.anotheria.webutils.bean.LabelValueBean")+" id="+quote("entry")+">");
-			appendIncreasedString("<option value="+quote("<bean:write name="+quote("entry")+" property="+quote("value")+"/>")+">"+"<bean:write name="+quote("entry")+" property="+quote("label")+" filter="+quote("false")+"/>"+"</option>");
-			appendString("</logic:iterate>");
+			appendString("<ano:iterate name="+quote(targetDocument.getMultiple().toLowerCase())+" type="+quote("net.anotheria.webutils.bean.LabelValueBean")+" id="+quote("entry")+">");
+			appendIncreasedString("<option value="+quote("<ano:write name="+quote("entry")+" property="+quote("value")+"/>")+">"+"<ano:write name="+quote("entry")+" property="+quote("label")+" filter="+quote("false")+"/>"+"</option>");
+			appendString("</ano:iterate>");
 			//ret += writeClosingTag("select");
 			decreaseIdent();
 			appendString("</select>&nbsp;<a href="+quote("#")+" onClick="+quote("document.forms."+targetDocument.getName()+".submit(); return false")+">GO</a>");
@@ -164,20 +164,20 @@ public class QueriesPageJspGenerator extends AbstractJSPGenerator implements IGe
 		increaseIdent();
 		appendString("<tr>");
 		increaseIdent();
-		appendString("<logic:iterate name=\"queriesMenu\" type=\"net.anotheria.webutils.bean.MenuItemBean\" id=\"entry\">");
+		appendString("<ano:iterate name=\"queriesMenu\" type=\"net.anotheria.webutils.bean.MenuItemBean\" id=\"entry\">");
 		increaseIdent();
 		appendString("<td>");
 		increaseIdent();
-		appendString("<logic:equal name=\"entry\" property=\"active\" value=\"true\">");
-		appendIncreasedString("<td class=\"menuTitleSelected\"><bean:write name=\"entry\" property=\"caption\"/></td>");
-		appendString("</logic:equal>");
-		appendString("<logic:notEqual name=\"entry\" property=\"active\" value=\"true\">");
-		appendIncreasedString("<td class=\"menuTitle\"><a href=\"<ano:tslink><bean:write name=\"entry\" property=\"link\"/></ano:tslink>\"><bean:write name=\"entry\" property=\"caption\"/></a></td>");
-		appendString("</logic:notEqual>");
+		appendString("<ano:equal name=\"entry\" property=\"active\" value=\"true\">");
+		appendIncreasedString("<td class=\"menuTitleSelected\"><ano:write name=\"entry\" property=\"caption\"/></td>");
+		appendString("</ano:equal>");
+		appendString("<ano:notEqual name=\"entry\" property=\"active\" value=\"true\">");
+		appendIncreasedString("<td class=\"menuTitle\"><a href=\"<anoweb:tslink><ano:write name=\"entry\" property=\"link\"/></anoweb:tslink>\"><ano:write name=\"entry\" property=\"caption\"/></a></td>");
+		appendString("</ano:notEqual>");
 		decreaseIdent();
 		appendString("</td>");
 		decreaseIdent();
-		appendString("</logic:iterate>");
+		appendString("</ano:iterate>");
 		
 
 		decreaseIdent();

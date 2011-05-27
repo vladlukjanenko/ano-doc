@@ -70,7 +70,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 					increaseIdent();
 					appendString("<div class=\"r_b_l\"><!-- --></div>");
 					appendString("<div class=\"r_b_r\"><!-- --></div>");
-					appendString("<div class=\"left_p\">"+generateNewFunction("", new MetaFunctionElement("add"))+"</div>");
+					appendString("<div class=\"left_p\">"+generateNewFunction("", new MetaFunctionElement("add")) +"&nbsp;&nbsp;" + generateDeleteSelectedFunction("", new MetaFunctionElement("delete"))+"</div>");
 					appendString("<div class=\"right_p\"><a href=\"#\"><img src=\"../cms_static/img/settings.gif\" alt=\"\"/></a>");
 						increaseIdent();
 						appendString("<div class=\"pop_up\">");
@@ -88,7 +88,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 										appendString("<div class=\"in_w\">");
 											increaseIdent();
 											//actually  - currentPage  parameter ! - for export paging!!!
-											String pageNumberParam = "?pageNumber=<bean:write name="+quote("currentpage")+" scope="+quote("request")+"/>";
+											String pageNumberParam = "?pageNumber=<ano:write name="+quote("currentpage")+" scope="+quote("request")+"/>";
 											appendString("<span>Export to <a href="+quote(SectionAction.EXPORTtoXML.getMappingName(section)+pageNumberParam)+">XML</a> or <a href="+quote(SectionAction.EXPORTtoCSV.getMappingName(section)+pageNumberParam)+">CSV</a></span>");
 										decreaseIdent();
 										appendString("</div>");
@@ -136,16 +136,16 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 						increaseIdent();
 							appendString("<li>"+StringUtils.capitalize(f.getName())+" "+StringUtils.capitalize(f.getFieldName())+":</li>");
 							increaseIdent();
-								appendString("<logic:iterate name="+quote(ModuleActionsGenerator.getFilterVariableName(f))+" id="+quote("triggerer")+" type="+quote("net.anotheria.asg.util.filter.FilterTrigger")+">");
+								appendString("<ano:iterate name="+quote(ModuleActionsGenerator.getFilterVariableName(f))+" id="+quote("triggerer")+" type="+quote("net.anotheria.asg.util.filter.FilterTrigger")+">");
 								increaseIdent();
-									appendString("<logic:equal name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
-									appendIncreasedString("<li><a href=\"#\" class=\"active\"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a></li>");
-									appendString("</logic:equal>");
-									appendString("<logic:notEqual name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
-									appendIncreasedString("<li><a href="+quote(SectionAction.SHOW.getMappingName(section)+"?pFilter"+i+"=<bean:write name="+quote("triggerer")+" property="+quote("parameter")+"/>")+"><bean:write name="+quote("triggerer")+" property="+quote("caption")+"/></a></li>");
-									appendString("</logic:notEqual>");
+									appendString("<ano:equal name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
+									appendIncreasedString("<li><a href=\"#\" class=\"active\"><ano:write name="+quote("triggerer")+" property="+quote("caption")+"/></a></li>");
+									appendString("</ano:equal>");
+									appendString("<ano:notEqual name="+quote("triggerer")+" property="+quote("parameter")+" value="+quote("<%=filterParameter"+i+"%>")+">");
+									appendIncreasedString("<li><a href="+quote(SectionAction.SHOW.getMappingName(section)+"?pFilter"+i+"=<ano:write name="+quote("triggerer")+" property="+quote("parameter")+"/>")+"><ano:write name="+quote("triggerer")+" property="+quote("caption")+"/></a></li>");
+									appendString("</ano:notEqual>");
 								decreaseIdent();
-								appendString("</logic:iterate>");
+								appendString("</ano:iterate>");
 							decreaseIdent();
 						decreaseIdent();
 						appendString("</ul>");
@@ -161,35 +161,35 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 	//first paging start
 	appendString("<div class=\"paginator\">");
 	increaseIdent();
-	appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfPages\" value=\"1\">");
+	appendString("<ano:greaterThan name=\"pagingControl\" property=\"numberOfPages\" value=\"1\">");
 		appendString("<ul>");
 		increaseIdent();
-			appendString("<logic:notEqual name=\"pagingControl\" property=\"first\" value=\"true\">");
-			appendIncreasedString("<li class=\"prev\"><a href=\"?pageNumber=<bean:write name=\"pagingControl\" property=\"previousPageNumber\"/>\">prev</a></li>");
-			appendString("</logic:notEqual>");
-			appendString("<logic:iterate id=\"pageElement\" name=\"pagingControl\" property=\"elements\" indexId=\"index\">");
+			appendString("<ano:notEqual name=\"pagingControl\" property=\"first\" value=\"true\">");
+			appendIncreasedString("<li class=\"prev\"><a href=\"?pageNumber=<ano:write name=\"pagingControl\" property=\"previousPageNumber\"/>\">prev</a></li>");
+			appendString("</ano:notEqual>");
+			appendString("<ano:iterate id=\"pageElement\" name=\"pagingControl\" property=\"elements\" indexId=\"index\">");
 			increaseIdent();
 				appendString("<li>");
 				increaseIdent();
-					appendString("<logic:equal name=\"pageElement\" property=\"separator\" value=\"true\">...</logic:equal>");
-					appendString("<logic:equal name=\"pageElement\" property=\"active\" value=\"true\"><bean:write name=\"pageElement\" property=\"caption\"/></logic:equal>");
-					appendString("<logic:equal name=\"pageElement\" property=\"active\" value=\"false\"><a href=\"?pageNumber=<bean:write name=\"pageElement\" property=\"caption\"/>\"><bean:write name=\"pageElement\" property=\"caption\"/></a></logic:equal>");
+					appendString("<ano:equal name=\"pageElement\" property=\"separator\" value=\"true\">...</ano:equal>");
+					appendString("<ano:equal name=\"pageElement\" property=\"active\" value=\"true\"><ano:write name=\"pageElement\" property=\"caption\"/></ano:equal>");
+					appendString("<ano:equal name=\"pageElement\" property=\"active\" value=\"false\"><a href=\"?pageNumber=<ano:write name=\"pageElement\" property=\"caption\"/>\"><ano:write name=\"pageElement\" property=\"caption\"/></a></ano:equal>");
 				decreaseIdent();
 				appendString("</li>");
 			decreaseIdent();
-			appendString("</logic:iterate>");
-			appendString("<logic:notEqual name=\"pagingControl\" property=\"last\" value=\"true\">");
-			appendIncreasedString("<li class=\"next\"><a href=\"?pageNumber=<bean:write name=\"pagingControl\" property=\"nextPageNumber\"/>\">next</a></li>");
-			appendString("</logic:notEqual>");
+			appendString("</ano:iterate>");
+			appendString("<ano:notEqual name=\"pagingControl\" property=\"last\" value=\"true\">");
+			appendIncreasedString("<li class=\"next\"><a href=\"?pageNumber=<ano:write name=\"pagingControl\" property=\"nextPageNumber\"/>\">next</a></li>");
+			appendString("</ano:notEqual>");
 		decreaseIdent();
 		appendString("</ul>");
-		appendString("</logic:greaterThan>");
+		appendString("</ano:greaterThan>");
 
 		increaseIdent();
 			appendString("<select name=\"itemsOnPage\" onchange=\"window.location='?itemsOnPage=' + this.options[this.selectedIndex].value\">");
-			appendString("<logic:iterate name=\"PagingSelector\" type=\"java.lang.String\" id=\"option\">");
-			appendString("<option value=\"<bean:write name=\"option\"/>\" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name=\"option\"/> per page</option>");
-			appendString("</logic:iterate>");
+			appendString("<ano:iterate name=\"PagingSelector\" type=\"java.lang.String\" id=\"option\">");
+			appendString("<option value=\"<ano:write name=\"option\"/>\" <ano:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</ano:equal>><ano:write name=\"option\"/> per page</option>");
+			appendString("</ano:iterate>");
 			appendString("</select>");
 		decreaseIdent();
 	decreaseIdent();
@@ -205,6 +205,8 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 			appendString("<tr class=\"lineCaptions\">");
 			increaseIdent();
 			boolean opened = false;
+
+			appendString("<td><input type=\"checkbox\" onclick=\"javascript:alert('Fix Me Andrey!')\"></td>");
 				for (int i=0; i<elements.size(); i++){
 					MetaViewElement element = elements.get(i);
 					
@@ -220,23 +222,25 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 			appendString("<tbody>");
 			increaseIdent();
 				String entryName = doc.getName().toLowerCase();
-				appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+" indexId=\"ind\">");
+				appendString("<ano:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+" indexId=\"ind\">");
 				increaseIdent();
 					appendString("<tr class=\"cmsDocument <%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
+					appendString("<td><input type=\"checkbox\" name=\"pId\" value=\"<ano:write filter=\"false\" name="+quote(entryName)+" property=\"plainId\"/>\"></td>");
+
 					opened = false;
 				        for (int i = 0; i < elements.size(); i++) {
 				            MetaViewElement element = elements.get(i);
-				        	
+
 							if (element instanceof MetaFunctionElement && opened == false)
 							{appendString("<td class=\"no_wrap\">"); opened = true;}
-							
+
 				            appendString(generateElement(entryName, element,doc));
 				        }
 				        		opened = false;
 				        		appendString("</td>");
 				        		appendString("</tr>");
 							decreaseIdent();
-							appendString("</logic:iterate>");
+							appendString("</ano:iterate>");
 						decreaseIdent();
 						appendString("</tbody>");
 					decreaseIdent();
@@ -247,34 +251,34 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 					//second paging start
 					appendString("<div class=\"paginator\">");
 					increaseIdent();
-					appendString("<logic:greaterThan name=\"pagingControl\" property=\"numberOfPages\" value=\"1\">");
+					appendString("<ano:greaterThan name=\"pagingControl\" property=\"numberOfPages\" value=\"1\">");
 						appendString("<ul>");
 						increaseIdent();
-							appendString("<logic:notEqual name=\"pagingControl\" property=\"first\" value=\"true\">");
-							appendIncreasedString("<li class=\"prev\"><a href=\"?pageNumber=<bean:write name=\"pagingControl\" property=\"previousPageNumber\"/>\">prev</a></li>");
-							appendString("</logic:notEqual>");
-							appendString("<logic:iterate id=\"pageElement\" name=\"pagingControl\" property=\"elements\" indexId=\"index\">");
+							appendString("<ano:notEqual name=\"pagingControl\" property=\"first\" value=\"true\">");
+							appendIncreasedString("<li class=\"prev\"><a href=\"?pageNumber=<ano:write name=\"pagingControl\" property=\"previousPageNumber\"/>\">prev</a></li>");
+							appendString("</ano:notEqual>");
+							appendString("<ano:iterate id=\"pageElement\" name=\"pagingControl\" property=\"elements\" indexId=\"index\">");
 							increaseIdent();
 								appendString("<li>");
 								increaseIdent();
-									appendString("<logic:equal name=\"pageElement\" property=\"separator\" value=\"true\">...</logic:equal>");
-									appendString("<logic:equal name=\"pageElement\" property=\"active\" value=\"true\"><bean:write name=\"pageElement\" property=\"caption\"/></logic:equal>");
-									appendString("<logic:equal name=\"pageElement\" property=\"active\" value=\"false\"><a href=\"?pageNumber=<bean:write name=\"pageElement\" property=\"caption\"/>\"><bean:write name=\"pageElement\" property=\"caption\"/></a></logic:equal>");
+									appendString("<ano:equal name=\"pageElement\" property=\"separator\" value=\"true\">...</ano:equal>");
+									appendString("<ano:equal name=\"pageElement\" property=\"active\" value=\"true\"><ano:write name=\"pageElement\" property=\"caption\"/></ano:equal>");
+									appendString("<ano:equal name=\"pageElement\" property=\"active\" value=\"false\"><a href=\"?pageNumber=<ano:write name=\"pageElement\" property=\"caption\"/>\"><ano:write name=\"pageElement\" property=\"caption\"/></a></ano:equal>");
 								decreaseIdent();
 								appendString("</li>");
 							decreaseIdent();
-							appendString("</logic:iterate>");
-							appendString("<logic:notEqual name=\"pagingControl\" property=\"last\" value=\"true\">");
-							appendIncreasedString("<li class=\"next\"><a href=\"?pageNumber=<bean:write name=\"pagingControl\" property=\"nextPageNumber\"/>\">next</a></li>");
-							appendString("</logic:notEqual>");
+							appendString("</ano:iterate>");
+							appendString("<ano:notEqual name=\"pagingControl\" property=\"last\" value=\"true\">");
+							appendIncreasedString("<li class=\"next\"><a href=\"?pageNumber=<ano:write name=\"pagingControl\" property=\"nextPageNumber\"/>\">next</a></li>");
+							appendString("</ano:notEqual>");
 						decreaseIdent();
 						appendString("</ul>");
-						appendString("</logic:greaterThan>");
+						appendString("</ano:greaterThan>");
 						increaseIdent();
 							appendString("<select name=\"itemsOnPage\" onchange=\"window.location='?itemsOnPage=' + this.options[this.selectedIndex].value\">");
-							appendString("<logic:iterate name=\"PagingSelector\" type=\"java.lang.String\" id=\"option\">");
-							appendString("<option value=\"<bean:write name=\"option\"/>\" <logic:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</logic:equal>><bean:write name=\"option\"/> per page</option>");
-							appendString("</logic:iterate>");
+							appendString("<ano:iterate name=\"PagingSelector\" type=\"java.lang.String\" id=\"option\">");
+							appendString("<option value=\"<ano:write name=\"option\"/>\" <ano:equal name=\"option\" value=\"<%=selectedPaging%>\">selected</ano:equal>><ano:write name=\"option\"/> per page</option>");
+							appendString("</ano:iterate>");
 							appendString("</select>");
 						decreaseIdent();
 					decreaseIdent();
@@ -333,6 +337,12 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		return "<a href="+quote(generateTimestampedLinkPath(path))+" class=\"button\"><span>"+getImage("add", "add new "+((MetaModuleSection)currentSection).getDocument().getName())+"Add new element</span></a>" ;
 	}
 	
+	private String generateDeleteSelectedFunction(String entryName, MetaFunctionElement element){
+		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_DELETE);
+		//todo change images names here getImage("add", "add new....
+		return "<a href="+quote(generateTimestampedLinkPath(path))+" id=\"deleteSelectedId\" class=\"button\"><span>"+getImage("add", "add new "+((MetaModuleSection)currentSection).getDocument().getName())+"Delete selected</span></a>" ;
+	}
+
 	private String generateElementHeader(MetaViewElement element){
 		if (element instanceof MetaFieldElement)
 			return generateFieldHeader((MetaFieldElement)element);
@@ -356,24 +366,24 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 			action = action+"?"+ViewConstants.PARAM_SORT_TYPE_NAME+"="+name;
 			String actionAZ = action + "&" + ViewConstants.PARAM_SORT_ORDER + "="+ViewConstants.VALUE_SORT_ORDER_ASC; 
 			String actionZA = action + "&" + ViewConstants.PARAM_SORT_ORDER + "="+ViewConstants.VALUE_SORT_ORDER_DESC; 
-			header += "<logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+">"+
+			header += "<ano:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+">"+
 						"<a href="+quote(generateTimestampedLinkPath(actionZA))+"class=\"down\">"+caption+"</a>"+
-					"</logic:equal>"+
-					"<logic:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+">"+
+					"</ano:equal>"+
+					"<ano:equal name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+">"+
 						"<a href="+quote(generateTimestampedLinkPath(actionAZ))+"class=\"up\">"+caption+"</a>"+
-					"</logic:equal>"+
-					"<logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+">"+
-						"<logic:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+">"+
+					"</ano:equal>"+
+					"<ano:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_ASC)+">"+
+						"<ano:notEqual name="+quote("currentSortCode")+" value="+quote(name+"_"+ViewConstants.VALUE_SORT_ORDER_DESC)+">"+
 							"<a href="+quote(generateTimestampedLinkPath(actionAZ))+">"+caption+"</a>"+
-						"</logic:notEqual>"+
-					"</logic:notEqual>";
+						"</ano:notEqual>"+
+					"</ano:notEqual>";
 		} else {
 			header = caption;//StringUtils.capitalize(name);
 		}
 		String displayLanguageCheck = "";
 		if(element instanceof MultilingualFieldElement) {
 			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
-			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";			
+			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <ano:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</ano:equal>";
 		}
 		
 		return "<td " + displayLanguageCheck + ">"+header+"</td>";
@@ -398,23 +408,23 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		String displayLanguageCheck = "";
 		if(element instanceof MultilingualFieldElement) {
 			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
-			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <logic:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</logic:equal>";			
+			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <ano:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</ano:equal>";
 		}
 		
-		return "<td " + displayLanguageCheck + "><bean:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
-		//return "<td><bean:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
+		return "<td " + displayLanguageCheck + "><ano:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
+		//return "<td><ano:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}
 	
 	private String generateImage(String entryName, MetaFieldElement element){
 		String ret = "";
 		ret += "<td>";
-		ret += "<logic:equal name="+quote(entryName)+" property="+quote(element.getName())+" value="+quote("")+">";
+		ret += "<ano:equal name="+quote(entryName)+" property="+quote(element.getName())+" value="+quote("")+">";
 		ret += "none";
-		ret += "</logic:equal>";
-		ret += "<logic:notEqual name="+quote(entryName)+" property="+quote(element.getName())+" value="+quote("")+">";
-		String imagePath = "getFile?pName=<bean:write name="+quote(entryName)+" property="+quote(element.getName())+"/>";
+		ret += "</ano:equal>";
+		ret += "<ano:notEqual name="+quote(entryName)+" property="+quote(element.getName())+" value="+quote("")+">";
+		String imagePath = "getFile?pName=<ano:write name="+quote(entryName)+" property="+quote(element.getName())+"/>";
 		ret += "<a href="+quote(imagePath)+" target="+quote("_blank")+"><img src="+quote(imagePath)+ " class=\"thumbnail\"></a>";
-		ret += "</logic:notEqual>";
+		ret += "</ano:notEqual>";
 		ret += "</td>";
 		return ret;
 	}
@@ -448,13 +458,13 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
             return getUnLockFunction(entryName, element);
 
         return "";
-		//return "<td><bean:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
+		//return "<td><ano:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}
 	
 	private String getCustomFunction(String entryName, MetaCustomFunctionElement element){
 		String caption = element.getCaption();
 		String link = element.getLink();
-		link = StringUtils.replace(link, "$plainId", "<bean:write name="+quote(entryName)+" property=\"plainId\"/>");
+		link = StringUtils.replace(link, "$plainId", "<ano:write name="+quote(entryName)+" property=\"plainId\"/>");
 		return "<a href="+quote(generateTimestampedLinkPath(link))+">"+caption+"</a>";
 	}
 
@@ -464,13 +474,13 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
      */
     private String getUnLockFunction(String entryName, MetaFunctionElement element) {
         String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_UNLOCK);
-        path += "?pId=<bean:write name=" + quote(entryName) + " property=\"plainId\"/>";
+        path += "?pId=<ano:write name=" + quote(entryName) + " property=\"plainId\"/>";
         path+="&nextAction=showList";
-		String alt = "Locked by: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/>, at: <bean:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
-        String link = "<a href=\"#\" onClick= "+quote("lightbox('"+alt+"<br /> Unlock "+((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getUnLockImage(alt)+"</a>";
-        String result  = "<logic:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">";
+		String alt = "Locked by: <ano:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/>, at: <ano:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
+        String link = "<a href=\"#\" onClick= "+quote("lightbox('"+alt+"<br /> Unlock "+((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<anoweb:tslink>"+path+"</anoweb:tslink>');")+">"+getUnLockImage(alt)+"</a>";
+        String result  = "<ano:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">";
         result+=link;
-        result+= "</logic:equal>";
+        result+= "</ano:equal>";
         return result;
     }
 
@@ -479,48 +489,48 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
      */
     private String getLockFunction(String entryName, MetaFunctionElement element) {
         String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LOCK);
-        path += "?pId=<bean:write name=" + quote(entryName) + " property=\"plainId\"/>";
+        path += "?pId=<ano:write name=" + quote(entryName) + " property=\"plainId\"/>";
         path+="&nextAction=showList";
         String link =  "<a href=\"#\" onClick= "+quote("lightbox('Lock "+
-				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getLockImage()+"</a>" ;
-        String result  = "<logic:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + ">";
+				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<anoweb:tslink>"+path+"</anoweb:tslink>');")+">"+getLockImage()+"</a>" ;
+        String result  = "<ano:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + ">";
         result+=link;
-        result+= "</logic:equal>";
+        result+= "</ano:equal>";
         return result;
     }
 
 	private String getDuplicateFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_DUPLICATE);
-		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
+		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
-		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getDuplicateImage()+"</a>" ;
+		return "<a href="+quote("<anoweb:tslink>"+path+"</anoweb:tslink>")+">"+getDuplicateImage()+"</a>" ;
 	}
 
 	private String getVersionFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_VERSIONINFO);
-		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
+		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
-		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getImage("version", "LastUpdate: <bean:write name="+quote(entryName)+" property="+quote("documentLastUpdateTimestamp")+"/>")+"</a>" ;
+		return "<a href="+quote("<anoweb:tslink>"+path+"</anoweb:tslink>")+">"+getImage("version", "LastUpdate: <ano:write name="+quote(entryName)+" property="+quote("documentLastUpdateTimestamp")+"/>")+"</a>" ;
 	}
 
 	private String getDeleteFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_DELETE);
-		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
+		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
-		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getDeleteImage()+"</a>" ;
+		return "<a href="+quote("<anoweb:tslink>"+path+"</anoweb:tslink>")+">"+getDeleteImage()+"</a>" ;
 	}
 
 	private String getDeleteWithConfirmationFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_DELETE);
-		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
+		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		return "<a href=\"#\" onClick="+quote("lightbox('Really delete "+
-				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <bean:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getDeleteImage()+"</a>" ;
+				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<anoweb:tslink>"+path+"</anoweb:tslink>');")+">"+getDeleteImage()+"</a>" ;
 	}
 
 	private String getEditFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_EDIT);
-		path += "?pId=<bean:write name="+quote(entryName)+" property=\"plainId\"/>";
+		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
-		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getEditImage()+"</a>" ;
+		return "<a href="+quote("<anoweb:tslink>"+path+"</anoweb:tslink>")+">"+getEditImage()+"</a>" ;
 	}
 }

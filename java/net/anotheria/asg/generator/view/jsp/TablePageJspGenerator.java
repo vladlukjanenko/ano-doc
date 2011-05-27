@@ -55,31 +55,34 @@ public class TablePageJspGenerator extends AbstractJSPGenerator {
 		}
 	    appendIncreasedString("<td width=\"1%\">&nbsp;</td>");
 		appendString("</tr>");
-		appendString("<logic:iterate name="+quote("rows")+" id="+quote("row")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, table))+" indexId="+quote("ind")+">");
+		appendString("<ano:iterate name="+quote("rows")+" id="+quote("row")+" type="+quote(ModuleBeanGenerator.getContainerEntryFormImport(doc, table))+" indexId="+quote("ind")+">");
 		increaseIdent();
 		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
 		increaseIdent();
-		appendString("<td width="+quote("1%")+"><bean:write name="+quote("row")+" property="+quote("position")+"/></td>");
+		appendString("<td width="+quote("1%")+"><ano:write name="+quote("row")+" property="+quote("position")+"/></td>");
 		for (int i=0; i<columns.size(); i++){
 		    MetaProperty p = (MetaProperty)columns.get(i);
-		    appendString("<td><bean:write name="+quote("row")+" property="+quote(table.extractSubName(p))+"/></td>");
+		    appendString("<td><ano:write name="+quote("row")+" property="+quote(table.extractSubName(p))+"/></td>");
 		}
-		String parameter = "pId=<bean:write name="+quote("row")+" property="+quote("ownerId")+"/>";
-		parameter += "&pPosition=<bean:write name="+quote("row")+" property="+quote("position")+"/>";
+		String parameter = "pId=<ano:write name="+quote("row")+" property="+quote("ownerId")+"/>";
+		parameter += "&pPosition=<ano:write name="+quote("row")+" property="+quote("position")+"/>";
 		appendString("<td width="+quote("1%")+"><a href="+quote(CMSMappingsConfiguratorGenerator.getContainerPath(doc, table, CMSMappingsConfiguratorGenerator.ACTION_DELETE)+"?"+parameter)+">"+getDeleteImage("delete row")+"</a></td>");
 		decreaseIdent();
 		appendString("</tr>");
 		decreaseIdent();
-		appendString("</logic:iterate>");
+		appendString("</ano:iterate>");
 		decreaseIdent();
 		appendString("</table>");
 		appendString("<br>");
 		decreaseIdent();
 		appendString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 		increaseIdent();
-		appendString("<html:form action="+quote(CMSMappingsConfiguratorGenerator.getContainerPath(doc, table, CMSMappingsConfiguratorGenerator.ACTION_ADD))+">");
-		appendString("<html:hidden property="+quote("ownerId")+"/>"); 
-		appendString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">"); 
+		//TODO removing of "html:" may cause some problems...
+		//appendString("<html:form action="+quote(CMSMappingsConfiguratorGenerator.getContainerPath(doc, table, CMSMappingsConfiguratorGenerator.ACTION_ADD))+">");
+		appendString("<form action="+quote(CMSMappingsConfiguratorGenerator.getContainerPath(doc, table, CMSMappingsConfiguratorGenerator.ACTION_ADD))+">");
+		//appendString("<html:hidden property="+quote("ownerId")+"/>");
+		appendString("<input type="+quote("hidden")+" name="+quote("ownerId")+"/>");
+		appendString("<input type="+quote("hidden")+" name="+quote("pId")+" value=\"<bean:write name="+quote(formName)+" property="+quote("ownerId")+"/>\">");
 		appendString("<tr class="+quote("lineCaptions")+">");
 	    appendIncreasedString("<td colspan="+quote("2")+">Add row:</td>");
 	    appendString("</tr>");
@@ -102,7 +105,7 @@ public class TablePageJspGenerator extends AbstractJSPGenerator {
 				appendString("<td align=\"left\" width=\"65%\">&nbsp;");
 				String field = "";
 				field += "<input type=\"text\" name="+quote(name);
-				field += " value=\"<bean:write name="+quote(CMSMappingsConfiguratorGenerator.getContainerEntryFormName(doc,table ))+" property="+quote(name)+"/>";
+				field += " value=\"<ano:write name="+quote(CMSMappingsConfiguratorGenerator.getContainerEntryFormName(doc,table ))+" property="+quote(name)+"/>";
 				field += "\">";
 				appendIncreasedString(field);
 				appendString("</td>");
@@ -120,7 +123,8 @@ public class TablePageJspGenerator extends AbstractJSPGenerator {
 	        decreaseIdent();
 	        appendString("</tr>");
 	    }
-	    appendString("</html:form>");
+	    //appendString("</html:form>");
+	    appendString("</form>");
 
 	    
 	    appendString("</body>");

@@ -48,6 +48,7 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.asg.util.locking.helper.DocumentLockingHelper;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
@@ -2093,13 +2094,20 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	}
 
 	private void generateDeleteActionMethod(MetaModuleSection section, String methodName){
-	    
+
 		MetaDocument doc = section.getDocument();
 	    appendString( getExecuteDeclaration(methodName));
 	    increaseIdent();
-	    appendStatement("String id = getStringParameter(req, PARAM_ID)");
+	    //appendStatement("String id = getStringParameter(req, PARAM_ID)");
+		//todo formating of generated code is wrong
+	    appendStatement("String[] iDs = req.getParameterValues(PARAM_ID)");
+		appendString("if (iDs == null){");
+		appendIncreasedStatement("throw new RuntimeException(\"Parameter \" + PARAM_ID + \" is not set.\")");
+		append(closeBlock());
+		appendString("for (String id : iDs){");
+		increaseIdent();
         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-           appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+           appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
            appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
            appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
             //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermission  2-nd parameter  can be anything!
@@ -2107,7 +2115,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
            appendString("}"); 
         }
 	    appendStatement(getServiceGetterCall(section.getModule())+".delete"+doc.getName()+"(id)");
-	    appendStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
+		append(closeBlock());
+		appendStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
 	    appendStatement("return null");
 	    append(closeBlock());
 	    

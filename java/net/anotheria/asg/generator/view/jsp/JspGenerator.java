@@ -112,19 +112,19 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		increaseIdent();
 		
 		openTR();
-		appendString("<logic:iterate name=\"menu\" type=\"net.anotheria.webutils.bean.MenuItemBean\" id=\"entry\">");
+		appendString("<ano:iterate name=\"menu\" type=\"net.anotheria.webutils.bean.MenuItemBean\" id=\"entry\">");
 		appendString("<td>");
 		increaseIdent();
-		appendString("<logic:equal name=\"entry\" property=\"active\" value=\"true\">");
-		appendIncreasedString("<td class=\"menuTitleSelected\"><bean:write name=\"entry\" property=\"caption\"/></td>");
-		appendString("</logic:equal>");
-		appendString("<logic:notEqual name=\"entry\" property=\"active\" value=\"true\">");
-		appendIncreasedString("<td class=\"menuTitle\"><a href=\"<ano:tslink><bean:write name=\"entry\" property=\"link\"/></ano:tslink>\"><bean:write name=\"entry\" property=\"caption\"/></a></td>");
-		appendString("</logic:notEqual>");
+		appendString("<ano:equal name=\"entry\" property=\"active\" value=\"true\">");
+		appendIncreasedString("<td class=\"menuTitleSelected\"><ano:write name=\"entry\" property=\"caption\"/></td>");
+		appendString("</ano:equal>");
+		appendString("<ano:notEqual name=\"entry\" property=\"active\" value=\"true\">");
+		appendIncreasedString("<td class=\"menuTitle\"><a href=\"<anoweb:tslink><ano:write name=\"entry\" property=\"link\"/></anoweb:tslink>\"><ano:write name=\"entry\" property=\"caption\"/></a></td>");
+		appendString("</ano:notEqual>");
 		decreaseIdent();
 		appendString("</td>");
 		decreaseIdent();
-		appendString("</logic:iterate>");
+		appendString("</ano:iterate>");
 		closeTR();
 
 		decreaseIdent();
@@ -176,7 +176,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		}
 		appendString(headerLine);
 
-		appendString("<logic:iterate name="+quote(doc.getMultiple().toLowerCase()+ModuleActionsGenerator.exportCSVSufix)+" type="+quote(GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc)+"."+doc.getName())+" id="+quote(entryName)+"><%--");
+		appendString("<ano:iterate name="+quote(doc.getMultiple().toLowerCase()+ModuleActionsGenerator.exportCSVSufix)+" type="+quote(GeneratorDataRegistry.getInstance().getContext().getDataPackageName(doc)+"."+doc.getName())+" id="+quote(entryName)+"><%--");
 		String bodyLine = "--%>";
 
 		for (MetaViewElement element : elements) {
@@ -185,10 +185,10 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 			String tag = multilangEl && lang != null ? doc.getField(element.getName()).getName(lang) : generateTag(element);
 			if (tag==null)
 				continue;
-			bodyLine += "<bean:write filter=\"false\" name=" + quote(entryName) + " property=\"" + tag + "\"/>;";
+			bodyLine += "<ano:write filter=\"false\" name=" + quote(entryName) + " property=\"" + tag + "\"/>;";
 		}
 		appendString(bodyLine);
-		appendString("</logic:iterate>");
+		appendString("</ano:iterate>");
 		return jsp;
 	}
 
@@ -275,7 +275,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		appendString("<div class=\"c_r\"><!-- --></div>");
 		appendString("<div class=\"c_b_l\"><!-- --></div>");
 		appendString("<div class=\"c_b_r\"><!-- --></div>");
-		appendString("<h2>Search result: <bean:write name=\"criteria\"/></h2>");
+		appendString("<h2>Search result: <ano:write name=\"criteria\"/></h2>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		
@@ -291,20 +291,20 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		decreaseIdent();
 		appendString("</tr>");
 		appendString("</thead>");
-		appendString("<logic:present name="+quote("result")+" >");
+		appendString("<ano:present name="+quote("result")+" >");
 		appendString("<tbody>");
-		appendString("<logic:iterate name="+quote("result")+" type="+quote("net.anotheria.anodoc.query2.ResultEntryBean")+" id="+quote("entry")+" indexId=\"ind\">");
+		appendString("<ano:iterate name="+quote("result")+" type="+quote("net.anotheria.anodoc.query2.ResultEntryBean")+" id="+quote("entry")+" indexId=\"ind\">");
 		increaseIdent();
 		appendString("<tr class=\"<%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%>\">");
-		appendString("<td style=\"width: 50px;\"><a href="+quote("<bean:write name="+quote("entry")+" property="+quote("editLink")+"/>")+" target="+quote("_blank")+"><bean:write name="+quote("entry")+" property="+quote("documentId")+"/></td>");
-		appendString("<td style=\"width: 200px;\"><bean:write name="+quote("entry")+" property="+quote("documentName")+"/></td>");
-		appendString("<td style=\"width: 200px;\"><bean:write name="+quote("entry")+" property="+quote("propertyName")+"/></td>");
-		appendString("<td><bean:write name="+quote("entry")+" property="+quote("info")+" filter="+quote("false")+"/></td>");
+		appendString("<td style=\"width: 50px;\"><a href="+quote("<ano:write name="+quote("entry")+" property="+quote("editLink")+"/>")+" target="+quote("_blank")+"><ano:write name="+quote("entry")+" property="+quote("documentId")+"/></td>");
+		appendString("<td style=\"width: 200px;\"><ano:write name="+quote("entry")+" property="+quote("documentName")+"/></td>");
+		appendString("<td style=\"width: 200px;\"><ano:write name="+quote("entry")+" property="+quote("propertyName")+"/></td>");
+		appendString("<td><ano:write name="+quote("entry")+" property="+quote("info")+" filter="+quote("false")+"/></td>");
 		appendString("</tr>");
 		decreaseIdent();
-		appendString("</logic:iterate>");
+		appendString("</ano:iterate>");
 		appendString("</tbody>");
-		appendString("</logic:present>");
+		appendString("</ano:present>");
 
 		decreaseIdent();
 		appendString("</table>");
@@ -336,7 +336,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		increaseIdent();
 		appendString("<head>");
 		increaseIdent();
-		appendString("<title>VersionInfo for <bean:write name=\"documentName\"/></title>");
+		appendString("<title>VersionInfo for <ano:write name=\"documentName\"/></title>");
 		//appendString("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">");
 		generatePragmas();
 		appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
@@ -365,17 +365,17 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		
 		appendString("<tr class=\"lineLight\">");
 		appendIncreasedString("<td width=\"20%\">Document name: </td>");
-		appendIncreasedString("<td width=\"80%\"><bean:write name="+quote("documentName")+"/></td>");
+		appendIncreasedString("<td width=\"80%\"><ano:write name="+quote("documentName")+"/></td>");
 		appendString("</tr>");
 
 		appendString("<tr class=\"lineDark\">");
 		appendIncreasedString("<td width=\"20%\">Document type: </td>");
-		appendIncreasedString("<td width=\"80%\"><bean:write name="+quote("documentType")+"/></td>");
+		appendIncreasedString("<td width=\"80%\"><ano:write name="+quote("documentType")+"/></td>");
 		appendString("</tr>");
 
 		appendString("<tr class=\"lineLight\">");
 		appendIncreasedString("<td width=\"20%\">Last update: </td>");
-		appendIncreasedString("<td width=\"80%\"><bean:write name="+quote("lastUpdate")+"/></td>");
+		appendIncreasedString("<td width=\"80%\"><ano:write name="+quote("lastUpdate")+"/></td>");
 		appendString("</tr>");
 
 		appendString("<tr class=\"lineDark\">");
@@ -447,7 +447,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		
 		appendString("<table width="+quote("100%")+" cellspacing="+quote("1")+" cellpadding="+quote("1")+" border="+quote("0")+">");
 		increaseIdent();
-		appendString("<html:form action="+quote(CMSMappingsConfiguratorGenerator.getFormPath(form))+">");
+		appendString("<form action="+quote(CMSMappingsConfiguratorGenerator.getFormPath(form))+">");
 		List<MetaFormField> elements = form.getElements();
 		for (int i=0; i<elements.size(); i++){
 ///*
@@ -456,23 +456,23 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		    	MetaFormSingleField field = (MetaFormSingleField )element;
 				appendString("<tr class="+quote("qs_info")+">");
 				increaseIdent();
-				appendString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
+				appendString("<td width=10%><img src="+quote("<ano:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
 				appendString("<td class="+quote("qs_info")+" align="+quote("left")+">");
 	
 				String htmlFieldDeclaration = generateFormField(field, field.getType().equals("boolean") ? "qs_input" : "qs_info");
 				
 				if (field.getType().equals("boolean")){
 					appendString(htmlFieldDeclaration);
-					appendString("&nbsp;<bean:message key="+quote(field.getTitle())+"/>");
+					appendString("&nbsp;<ano:message key="+quote(field.getTitle())+"/>");
 				}else{
-					appendString("<bean:message key="+quote(field.getTitle())+"/>"+(!(field.isSpacer()) ? ":&nbsp;<br><br>" : ""));
+					appendString("<ano:message key="+quote(field.getTitle())+"/>"+(!(field.isSpacer()) ? ":&nbsp;<br><br>" : ""));
 					if (htmlFieldDeclaration.length()>0)
 						appendString(htmlFieldDeclaration);
 				}
 				if (!field.isSpacer())
 					appendString("<br><br>");
 				appendString("</td>");
-				appendString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
+				appendString("<td width=10%><img src="+quote("<ano:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
 				decreaseIdent();
 				appendString("</tr>");
 		    }
@@ -482,7 +482,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		    	//now write inner table;
 				appendString("<tr class="+quote("qs_info")+">");
 				increaseIdent();
-				appendString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
+				appendString("<td width=10%><img src="+quote("<ano:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
 				appendString("<td class="+quote("qs_info")+" >");
 				increaseIdent();
 				appendString("<table width="+quote("100%")+" cellpadding="+quote(0)+" cellspacing="+quote(0)+" border="+quote(0)+">");
@@ -493,7 +493,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 				List<MetaFormTableColumn> columns = table.getColumns();
 				for (MetaFormTableColumn col : columns){
 					MetaFormTableHeader header = col.getHeader();
-					appendIncreasedString("<td><strong><bean:message key="+quote(header.getKey())+"/></strong></td>");
+					appendIncreasedString("<td><strong><ano:message key="+quote(header.getKey())+"/></strong></td>");
 				}
 
 				appendString("</tr>");
@@ -518,7 +518,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 				appendString("</table>");
 				decreaseIdent();
 				appendString("</td>");
-				appendString("<td width=10%><img src="+quote("<bean:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
+				appendString("<td width=10%><img src="+quote("<ano:message key="+quote("emptyimage")+"/>")+" width="+quote(10)+" height="+quote(1)+"/></td>");
 				appendString("</tr>");		    	
 		    }
 		    
@@ -526,7 +526,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		}
 
 		decreaseIdent();
-		appendString("</html:form>");
+		appendString("</form>");
 		decreaseIdent();
 		appendString("</table>");
 
