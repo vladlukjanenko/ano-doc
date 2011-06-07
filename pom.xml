@@ -4,7 +4,7 @@
   <parent>
 	<groupId>net.anotheria</groupId>
 	<artifactId>parent</artifactId>
-	<version>1.4</version>
+	<version>1.10</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -21,21 +21,16 @@
 	<dependency>
 		<groupId>net.anotheria</groupId>
 		<artifactId>ano-prise</artifactId>
-		<version>1.0.1</version>
+		<version>1.0.19</version>
 	</dependency>
 	<dependency>
 	  <groupId>net.anotheria</groupId>
 	  <artifactId>configureme</artifactId>
-	  <version>1.0.0</version>
+	  <version>1.0.2</version>
 	</dependency>
 	<dependency>
 	  <groupId>net.anotheria</groupId>
 	  <artifactId>moskito-core</artifactId>
-	  <version>1.1.5</version>
-	</dependency>
-	<dependency>
-	  <groupId>net.anotheria</groupId>
-	  <artifactId>moskito-util</artifactId>
 	  <version>1.1.5</version>
 	</dependency>
 	<dependency>
