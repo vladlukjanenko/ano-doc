@@ -235,18 +235,20 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<div class=\"c_b_r\"><!-- --></div>");
 
 		String entryName = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()));
-		String result = "<ano:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) metaSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LOCK);
-		path += "?pId=<ano:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
-		result += "<a href=\"#\" onClick= "
-				+ quote("lightbox('All unsaved data will be lost!!!<br /> Really lock  "
-						+ CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())
-						+ " with id: <ano:write name=" + entryName + " property=\"id\"/>?','<anoweb:tslink>" + path + "</anoweb:tslink>');") + ">" + getLockImage()
-				+ "&nbsp;Lock</a>";
-		result += "</ano:equal>";
-		appendString(result);
 
 		if (StorageType.CMS.equals(((MetaModuleSection) metaSection).getDocument().getParentModule().getStorageType())) {
+
+			String result = "<ano:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
+			String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) metaSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LOCK);
+			path += "?pId=<ano:write name=" + entryName + " property=\"id\"/>" + "&nextAction=showEdit";
+			result += "<a href=\"#\" onClick= "
+					+ quote("lightbox('All unsaved data will be lost!!!<br /> Really lock  "
+							+ CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())
+							+ " with id: <ano:write name=" + entryName + " property=\"id\"/>?','<anoweb:tslink>" + path + "</anoweb:tslink>');") + ">" + getLockImage()
+					+ "&nbsp;Lock</a>";
+			result += "</ano:equal>";
+			appendString(result);
+			
 			appendString("<ano:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">");
 
 			path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) metaSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_UNLOCK);
