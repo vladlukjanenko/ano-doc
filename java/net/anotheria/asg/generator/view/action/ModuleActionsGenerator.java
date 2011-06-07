@@ -48,7 +48,6 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
-import net.anotheria.asg.util.locking.helper.DocumentLockingHelper;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
 
@@ -410,35 +409,35 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	 * @return
 	 */
 	public static String getActionSuffix(MetaModuleSection section){
-	    return section.getDocument().getName()+"MafAction";
+	    return section.getDocument().getName()+"Action";
 	}
 	
 	public static String getMultiOpActionName(MetaModuleSection section){
-	    return "MultiOp"+section.getDocument().getMultiple()+"MafAction";
+	    return "MultiOp"+section.getDocument().getMultiple()+"Action";
 	}
 
 	public static String getMultiOpDialogActionName(MetaModuleSection section){
-	    return "MultiOpDialog"+section.getDocument().getMultiple()+"MafAction";
+	    return "MultiOpDialog"+section.getDocument().getMultiple()+"Action";
 	}
 
 	public static String getShowActionName(MetaModuleSection section){
-	    return "Show"+section.getDocument().getMultiple()+"MafAction";
+	    return "Show"+section.getDocument().getMultiple()+"Action";
 	}
 	
 	public static String getExportActionName(MetaModuleSection section){
-		return "Export"+section.getDocument().getMultiple()+"MafAction";
+		return "Export"+section.getDocument().getMultiple()+"Action";
 	}
 
 	public static String getSearchActionName(MetaModuleSection section){
-	    return "Search"+section.getDocument().getMultiple()+"MafAction";
+	    return "Search"+section.getDocument().getMultiple()+"Action";
 	}
 
 	public static String getShowQueryActionName(MetaModuleSection section){
-		return "Show"+section.getDocument().getMultiple()+"QueriesMafAction";
+		return "Show"+section.getDocument().getMultiple()+"QueriesAction";
 	}
 
 	public static String getExecuteQueryActionName(MetaModuleSection section){
-		return "Execute"+section.getDocument().getMultiple()+"QueriesMafAction";
+		return "Execute"+section.getDocument().getMultiple()+"QueriesAction";
 	}
 
 	public static String getEditActionName(MetaModuleSection section){
@@ -2603,7 +2602,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	// TABLE
 	
 	public static String getContainerMultiOpActionName(MetaDocument doc, MetaContainerProperty property){
-		return "MultiOp"+doc.getMultiple()+StringUtils.capitalize(property.getName())+"MafAction";
+		return "MultiOp"+doc.getMultiple()+StringUtils.capitalize(property.getName())+"Action";
 	}
 
 	public static String getContainerShowActionName(MetaDocument doc, MetaContainerProperty property){

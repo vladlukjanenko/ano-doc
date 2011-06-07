@@ -34,7 +34,7 @@ public class BaseViewActionGenerator extends AbstractGenerator {
 	}
 	
 	public static String getViewActionName(MetaView view){
-		return "Base"+StringUtils.capitalize(view.getName())+"MafAction";
+		return "Base"+StringUtils.capitalize(view.getName())+"Action";
 	}
 	
 	public GeneratedClass generateViewAction(MetaView view){

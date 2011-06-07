@@ -46,7 +46,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		LINKSTOME("LinksToMe", "LinksTo", OperationType.SINGLE, false){
 			@Override
 			public String getClassName(MetaModuleSection section){
-				return "Edit" + section.getDocument().getName() + "MafAction";
+				return "Edit" + section.getDocument().getName() + "Action";
 			}
 			@Override
 			public String getViewName(MetaModuleSection section){
@@ -66,23 +66,23 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		EXPORTtoCSV("Export.csv", "Show", OperationType.SINGLE, true){
 			@Override
 			public String getClassName(MetaModuleSection section){
-				return "Export" + section.getDocument().getName(true) + "MafAction";
+				return "Export" + section.getDocument().getName(true) + "Action";
 			}
 			@Override
 			public String getViewName(MetaModuleSection section){
 				MetaDocument doc = section.getDocument();
-				return "Show"+doc.getName(true) + "AsCSVMaf";
+				return "Show"+doc.getName(true) + "AsCSV";
 			}
 		},
 		EXPORTtoXML("Export.xml", "Show", OperationType.SINGLE, true){
 			@Override
 			public String getClassName(MetaModuleSection section){
-				return "Export" + section.getDocument().getName(true) + "MafAction";
+				return "Export" + section.getDocument().getName(true) + "Action";
 			}
 			@Override
 			public String getViewName(MetaModuleSection section){
 				MetaDocument doc = section.getDocument();
-				return "Show"+doc.getName(true) + "AsXMLMaf";
+				return "Show"+doc.getName(true) + "AsXML";
 			}
 		},
 		
@@ -107,7 +107,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		public String getClassName(MetaModuleSection section) {
 			switch (type) {
 			case SINGLE:
-				return action + section.getDocument().getName(multiDocument) + "MafAction";
+				return action + section.getDocument().getName(multiDocument) + "Action";
 			case MULTIPLE_DIALOG:
 				return ModuleActionsGenerator.getMultiOpDialogActionName(section);
 			}
@@ -126,7 +126,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 		public String getViewName(MetaModuleSection section){
 			MetaDocument doc = section.getDocument();
-			return view+doc.getName(multiDocument) + "Maf";
+			return view+doc.getName(multiDocument);
 		}
 		
 		public String getViewPath(MetaModuleSection section){

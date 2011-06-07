@@ -205,11 +205,11 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getShowPageName(MetaDocument doc){
-		return "Show"+doc.getMultiple()+"Maf";
+		return "Show"+doc.getMultiple();
 	}
 	
 	public static String getSearchResultPageName(){
-		return "SearchResultMaf";
+		return "SearchResult";
 	}
 
 	/**
@@ -217,7 +217,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getVersionInfoPageName(){
-		return "VersionInfoMaf";
+		return "VersionInfo";
 	}
 
 	/**
@@ -230,7 +230,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 
 	
 	public static String getShowQueriesPageName(MetaDocument doc){
-		return "Show"+doc.getMultiple()+"Queries"+"Maf";
+		return "Show"+doc.getMultiple()+"Queries";
 	}
 	
 	/**
@@ -238,7 +238,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getExportAsCSVPageName(MetaDocument doc){
-		return "Show"+doc.getMultiple()+"AsCSVMaf";
+		return "Show"+doc.getMultiple()+"AsCSV";
 	}
 
 	/**
@@ -246,7 +246,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getExportAsXMLPageName(MetaDocument doc){
-		return "Show"+doc.getMultiple()+"AsXMLMaf";
+		return "Show"+doc.getMultiple()+"AsXML";
 	}
 
 	/**
@@ -254,19 +254,19 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	 * @return
 	 */
 	public static String getEditPageName(MetaDocument doc){
-		return "Edit"+doc.getName()+"Maf";
+		return "Edit"+doc.getName();
 	}
 	
 	public static String getDialogName(MetaDialog dialog, MetaDocument doc){
-		return dialog.getName()+doc.getName()+"Maf";
+		return dialog.getName()+doc.getName();
 	}
 	
 	public static String getLinksToMePageName(MetaDocument doc){
-		return "LinksTo"+doc.getName()+"Maf";
+		return "LinksTo"+doc.getName();
 	}
 
 	public static String getContainerPageName(MetaDocument doc, MetaContainerProperty table){
-		return "Show"+doc.getName()+StringUtils.capitalize(table.getName())+"Maf";
+		return "Show"+doc.getName()+StringUtils.capitalize(table.getName());
 	}
 	
 	protected static String generateTimestampedLinkPath(String path){
@@ -647,10 +647,10 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 
 	protected String getMenuName(MetaView view){
-		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"MenuMaf";		
+		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"Menu";		
 	}
 	
 	protected String getFooterName(MetaView view){
-		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"FooterMaf";		
+		return "../../shared/jsp/"+StringUtils.capitalize(view.getName())+"Footer";		
 	}
 }

@@ -50,7 +50,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		clazz.setPackageName(getSharedActionPackageName());
 
 		Collection<MetaModule> modules = GeneratorDataRegistry.getInstance().getModules();
-		appendCommentLine("BaseMafActionGenerator");
+		appendCommentLine(BaseActionGenerator.class.getName());
 		clazz.addImport("net.anotheria.util.StringUtils");
 		clazz.addImport(ContextManager.class);
 		clazz.addImport("net.anotheria.webutils.actions.*");

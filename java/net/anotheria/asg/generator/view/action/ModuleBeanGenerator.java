@@ -335,13 +335,14 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
             emptyline();
 			generateFieldMethodsInDialog(multilingualInstanceDisabledElement, doc);
 		}
+		
         // add fields!!!! Lock!!!
-        generateAdditionalFields(doc,"locked",MetaProperty.Type.BOOLEAN,"LockableObject \"locked\" property. For object Locking.");
-        generateAdditionalFields(doc,"lockerId",MetaProperty.Type.STRING,"LockableObject \"lockerId\" property. For userName containing.");
-        generateAdditionalFields(doc,"lockingTime",MetaProperty.Type.STRING,"LockableObject \"lockingTime\" property.");
+        generateAdditionalFields(doc,"locked", MetaProperty.Type.BOOLEAN,"LockableObject \"locked\" property. For object Locking.");
+        generateAdditionalFields(doc,"lockerId", MetaProperty.Type.STRING,"LockableObject \"lockerId\" property. For userName containing.");
+        generateAdditionalFields(doc,"lockingTime", MetaProperty.Type.STRING,"LockableObject \"lockingTime\" property.");
         
         emptyline();
-		
+
 		return clazz;
 	}
 	
