@@ -60,10 +60,9 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		clazz.addImport("net.anotheria.maf.action.ActionMapping");
 		clazz.addImport("net.anotheria.maf.bean.FormBean");	
 		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");	
-		
 
 		clazz.setAbstractClass(true);
-		clazz.setParent("BaseMafAction");
+		clazz.setParent("BaseAction");
 		clazz.setGeneric("T extends FormBean");
 		clazz.setName(getBaseActionName());
 

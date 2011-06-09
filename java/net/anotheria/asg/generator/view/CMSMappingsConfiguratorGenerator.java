@@ -27,6 +27,12 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
+import net.anotheria.webutils.actions.LoginAction;
+import net.anotheria.webutils.actions.LogoutAction;
+import net.anotheria.webutils.filehandling.actions.FileAjaxUpload;
+import net.anotheria.webutils.filehandling.actions.GetFile;
+import net.anotheria.webutils.filehandling.actions.ShowFile;
+import net.anotheria.webutils.filehandling.actions.ShowTmpFile;
 
 /**
  * Generator class for the CMSFilter.
@@ -146,7 +152,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	public static enum SharedAction{
 		//SHOW("Show", "Show", OperationType.SINGLE, true, false),
 		
-		SEARCH("CmsSearch", "SearchResultMaf"){
+		SEARCH("CmsSearch", "SearchResult"){
 //			@Override
 //			public String getViewName(MetaModuleSection section){
 //				return "SearchResultMaf";
@@ -171,7 +177,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		}
 		
 		public String getClassName() {
-				return action + "MafAction";
+				return action + "Action";
 		}
 		
 		public String getMappingName(){
@@ -259,12 +265,6 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		clazz.addImport("net.anotheria.maf.action.ActionMappings");
 		clazz.addImport("net.anotheria.maf.action.ActionMappingsConfigurator");
 		clazz.addImport(IndexPageActionGenerator.getIndexPageFullName());
-		clazz.addImport("net.anotheria.webutils.filehandling.actions.ShowFileMaf");
-		clazz.addImport("net.anotheria.webutils.filehandling.actions.FileAjaxUploadMaf");
-		clazz.addImport("net.anotheria.webutils.filehandling.actions.ShowTmpFileMaf");
-		clazz.addImport("net.anotheria.webutils.filehandling.actions.GetFileMaf");
-		clazz.addImport("net.anotheria.webutils.actions.LoginMafAction");
-		clazz.addImport("net.anotheria.webutils.actions.LogoutMafAction");
 		
 		
 
@@ -297,14 +297,14 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		appendString("@Override");
 		openFun("public void configureActionMappings()");
 		appendStatement("ActionMappings.addMapping(\"index\", " + IndexPageActionGenerator.getIndexPageActionName() + ".class, new ActionForward(\"success\", "+quote(IndexPageJspGenerator.getIndexJspFullName())+"))");
-		appendStatement("ActionMappings.addMapping(\"fileShow\", ShowFileMaf.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
-		appendStatement("ActionMappings.addMapping(\"fileUpload\", FileAjaxUploadMaf.class)");
+		appendStatement("ActionMappings.addMapping(\"fileShow\", "+ShowFile.class.getName()+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
+		appendStatement("ActionMappings.addMapping(\"fileUpload\", "+quote(FileAjaxUpload.class.getName())+")");
 		
-		appendStatement("ActionMappings.addMapping(\"showTmpFile\", ShowTmpFileMaf.class)");
-		appendStatement("ActionMappings.addMapping(\"getFile\", GetFileMaf.class)");
+		appendStatement("ActionMappings.addMapping(\"showTmpFile\", "+quote(ShowTmpFile.class.getName())+")");
+		appendStatement("ActionMappings.addMapping(\"getFile\", "+quote(GetFile.class.getName())+")");
 		
-		appendStatement("ActionMappings.addMapping(\"login\", LoginMafAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
-		appendStatement("ActionMappings.addMapping(\"logout\", LogoutMafAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
+		appendStatement("ActionMappings.addMapping(\"login\", "+quote(LoginAction.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
+		appendStatement("ActionMappings.addMapping(\"logout\", "+quote(LogoutAction.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
 		
 		
 		generateSharedMappings(clazz);
