@@ -166,5 +166,18 @@ public class MetaViewElement {
 		}
 		return false;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "MetaViewElement{" +
+				"readonly=" + readonly +
+				", name='" + name + '\'' +
+				", caption='" + caption + '\'' +
+				", description='" + description + '\'' +
+				", comparable=" + comparable +
+				", rich=" + rich +
+				", decorator=" + decorator +
+				", validators=" + validators +
+				'}';
+	}
 }

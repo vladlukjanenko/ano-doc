@@ -37,6 +37,13 @@ public class MetaProperty implements Cloneable{
 					return t;
 			return null;
 		}
+
+		@Override
+		public String toString() {
+			return "Type{" +
+					"name='" + name + '\'' +
+					'}';
+		}
 	}
 	
 	/**

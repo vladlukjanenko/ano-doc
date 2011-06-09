@@ -1550,7 +1550,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//if update, then first get the target object.
 		appendStatement("boolean create = false");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = null");
-		appendString( "if (form.getId()!=null && form.getId().length()>0){");	
+		appendString( "if (form.getId()!=null && form.getId().length()>0){");
 		appendIncreasedString(doc.getVariableName()+" = ("+doc.getName()+")"+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(form.getId()).clone();");
 		appendString( "}else{");
 		increaseIdent();
@@ -1584,6 +1584,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						appendStatement("TemporaryFileHolder "+holderName+" = FileStorage.getTemporaryFile(req,\""+varName+"\")");
 						appendString( "if ("+holderName+"!=null && "+holderName+".getData()!=null){");
 						increaseIdent();
+						appendStatement("FileStorage.removeFilePermanently( "+doc.getVariableName()+"."+p.toGetter()+"() )");
 						appendStatement("FileStorage.storeFilePermanently(req, "+holderName+".getFileName(),\""+varName+"\")");
 						appendStatement(doc.getVariableName()+"."+p.toSetter()+"("+holderName+".getFileName())");
 						appendStatement("FileStorage.removeTemporaryFile(req,\""+varName+"\")");
@@ -2101,19 +2102,25 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//todo formating of generated code is wrong
 	    appendStatement("String[] iDs = req.getParameterValues(PARAM_ID)");
 		appendString("if (iDs == null){");
-		appendIncreasedStatement("throw new RuntimeException(\"Parameter \" + PARAM_ID + \" is not set.\")");
+		appendStatement("throw new RuntimeException(\"Parameter \" + PARAM_ID + \" is not set.\")");
 		append(closeBlock());
 		appendString("for (String id : iDs){");
 		increaseIdent();
         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
            appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
-           appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
-           appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
+           appendString("if ("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
+           appendStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
             //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermission  2-nd parameter  can be anything!
-           appendIncreasedStatement("DocumentLockingHelper.delete.checkExecutionPermission(lockable, false, getUserId(req))");
-           appendString("}"); 
+           appendStatement("DocumentLockingHelper.delete.checkExecutionPermission(lockable, false, getUserId(req))");
+           appendString("}");
         }
 	    appendStatement(getServiceGetterCall(section.getModule())+".delete"+doc.getName()+"(id)");
+		//delete images from file system
+		for (MetaProperty property : section.getDocument().getProperties()){
+			if ( property.getType() == MetaProperty.Type.IMAGE)
+				appendStatement("FileStorage.removeFilePermanently( "+doc.getVariableName()+"Curr."+property.toGetter()+"() )");
+		}
+
 		append(closeBlock());
 		appendStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
 	    appendStatement("return null");
@@ -2149,8 +2156,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
-		appendStatement(doc.getName()+" "+doc.getVariableName()+"Src = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+		appendStatement(doc.getName()+" "+doc.getVariableName()+"Src = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+"Dest = "+DataFacadeGenerator.getDocumentFactoryName(doc)+".create"+doc.getName()+"("+doc.getVariableName()+"Src)");
+
+		//clone images from file system
+		for (MetaProperty property : section.getDocument().getProperties()){
+			if ( property.getType() == MetaProperty.Type.IMAGE)
+				appendStatement(doc.getVariableName()+"Dest."+property.toSetter()+"(FileStorage.cloneFilePermanently( "+doc.getVariableName()+"Dest."+property.toGetter()+"() ))");
+		}
 
 		appendStatement(doc.getName()+" "+doc.getVariableName()+"Created = "+getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+"Dest"+")");
 	    appendStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&")+"+PARAM_ID+"+quote("=")+"+"+doc.getVariableName()+"Created.getId()"+")");

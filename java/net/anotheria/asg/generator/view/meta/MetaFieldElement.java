@@ -5,18 +5,17 @@ package net.anotheria.asg.generator.view.meta;
  * @author another
  */
 public class MetaFieldElement extends MetaViewElement{
-	
+
 	public MetaFieldElement(String name){
 		super(name);
-	}
-	
-	
-	
-	public String toString(){
-		return "Field "+getName();
 	}
 
 	public String getVariableName(){
 		return getName();
 	}
+
+	public String toString(){
+		return "Field "+getName();
+	}
+
 }
