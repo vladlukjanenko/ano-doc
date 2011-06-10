@@ -87,8 +87,7 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 		if (filterParameter == null || filterParameter.length() == 0) {
 			return true;
 		}
-		if (!(document instanceof Document))
-		{
+		if (!(document instanceof Document)){
 			return false;
 		}
 		
