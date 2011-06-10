@@ -289,13 +289,18 @@ public class AbstractGenerator{
 	}
 	
 	/**
-	 * @deprecated use closeBlock(String) instead
+	 * @deprecated use closeBlock(String) or closeBlockNEW instead
 	 */
 	@Deprecated
 	protected String closeBlock(){
 		decreaseIdent();
 		String ret = writeString("}");
 		return ret;
+	}
+
+	protected void closeBlockNEW(){
+		decreaseIdent();
+		appendString("}");
 	}
 
 	/**

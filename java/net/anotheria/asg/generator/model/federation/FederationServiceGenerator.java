@@ -1,15 +1,26 @@
 package net.anotheria.asg.generator.model.federation;
 
-import net.anotheria.asg.generator.*;
-import net.anotheria.asg.generator.meta.*;
-import net.anotheria.asg.generator.model.AbstractServiceGenerator;
-import net.anotheria.asg.generator.model.DataFacadeGenerator;
-import net.anotheria.asg.generator.model.ServiceGenerator;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.anotheria.asg.generator.CommentGenerator;
+import net.anotheria.asg.generator.Context;
+import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.IGenerateable;
+import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.meta.FederatedDocumentMapping;
+import net.anotheria.asg.generator.meta.FederatedModuleDef;
+import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaFederationModule;
+import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.model.AbstractServiceGenerator;
+import net.anotheria.asg.generator.model.DataFacadeGenerator;
+import net.anotheria.asg.generator.model.ServiceGenerator;
 
 /**
  * Generator for the FederationService.

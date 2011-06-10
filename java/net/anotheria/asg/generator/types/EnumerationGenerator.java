@@ -1,11 +1,18 @@
 package net.anotheria.asg.generator.types;
 
-import net.anotheria.asg.generator.*;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.types.meta.EnumerationType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.anotheria.asg.generator.AbstractGenerator;
+import net.anotheria.asg.generator.Context;
+import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.IGenerateable;
+import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.TypeOfClass;
+import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.types.meta.EnumerationType;
 
 /**
  * TODO please remind another to comment this class

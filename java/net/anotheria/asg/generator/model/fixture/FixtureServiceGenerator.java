@@ -1,6 +1,19 @@
 package net.anotheria.asg.generator.model.fixture;
 
-import net.anotheria.asg.generator.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import net.anotheria.asg.generator.CommentGenerator;
+import net.anotheria.asg.generator.Context;
+import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GenerationOptions;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.IGenerateable;
+import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
@@ -13,12 +26,6 @@ import net.anotheria.asg.service.BaseFixtureService;
 import net.anotheria.asg.service.IFixtureService;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class FixtureServiceGenerator  extends AbstractServiceGenerator implements IGenerator{
 	
