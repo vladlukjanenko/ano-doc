@@ -2,7 +2,6 @@ package net.anotheria.asg.util.decorators;
 
 import net.anotheria.anodoc.data.NoSuchPropertyException;
 import net.anotheria.asg.data.DataObject;
-import net.anotheria.asg.util.decorators.IAttributeDecorator;
 import net.anotheria.util.StringUtils;
 
 /**

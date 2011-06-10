@@ -3,7 +3,6 @@ package net.anotheria.asg.util.decorators;
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.NoSuchPropertyException;
 import net.anotheria.anodoc.data.StringProperty;
-import net.anotheria.asg.util.decorators.IAttributeDecorator;
 
 /**
  * This decorator decorates a link value with the linked document name.
