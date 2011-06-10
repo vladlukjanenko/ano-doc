@@ -40,7 +40,7 @@ public class SharedFooterJspGenerator extends AbstractJSPGenerator {
 			String viewSwitcher = "";
 			viewSwitcher += "<ano:size id="+quote("listsize")+" name="+quote("views")+"/>";
 			viewSwitcher +="<ano:iterate name="+quote("views")+" type="+quote("net.anotheria.webutils.bean.MenuItemBean")+" id="+quote("v")+" indexId="+quote("ind")+" >";
-			viewSwitcher += "<a href="+quote("<anoweb:tslink><ano:write name="+quote("v")+" property="+quote("link")+"/></anoweb:tslink>")+">";
+			viewSwitcher += "<a href="+quote("<ano:tslink><ano:write name="+quote("v")+" property="+quote("link")+"/></ano:tslink>")+">";
 			viewSwitcher += "<ano:write name="+quote("v")+" property="+quote("caption")+"/>";
 			viewSwitcher += "</a>";
 			viewSwitcher += "<ano:notEqual name="+quote("ind")+" value="+quote("<%"+QUOTE+"+(listsize-1)%>")+">&nbsp;|&nbsp;</ano:notEqual>";

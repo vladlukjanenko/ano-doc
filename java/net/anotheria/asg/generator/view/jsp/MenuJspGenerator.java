@@ -130,14 +130,14 @@ public class MenuJspGenerator extends AbstractJSPGenerator {
 									decreaseIdent();
 									appendString("</ano:equal>");
 									appendString("<ano:notEqual name=\"NaviItem\" property=\"active\" value=\"true\">");
-									appendString("<li><a href=\"<anoweb:tslink><ano:write name=\"NaviItem\" property=\"link\"/></anoweb:tslink>\"><ano:write name=\"NaviItem\" property=\"caption\"/></a></li>");
+									appendString("<li><a href=\"<ano:tslink><ano:write name=\"NaviItem\" property=\"link\"/></ano:tslink>\"><ano:write name=\"NaviItem\" property=\"caption\"/></a></li>");
 									appendString("</ano:notEqual>");
 								decreaseIdent();
 								appendString("</ano:iterate>");
 							decreaseIdent();
 							appendString("</ul>");
 							
-							appendString("<a href=\"<anoweb:tslink>logout</anoweb:tslink>\" class=\"logout\">Logout</a>");
+							appendString("<a href=\"<ano:tslink>logout</ano:tslink>\" class=\"logout\">Logout</a>");
 							appendString("<div class=\"clear\"><!-- --></div>");
 							appendString("<a href=\"http://www.anotheria.net\" class=\"powered\"><img src=\"../cms_static/img/powered_conf.gif\" alt=\"\"/></a>");
 						

@@ -244,7 +244,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result += "<a href=\"#\" onClick= "
 					+ quote("lightbox('All unsaved data will be lost!!!<br /> Really lock  "
 							+ CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())
-							+ " with id: <ano:write name=" + entryName + " property=\"id\"/>?','<anoweb:tslink>" + path + "</anoweb:tslink>');") + ">" + getLockImage()
+							+ " with id: <ano:write name=" + entryName + " property=\"id\"/>?','<ano:tslink>" + path + "</ano:tslink>');") + ">" + getLockImage()
 					+ "&nbsp;Lock</a>";
 			result += "</ano:equal>";
 			appendString(result);
@@ -260,7 +260,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 			appendString("<a href=\"#\" onClick= "
 					+ quote("lightbox('" + alt + "<br /> Unlock " + ((MetaModuleSection) metaSection).getDocument().getName()
-							+ " with id: <ano:write name=" + entryName + " property=\"id\"/>?','<anoweb:tslink>" + path + "</anoweb:tslink>');") + ">"
+							+ " with id: <ano:write name=" + entryName + " property=\"id\"/>?','<ano:tslink>" + path + "</ano:tslink>');") + ">"
 					+ getUnLockImage(alt) + "" + " Unlock</a><span>&nbsp;Locked by <b><ano:write name="
 					+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property="
 					+ quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + "/></b>");
@@ -429,7 +429,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<ano:present name=" + quote("linksToMe") + " scope=" + quote("request") + ">");
 		String linksToMePagePath = CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_LINKS_TO_ME) + "?pId=<ano:write name="
 				+ quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument())) + " property=\"id\"/>";
-		appendString("<a href=" + quote("<anoweb:tslink>" + linksToMePagePath + "</anoweb:tslink>") + ">Show direct links to  this document</a>");
+		appendString("<a href=" + quote("<ano:tslink>" + linksToMePagePath + "</ano:tslink>") + ">Show direct links to  this document</a>");
 		appendString("</ano:present>");
 		appendString("<div class=\"clear\"><!-- --></div>");
 		appendString("</div>");

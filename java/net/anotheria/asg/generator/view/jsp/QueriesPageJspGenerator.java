@@ -172,7 +172,7 @@ public class QueriesPageJspGenerator extends AbstractJSPGenerator implements IGe
 		appendIncreasedString("<td class=\"menuTitleSelected\"><ano:write name=\"entry\" property=\"caption\"/></td>");
 		appendString("</ano:equal>");
 		appendString("<ano:notEqual name=\"entry\" property=\"active\" value=\"true\">");
-		appendIncreasedString("<td class=\"menuTitle\"><a href=\"<anoweb:tslink><ano:write name=\"entry\" property=\"link\"/></anoweb:tslink>\"><ano:write name=\"entry\" property=\"caption\"/></a></td>");
+		appendIncreasedString("<td class=\"menuTitle\"><a href=\"<ano:tslink><ano:write name=\"entry\" property=\"link\"/></ano:tslink>\"><ano:write name=\"entry\" property=\"caption\"/></a></td>");
 		appendString("</ano:notEqual>");
 		decreaseIdent();
 		appendString("</td>");

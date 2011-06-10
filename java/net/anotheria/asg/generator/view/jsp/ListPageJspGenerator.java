@@ -112,9 +112,9 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 			MetaDocument linkTarget = targetModule.getDocumentByName(link2p.getTargetDocumentName());
 			String targetLinkAction = SectionAction.EDIT.getMappingName(linkTarget);
 
-			appendString("<td><a href=<anoweb:tslink>" + quote(targetLinkAction + "?pId=<ano:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + "/></anoweb:tslink>")
+			appendString("<td><a href=<ano:tslink>" + quote(targetLinkAction + "?pId=<ano:write name=" + quote("element") + " property=" + quote(list.getContainedProperty().getName()) + "/></ano:tslink>")
 					+ "><ano:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/></a></td>");
-			appendString("<td><a href=<anoweb:tslink>" + quote(targetLinkAction + "?pId=<ano:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + "/></anoweb:tslink>")
+			appendString("<td><a href=<ano:tslink>" + quote(targetLinkAction + "?pId=<ano:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + "/></ano:tslink>")
 					+ "><ano:write name=\"element\" property=\"description\" filter=\"true\"/></a></td>");
 		} else if (p.getType() == MetaProperty.Type.IMAGE) {
 			String imageName = "<ano:write name=\"element\" property=" + quote(list.getContainedProperty().getName()) + " filter=\"true\"/>";

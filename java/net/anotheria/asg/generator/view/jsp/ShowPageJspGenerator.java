@@ -477,7 +477,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
         path += "?pId=<ano:write name=" + quote(entryName) + " property=\"plainId\"/>";
         path+="&nextAction=showList";
 		String alt = "Locked by: <ano:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME)+"/>, at: <ano:write name="+quote(entryName)+" property="+quote(LockableObject.INT_LOCKING_TIME_PROPERTY_NAME)+"/>";
-        String link = "<a href=\"#\" onClick= "+quote("lightbox('"+alt+"<br /> Unlock "+((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<anoweb:tslink>"+path+"</anoweb:tslink>');")+">"+getUnLockImage(alt)+"</a>";
+        String link = "<a href=\"#\" onClick= "+quote("lightbox('"+alt+"<br /> Unlock "+((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getUnLockImage(alt)+"</a>";
         String result  = "<ano:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">";
         result+=link;
         result+= "</ano:equal>";
@@ -492,7 +492,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
         path += "?pId=<ano:write name=" + quote(entryName) + " property=\"plainId\"/>";
         path+="&nextAction=showList";
         String link =  "<a href=\"#\" onClick= "+quote("lightbox('Lock "+
-				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<anoweb:tslink>"+path+"</anoweb:tslink>');")+">"+getLockImage()+"</a>" ;
+				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getLockImage()+"</a>" ;
         String result  = "<ano:equal name=" + quote(entryName) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + ">";
         result+=link;
         result+= "</ano:equal>";
@@ -503,34 +503,34 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_DUPLICATE);
 		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
-		return "<a href="+quote("<anoweb:tslink>"+path+"</anoweb:tslink>")+">"+getDuplicateImage()+"</a>" ;
+		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getDuplicateImage()+"</a>" ;
 	}
 
 	private String getVersionFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_VERSIONINFO);
 		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
-		return "<a href="+quote("<anoweb:tslink>"+path+"</anoweb:tslink>")+">"+getImage("version", "LastUpdate: <ano:write name="+quote(entryName)+" property="+quote("documentLastUpdateTimestamp")+"/>")+"</a>" ;
+		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getImage("version", "LastUpdate: <ano:write name="+quote(entryName)+" property="+quote("documentLastUpdateTimestamp")+"/>")+"</a>" ;
 	}
 
 	private String getDeleteFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_DELETE);
 		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
-		return "<a href="+quote("<anoweb:tslink>"+path+"</anoweb:tslink>")+">"+getDeleteImage()+"</a>" ;
+		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getDeleteImage()+"</a>" ;
 	}
 
 	private String getDeleteWithConfirmationFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_DELETE);
 		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		return "<a href=\"#\" onClick="+quote("lightbox('Really delete "+
-				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<anoweb:tslink>"+path+"</anoweb:tslink>');")+">"+getDeleteImage()+"</a>" ;
+				((MetaModuleSection)currentSection).getDocument().getName()+" with id: <ano:write name="+quote(entryName)+" property=\"id\"/>?','<ano:tslink>"+path+"</ano:tslink>');")+">"+getDeleteImage()+"</a>" ;
 	}
 
 	private String getEditFunction(String entryName, MetaFunctionElement element){
 		String path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_EDIT);
 		path += "?pId=<ano:write name="+quote(entryName)+" property=\"plainId\"/>";
 		
-		return "<a href="+quote("<anoweb:tslink>"+path+"</anoweb:tslink>")+">"+getEditImage()+"</a>" ;
+		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getEditImage()+"</a>" ;
 	}
 }
