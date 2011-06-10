@@ -40,6 +40,11 @@ import net.anotheria.webutils.filehandling.actions.ShowTmpFile;
  */
 public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	
+	/**
+	 * Type op operation for dialogs.
+	 * @author lrosenberg
+	 *
+	 */
 	private static enum OperationType{
 		SINGLE,
 		MULTIPLE_DIALOG,
@@ -396,11 +401,29 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	
 	
 	//TODO: Investigate this methods copied from StrutsCOnfigGenerator
+	/**
+	 * Show action for data.
+	 */
 	public static final String ACTION_SHOW   = "show";
+	/**
+	 * new dialog.
+	 */
 	public static final String ACTION_NEW    = "new";
+	/**
+	 * edit existing element.
+	 */
 	public static final String ACTION_EDIT   = "edit";
+	/**
+	 * creates a new element.
+	 */
 	public static final String ACTION_CREATE = "create";
+	/**
+	 * Updates an existing element.
+	 */
 	public static final String ACTION_UPDATE = "update";
+	/**
+	 * Deletes an element.
+	 */
 	public static final String ACTION_DELETE = "delete";
 	public static final String ACTION_VERSIONINFO = "versioninfo";
 	public static final String ACTION_DUPLICATE = "duplicate";
@@ -415,7 +438,13 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	public static final String ACTION_SEARCH = "search";
 	public static final String ACTION_COPY_LANG ="copyLang";
 	public static final String ACTION_SWITCH_MULTILANGUAGE_INSTANCE = "switchMultilang";
+	/**
+	 * Locks current document.
+	 */
     public static final String ACTION_LOCK = "lock";
+	/**
+	 * Unlocks current document.
+	 */
     public static final String ACTION_UNLOCK = "unLock";
     public static final String ACTION_CLOSE = "close";
 	
