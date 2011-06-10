@@ -297,7 +297,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		appendString("@Override");
 		openFun("public void configureActionMappings()");
 		appendStatement("ActionMappings.addMapping(\"index\", " + IndexPageActionGenerator.getIndexPageActionName() + ".class, new ActionForward(\"success\", "+quote(IndexPageJspGenerator.getIndexJspFullName())+"))");
-		appendStatement("ActionMappings.addMapping(\"fileShow\", "+ShowFile.class.getName()+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
+		appendStatement("ActionMappings.addMapping(\"fileShow\", "+quote(ShowFile.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
 		appendStatement("ActionMappings.addMapping(\"fileUpload\", "+quote(FileAjaxUpload.class.getName())+")");
 		
 		appendStatement("ActionMappings.addMapping(\"showTmpFile\", "+quote(ShowTmpFile.class.getName())+")");
