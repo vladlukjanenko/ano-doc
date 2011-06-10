@@ -6,7 +6,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.FederatedDocumentMapping;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
@@ -18,7 +17,6 @@ import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.MetaTableProperty;
 import net.anotheria.asg.generator.meta.ModuleParameter;
 import net.anotheria.asg.generator.meta.StorageType;
-import net.anotheria.asg.generator.view.meta.MetaValidator;
 import net.anotheria.util.StringUtils;
 
 import org.jdom.Document;

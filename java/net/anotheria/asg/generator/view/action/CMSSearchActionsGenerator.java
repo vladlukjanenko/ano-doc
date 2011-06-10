@@ -8,12 +8,10 @@ import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SharedAction;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.asg.util.listener.SysOutServiceListener;
 
 public class CMSSearchActionsGenerator extends AbstractGenerator {
 

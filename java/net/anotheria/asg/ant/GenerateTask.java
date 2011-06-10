@@ -5,7 +5,6 @@ import java.io.File;
 import net.anotheria.asg.generator.Generator;
 import net.anotheria.asg.generator.util.FileWriter;
 
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 /**
  * Tasks for generation of java files out of xml data.

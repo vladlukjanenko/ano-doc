@@ -1,15 +1,19 @@
 package net.anotheria.asg.generator.model.docs;
 
-import net.anotheria.anodoc.query2.DocumentQuery;
-import net.anotheria.anodoc.query2.QueryResult;
-import net.anotheria.asg.generator.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.anotheria.asg.generator.CommentGenerator;
+import net.anotheria.asg.generator.Context;
+import net.anotheria.asg.generator.FileEntry;
+import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GeneratorDataRegistry;
+import net.anotheria.asg.generator.IGenerateable;
+import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.AbstractServiceGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class CMSBasedServiceGenerator extends AbstractServiceGenerator implements IGenerator{
 
