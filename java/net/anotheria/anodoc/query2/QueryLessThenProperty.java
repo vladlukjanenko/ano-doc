@@ -1,7 +1,5 @@
 package net.anotheria.anodoc.query2;
 
-import net.anotheria.anodoc.query2.QueryProperty;
-
 /**
  * Presents the query of abstract DataObjects that have Property with given name 
  * and its value less then or equal (if including) to the querying value.
