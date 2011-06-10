@@ -210,8 +210,9 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 				for (int i=0; i<elements.size(); i++){
 					MetaViewElement element = elements.get(i);
 					
-					if (element instanceof MetaFunctionElement && opened == false)
-					{appendString("<td width=\"80\">&nbsp;</td>"); opened = true;}
+					if (element instanceof MetaFunctionElement && opened == false){
+						appendString("<td width=\"80\">&nbsp;</td>"); opened = true;
+					}
 					
 					appendString(generateElementHeader(element));
 				}
@@ -231,8 +232,10 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 				        for (int i = 0; i < elements.size(); i++) {
 				            MetaViewElement element = elements.get(i);
 
-							if (element instanceof MetaFunctionElement && opened == false)
-							{appendString("<td class=\"no_wrap\">"); opened = true;}
+							if (element instanceof MetaFunctionElement && opened == false){
+								appendString("<td class=\"no_wrap\">"); 
+								opened = true;
+							}
 
 				            appendString(generateElement(entryName, element,doc));
 				        }
