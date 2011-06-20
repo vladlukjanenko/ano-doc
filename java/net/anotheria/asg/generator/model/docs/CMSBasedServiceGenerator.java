@@ -62,37 +62,37 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    appendString("public ", getCRUDServiceName(doc), "(){");
 	    increaseIdent();
 	    appendStatement("this("+getFactoryName(module)+".getDefaultInstance())");
-	    append(closeBlock());
+	    closeBlockNEW();
 
 	    emptyline();
 	    appendString("public ", getCRUDServiceName(doc), "("+getInterfaceName(module)+" aService){");
 	    increaseIdent();
 	    appendStatement("service = aService");
-	    append(closeBlock());
+	    closeBlockNEW();
 
 	    emptyline();
 	    appendString("public "+doc.getName()+" create("+doc.getName()+" "+doc.getVariableName()+")  throws ASGRuntimeException {");
 	    increaseIdent();
 		appendStatement("return service.create"+doc.getName()+"(", doc.getVariableName(), ")");
-		append(closeBlock());
+		closeBlockNEW();
 	    emptyline();
 
 		appendString("public void delete(", doc.getName(), " ", doc.getVariableName(), ") throws ASGRuntimeException {");
 	    increaseIdent();
 	    appendStatement("service.delete",doc.getName(),"(",doc.getVariableName(),")");
-		append(closeBlock());
+		closeBlockNEW();
 	    emptyline();
 
 		appendString("public "+doc.getName()+" get(String id) throws ASGRuntimeException {");
 	    increaseIdent();
 	    appendStatement("return service.get",doc.getName(),"(id)");
-		append(closeBlock());
+		closeBlockNEW();
 	    emptyline();
 
 		appendString("public ", doc.getName(), " update(", doc.getName(), " ", doc.getVariableName(), ") throws ASGRuntimeException {");
 	    increaseIdent();
 	    appendStatement("return service.update",doc.getName(),"(",doc.getVariableName(),")");
-		append(closeBlock());
+		closeBlockNEW();
 	    emptyline();
 
 
@@ -147,12 +147,12 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    increaseIdent();
 	    if (module.getListeners().size()>0){
 	    	for (int i=0; i<module.getListeners().size(); i++){
-	    		String listClassName = (String)module.getListeners().get(i);
+	    		String listClassName = module.getListeners().get(i);
 	    		appendStatement("addServiceListener(new "+listClassName+"())");
 	    	}
 	    }
 		appendStatement("addModuleListener("+module.getModuleClassName()+".MODULE_ID, this)");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 
 	    appendString("static final "+getImplementationName(module)+" getInstance(){");
@@ -160,16 +160,16 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    appendString("if (instance==null){");
 	    increaseIdent();
 	    appendStatement("instance = new "+getImplementationName(module)+"()");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    appendStatement("return instance");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 
 	    //generate module handling.
 	    appendString("private "+module.getModuleClassName()+" "+getModuleGetterCall(module)+"{");
 	    increaseIdent();
 	    appendStatement("return ("+module.getModuleClassName()+") getModule("+module.getModuleClassName()+".MODULE_ID)");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 
 		//implementing of IModuleListener
@@ -177,7 +177,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    appendString("public void moduleLoaded(Module module){");
 	    increaseIdent();
 	    appendStatement("firePersistenceChangedEvent()");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 
 	    boolean containsAnyMultilingualDocs = false;
@@ -198,13 +198,13 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("List "+doc.getMultiple().toLowerCase()+" = new ArrayList()");
             appendStatement(doc.getMultiple().toLowerCase()+".addAll("+getModuleGetterCall(module)+".get"+doc.getMultiple()+"())");
 	        appendStatement("return "+doc.getMultiple().toLowerCase());
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType){");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 
 			appendComment("Returns the "+doc.getName()+" objects with the specified ids.");
@@ -219,17 +219,17 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("if(ids.contains("+doc.getVariableName()+".getId())){");
 	        increaseIdent();
 	        appendStatement("ret.add("+doc.getVariableName()+")");
-	        append(closeBlock());
-	        append(closeBlock());
+	        closeBlockNEW();
+	        closeBlockNEW();
 	        appendStatement("return ret");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 
 	        appendComment("Returns the "+doc.getName()+" objects with the specified ids, sorted by given sorttype.");
 	        appendStatement("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids, SortType sortType){");
 	        increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(ids), sortType)");
-			append(closeBlock());
+			closeBlockNEW();
 	        emptyline();
 
 
@@ -239,8 +239,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
             appendString("if (hasServiceListeners()){");
 	        increaseIdent();
             appendStatement("fireObjectDeletedEvent("+doc.getVariableName()+")");
-	        append(closeBlock());
-	        append(closeBlock());
+	        closeBlockNEW();
+	        closeBlockNEW();
 	        emptyline();
 
 	        appendString("public void delete"+doc.getName()+"(String id){");
@@ -252,8 +252,8 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
             appendString("if(varValue!=null){");
             increaseIdent();
             appendStatement("fireObjectDeletedEvent(varValue)");
-	        append(closeBlock());
-	        append(closeBlock());
+	        closeBlockNEW();
+	        closeBlockNEW();
 	        emptyline();
 
 
@@ -266,22 +266,22 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : list){");
 	        increaseIdent();
 	        appendStatement("module.delete"+doc.getName()+"("+doc.getVariableName()+".getId())");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        appendStatement("updateModule(module)");
 
 	        appendString("if (hasServiceListeners()){");
 	        increaseIdent();
 	        appendString("for (int t=0; t<list.size(); t++)");
 	        appendIncreasedStatement("fireObjectDeletedEvent(list.get(t))");
-	        append(closeBlock());
+	        closeBlockNEW();
 
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id){");
 	        increaseIdent();
 	        appendStatement("return "+getModuleGetterCall(module)+".get"+doc.getName()+"(id)");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 	        //import
@@ -293,9 +293,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
             appendString("if (hasServiceListeners()){");
             increaseIdent();
             appendStatement("fireObjectImportedEvent("+doc.getVariableName()+")");
-            append(closeBlock());
+            closeBlockNEW();
 	        appendStatement("return "+doc.getVariableName());
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
             //importList
@@ -307,7 +307,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        appendStatement(doc.getName()+" imported = module.import"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
             appendStatement("ret.add(imported)");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        appendStatement("updateModule(module)");
             appendString("if (hasServiceListeners()){");
             increaseIdent();
@@ -315,9 +315,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
             increaseIdent();
             appendStatement("fireObjectImportedEvent("+doc.getVariableName()+")");
             decreaseIdent();
-            append(closeBlock());
+            closeBlockNEW();
 	        appendStatement("return ret");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 	        //create
@@ -328,7 +328,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendStatement("updateModule(module)");
 	        appendStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
 	        appendStatement("return "+doc.getVariableName());
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 
@@ -343,7 +343,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        appendStatement(doc.getName()+" created = module.create"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
 	        appendStatement("ret.add(created)");
-	        append(closeBlock());
+	        closeBlockNEW();
 
 	        appendStatement("updateModule(module)");
 
@@ -351,10 +351,10 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
 	        appendIncreasedStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
-	        append(closeBlock());
+	        closeBlockNEW();
 
 	        appendStatement("return ret");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 
@@ -372,10 +372,10 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("if (oldVersion != null){");
 	        increaseIdent();
 	        appendStatement("fireObjectUpdatedEvent(oldVersion, "+doc.getVariableName()+")");
-	        append(closeBlock());
+	        closeBlockNEW();
 
 	        appendStatement("return "+doc.getVariableName());
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 
@@ -393,17 +393,17 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        appendString("if (oldList!=null)");
 	        appendIncreasedStatement("oldList.add(module.get"+doc.getName()+"("+doc.getVariableName()+".getId()))");
 	        appendStatement("module.update"+doc.getName()+"(("+DocumentGenerator.getDocumentName(doc)+")"+doc.getVariableName()+")");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        appendStatement("updateModule(module)");
 
 	        appendString("if (oldList!=null){");
 	        increaseIdent();
 	        appendString("for (int t=0; t<list.size(); t++)");
 	        appendIncreasedStatement("fireObjectUpdatedEvent(oldList.get(t), list.get(t))");
-	        append(closeBlock());
+	        closeBlockNEW();
 
 	        appendStatement("return list");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 
@@ -424,7 +424,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	        increaseIdent();
 	        appendString("if (value!=null && property.getValue().equals(value))");
 	        appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        decreaseIdent();
 			appendString("}catch(NoSuchPropertyException nspe){");
 			increaseIdent();
@@ -433,15 +433,15 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			decreaseIdent();
 	        appendString("}catch(Exception ignored){}");
 
-	        append(closeBlock());
+	        closeBlockNEW();
 	        appendString("return ret;");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType){");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
-			append(closeBlock());
+			closeBlockNEW();
 
 			appendComment("Executes a query on "+doc.getMultiple());
 			appendString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query){");
@@ -452,24 +452,24 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			increaseIdent();
 			appendStatement("List<QueryResultEntry> partialResult = query.match(all"+doc.getMultiple()+".get(i))");
 			appendStatement("result.add(partialResult)");
-			append(closeBlock());
+			closeBlockNEW();
 
 			appendStatement("return result");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
 //	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
 //	        increaseIdent();
 //	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
-//	        append(closeBlock());
+//	        closeBlockNEW();
 //	        emptyline();
 //	        
 //			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 //			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
 //	        increaseIdent();
 //	        appendStatement("throw new RuntimeException(\"Not yet implemented\")");
-//	        append(closeBlock());
+//	        closeBlockNEW();
 //			emptyline();
 
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(QueryProperty... property){");
@@ -483,21 +483,21 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendStatement("for (QueryProperty qp : property){");
 			increaseIdent();
 			appendStatement("mayPass = mayPass && qp.doesMatch("+doc.getVariableName()+".getPropertyValue(qp.getName()))");
-			append(closeBlock());
+			closeBlockNEW();
 
 			appendString("if (mayPass)");
 			appendIncreasedStatement("ret.add("+doc.getVariableName()+")");
-			append(closeBlock());
+			closeBlockNEW();
 
 			appendStatement("return ret");
-			append(closeBlock());
+			closeBlockNEW();
 	        emptyline();
 
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property){");
 	        increaseIdent();
 	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
-	        append(closeBlock());
+	        closeBlockNEW();
 			emptyline();
 			
 			// get elements COUNT
@@ -505,7 +505,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendString("public int get" + doc.getMultiple() + "Count() {");
 			increaseIdent();
 			appendStatement("return " + getModuleGetterCall(module) + ".get" + doc.getMultiple() + "().size()");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 			// end get elements COUNT
 
@@ -514,7 +514,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendString("public " + listDecl + " get" + doc.getMultiple() + "(Segment aSegment) {");
 			increaseIdent();
 			appendStatement("return Slicer.slice(aSegment, get" + doc.getMultiple() + "()).getSliceData()");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 			// end get elements Segment
 
@@ -532,14 +532,14 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 			appendStatement("for (QueryProperty qp : property) {");
 			increaseIdent();
 			appendStatement("mayPass = mayPass && qp.doesMatch(" + doc.getVariableName() + ".getPropertyValue(qp.getName()))");
-			append(closeBlock());
+			closeBlockNEW();
 			appendString("if (mayPass)");
 			appendIncreasedStatement("ret.add(" + doc.getVariableName() + ")");
 			appendString("if (ret.size() > pOffset + pLimit)");			
 			appendIncreasedStatement("break");
-			append(closeBlock());
+			closeBlockNEW();
 			appendStatement("return Slicer.slice(aSegment, ret).getSliceData()");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 			// end get elements Segment with FILTER
 			
@@ -549,7 +549,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 					+ "ByProperty(Segment aSegment, SortType aSortType, QueryProperty... aProperty){");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get" + doc.getMultiple() + "ByProperty(aSegment, aProperty), aSortType)");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 			// end get elements Segment with SORTING, FILTER
 
@@ -565,9 +565,9 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 				increaseIdent();
 				appendStatement("document.copyLANG2LANG(sourceLanguage, targetLanguage)");
 //				appendStatement("update"+doc.getName()+"(document)");
-				append(closeBlock());
+				closeBlockNEW();
 				appendStatement("update"+doc.getMultiple()+"(allDocuments)");
-				append(closeBlock());
+				closeBlockNEW();
 				emptyline();
 
 			}
@@ -583,7 +583,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 				if (GeneratorDataRegistry.hasLanguageCopyMethods(doc))
 					appendStatement("copyMultilingualAttributesInAll"+doc.getMultiple()+"(sourceLanguage, targetLanguage)");
 			}
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 	    }
 
@@ -609,7 +609,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
 	    	appendStatement("return ret");
-	    	append(closeBlock());
+	    	closeBlockNEW();
 	    	emptyline();
 
             appendStatement("public XMLNode export"+d.getMultiple()+"ToXML(List<"+d.getName()+"> list){");
@@ -619,7 +619,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
 	    	appendStatement("return ret");
-	    	append(closeBlock());
+	    	closeBlockNEW();
 	    	emptyline();
 
 
@@ -632,7 +632,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		    	appendString("for ("+d.getName()+" object : list)");
 		    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
 		    	appendStatement("return ret");
-		    	append(closeBlock());
+		    	closeBlockNEW();
 		    	emptyline();
 
 				appendStatement("public XMLNode export"+d.getMultiple()+"ToXML(String[] languages, List<"+d.getName()+"> list){");
@@ -642,7 +642,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		    	appendString("for ("+d.getName()+" object : list)");
 		    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
 		    	appendStatement("return ret");
-		    	append(closeBlock());
+		    	closeBlockNEW();
 		    	emptyline();
 		    }
 
@@ -658,7 +658,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 	    }
 	    emptyline();
 	    appendStatement("return ret");
-	    append(closeBlock());
+	    closeBlockNEW();
 
 
 	    if (containsAnyMultilingualDocs && GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
@@ -671,7 +671,7 @@ public class CMSBasedServiceGenerator extends AbstractServiceGenerator implement
 		    }
 		    emptyline();
 		    appendStatement("return ret");
-		    append(closeBlock());
+		    closeBlockNEW();
 	    }
 	    return clazz;
 	}

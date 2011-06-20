@@ -64,7 +64,7 @@ public class ModuleFactoryGenerator extends AbstractGenerator implements IGenera
 		appendString("public Module recreateModule(String ownerId, String copyId) {");
 		increaseIdent();
 		appendStatement("return new Module"+module.getName()+"()");
-		append(closeBlock());
+		closeBlockNEW();
 		
 	}
 	
@@ -81,7 +81,7 @@ public class ModuleFactoryGenerator extends AbstractGenerator implements IGenera
 		}
 		
 		appendStatement("throw new RuntimeException(\"Unexpected document in list:\"+context.getId())");
-		append(closeBlock());
+		closeBlockNEW();
 		
 	}
 }
