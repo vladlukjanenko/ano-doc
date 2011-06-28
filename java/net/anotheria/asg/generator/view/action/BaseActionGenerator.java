@@ -197,7 +197,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("protected boolean isAuthorizationRequired(){");
 		increaseIdent();
 		appendStatement("return false");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		clazz.addImport(List.class);
@@ -206,7 +206,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("protected List<String> getRequiredRoles(){");
 		increaseIdent();
 		appendStatement("return EMPTY_ROLE_LIST");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("protected boolean checkAuthorization(HttpServletRequest req){");
@@ -222,7 +222,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("public String getSubsystem() {");
 		increaseIdent();
 		appendStatement("return "+quote("asg"));
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 	
 		appendString("protected String stripPath(String path){");
@@ -230,20 +230,20 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("if (path==null || path.length()==0)");
 		appendIncreasedStatement("throw new IllegalArgumentException("+quote("path null or empty")+")");
 		appendStatement("return path.startsWith("+quote("/")+") ? path.substring(1) : path");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		//  ading  2  methods  actually -- for  LockConfig ussage....
 		appendString("protected long getLockingTimeout(){");
 		increaseIdent();
 		appendStatement("return lockConfig.getTimeout()");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("protected boolean isAutoLockingEnabled(){");
 		increaseIdent();
 		appendStatement("return lockConfig.isAutolocking()");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		//
@@ -259,9 +259,9 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		increaseIdent();
 		appendString("if (userManager.userInRole(userId, role))");
 		appendIncreasedStatement("return");
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("throw new RuntimeException("+quote("Permission denied, expected one of those: ")+"+requiredRoles)");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		
@@ -269,7 +269,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		increaseIdent();
 		appendStatement("String userId = getUserId(req)");
 		appendStatement("return userId==null ? false : userManager.userInRole(userId, role)");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 */
 		appendString("protected boolean isUserInRole(HttpServletRequest req, String ... roles){");
@@ -281,9 +281,9 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		increaseIdent();
 		appendString("if (userManager.userInRole(userId, role))");
 		appendIncreasedStatement("return true");
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("return false");
-		append(closeBlock());
+		closeBlockNEW();
 		
 		appendString("protected void prepareMenu(HttpServletRequest req) {");
 		increaseIdent();
@@ -292,7 +292,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("if (naviItem.isActive())");
 		appendString("naviItem.setSubNavi(getSubNavigation());");
 		appendString("addBeanToRequest(req, BEAN_MAIN_NAVIGATION, navigation);");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("protected abstract List<NavigationItemBean> getSubNavigation();");
@@ -321,7 +321,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		}
 	
 		appendString("return menu;");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		appendString("protected abstract String getActiveMainNavi();");
@@ -342,7 +342,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		} else {
 			appendStatement("return new ArrayList<String>()");
 		}			
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		
@@ -353,7 +353,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("bean.setLink(link);");
 		appendString("bean.setActive(title.equals(getActiveMainNavi()));");
 		appendString("return bean;");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		emptyline();
 		emptyline();
@@ -380,14 +380,14 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendIncreasedStatement("attributes.add(docAtt)");
 		appendIncreasedStatement("refreshSessionLockedAtribute(req, attributes)");
 		appendString("}");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendComment("Putting attribute to the HttpSession.");
         appendString("private void refreshSessionLockedAtribute(HttpServletRequest req, List<LockedDocumentAttribute> attributes) {");
 		increaseIdent();
 		appendStatement("req.getSession().setAttribute(LOCKED_OBJECTS_COLLECTION_SESSION_ATTRIBUTE_NAME, attributes)");
-        append(closeBlock());
+        closeBlockNEW();
 		emptyline();
 
 		appendComment("Removing attributes List<LockedDocumentAttribute> - from session.");
@@ -399,7 +399,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendIncreasedStatement("attributes.remove(docAtt)");
 		appendIncreasedStatement("refreshSessionLockedAtribute(req, attributes)");
 		appendString("}");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendComment("Return true if current document represented as  <a>LockedDocumentAttribute</a>. in session attributes list.");
@@ -408,7 +408,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendStatement("List<LockedDocumentAttribute> attributes = getLockedAttributesList(req)");
 		appendStatement("LockedDocumentAttribute docAtt = new LockedDocumentAttribute(doc)");
 	    appendStatement("return attributes.contains(docAtt)");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 
@@ -422,7 +422,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendIncreasedStatement("attributes = (List<LockedDocumentAttribute>) sessionBean");
 		appendString("}");
 	    appendStatement("return attributes == null ? new ArrayList<LockedDocumentAttribute>() : attributes");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		emptyline();
 
@@ -444,37 +444,37 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		increaseIdent();
 		appendStatement("this.docId = doc.getId()");
         appendStatement("this.documentClazz = doc.getClass()");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("public String getDocId() {");
 		increaseIdent();
 		appendStatement("return docId");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("public Class<? extends AbstractASGDocument> getDocumentClazz() {");
 		increaseIdent();
 		appendStatement("return documentClazz");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("public void setDocId(String aDocId) {");
 		increaseIdent();
 		appendStatement("this.docId = aDocId");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("public void setDocumentClazz(Class<? extends AbstractASGDocument> aDocumentClazz) {");
 		increaseIdent();
 		appendStatement("this.documentClazz = aDocumentClazz");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();				
 
 		appendString("public boolean equals(Object o) {");
 		increaseIdent();
 		appendStatement("return o!=null && (this == o || o instanceof LockedDocumentAttribute && ((LockedDocumentAttribute) o).getDocId().equals(getDocId()) && \n \t\t\t\t ((LockedDocumentAttribute) o).getDocumentClazz().equals(getDocumentClazz()))");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 
@@ -484,7 +484,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendStatement("final int mult = 31");
 		appendStatement("result = mult * result + (documentClazz != null ? documentClazz.hashCode() : 0)");
 		appendStatement("return result");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("public String toString() {");
@@ -495,12 +495,12 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendStatement("sb.append(\", documentClazz=\").append(documentClazz)");
 		appendStatement("sb.append('}')");
 		appendStatement("return sb.toString()");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 
 		emptyline();
-		append(closeBlock());
+		closeBlockNEW();
 
 		return clazz;
 	}

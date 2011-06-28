@@ -126,7 +126,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				
 				timer.startExecution(section.getModule().getName()+"-dialog-container");
 				for (int p=0; p<doc.getProperties().size(); p++){
-					MetaProperty pp = (MetaProperty)doc.getProperties().get(p);
+					MetaProperty pp = doc.getProperties().get(p);
 					//System.out.println("checking "+pp+" "+(pp instanceof MetaContainerProperty));
 					if (pp instanceof MetaContainerProperty){
 						MetaContainerProperty mcp = (MetaContainerProperty)pp;
@@ -253,7 +253,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("log.fatal(\"Couldn't instantiate filter:\", e)");
 			appendString("}");
 		}
-		append(closeBlock());
+		closeBlockNEW();
 
 
 		appendString(getExecuteDeclaration());
@@ -275,7 +275,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				appendStatement(filterParameterName + " = (String)getBeanFromSession(req, SA_FILTER+" + quote(i) + ")");
 				appendString("if (" + filterParameterName + "==null)");
 				appendIncreasedStatement(filterParameterName + " = " + quote(""));
-				append(closeBlock());
+				closeBlockNEW();
 				appendStatement("req.setAttribute(" + quote("currentFilterParameter" + i) + ", " + filterParameterName + ")");
 				emptyline();
 			}
@@ -320,7 +320,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("sessionSortType = (" + sortType + ")getBeanFromSession(req, SA_SORT_TYPE)");
 			appendStatement("sortType = sessionSortType == null ? new " + docSortType + "(sortMethod, sortOrder) : new " +docSortType+"(sessionSortType.getSortBy(), sessionSortType.getSortOrder())");
 			appendStatement("sessionSortType = sessionSortType == null ? new " + sortType + "(sortMethod, sortOrder) : sessionSortType");
-			append(closeBlock());
+			closeBlockNEW();
 			appendStatement("req.setAttribute(" + quote("currentSortCode") + ", sessionSortType.getMethodAndOrderCode())");
 			emptyline();
 		}
@@ -342,7 +342,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 			appendString("if (mayPass)");
 			append(writeIncreasedStatement(listName + ".add(element)"));
-			append(closeBlock());
+			closeBlockNEW();
 		} else {
 			appendStatement("List<" + doc.getName() + "> " + listName + " = " + getServiceGetterCall(section.getModule()) + ".get" + doc.getMultiple() + "()");
 		}
@@ -386,7 +386,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 
 		appendStatement("return mapping.findForward(\"success\")");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 
@@ -513,7 +513,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    writePathResolveForMultiOpAction(doc,CMSMappingsConfiguratorGenerator.ACTION_VERSIONINFO);
 	    
 	    appendStatement("throw new IllegalArgumentException("+quote("Unknown path: ")+"+path)");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 	    
 		
@@ -597,7 +597,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         }
 	    
 	    appendStatement("throw new IllegalArgumentException("+quote("Unknown path: ")+"+path)");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 	    
 		
@@ -765,7 +765,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		appendStatement("res.sendRedirect(" + getShowActionRedirect(doc) + ")");
 		appendStatement("return null");
-		append(closeBlock());
+		closeBlockNEW();
 	}
 
 	private void generateRedirectPathMethod(MetaModuleSection section) {
@@ -779,7 +779,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         appendString("else");
         appendIncreasedString("return nextAction.equals(\"showEdit\") ? "+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+item.getId()");
         appendIncreasedString("       : "+getShowActionRedirect(doc)+";"); 
-        append(closeBlock());
+        closeBlockNEW();
     }
 
 
@@ -810,7 +810,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         appendString("}");
         appendStatement("res.sendRedirect(getRedirectUrl(req, "+doc.getVariableName()+"Curr))");
 	    appendStatement("return null");
-	    append(closeBlock());
+	    closeBlockNEW();
     }
 
     private void writePathResolveForMultiOpAction(MetaDocument doc,String action){
@@ -956,7 +956,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("log.fatal(\"Couldn't instantiate filter:\", e)");
 			appendString( "}");
 		}
-	    append(closeBlock());
+	    closeBlockNEW();
 		
 
 	    appendString( getExecuteDeclaration());
@@ -978,7 +978,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		    	appendStatement(filterParameterName+" = (String)getBeanFromSession(req, SA_FILTER+"+quote(i)+")");
 		    	appendString( "if ("+filterParameterName+"==null)");
 		    	appendIncreasedStatement(filterParameterName+" = "+quote(""));
-			    append(closeBlock());
+			    closeBlockNEW();
 		    	appendStatement("req.setAttribute("+quote("currentFilterParameter"+i)+", "+filterParameterName+")");
 		    	emptyline();
 	    	}
@@ -1020,7 +1020,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("sortType = ("+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+")getBeanFromSession(req, SA_SORT_TYPE)");
 			appendString( "if (sortType==null)");
 			appendIncreasedStatement("sortType = new "+ModuleBeanGenerator.getListItemBeanSortTypeName(doc)+"(sortMethod, sortOrder)");
-		    append(closeBlock());
+		    closeBlockNEW();
 			appendStatement("req.setAttribute("+quote("currentSortCode")+", sortType.getMethodAndOrderCode())");
 			emptyline();
 		}
@@ -1042,7 +1042,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		    }
 		    appendString( "if (mayPass)");
 		    append(writeIncreasedStatement(listName+".add("+unfilteredListName+".get(i))"));
-		    append(closeBlock());
+		    closeBlockNEW();
 	    }else{
 		    appendStatement("List<"+doc.getName()+"> "+listName+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getMultiple()+"()");
 	    }
@@ -1056,7 +1056,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 		appendStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
 		appendStatement("beans.add(bean)");
-		append(closeBlock());
+		closeBlockNEW();
 	    emptyline();
 	    if (containsComparable){
 	    	appendStatement("beans = sorter.sort(beans, sortType)");
@@ -1100,7 +1100,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    }
 	    
 	    appendStatement("return mapping.findForward(\"success\")");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 	    
 	    
@@ -1184,7 +1184,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("bean.setDocumentLastUpdateTimestamp(NumberUtils.makeISO8601TimestampString("+doc.getVariableName()+".getLastUpdateTimestamp()))");
 	    
 	    appendStatement("return bean");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    return clazz;
 	}
 	
@@ -1255,7 +1255,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		increaseIdent();
 		appendStatement(ModuleBeanGenerator.getListItemBeanName(doc)+" bean = "+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"("+doc.getVariableName()+")");
 		appendStatement("beans.add(bean)");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    ret += emptyline();
 	    appendStatement("addBeanToRequest(req, "+quote(listName)+", beans)");
 	
@@ -1280,12 +1280,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendStatement("bean.setPropertyName(entry.getMatchedProperty().getId())");
 	    appendStatement("bean.setInfo(entry.getInfo().toHtml())");
 	    appendStatement("beans.add(bean)");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    appendStatement("req.setAttribute("+quote("result")+", beans)");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    
 	    appendStatement("return mapping.findForward(\"success\")");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    return clazz;
 	}
 
@@ -1362,7 +1362,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				beanCreationCall+=targetDocument.getVariableName()+".getId(), ";
 				beanCreationCall+=targetDocument.getVariableName()+".getName()))";
 				appendStatement(beanCreationCall);
-				append(closeBlock());
+				closeBlockNEW();
 				appendStatement("addBeanToRequest(req, "+quote(targetDocument.getMultiple().toLowerCase())+", "+targetDocument.getMultiple().toLowerCase()+"Beans)"); 
 				emptyline();
 				
@@ -1373,7 +1373,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		
 		appendStatement("return mapping.findForward(\"success\")");
-		append(closeBlock());
+		closeBlockNEW();
 		return clazz;
 	}
 
@@ -1413,11 +1413,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString("for (int i=0; i<"+listName+".size(); i++){");
 		increaseIdent();
 		appendStatement("beans.add("+getMakeBeanFunctionName(ModuleBeanGenerator.getListItemBeanName(doc))+"(("+doc.getName()+")"+listName+".get(i)))");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		appendStatement("return mapping.findForward(\"success\")");
-		append(closeBlock());
+		closeBlockNEW();
 
 		return clazz;
 	}
@@ -1485,7 +1485,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		appendStatement("return mapping.findForward("+quote("success")+")");
 	    
-		append(closeBlock()); 
+		closeBlockNEW(); 
 	}
 	
 	/**
@@ -1556,7 +1556,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		increaseIdent();
 		appendString( doc.getVariableName()+" = "+DataFacadeGenerator.getDocumentFactoryName(doc)+".create"+doc.getName()+"();");
 		appendString( "create = true;");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		appendStatement("String nextAction = req.getParameter("+quote("nextAction")+")");
@@ -1588,7 +1588,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						appendStatement("FileStorage.storeFilePermanently(req, "+holderName+".getFileName(),\""+varName+"\")");
 						appendStatement(doc.getVariableName()+"."+p.toSetter()+"("+holderName+".getFileName())");
 						appendStatement("FileStorage.removeTemporaryFile(req,\""+varName+"\")");
-						append(closeBlock());
+						closeBlockNEW();
 						continue;
 					}
 					if (! (p instanceof MetaContainerProperty)){
@@ -1633,7 +1633,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendIncreasedStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
 		appendString("}");
 	    appendStatement("return null");
-		append(closeBlock());
+		closeBlockNEW();
 
 		if (StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())) {
 			appendComment("Simply unlocks document after updation.");
@@ -1641,7 +1641,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			increaseIdent();
 			appendString("if(((LockableObject)" + doc.getVariableName() + ").isLocked())");
 			appendIncreasedStatement("unLock" + doc.getMultiple() + "(" + doc.getVariableName() + ", req, false)");
-			append(closeBlock());
+			closeBlockNEW();
 		}
 	}
 	
@@ -1702,7 +1702,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+id)");
 		
 	    appendStatement("return null");
-		append(closeBlock()); //end doExecute
+		closeBlockNEW(); //end doExecute
 	}
 
 	/**
@@ -1769,7 +1769,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&pId=")+"+id)");
 		
 	    appendStatement("return null");
-		append(closeBlock()); //end doExecute
+		closeBlockNEW(); //end doExecute
 	}
 
 	/**
@@ -1958,7 +1958,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						increaseIdent();
 						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+"Temp.getId(), "+targetDocument.getVariableName()+"Temp.getName() )");
 						appendStatement(listName,"Values.add(bean)");
-						append(closeBlock());
+						closeBlockNEW();
 
 					}
 
@@ -2005,7 +2005,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 		
 		appendStatement("return mapping.findForward(\"success\")");
-		append(closeBlock()); 
+		closeBlockNEW(); 
 		emptyline();
 		
 		appendAddFieldExplanationsMethod(doc);
@@ -2036,7 +2036,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				appendString( "}");
 			}
 			appendStatement("return ret");
-			append(closeBlock());
+			closeBlockNEW();
 			
 			for (DirectLink l : backlinks){
 				if (l.getProperty().isMultilingual()){
@@ -2051,9 +2051,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						appendString( "for ("+l.getDocument().getName() +" doc : list ){");
 						increaseIdent();
 						appendStatement("ret.add(new LinkToMeBean(doc, "+quote(l.getProperty().getName())+"))");
-						append(closeBlock());
+						closeBlockNEW();
 						appendStatement("return ret");
-						append(closeBlock());
+						closeBlockNEW();
 					}
 				}else{
 					appendString( "private List<LinkToMeBean> findLinkToCurrentDocumentIn"+l.getModule().getName()+l.getDocument().getName()+StringUtils.capitalize(l.getProperty().getName())+"(String documentId) throws "+ServiceGenerator.getExceptionImport(l.getModule())+"{");
@@ -2066,9 +2066,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					appendString( "for ("+l.getDocument().getName() +" doc : list ){");
 					increaseIdent();
 					appendStatement("ret.add(new LinkToMeBean(doc, "+quote(l.getProperty().getName())+"))");
-					append(closeBlock());
+					closeBlockNEW();
 					appendStatement("return ret");
-					append(closeBlock());
+					closeBlockNEW();
 				}
 			}
 		}
@@ -2103,7 +2103,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendStatement("String[] iDs = req.getParameterValues(PARAM_ID)");
 		appendString("if (iDs == null){");
 		appendStatement("throw new RuntimeException(\"Parameter \" + PARAM_ID + \" is not set.\")");
-		append(closeBlock());
+		closeBlockNEW();
 		appendString("for (String id : iDs){");
 		increaseIdent();
         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
@@ -2121,10 +2121,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				appendStatement("FileStorage.removeFilePermanently( "+doc.getVariableName()+"Curr."+property.toGetter()+"() )");
 		}
 
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("res.sendRedirect("+getShowActionRedirect(doc)+")");
 	    appendStatement("return null");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    
 	}
 
@@ -2168,7 +2168,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(doc.getName()+" "+doc.getVariableName()+"Created = "+getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+"Dest"+")");
 	    appendStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&")+"+PARAM_ID+"+quote("=")+"+"+doc.getVariableName()+"Created.getId()"+")");
 	    appendStatement("return null");
-	    append(closeBlock());
+	    closeBlockNEW();
 	}
 
 	private GeneratedClass generateNewAction(MetaModuleSection section){
@@ -2262,7 +2262,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 //
 //						appendStatement("LabelValueBean bean = new LabelValueBean(" + targetDocument.getVariableName() + ".getId(), " + targetDocument.getVariableName() + ".getName() )");
 //						appendStatement(listName + "Values.add(bean)");
-//						append(closeBlock());
+//						closeBlockNEW();
 //					}
 //
 //					String lang = getElementLanguage(element);
@@ -2328,7 +2328,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 						appendStatement("LabelValueBean bean = new LabelValueBean(" + targetDocument.getVariableName() + ".getId(), " + targetDocument.getVariableName() + ".getName() )");
 						appendStatement(listName + "Values.add(bean)");
-						append(closeBlock());
+						closeBlockNEW();
 					}
 
 					String lang = getElementLanguage(element);
@@ -2452,7 +2452,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			//putting to cache!
 			appendIncreasedStatement("addLockedAttribute(req, lock)");
 			appendString("}");
-			append(closeBlock());
+			closeBlockNEW();
 
 			appendComment("Executing unlocking. Actually.");
 			appendString("protected void unLock" + doc.getMultiple() + "(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req, boolean unlockByTimeoout) throws Exception{");
@@ -2470,7 +2470,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedString("}");
 	        appendIncreasedStatement("removeLockedAttribute(req, lock)");
 			appendString("}");
-			append(closeBlock());
+			closeBlockNEW();
 
 			
 		    appendComment("Executing auto-unlocking check....");
@@ -2480,7 +2480,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					").isLocked() && \n \t \t \t \t ( System.currentTimeMillis() >= ((AbstractASGDocument)"+doc.getVariableName()+").getLockingTime() + getLockingTimeout())");
 			appendString("if(shouldUnlock)");
             appendIncreasedStatement("unLock"+ doc.getMultiple() + "(" +doc.getVariableName() + ", req, true)");
-			append(closeBlock());
+			closeBlockNEW();
 
 			appendComment("Checking UpdateCapability rights");
 			appendString("protected void canUpdate" + doc.getMultiple() + "(" + doc.getName() + " " + doc.getVariableName() + ", HttpServletRequest req) throws Exception{");
@@ -2496,7 +2496,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendString("if (wasUnlockedByAdmin("+ doc.getVariableName() +", req)) {");
 			appendIncreasedStatement("throw new LockingException(getUserId(req)+\" . Document can't be updated! It was unlocked by user in 'admin' role!!!\")");
             appendString("}");
-			append(closeBlock());
+			closeBlockNEW();
 
 			appendComment("");
 			appendString("private boolean isTimeoutReached("+doc.getName() +" "+ doc.getVariableName()+"){");
@@ -2506,7 +2506,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("return lock.isLocked() && lock.getLockingTime() + getLockingTimeout() <= System.currentTimeMillis()");
             appendString("}");
 			appendStatement("return false");
-			append(closeBlock());
+			closeBlockNEW();
 
 			appendComment("");
 			appendString("private boolean wasUnlockedByAdmin("+doc.getName() +" "+ doc.getVariableName()+", HttpServletRequest req){");
@@ -2516,7 +2516,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendIncreasedStatement("return !lock.isLocked() && containsLockedAttribute(req, lock)");
             appendString("}");
 			appendStatement("return false");
-			append(closeBlock());
+			closeBlockNEW();
 			
 		}
 	    
@@ -2716,7 +2716,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		}
 	    
 	    appendStatement("throw new IllegalArgumentException("+quote("Unknown path: ")+"+path)");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 	    
 		
@@ -2817,7 +2817,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("FileStorage.storeFilePermanently(req, holder.getFileName(), \""+varName+"\")");
 			appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"(holder.getFileName())");
 			appendStatement("FileStorage.removeTemporaryFile(req, \""+varName+"\")");
-			append(closeBlock());
+			closeBlockNEW();
 		} else {
 			String getter = "form."+p.toBeanGetter()+"()";
 			appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"("+getter+")");
@@ -2828,7 +2828,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("return "+getSuperCall());
 		else
 			appendStatement("return "+CMSMappingsConfiguratorGenerator.getContainerPath(doc, list, CMSMappingsConfiguratorGenerator.ACTION_SHOW)+"(mapping, af, req, res)");
-		append(closeBlock());
+		closeBlockNEW();
 		
 	}
 	
@@ -2890,9 +2890,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString("for (int i=Integer.parseInt(ids[0]); i<=Integer.parseInt(ids[ids.length-1]); i++){");
 		increaseIdent();
 		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(list)+"("+quote("")+"+i)");
-		append(closeBlock());
+		closeBlockNEW();
 		
-		append(closeBlock());
+		closeBlockNEW();
 		String call = "";
 		MetaProperty p = list.getContainedProperty();
 		String getter = "form."+p.toBeanGetter()+"()";
@@ -2902,7 +2902,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("return "+getSuperCall());
 		else
 			appendStatement("return "+CMSMappingsConfiguratorGenerator.getContainerPath(doc, list, CMSMappingsConfiguratorGenerator.ACTION_SHOW)+"(mapping, af, req, res)");
-		append(closeBlock());
+		closeBlockNEW();
 		
 	}
 
@@ -2957,7 +2957,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryAdderName(table)+"("+call+")");
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 		appendStatement("return "+getSuperCall());
-		append(closeBlock());
+		closeBlockNEW();
 		return clazz;
 	}
 
@@ -3009,7 +3009,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("return "+getSuperCall());
 		else
 			appendStatement("return "+CMSMappingsConfiguratorGenerator.getContainerPath(doc, container, CMSMappingsConfiguratorGenerator.ACTION_SHOW)+"(mapping, af, req, res)");
-		append(closeBlock());
+		closeBlockNEW();
 	}
 
 	private GeneratedClass generateContainerMoveEntryAction(MetaModuleSection section, MetaContainerProperty container){
@@ -3088,7 +3088,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("return "+getSuperCall());
 		else
 			appendStatement("return "+CMSMappingsConfiguratorGenerator.getContainerPath(doc, container, CMSMappingsConfiguratorGenerator.ACTION_SHOW)+"(mapping, af, req, res)");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		String moveMethodParameter = doc.getName()+" "+doc.getVariableName()+", int position";
@@ -3099,7 +3099,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendIncreasedStatement("return");
 		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntrySwapperName(container)+"(position, position-1)");
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		appendString("private void moveTop("+moveMethodParameter+") throws ASGRuntimeException {");
@@ -3109,7 +3109,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("targetList.add(0, toSwap)");
 		appendStatement(doc.getVariableName()+".set"+container.getAccesserName()+"(targetList)"); 
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("private void moveDown("+moveMethodParameter+") throws ASGRuntimeException {");
@@ -3119,8 +3119,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntrySwapperName(container)+"(position, position+1)");
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
-		append(closeBlock());
-		append(closeBlock());
+		closeBlockNEW();
+		closeBlockNEW();
 		emptyline();
 
 		appendString("private void moveBottom("+moveMethodParameter+") throws ASGRuntimeException {");
@@ -3130,7 +3130,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("targetList.add(toSwap)");
 		appendStatement(doc.getVariableName()+".set"+container.getAccesserName()+"(targetList)"); 
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
-		append(closeBlock());
+		closeBlockNEW();
 	}
 
 	/**
@@ -3236,7 +3236,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement(DataFacadeGenerator.getDocumentImport(targetDocument)+" "+targetDocument.getTemporaryVariableName()+" = ("+DataFacadeGenerator.getDocumentImport(targetDocument)+") "+listName+".get(i)");
 			appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getTemporaryVariableName()+".getId(), "+targetDocument.getTemporaryVariableName()+".getName()+\" [\"+"+targetDocument.getTemporaryVariableName()+".getId()+\"]\" )");
 			appendStatement(listName+"Values.add(bean)");
-			append(closeBlock());
+			closeBlockNEW();
 			appendStatement("addBeanToRequest(req, "+quote(link.getName().toLowerCase()+"ValuesCollection")+", "+listName+"Values"+")");
 		}
 		
@@ -3255,7 +3255,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		
 		    appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+" + "element.getValue(), element.name())");
 		    appendStatement(listName+".add(bean)");
-		    append(closeBlock());
+		    closeBlockNEW();
 		    appendStatement("addBeanToRequest(req, "+quote(listName)+", " + listName +")");
 		}
 		
@@ -3301,11 +3301,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement("bean.setDescription("+EnumTypeGenerator.getEnumClassName(type)+".getConstantByValue(value).name())");
 		}
 		appendStatement("beans.add(bean)");
-		append(closeBlock());		
+		closeBlockNEW();		
 		appendStatement("addBeanToRequest(req, "+quote("elements")+", beans)");
 //*/		
 		appendStatement("return mapping.findForward(", quote("success"), ")");
-		append(closeBlock()); 
+		closeBlockNEW(); 
 	}
 	
 	/**
@@ -3365,11 +3365,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			appendStatement(setter);
 		}
 		appendStatement("beans.add(bean)");
-		append(closeBlock());		
+		closeBlockNEW();		
 		appendStatement("addBeanToRequest(req, "+quote("rows")+", beans)");
 		
 		appendStatement("return mapping.findForward("+quote("success")+")");
-		append(closeBlock());		
+		closeBlockNEW();		
 		
 		return clazz;
 	}
@@ -3411,7 +3411,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		List<String> targets = form.getTargets();
 		appendString("public static String[] MAIL_TARGETS = {");
 		for (int i=0; i<targets.size(); i++){
-			appendIncreasedString(quote((String)targets.get(i))+",");
+			appendIncreasedString(quote(targets.get(i))+",");
 		}
 		appendStatement("}");
 		emptyline();
@@ -3558,12 +3558,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendString("}catch(Exception e){");
 		increaseIdent();
 		appendStatement("e.printStackTrace()");
-		append(closeBlock());
-		append(closeBlock());
+		closeBlockNEW();
+		closeBlockNEW();
 		emptyline();		
 		
 		appendStatement("return mapping.findForward(\"success\")");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		return clazz;
@@ -3603,7 +3603,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				appendStatement("LabelValueBean bean = new LabelValueBean(\"\"+" + "element.getValue(), element.name())");
 				appendStatement(listName+"Values.add(bean)");
 
-			    append(closeBlock());
+			    closeBlockNEW();
 			    generatedProperties.add(arrName);
 			}else{
 				appendString("//enumeration "+type.getName()+" already prepared.");

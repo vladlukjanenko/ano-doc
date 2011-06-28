@@ -50,7 +50,7 @@ public class TablePageJspGenerator extends AbstractJSPGenerator {
 		appendString("<tr class="+quote("lineCaptions")+">");
 	    appendIncreasedString("<td width=\"1%\">Pos</td>");
 		for (int i=0; i<columns.size(); i++){
-		    MetaProperty p = (MetaProperty)columns.get(i);
+		    MetaProperty p = columns.get(i);
 		    appendIncreasedString("<td>"+StringUtils.capitalize(table.extractSubName(p))+"</td>");
 		}
 	    appendIncreasedString("<td width=\"1%\">&nbsp;</td>");
@@ -61,7 +61,7 @@ public class TablePageJspGenerator extends AbstractJSPGenerator {
 		increaseIdent();
 		appendString("<td width="+quote("1%")+"><ano:write name="+quote("row")+" property="+quote("position")+"/></td>");
 		for (int i=0; i<columns.size(); i++){
-		    MetaProperty p = (MetaProperty)columns.get(i);
+		    MetaProperty p = columns.get(i);
 		    appendString("<td><ano:write name="+quote("row")+" property="+quote(table.extractSubName(p))+"/></td>");
 		}
 		String parameter = "pId=<ano:write name="+quote("row")+" property="+quote("ownerId")+"/>";
@@ -91,7 +91,7 @@ public class TablePageJspGenerator extends AbstractJSPGenerator {
 			increaseIdent();
 	        
 	        if (i<columns.size()){
-				MetaProperty p = (MetaProperty)columns.get(i);
+				MetaProperty p = columns.get(i);
 				appendString("<td align=\"right\" width=\"35%\">");
 				increaseIdent();
 				String name = table.extractSubName(p);

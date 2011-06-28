@@ -451,7 +451,7 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		List<MetaFormField> elements = form.getElements();
 		for (int i=0; i<elements.size(); i++){
 ///*
-		    MetaFormField element = (MetaFormField)elements.get(i);
+		    MetaFormField element = elements.get(i);
 		    if (element.isSingle()){
 		    	MetaFormSingleField field = (MetaFormSingleField )element;
 				appendString("<tr class="+quote("qs_info")+">");

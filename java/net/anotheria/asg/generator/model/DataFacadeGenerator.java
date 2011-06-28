@@ -92,7 +92,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		appendString("public "+doc.getName()+" build(){");
 		increaseIdent(); 
 		appendStatement("return "+doc.getName()+"Factory.create"+doc.getName()+"(this)");
-		append(closeBlock());
+		closeBlockNEW();
 		
 		return clazz;
 	}
@@ -127,19 +127,19 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		appendString("public "+getSortTypeName(doc)+"(){");
 		increaseIdent();
 		appendString("super(SORT_BY_DEFAULT);");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("public "+getSortTypeName(doc)+"(int method){");
 		increaseIdent();
 		appendString("super(method);");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 				
 		appendString("public "+getSortTypeName(doc)+"(int method, boolean order){");
 		increaseIdent();
 		appendString("super(method, order);");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		appendString("public static int name2method(String name){");
@@ -150,7 +150,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 				appendIncreasedStatement("return SORT_BY_"+p.getName().toUpperCase());
 		}
 		appendStatement("throw new RuntimeException("+quote("Unknown sort type name: ")+"+name)");		
-		append(closeBlock());
+		closeBlockNEW();
 
 		return clazz;
 	}
@@ -218,10 +218,10 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	        increaseIdent();
 	        appendStatement("MultilingualObject multilangDoc = (MultilingualObject) object");
 	        appendStatement("ret.addChildNode(XMLHelper.createXMLNodeForBooleanValue("+quote("multilingualDisabled")+", null, multilangDoc.isMultilingualDisabledInstance()))");
-	        append(closeBlock());
+	        closeBlockNEW();
 		}
 		appendStatement("return ret");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		appendString("public static XMLNode toXML("+doc.getName()+" object){");
@@ -231,7 +231,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		}else{
 			appendStatement("return _toXML(object)");
 		}
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported()){
@@ -242,7 +242,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 			appendString("if (languages==null || languages.length==0)");
 			appendIncreasedStatement("return toXML(object)");
 			appendStatement("return _toXML(object, languages)");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 		}
 		
@@ -250,7 +250,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		appendString("public static "+doc.getName()+" fromXML(XMLNode node){");
 		increaseIdent();
 		appendStatement("return null");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		
 		
@@ -582,7 +582,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		increaseIdent();
 		appendStatement(p.getName(), " = ", "aValue");
 		appendStatement("return this");
-		append(closeBlock());
+		closeBlockNEW();
 		
 	}
 

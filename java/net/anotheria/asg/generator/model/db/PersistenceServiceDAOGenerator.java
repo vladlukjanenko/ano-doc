@@ -170,7 +170,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("throw new RowMapperException(e)");
 		appendString("}");
 
-		append(closeBlock());
+		closeBlockNEW();
 
 		return clazz;
 	}
@@ -474,16 +474,16 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			appendStatement("maxId = maxId >= dbConfig.getStartId() ? maxId : dbConfig.getStartId()");
 			appendStatement("lastId = new AtomicLong(maxId)");
 			appendStatement("lastIds.put(tableName, lastId)");
-			append(closeBlock());
-			append(closeBlock());
-			append(closeBlock());
+			closeBlockNEW();
+			closeBlockNEW();
+			closeBlockNEW();
 			appendStatement("return lastId");
 
 		} else {
 			appendStatement("return lastId");
 
 		}
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		//get last id method
@@ -495,7 +495,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			appendString("if (lastId.get()<lastIdValue)");
 			appendIncreasedStatement("lastId.set(lastIdValue)");
 		}
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 
@@ -512,7 +512,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			appendStatement("sql.append(sql1).append(TABNAME).append(sql2)");
 			appendStatement("return sql.toString()");
 		}
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		String throwsClause = " throws DAOException";
@@ -529,7 +529,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("ret.add(rowMapper.map(result))");
 		appendStatement("return  ret");
 		generateFunctionEnd(callLog, true, true);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendComment("Deletes a " + doc.getName() + " object by id.");
@@ -542,9 +542,9 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("if (rows!=1 && rows!=0){");
 		increaseIdent();
 		appendStatement("log.warn(\"Deleted more than one row of " + doc.getName() + ": \"+id)");
-		append(closeBlock());
+		closeBlockNEW();
 		generateFunctionEnd(callLog, true, false);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		//deleteListXYZ method
@@ -565,11 +565,11 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("if (rows!=1 && rows!=0){");
 		increaseIdent();
 		appendStatement("log.warn(\"Deleted more than one row of " + doc.getName() + ": \"+" + doc.getVariableName() + ".getId())");
-		append(closeBlock());
-		append(closeBlock());
+		closeBlockNEW();
+		closeBlockNEW();
 		appendStatement("con.commit()");
 		generateFunctionEnd(callLog, true, false);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		//getXYZ method
@@ -585,7 +585,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("throw new " + getNoItemExceptionName(doc) + "(id)");
 		appendStatement("return rowMapper.map(result)");
 		generateFunctionEnd(callLog, true, true);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		int ii = 0;
@@ -618,7 +618,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("return " + copyResVarName);
 		generateFunctionEnd(callLog, true, false);
 
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		ii = 0;
@@ -654,11 +654,11 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement(copyResVarName + ".copyAttributesFrom(" + doc.getVariableName() + ")");
 		appendStatement("adjustLastId(con, Long.parseLong(" + doc.getVariableName() + ".getId()))");
 		appendStatement("ret.add(" + copyResVarName + ")");
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("con.commit()");
 		appendStatement("return ret");
 		generateFunctionEnd(callLog, true, false);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 
@@ -705,11 +705,11 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("} finally {");
 		increaseIdent();		
 		appendStatement("net.anotheria.db.util.JDBCUtil.release(ps)");
-		append(closeBlock());
-		append(closeBlock());
+		closeBlockNEW();
+		closeBlockNEW();
 		appendStatement("log.error(\"All \"+ dbConfig.getIdRecoveryAttempts()+\" attempt of id rereading - Failed. \"+" + callLog + ", throwable)");
 		appendStatement("throw new DAOSQLException(throwable)");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 
@@ -751,7 +751,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement(copyResVarName + ".copyAttributesFrom(" + doc.getVariableName() + ")");
 
 		appendStatement("ret.add(" + copyResVarName + ")");
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("con.commit()");
 		appendStatement("return ret");
 		decreaseIdent();
@@ -765,11 +765,11 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("} finally {");
 		increaseIdent();
 		appendStatement("net.anotheria.db.util.JDBCUtil.release(ps)");
-		append(closeBlock());
-		append(closeBlock());
+		closeBlockNEW();
+		closeBlockNEW();
 		appendStatement("log.error(\"All \"+ dbConfig.getIdRecoveryAttempts()+\" attempt of id rereading - Failed. \"+" + callLog + ", throwable)");
 		appendStatement("throw new DAOSQLException(throwable)");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		//updateXYZ method
@@ -793,7 +793,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
 		appendStatement("return " + doc.getVariableName());
 		generateFunctionEnd(callLog, true, false);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 
@@ -822,12 +822,12 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("if (rows!=1)");
 		appendIncreasedStatement("throw new DAOException(\"Update failed, updated rows: \"+rows)");
 
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("con.commit()");
 		appendStatement("return list");
 		generateFunctionEnd(callLog, true, false);
 
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		//end updateListXYZ
 
@@ -850,7 +850,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("String statement = p.unprepaireable()? (String) p.getValue(): " + quote("?"));
 		//http://infra.anotheria.net:9080/jira/browse/ANODOC-8
 		appendStatement("whereClause += p.getName().toLowerCase()+p.getComparator()+statement");
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("SQL += whereClause");
 		//appendStatement("System.out.println(SQL)"));
 		appendStatement("ps = con.prepareStatement(SQL)");
@@ -861,7 +861,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("if(property.unprepaireable())");
 		appendIncreasedStatement("continue");
 		appendStatement("setProperty(++propertyPosition, ps, property)");
-		append(closeBlock());
+		closeBlockNEW();
 
 		appendStatement("result = ps.executeQuery()");
 		appendStatement("ArrayList<" + doc.getName() + "> ret = new ArrayList<" + doc.getName() + ">()");
@@ -869,7 +869,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("ret.add(rowMapper.map(result))");
 		appendStatement("return  ret");
 		generateFunctionEnd(callLog, true, true);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		// get elements COUNT
@@ -886,7 +886,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("pCount = result.getInt(1)");
 		appendStatement("return pCount");
 		generateFunctionEnd(callLog, true, true);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		// end get elements COUNT
 
@@ -905,7 +905,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("ret.add(rowMapper.map(result))");
 		appendStatement("return  ret");
 		generateFunctionEnd(callLog, true, true);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		// end get elements Segment
 
@@ -928,7 +928,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("whereClause += " + quote(" AND "));
 		appendStatement("String statement = p.unprepaireable()? (String) p.getValue(): " + quote("?"));
 		appendStatement("whereClause += p.getName()+p.getComparator()+statement");
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("SQL += whereClause");
 		appendStatement("SQL += SQL_READ_ALL_2 + SQL_LIMIT_1 + SQL_OFFSET_1");
 		appendStatement("ps = con.prepareStatement(SQL)");
@@ -938,7 +938,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("if(property.unprepaireable())");
 		appendIncreasedStatement("continue");
 		appendStatement("setProperty(++propertyPosition, ps, property)");
-		append(closeBlock());
+		closeBlockNEW();
 		appendStatement("int pLimit = aSegment.getElementsPerSlice()");
 		appendStatement("int pOffset = aSegment.getSliceNumber() * aSegment.getElementsPerSlice() - aSegment.getElementsPerSlice()");
 		appendStatement("ps.setInt(++propertyPosition, pLimit)");
@@ -949,7 +949,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendIncreasedStatement("ret.add(rowMapper.map(result))");
 		appendStatement("return  ret");
 		generateFunctionEnd(callLog, true, true);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		// end get elements Segment with FILTER
 
@@ -958,32 +958,32 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("if(property.unprepaireable()){");
 		increaseIdent();
 		appendStatement("return");
-		append(closeBlock());
+		closeBlockNEW();
 		for (MetaProperty p : properties) {
 			appendString("if (" + getAttributeConst(p) + ".equals(property.getName().toLowerCase())){");
 			increaseIdent();
 			appendStatement(getDB2PropertyCallMapping("property.getValue()", p, "position"));
 			appendStatement("return");
-			append(closeBlock());
+			closeBlockNEW();
 		}
 		MetaProperty rawId = new MetaProperty("id", MetaProperty.Type.LONG);
 		appendString("if (" + getAttributeConst(id) + ".equals(property.getName())){");
 		increaseIdent();
 		appendStatement(getDB2PropertyCallMapping("property.getValue()", rawId, "position"));
 		appendStatement("return");
-		append(closeBlock());
+		closeBlockNEW();
 		appendString("if (" + quote(dao_created.getName()) + ".equals(property.getName())){");
 		increaseIdent();
 		appendStatement(getDB2PropertyCallMapping("property.getValue()", dao_created, "position"));
 		appendStatement("return");
-		append(closeBlock());
+		closeBlockNEW();
 		appendString("if (" + quote(dao_updated.getName()) + ".equals(property.getName())){");
 		increaseIdent();
 		appendStatement(getDB2PropertyCallMapping("property.getValue()", dao_updated, "position"));
 		appendStatement("return");
-		append(closeBlock());
+		closeBlockNEW();
 
-		append(closeBlock()); //end setProperty
+		closeBlockNEW(); //end setProperty
 
 		appendString("/* ---------- SQL --------- ");
 		generateSQLCreate(doc, dao_created, dao_updated);
@@ -991,7 +991,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 
 		openFun("public void createStructure(Connection connection) " + throwsClause);
 		appendCommentLine("not implemented");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		appendString("/* ---------- SQL --------- ");
@@ -999,7 +999,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendString("   ---------- SQL --------- */");
 		openFun("public void deleteStructure(Connection connection) " + throwsClause);
 		appendCommentLine("not implemented");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		openFun("private long getMaxId(Connection con, String tableName) " + throwsClause);
@@ -1017,7 +1017,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		appendStatement("return maxId");
 
 		generateFunctionEnd(quote("getMaxId(") + "+con+" + quote(", ") + "+tableName+" + quote(")"), false, true);
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 
 		//init() method
@@ -1028,7 +1028,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			appendStatement("maxId = maxId >= dbConfig.getStartId() ? maxId : dbConfig.getStartId()");
 			appendStatement("lastId = new AtomicLong(maxId)");
 		}
-		append(closeBlock());
+		closeBlockNEW();
 
 		return clazz;
 	}
@@ -1128,7 +1128,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		if (isCloseResultSet)
 			appendStatement("net.anotheria.db.util.JDBCUtil.release(result)");
 		appendStatement("net.anotheria.db.util.JDBCUtil.release(" + (usePreparedSt ? "ps" : "st") + ")");
-		append(closeBlock());
+		closeBlockNEW();
 	}
 
 

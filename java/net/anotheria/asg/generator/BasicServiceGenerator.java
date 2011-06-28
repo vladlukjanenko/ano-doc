@@ -49,7 +49,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
         appendString("protected BasicService(){");
         increaseIdent();
         appendStatement("log = Logger.getLogger(this.getClass())");
-        append(closeBlock());
+        closeBlockNEW();
         emptyline();
 		return clazz;
 	}
@@ -79,14 +79,14 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		appendString("static{");
 		increaseIdent();
 		appendString("AnoDocConfigurator.configure();");
-        append(closeBlock());
+        closeBlockNEW();
         emptyline();
         
         //generate constructor
         appendString("protected BasicCMSService(){");
         increaseIdent();
         appendStatement("service = ModuleServiceFactory.createModuleService()");
-        append(closeBlock());
+        closeBlockNEW();
         emptyline();
         
         //generate update method.
@@ -97,15 +97,15 @@ public class BasicServiceGenerator extends AbstractGenerator{
         appendString("}catch(Exception e){");
         increaseIdent();
         appendString("log.error(\"updateModule\", e);");
-        append(closeBlock());
-        append(closeBlock());
+        closeBlockNEW();
+        closeBlockNEW();
 		emptyline();
 
         //generate method for adding module listener.
         appendString("protected void addModuleListener(String moduleId, IModuleListener moduleListener){");
         increaseIdent();
         appendString("service.addModuleListener(moduleId, MY_OWNER_ID, moduleListener);");
-        append(closeBlock());
+        closeBlockNEW();
     	emptyline();
 
         appendString("protected Module getModule(String moduleId){");
@@ -115,9 +115,9 @@ public class BasicServiceGenerator extends AbstractGenerator{
         appendString("}catch(Exception e){");
         increaseIdent();
         appendString("log.error(\"getModule\", e);");
-        append(closeBlock());
+        closeBlockNEW();
         appendStatement("return null");
-        append(closeBlock());
+        closeBlockNEW();
         emptyline();
         
 		return clazz;

@@ -134,7 +134,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		appendString("public RemoteExceptionWrapper(RemoteException e){");
 		increaseIdent();
 		appendStatement("super(e)");
-		append(closeBlock());
+		closeBlockNEW();
 		
 		return clazz;
 	}
@@ -178,7 +178,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 	    List<MetaDocument> docs = aModule.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        MetaDocument doc = docs.get(i);
 	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 	        String listDecl = "List<"+doc.getName()+">";
 	        
@@ -465,7 +465,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("}catch(Exception e){");
 	    appendIncreasedStatement("log.fatal(\"Coulnd't obtain rmi registry\", e)");
 	    appendString("}");
-        append(closeBlock());
+        closeBlockNEW();
 	    emptyline();
         
 	    appendString("public static final String getServiceId(){");
@@ -532,7 +532,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendIncreasedStatement("System.err.println(", quote("Couldn't start service"), ")");
 	    appendIncreasedStatement("System.exit(-2)");
 	    appendString("}");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    
 	    appendString("@SuppressWarnings(", quote("unchecked"), ")");
 	    appendString("public static void startService(Registry registry) throws Exception{");
@@ -556,8 +556,8 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    increaseIdent();	
 	    appendStatement("log.fatal(", quote("Could not read UserService In Memory: "), "+ e)");
 	    appendStatement("throw e");
-	    append(closeBlock());
-	    append(closeBlock());
+	    closeBlockNEW();
+	    closeBlockNEW();
 	    
 	    
 	    appendStatement(getInterfaceName(aModule)+" mySkeleton = new "+getSkeletonName(aModule)+"(myService)");
@@ -567,7 +567,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		appendStatement("registry.rebind(serviceId, rmiServant)");
 		appendStatement("log.info(", quote(getServerName(aModule)+" for service "), " + serviceId + ", quote(" is up and running.")+")");
 
-	    append(closeBlock());
+	    closeBlockNEW();
 	    return clazz;
 	}
 
@@ -628,9 +628,9 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("if (instance==null){");
 	    increaseIdent();
 	    appendStatement("instance = new "+getStubName(aModule)+"()");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    appendStatement("return instance");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 	    
 	    appendString("protected "+getInterfaceName(aModule)+" getDelegate() throws "+ServiceGenerator.getExceptionName(aModule)+"{");
@@ -649,16 +649,16 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendIncreasedStatement("throw new "+ServiceGenerator.getExceptionName(aModule)+"(e)");
 	    appendString("}");
         
-        append(closeBlock());
-        append(closeBlock());
-        append(closeBlock());
+        closeBlockNEW();
+        closeBlockNEW();
+        closeBlockNEW();
 	    appendStatement("return delegate");
-        append(closeBlock());
+        closeBlockNEW();
 	    emptyline();
 
 	    List<MetaDocument> docs = aModule.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        MetaDocument doc = docs.get(i);
 	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
 
 	        String listDecl = "List<"+doc.getName()+">";
@@ -1268,7 +1268,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         appendIncreasedStatement("notifyDelegateFailed()");
         appendIncreasedStatement("throw new RemoteExceptionWrapper(e)");
         appendString("}");
-        append(closeBlock());
+        closeBlockNEW();
 	    emptyline();
 	}
 	
@@ -1307,7 +1307,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
     	appendIncreasedStatement("throw new "+ServiceGenerator.getExceptionName(module)+"(errorMessage, unexpectedError)");
 
     	appendString("}");
-        append(closeBlock());
+        closeBlockNEW();
 	    emptyline();
 
 	    //version with callcontext
@@ -1330,7 +1330,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
     	appendIncreasedStatement("throw new "+ServiceGenerator.getExceptionName(module)+"(errorMessage, unexpectedError)");
 
     	appendString("}");
-        append(closeBlock());
+        closeBlockNEW();
 	    emptyline();
 
 	}
@@ -1356,7 +1356,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		appendIncreasedStatement("throw new " + ServiceGenerator.getExceptionName(module) + "(errorMessage, unexpectedError)");
 
 		appendString("}");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 		//version with callcontext
 		appendComment(comment);
@@ -1371,7 +1371,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		appendIncreasedStatement("log.error(errorMessage, unexpectedError)");
 		appendIncreasedStatement("throw new " + ServiceGenerator.getExceptionName(module) + "(errorMessage, unexpectedError)");
 		appendString("}");
-		append(closeBlock());
+		closeBlockNEW();
 		emptyline();
 	}
 

@@ -82,11 +82,11 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    appendStatement("pService = "+JDBCPersistenceServiceGenerator.getFactoryName(module)+".create"+JDBCPersistenceServiceGenerator.getServiceName(module)+"()");
 	    if (module.getListeners().size()>0){
 	    	for (int i=0; i<module.getListeners().size(); i++){
-	    		String listClassName = (String)module.getListeners().get(i);
+	    		String listClassName = module.getListeners().get(i);
 	    		appendStatement("addServiceListener(new "+listClassName+"())");
 	    	}
 	    }
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 	    
 	    appendString("static final "+getImplementationName(module)+" getInstance(){");
@@ -94,9 +94,9 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    appendString("if (instance==null){");
 	    increaseIdent();
 	    appendStatement("instance = new "+getImplementationName(module)+"()");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    appendStatement("return instance");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 	    
 
@@ -104,7 +104,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
-	        MetaDocument doc = (MetaDocument)docs.get(i);
+	        MetaDocument doc = docs.get(i);
 	        String listDecl = "List<"+doc.getName()+">";
 
 	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
@@ -118,25 +118,25 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"(SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 
 			//appendString("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids)"+throwsClause+"{");
 			//increaseIdent();
 			//appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(), sortType)");
-			//append(closeBlock());
+			//closeBlockNEW();
 			//emptyline();
 
 			//appendString("public "+listDecl+" get"+doc.getMultiple()+"(List<String> ids, SortType sortType)"+throwsClause+"{");
 			//increaseIdent();
 			//appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"(ids), sortType)");
-			//append(closeBlock());
+			//closeBlockNEW();
 			//emptyline();
 
 			appendString("public void delete"+doc.getName()+"("+doc.getName()+" "+doc.getVariableName()+")"+throwsClause+"{");
@@ -145,8 +145,8 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
             appendString("if(hasServiceListeners()){");
             increaseIdent();
             appendStatement("fireObjectDeletedEvent("+doc.getVariableName()+")");
-	        append(closeBlock());
-	        append(closeBlock());
+	        closeBlockNEW();
+	        closeBlockNEW();
 	        emptyline();
 
 
@@ -158,12 +158,12 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
             appendString("if(varValue!=null){");
             increaseIdent();
             appendStatement("fireObjectDeletedEvent(varValue)");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 	        appendComment("Deletes multiple "+doc.getName()+" objects.");
@@ -179,8 +179,8 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        increaseIdent();
 	        appendString("for (int t = 0; t<list.size(); t++)");
 	        appendIncreasedStatement("fireObjectDeletedEvent(list.get(t))");
-	        append(closeBlock());	
-	        append(closeBlock());	
+	        closeBlockNEW();	
+	        closeBlockNEW();	
 	        emptyline();
 	        
 	        appendString("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+"{");
@@ -194,7 +194,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 	        
 	        
@@ -205,13 +205,13 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
             appendString("if(hasServiceListeners()){");
             increaseIdent();
             appendStatement("fireObjectImportedEvent("+doc.getVariableName()+")");
-            append(closeBlock());
+            closeBlockNEW();
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
 	        appendStatement("return "+doc.getVariableName());
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
             appendString("public "+listDecl+" import"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause+"{");
@@ -225,13 +225,13 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
             increaseIdent();
             appendStatement("fireObjectImportedEvent("+doc.getVariableName()+")");
             decreaseIdent();
-            append(closeBlock());
+            closeBlockNEW();
 	        decreaseIdent();
 	        appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 	        appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 	        appendString("}");
 	        appendStatement("return ret");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 	        
@@ -245,7 +245,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendString("}");
 	        appendStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
 	        appendStatement("return "+doc.getVariableName());
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 	        
 	        //
@@ -263,9 +263,9 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        increaseIdent();
 	        appendString("for ("+doc.getName()+" "+doc.getVariableName()+" : ret)");
 	        appendIncreasedStatement("fireObjectCreatedEvent("+doc.getVariableName()+")");
-	        append(closeBlock());	
+	        closeBlockNEW();	
 	        appendStatement("return ret");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 	        appendComment("Updates multiple "+doc.getName()+" objects.\nReturns the updated versions.");
@@ -282,9 +282,9 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        increaseIdent();
 	        appendString("for (int t = 0; t<ret.size(); t++)");
 	        appendIncreasedStatement("fireObjectUpdatedEvent(list.get(t), ret.get(t))");
-	        append(closeBlock());	
+	        closeBlockNEW();	
 	        appendStatement("return ret");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 
 	        
@@ -306,7 +306,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        appendIncreasedStatement("fireObjectUpdatedEvent(oldVersion, "+doc.getVariableName()+")");
 	        
 	        appendStatement("return "+doc.getVariableName());
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 	        
 	        appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value)"+throwsClause+"{");
@@ -333,7 +333,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	        increaseIdent();
 	        appendString("if (value!=null && property.getValue().equals(value))"));
 	        appendIncreasedStatement("add("+doc.getVariableName()+")"));
-	        append(closeBlock());
+	        closeBlockNEW();
 	        decreaseIdent();
 			appendString("}catch(NoSuchPropertyException nspe){"));
 			increaseIdent();
@@ -342,15 +342,15 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			decreaseIdent();
 	        appendString("}catch(Exception ignored){}"));
 	        
-	        append(closeBlock());
+	        closeBlockNEW();
 	        appendString("return ret;"));
-	*/      append(closeBlock());
+	*/      closeBlockNEW();
 	        emptyline();
 	        
 			appendString("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(String propertyName, Object value, SortType sortType)"+throwsClause+"{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(propertyName, value), sortType)");
-			append(closeBlock());
+			closeBlockNEW();
 			
 			appendComment("Executes a query on "+doc.getMultiple());
 			appendString("public QueryResult executeQueryOn"+doc.getMultiple()+"(DocumentQuery query)"+throwsClause+"{");
@@ -361,10 +361,10 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			increaseIdent();
 			appendStatement("List<QueryResultEntry> partialResult = query.match(all"+doc.getMultiple()+".get(i))");
 			appendStatement("result.add(partialResult)");
-			append(closeBlock());
+			closeBlockNEW();
 			
 			appendStatement("return result");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 
 			appendComment("Returns all "+doc.getName()+" objects, where property matches.");
@@ -375,14 +375,14 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			appendString("}catch("+JDBCPersistenceServiceGenerator.getExceptionName(module)+" e){");
 			appendIncreasedStatement("throw new "+getExceptionName(module)+"(\"Persistence failed: \"+e.getMessage())");
 			appendString("}");
-	        append(closeBlock());
+	        closeBlockNEW();
 	        emptyline();
 	        
 			appendComment("Returns all "+doc.getName()+" objects, where property matches, sorted");
 			appendStatement("public "+listDecl+" get"+doc.getMultiple()+"ByProperty(SortType sortType, QueryProperty... property)"+throwsClause+"{");
 	        increaseIdent();
 	        appendStatement("return StaticQuickSorter.sort(get"+doc.getMultiple()+"ByProperty(property), sortType)");
-	        append(closeBlock());
+	        closeBlockNEW();
 			emptyline();
 			
 			// get elements COUNT
@@ -395,7 +395,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			appendString("} catch (" + JDBCPersistenceServiceGenerator.getExceptionName(module) + " e) {");
 			appendIncreasedStatement("throw new " + getExceptionName(module) + "(\"Persistence failed: \"+e.getMessage())");
 			appendString("}");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 			// end get elements COUNT
 
@@ -409,7 +409,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			appendString("} catch (" + JDBCPersistenceServiceGenerator.getExceptionName(module) + " e) {");
 			appendIncreasedStatement("throw new " + getExceptionName(module) + "(\"Persistence failed: \"+e.getMessage())");
 			appendString("}");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 			// end get elements Segment
 
@@ -423,7 +423,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 			appendString("} catch (" + JDBCPersistenceServiceGenerator.getExceptionName(module) + " e) {");
 			appendIncreasedStatement("throw new " + getExceptionName(module) + "(\"Persistence failed: \"+e.getMessage())");
 			appendString("}");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 			// end get elements Segment with FILTER
 
@@ -433,7 +433,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 					+ "ByProperty(Segment aSegment, SortType aSortType, QueryProperty... aProperty)" + throwsClause + "{");
 			increaseIdent();
 			appendStatement("return StaticQuickSorter.sort(get" + doc.getMultiple() + "ByProperty(aSegment, aProperty), aSortType)");
-			append(closeBlock());
+			closeBlockNEW();
 			emptyline();
 			// end get elements Segment with SORTING, FILTER
 	    }
@@ -452,12 +452,12 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
 	    	appendStatement("return ret");
-	    	append(closeBlock());
+	    	closeBlockNEW();
 	    	appendStatement("catch("+getExceptionName(module)+" e){");
 	    	increaseIdent();
 	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
-	    	append(closeBlock());
-	    	append(closeBlock());
+	    	closeBlockNEW();
+	    	closeBlockNEW();
 	    	emptyline();
 
 			appendString("public XMLNode export"+d.getMultiple()+"ToXML(List<"+d.getName()+"> list){");
@@ -467,7 +467,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object))");
 	    	appendStatement("return ret");
-	    	append(closeBlock());
+	    	closeBlockNEW();
 	    	emptyline();
 	    	
 	    	appendString("public XMLNode export"+d.getMultiple()+"ToXML(String languages[]){");
@@ -481,12 +481,12 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
 	    	appendStatement("return ret");
-	    	append(closeBlock());
+	    	closeBlockNEW();
 	    	appendStatement("catch("+getExceptionName(module)+" e){");
 	    	increaseIdent();
 	    	appendStatement("throw new RuntimeException("+quote("export"+d.getMultiple()+"ToXML() failure: ")+" + e.getStackTrace())");
-	    	append(closeBlock());
-	    	append(closeBlock());
+	    	closeBlockNEW();
+	    	closeBlockNEW();
 	    	emptyline();
 
 			appendString("public XMLNode export"+d.getMultiple()+"ToXML(String languages[], List<"+d.getName()+"> list){");
@@ -496,7 +496,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    	appendString("for ("+d.getName()+" object : list)");
 	    	appendIncreasedStatement("ret.addChildNode("+DataFacadeGenerator.getXMLHelperName(d)+".toXML(object, languages))");
 	    	appendStatement("return ret");
-	    	append(closeBlock());
+	    	closeBlockNEW();
 	    	emptyline();
 	    }
 	    
@@ -520,7 +520,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    }
 	    emptyline();
 	    appendStatement("return ret");
-	    append(closeBlock());
+	    closeBlockNEW();
 	    emptyline();
 	    
 	    appendString("public XMLNode exportToXML(String[] languages){");
@@ -532,7 +532,7 @@ public class JDBCBasedServiceGenerator extends AbstractServiceGenerator implemen
 	    }
 	    emptyline();
 	    appendStatement("return ret");
-	    append(closeBlock());
+	    closeBlockNEW();
 
 	    
 	    return clazz;
