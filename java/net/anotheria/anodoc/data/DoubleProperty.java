@@ -1,7 +1,7 @@
 package net.anotheria.anodoc.data;
 
 /**
- * This class represents a double property (the mapping for double attributes)
+ * This class represents a double property (the mapping for double attributes).
  * @since 1.1
  */
 public class DoubleProperty extends Property{
@@ -25,14 +25,14 @@ public class DoubleProperty extends Property{
 	}
 
 	/**
-	 * Returns the value of this property as Float object.
+	 * @return the value of this property as Float object.
 	 */	
 	public Double getDouble(){
 		return (Double)getValue();
 	}
 	
 	/**
-	 * Returns the value of this property as float.
+	 * @return the value of this property as float.
 	 */	
 	public double getdouble(){
 		return getDouble().doubleValue();
@@ -72,7 +72,7 @@ public class DoubleProperty extends Property{
 	}
 
 	/**
-	 * Returns the size needed to hold a float value in bytes (8).
+	 * @return the size needed to hold a float value in bytes (8).
 	 * @see net.anotheria.anodoc.data.Property#getSizeInBytes()
 	 */
 	@Override public long getSizeInBytes() {

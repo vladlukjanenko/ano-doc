@@ -57,7 +57,7 @@ public class Document extends DataHolder
 	}
 	
 	/**
-	 * Creates a new document as a copy of another document
+	 * Creates a new document as a copy of another document.
 	 * @param anotherDocument the document to be copied
 	 */
 	public Document(Document anotherDocument){
@@ -79,7 +79,9 @@ public class Document extends DataHolder
 	/**
      * Returns the DataHolder contained in this Document under the given name.
      * A document can contain properties, documents and lists.
-     * @see net.anotheria.anodoc.data.NoSuchDataHolderException 
+     * @see net.anotheria.anodoc.data.NoSuchDataHolderException
+	 * @param name of DataHolder
+	 * @return DataHolder
 	 */	
 	public DataHolder getDataHolder(String name) throws NoSuchDataHolderException{
 		DataHolder holder = dataStorage.get(name);
@@ -90,7 +92,9 @@ public class Document extends DataHolder
 	
 	/**
 	 * Returns the Document contained in this Document under the given name. 
-     * @see net.anotheria.anodoc.data.NoSuchDocumentException 
+     * @see net.anotheria.anodoc.data.NoSuchDocumentException
+	 * @param name of Document
+	 * @return Document
 	 */
 	public Document getDocument(String name) throws NoSuchDocumentException{
 		try{
@@ -103,7 +107,7 @@ public class Document extends DataHolder
 	
 	/**
 	 * Returns a list of all contained properties.
-	 * @return
+	 * @return properties
 	 */
 	public List<Property> getProperties(){
 		Collection<DataHolder> holders = dataStorage.values();
@@ -120,10 +124,12 @@ public class Document extends DataHolder
 	
 	/**
 	 * Returns the DocumentList contained in this Document under the given name. 
-	 * @throws net.anotheria.anodoc.data.NoSuchDocumentListException 
+	 * @param name of DocumentList
+	 * @throws net.anotheria.anodoc.data.NoSuchDocumentListException
+	 * @return DocumentList
 	 */
 	@SuppressWarnings("unchecked")
-	public <D extends Document>DocumentList<D> getDocumentList(String name){
+	public <D extends Document> DocumentList<D> getDocumentList(String name){
 		try{
 			DataHolder holder = getDataHolder(name);
 			if (holder instanceof DocumentList)
@@ -133,7 +139,9 @@ public class Document extends DataHolder
 	}
 	
 	/**
-	 * Returns the Property contained in this Document under the given name. 
+	 * Returns the Property contained in this Document under the given name.
+	 * @param name of property
+	 * @return Property
 	 */
 	public Property getProperty(String name) throws NoSuchPropertyException{
 		try{
@@ -145,7 +153,9 @@ public class Document extends DataHolder
 	}
 	
 	/**
-	 * Returns the IntProperty contained in this Document under the given name. 
+	 * Returns the IntProperty contained in this Document under the given name.
+	 * @param name of property
+	 * @return IntProperty
 	 */
 	public IntProperty getIntProperty(String name) throws NoSuchPropertyException{
 		try{
@@ -157,7 +167,9 @@ public class Document extends DataHolder
 	}
 
 	/**
-	 * Returns the LongProperty contained in this Document under the given name. 
+	 * Returns the LongProperty contained in this Document under the given name.
+	 * @param name of property
+	 * @return LongProperty
 	 */
 	public LongProperty getLongProperty(String name) throws NoSuchPropertyException{
 		try{
@@ -169,7 +181,9 @@ public class Document extends DataHolder
 	}
 	
 	/**
-	 * Returns the StringProperty contained in this Document under the given name. 
+	 * Returns the StringProperty contained in this Document under the given name.
+	 * @param name of StringProperty
+	 * @return StringProperty
 	 */
 	public StringProperty getStringProperty(String name) throws NoSuchPropertyException{
 		try{
@@ -182,6 +196,8 @@ public class Document extends DataHolder
 
 	/**
 	 * Returns the BooleanProperty contained in this Document under the given name. 
+	 * @param name of BooleanProperty
+	 * @return BooleanProperty
 	 */
 	public BooleanProperty getBooleanProperty(String name) throws NoSuchPropertyException{
 		try{
@@ -193,7 +209,9 @@ public class Document extends DataHolder
 	}
 
 	/**
-	 * Returns the ListProperty contained in this Document under the given name. 
+	 * Returns the ListProperty contained in this Document under the given name.
+	 * @param name of ListProperty
+	 * @return ListProperty
 	 */
 	public ListProperty getListProperty(String name) throws NoSuchPropertyException{
 		try{
@@ -206,6 +224,8 @@ public class Document extends DataHolder
 	
 	/**
 	 * Returns the FloatProperty contained in this Document under the given name. 
+	 * @param name of FloatProperty
+	 * @return FloatProperty
 	 */
 	public FloatProperty getFloatProperty(String name) throws NoSuchPropertyException{
 		try{
@@ -218,6 +238,8 @@ public class Document extends DataHolder
 	
 	/**
 	 * Returns the DoubleProperty contained in this Document under the given name. 
+	 * @param name of DoubleProperty
+	 * @return DoubleProperty
 	 */
 	public DoubleProperty getDoubleProperty(String name) throws NoSuchPropertyException{
 		try{
@@ -233,9 +255,11 @@ public class Document extends DataHolder
 	 * which means that if no DocumentList is contained it a new will be created.  
 	 * This function is protected because it implies very much knowledge about the module 
 	 * structure and shouldn't be called from outside a document.
-	 * @see net.anotheria.anodoc.data.NoSuchDocumentListException 
+	 * @see net.anotheria.anodoc.data.NoSuchDocumentListException
+	 * @param name of Document
+	 * @return DocumentList
 	 */
-	protected <D extends Document>DocumentList<D> getDocumentListAnyCase(String name) {
+	protected <D extends Document> DocumentList<D> getDocumentListAnyCase(String name) {
 		try{
 			return getDocumentList(name);
 		}catch(NoSuchDocumentListException e){
@@ -251,12 +275,14 @@ public class Document extends DataHolder
 	 * which means that if no Document is contained it a new will be created. 
 	 * This function is protected because it implies very much knowledge about the module 
 	 * structure and shouldn't be called from outside a document.
-	 * @see net.anotheria.anodoc.data.NoSuchDocumentException 
+	 * @see net.anotheria.anodoc.data.NoSuchDocumentException
+	 * @param name of document
+	 * @return Doucument
 	 */
 	protected Document getDocumentAnyCase(String name) {
 		try{
 			return getDocument(name);
-		}catch(NoSuchDocumentException e){};
+		}catch(NoSuchDocumentException e){}
 		Document newDoc = createDocument(name);
 		putDocument(newDoc);
 		return newDoc;
@@ -278,7 +304,7 @@ public class Document extends DataHolder
 	 * @param name
 	 * @return
 	 */
-	protected <D extends Document>DocumentList<D> createDocumentList(String name){
+	protected <D extends Document> DocumentList<D> createDocumentList(String name){
 		return new DocumentList<D>(name);
 	}
 	
@@ -461,6 +487,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the long value of the according LongProperty,
 	 * or an empty long (see getEmptyLong) if none set.
+	 * @return long value
 	 */
 	public long getLong(String fieldId) throws NoSuchPropertyException{
 		try{
@@ -473,6 +500,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the int value of the according IntProperty,
 	 * or an empty int (see getEmptyInt) if none set.
+	 * @return int value
 	 */
 	public int getInt(String fieldId) throws NoSuchPropertyException{
 		try{
@@ -481,7 +509,13 @@ public class Document extends DataHolder
 			return getEmptyInt();
 		}
 	}
-	
+
+	/**
+	 * Returns list of Property by fieldId.
+	 * @param fieldId fieldId
+	 * @return list of Property or empty list if no Property was found by diven fieldId
+	 * @throws NoSuchPropertyException
+	 */
 	public List<Property> getList(String fieldId) throws NoSuchPropertyException{
 		try{
 			return getListProperty(fieldId).getList();
@@ -493,6 +527,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the float value of the according FloatProperty,
 	 * or an empty float (see getEmptyFloat) if none set.
+	 * @return float value of FloatProperty
 	 */
 	public float getFloat(String fieldId) throws NoSuchPropertyException{
 		try{
@@ -505,6 +540,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the double value of the according DoubleProperty,
 	 * or an empty double (see getEmptyDouble) if none set.
+	 * @return double value of DoubleProperty
 	 */
 	public double getDouble(String fieldId) throws NoSuchPropertyException{
 		try{
@@ -517,6 +553,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the boolean value of the according BooleanProperty,
 	 * or an empty boolean (see getEmptyBoolean) if none set.
+	 * @return boolean value
 	 */
 	public boolean getBoolean(String fieldId) throws NoSuchPropertyException{
 		try{
@@ -571,19 +608,21 @@ public class Document extends DataHolder
 	public void setBoolean(String fieldId, boolean value){
 		putBooleanProperty(new BooleanProperty(fieldId, value));
 	}
-	
+
 	/**
-	 * Returns the initial value for a string (empty string - ""). Overwrite it if you wish another values. An empty value will always be returned if  
-	 * you call get'Type' and the corresponding property doesn't exists.   
+	 * Returns the initial value for a string (empty string - ""). Overwrite it if you wish another values. An empty value will always be returned if
+	 * you call get'Type' and the corresponding property doesn't exists.
+	 *
+	 * @return ""
 	 */
-	 
-	public String getEmptyString(){
+	public String getEmptyString() {
 		return "";
 	}
-	
+
 	/**
 	 * Returns the initial value for a long (0). Overwrite it if you wish another values. An empty value will always be returned if  
 	 * you call get'Type' and the corresponding property doesn't exists.   
+	 * @return 0
 	 */
 	public long getEmptyLong(){
 		return 0;
@@ -592,6 +631,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the initial value for a int (0). Overwrite it if you wish another values. An empty value will always be returned if  
 	 * you call get'Type' and the corresponding property doesn't exists.   
+	 * @return 0
 	 */
 	public int getEmptyInt(){
 		return 0;
@@ -600,6 +640,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the initial value for a float (0.0). Overwrite it if you wish another values. An empty value will always be returned if  
 	 * you call get'Type' and the corresponding property doesn't exists.   
+	 * @return 0
 	 */
 	public float getEmptyFloat(){
 		return 0;
@@ -608,6 +649,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the initial value for a double (0.0). Overwrite it if you wish another values. An empty value will always be returned if  
 	 * you call get'Type' and the corresponding property doesn't exists.   
+	 * @return 0.0
 	 */
 	public double getEmptyDouble(){
 		return 0.0;
@@ -616,6 +658,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the initial value for a boolean (false). Overwrite it if you wish another values. An empty value will always be returned if  
 	 * you call get'Type' and the corresponding property doesn't exists.   
+	 * @return false
 	 */
 	public boolean getEmptyBoolean(){
 		return false;
@@ -628,6 +671,7 @@ public class Document extends DataHolder
 	/**
 	 * Returns the cumulative size of the contained DataHolders.
 	 * @see net.anotheria.anodoc.data.DataHolder#getSizeInBytes()
+	 * @return size of the contained DataHolders
 	 */
 	public long getSizeInBytes() {
 		int sum = 0;

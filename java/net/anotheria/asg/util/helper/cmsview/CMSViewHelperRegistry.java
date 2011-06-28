@@ -19,8 +19,11 @@ public class CMSViewHelperRegistry {
 	/**
 	 * An empty list as null object.
 	 */
-	private static ArrayList<CMSViewHelper> EMPTY_LIST = new ArrayList<CMSViewHelper>(0);
-	
+	private static final ArrayList<CMSViewHelper> EMPTY_LIST = new ArrayList<CMSViewHelper>(0);
+
+	private CMSViewHelperRegistry() {
+	}
+
 	static{
 		helperMap = Collections.synchronizedMap(new HashMap<String, List<CMSViewHelper>>());
 	}

@@ -21,9 +21,8 @@ public interface DocumentFilter {
 	boolean mayPass(DataObject document, String attributeName, String filterParameter);
 	
 	/**
-	 * Returns the list of triggerers.
 	 * @param storedFilterParameter
-	 * @return
+	 * @return the list of triggerers
 	 */
 	List<FilterTrigger> getTriggerer(String storedFilterParameter);
 	

@@ -14,7 +14,8 @@ public interface IModuleStorage {
 	void saveModule(Module module) throws StorageFailureException;
 	
 	/**
-	 * Loads the specified instance. 
+	 * Loads the specified instance.
+	 * @return loaded module
 	 */
 	Module loadModule(String ownerId, String copyId) throws NoStoredModuleEntityException, StorageFailureException;
 	

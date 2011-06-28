@@ -53,7 +53,7 @@ public class MetaFilter implements Cloneable{
 
 	/**
 	 * Extracts the classname from the fully qualified class name.
-	 * @return
+	 * @return class name
 	 */
 	public String getClassNameOnly(){
 		if (className.lastIndexOf('.')==-1)

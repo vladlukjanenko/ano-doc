@@ -37,12 +37,12 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 		MetaDocument doc = (MetaDocument)gdoc;
 		
 		//System.out.println(ret);
-		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(generateDocument(doc)));
-		_ret.add(new FileEntry(generateSortType(doc)));
-		_ret.add(new FileEntry(generateXMLHelper(doc)));
-		_ret.add(new FileEntry(generateBuilder(doc)));
-		return _ret;
+		List<FileEntry> ret = new ArrayList<FileEntry>();
+		ret.add(new FileEntry(generateDocument(doc)));
+		ret.add(new FileEntry(generateSortType(doc)));
+		ret.add(new FileEntry(generateXMLHelper(doc)));
+		ret.add(new FileEntry(generateBuilder(doc)));
+		return ret;
 	}
 	
 	public String getDocumentName(MetaDocument doc){
@@ -405,25 +405,25 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 	
 	private void generatePropertyConstants(MetaDocument doc){
-		_generatePropertyConstant(id);
-		_generatePropertyConstants(doc.getProperties());
-		_generatePropertyConstants(doc.getLinks());
+		generatePropertyConstant(id);
+		generatePropertyConstants(doc.getProperties());
+		generatePropertyConstants(doc.getLinks());
 	}
 	
-	private void _generatePropertyConstants(List<MetaProperty> propertyList){
+	private void generatePropertyConstants(List<MetaProperty> propertyList){
 		for (int i=0; i<propertyList.size(); i++){
 			MetaProperty p = propertyList.get(i);
 			if (p instanceof MetaTableProperty){
 				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
 				for (int t=0; t<columns.size(); t++)
-					_generatePropertyConstant(columns.get(t));
+					generatePropertyConstant(columns.get(t));
 			}else{
-				_generatePropertyConstant(p);
+				generatePropertyConstant(p);
 			}
 		}
 	}
 	
-	private void _generatePropertyConstant(MetaProperty p){
+	private void generatePropertyConstant(MetaProperty p){
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
 			for (String l: GeneratorDataRegistry.getInstance().getContext().getLanguages()){
 				String decl = PROPERTY_DECLARATION;
@@ -443,11 +443,11 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	
 	
 	private void generatePropertyAccessMethods(MetaDocument doc){
-		_generatePropertyAccessMethods(doc.getProperties());
-		_generatePropertyAccessMethods(doc.getLinks());
+		generatePropertyAccessMethods(doc.getProperties());
+		generatePropertyAccessMethods(doc.getLinks());
 	}
 	
-	private void _generatePropertyAccessMethods(List<MetaProperty> properties){
+	private void generatePropertyAccessMethods(List<MetaProperty> properties){
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
 			generatePropertyGetterMethod(p);
@@ -460,11 +460,11 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 	
 	private void generateBuilderPropertyAccessMethods(MetaDocument doc){
-		_generateBuilderPropertyAccessMethods(doc, doc.getProperties());
-		_generateBuilderPropertyAccessMethods(doc, doc.getLinks());
+		generateBuilderPropertyAccessMethods(doc, doc.getProperties());
+		generateBuilderPropertyAccessMethods(doc, doc.getLinks());
 	}
 	
-	private void _generateBuilderPropertyAccessMethods(MetaDocument doc, List<MetaProperty> properties){
+	private void generateBuilderPropertyAccessMethods(MetaDocument doc, List<MetaProperty> properties){
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
 			//generateBuilderPropertyGetterMethod(p);
@@ -629,7 +629,7 @@ public class DataFacadeGenerator extends AbstractDataObjectGenerator implements 
 	}
 
 	private void generateAdditionalMethods(MetaDocument doc){
-		List <MetaProperty>properties = doc.getProperties();
+		List<MetaProperty> properties = doc.getProperties();
 		for (MetaProperty p : properties){
 			if (p instanceof MetaContainerProperty)
 				generateContainerMethods((MetaContainerProperty)p);

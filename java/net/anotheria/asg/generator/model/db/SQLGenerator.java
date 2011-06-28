@@ -40,13 +40,13 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		GeneratedSQLFile allCreate = new GeneratedSQLFile("create_all");
 		GeneratedSQLFile allDelete = new GeneratedSQLFile("delete_all");
 
-		MetaProperty dao_created = new MetaProperty("dao_created", MetaProperty.Type.LONG);
-	    MetaProperty dao_updated = new MetaProperty("dao_updated", MetaProperty.Type.LONG);
+		MetaProperty daoCreated = new MetaProperty("dao_created", MetaProperty.Type.LONG);
+	    MetaProperty daoUpdated = new MetaProperty("dao_updated", MetaProperty.Type.LONG);
 
 		String tableNames = "";
 		for (MetaDocument doc : documents){
 			GenerationJobManager.getCurrentJob().setBuilder(allCreate.getBody());
-			generateSQLCreate(doc, dao_created, dao_updated);
+			generateSQLCreate(doc, daoCreated, daoUpdated);
 			emptyline();
 			
 			if (tableNames.length()>0)
@@ -90,10 +90,10 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 		startNewJob(file);
 		
 		
-	    MetaProperty dao_created = new MetaProperty("dao_created", MetaProperty.Type.LONG);
-	    MetaProperty dao_updated = new MetaProperty("dao_updated", MetaProperty.Type.LONG);
+	    MetaProperty daoCreated = new MetaProperty("dao_created", MetaProperty.Type.LONG);
+	    MetaProperty daoUpdated = new MetaProperty("dao_updated", MetaProperty.Type.LONG);
 
-		generateSQLCreate(doc, dao_created, dao_updated);
+		generateSQLCreate(doc, daoCreated, daoUpdated);
 		
 		return file;
 	}

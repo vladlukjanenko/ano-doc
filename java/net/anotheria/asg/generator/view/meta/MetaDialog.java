@@ -20,10 +20,11 @@ public class MetaDialog {
 	 * Elements of the dialog.
 	 */
 	private List<MetaViewElement> elements;
-	/** 
-	 * Link to customization javascript
+	/**
+	 * Link to customization javascript.
 	 */
 	private String javascript;
+	
 	/**
 	 * Creates a new dialog with the given name.
 	 * @param aName the name of the dialog.
@@ -32,8 +33,12 @@ public class MetaDialog {
 		this.name = aName;
 		elements = new ArrayList<MetaViewElement>();
 	}
-	
-	
+
+	/**
+	 * Adds new dialog element.
+	 *
+	 * @param element element to add
+	 */
 	public void addElement(MetaViewElement element){
 		elements.add(element);
 	}
@@ -41,51 +46,32 @@ public class MetaDialog {
 	
 
 	/**
-	 * @return
+	 *
+	 * @return list of dialog elements
 	 */
 	public List<MetaViewElement> getElements() {
 		return elements;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getTitle() {
 		return title;
 	}
 
-	/**
-	 * @param list
-	 */
 	public void setElements(List<MetaViewElement> list) {
 		elements = list;
 	}
 
-	/**
-	 * @param string
-	 */
 	public void setName(String string) {
 		name = string;
 	}
 
-	/**
-	 * @param string
-	 */
 	public void setTitle(String string) {
 		title = string;
 	}
-	
-	@Override public String toString(){
-		return name+" "+elements;
-	}
-
 
 	public String getJavascript() {
 		return javascript;
@@ -94,6 +80,10 @@ public class MetaDialog {
 
 	public void setJavascript(String javascript) {
 		this.javascript = javascript;
+	}
+
+	@Override public String toString(){
+		return name+" "+elements;
 	}
 
 }

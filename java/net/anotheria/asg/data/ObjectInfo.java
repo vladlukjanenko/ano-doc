@@ -92,7 +92,7 @@ public class ObjectInfo {
 	
 	/**
 	 * Creates the XMLNode for xml representation of this object info.
-	 * @return
+	 * @return created XMLNode
 	 */
 	public XMLNode toXML(){
 		XMLNode ret = new XMLNode("objectinfo");

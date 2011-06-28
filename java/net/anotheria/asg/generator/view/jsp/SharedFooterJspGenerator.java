@@ -7,6 +7,9 @@ import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
+/**
+ * Generator for jsp footer.
+ */
 public class SharedFooterJspGenerator extends AbstractJSPGenerator {
 	
 	/**

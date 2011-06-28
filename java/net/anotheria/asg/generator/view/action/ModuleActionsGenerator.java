@@ -1954,9 +1954,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 						appendStatement("List<"+DataFacadeGenerator.getDocumentImport(targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
 						appendStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
 						appendStatement(listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
-						appendString( "for ("+(DataFacadeGenerator.getDocumentImport(targetDocument))+" "+targetDocument.getVariableName()+" : "+listName+"){");
+						appendString( "for ("+(DataFacadeGenerator.getDocumentImport(targetDocument))+" "+targetDocument.getVariableName()+"Temp : "+listName+"){");
 						increaseIdent();
-						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+".getId(), "+targetDocument.getVariableName()+".getName() )");
+						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+"Temp.getId(), "+targetDocument.getVariableName()+"Temp.getName() )");
 						appendStatement(listName,"Values.add(bean)");
 						append(closeBlock());
 

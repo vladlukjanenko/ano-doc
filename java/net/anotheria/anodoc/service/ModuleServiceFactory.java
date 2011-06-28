@@ -5,6 +5,9 @@ package net.anotheria.anodoc.service;
  */
 public class ModuleServiceFactory {
 
+	private ModuleServiceFactory() {
+	}
+
 	/**
 	 * Returns a IModuleService instance.
 	 */

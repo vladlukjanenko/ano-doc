@@ -43,42 +43,45 @@ public class MetaDecorator implements Cloneable{
 		
 	}
 	/**
-	 * @return
+	 * @return class name of the decorator
 	 */
 	public String getClassName() {
 		return className;
 	}
 
 	/**
-	 * @return
+	 * @return name of a decorator
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @return
+	 * @return rule for this decorator instance
 	 */
 	public String getRule() {
 		return rule;
 	}
 
 	/**
-	 * @param string
+	 * Sets class name for decorator.
+	 * @param string class name
 	 */
 	public void setClassName(String string) {
 		className = string;
 	}
 
 	/**
-	 * @param string
+	 * Sets name for decorator.
+	 * @param string name
 	 */
 	public void setName(String string) {
 		name = string;
 	}
 
 	/**
-	 * @param string
+	 * Sets rule for decorator instance.
+	 * @param string rule
 	 */
 	public void setRule(String string) {
 		rule = string;
@@ -98,8 +101,7 @@ public class MetaDecorator implements Cloneable{
 	}
 	
 	/**
-	 * Returns the name of the class of the decorator without a package.
-	 * @return
+	 * @return the name of the class of the decorator without a package.
 	 */
 	public String getClassNameOnly(){
 		if (className.lastIndexOf('.')==-1)

@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.util.Arrays;
 
 
-abstract public class BaseRemoteServiceSkeleton implements RemoteService{
+abstract class BaseRemoteServiceSkeleton implements RemoteService{
 	
 	@Override
 	public EchoResponse getEcho(EchoRequest req) throws RemoteException{

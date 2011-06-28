@@ -18,12 +18,15 @@ import org.jdom.input.SAXBuilder;
  */
 public final class XMLFiltersParser {
 
+	private XMLFiltersParser(){
+	}
+
 	/**
 	 * Parses the filter definition.
 	 * @param content
 	 * @return
 	 */
-	public static final List<MetaFilter> parseFilters(String content){
+	public static List<MetaFilter> parseFilters(String content){
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
 		List<MetaFilter> ret = new ArrayList<MetaFilter>();
@@ -46,11 +49,10 @@ public final class XMLFiltersParser {
 		return ret;
 	}
 	
-	private static final MetaFilter parseFilter(final Element e){
+	private static MetaFilter parseFilter(final Element e){
 		String name = e.getAttributeValue("name");
 		String className = e.getAttributeValue("class");
 		return new MetaFilter(name, className);
 	}
 
-	private XMLFiltersParser(){}
 }

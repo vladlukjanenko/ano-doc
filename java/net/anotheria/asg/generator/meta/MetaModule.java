@@ -31,7 +31,7 @@ public class MetaModule implements IGenerateable{
 	 */
 	private String name;
 	/**
-	 * List of the documents in this module
+	 * List of the documents in this module.
 	 */
 	private List<MetaDocument> documents;
 	/**
@@ -85,7 +85,7 @@ public class MetaModule implements IGenerateable{
 	/**
 	 * Returns true if an option is enabled. For example 'rmi' is an option which can be enabled.
 	 * @param key
-	 * @return
+	 * @return true if an option is enabled
 	 */
 	public boolean isEnabledByOptions(String key){
 		if (moduleOptions!=null){
@@ -101,31 +101,28 @@ public class MetaModule implements IGenerateable{
 		return "module "+name+" storage: "+storageType+" documents: "+documents;
 	}
 	/**
-	 * Returns contained documents.
-	 * @return
+	 * @return contained documents
 	 */
 	public List<MetaDocument> getDocuments() {
 		return documents;
 	}
 
 	/**
-	 * @return
+	 * @return name of the module
 	 */
 	public String getName() {
 		return name;
 	}
 	
 	/**
-	 * Returns the name for the module implementation class in the cms storage.
-	 * @return
+	 * @return the name for the module implementation class in the cms storage
 	 */
 	public String getModuleClassName(){
 		return "Module"+getName();
 	}
 	
 	/**
-	 * Returns the class name of the generated module factory.
-	 * @return
+	 * @return the class name of the generated module factory
 	 */
 	public String getFactoryClassName(){
 		return getModuleClassName()+"Factory";
@@ -147,19 +144,19 @@ public class MetaModule implements IGenerateable{
 	
 	/**
 	 * Returns the id of the module. Id is basically name.toLowerCase().
-	 * @return
+	 * @return the id of the module
 	 */
 	public String getId(){
 		return getName().toLowerCase();
 	}
 
-	public MetaDocument getDocumentByName(String name){
+	public MetaDocument getDocumentByName(String aName){
 	    for (int i=0; i<documents.size(); i++){
 	        MetaDocument d = documents.get(i);
-	        if (d.getName().equals(name))
+	        if (d.getName().equals(aName))
 	            return d;
 	    }
-	    throw new RuntimeException("No such document: "+name + " in module "+getName());
+	    throw new RuntimeException("No such document: "+aName + " in module "+getName());
 	}
 
 	@Override public boolean equals(Object o){
@@ -213,13 +210,13 @@ public class MetaModule implements IGenerateable{
 		parameters.put(p.getName(), p);
 	}
 	
-	public ModuleParameter getModuleParameter(String name){
-		return parameters.get(name);
+	public ModuleParameter getModuleParameter(String aName){
+		return parameters.get(aName);
 	}
 	
-	public boolean isParameterEqual(String name, String value){
-		ModuleParameter p = getModuleParameter(name);
-		return p == null ? false : p.getValue().equals(value);
+	public boolean isParameterEqual(String aName, String aValue){
+		ModuleParameter p = getModuleParameter(aName);
+		return p == null ? false : p.getValue().equals(aValue);
 	}
 
 	public GenerationOptions getModuleOptions() {

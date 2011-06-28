@@ -47,20 +47,26 @@ public class MetaModuleSection extends MetaSection{
 		defaultSortable = null;
 		filters = new ArrayList<MetaFilter>();
 	}
-	
+
+	/**
+	 * Adds dialog.
+	 *
+	 * @param d dialog to add
+	 */
 	public void addDialog(MetaDialog d){
 		dialogs.add(d);
 	}
 	
 	/**
-	 * @return
+	 * @return target module
 	 */
 	public MetaModule getModule() {
 		return module;
 	}
 
 	/**
-	 * @param module
+	 * Sets target module.
+	 * @param module module to set
 	 */
 	public void setModule(MetaModule module) {
 		this.module = module;
@@ -82,46 +88,52 @@ public class MetaModuleSection extends MetaSection{
         this.document = document;
     }
 	/**
-	 * @return
+	 * @return elements of the view
 	 */
 	public List<MetaViewElement> getElements() {
 		return elements;
 	}
 
 	/**
-	 * @param list
+	 * Sets elements to view.
+	 * @param list elements
 	 */
 	public void setElements(List<MetaViewElement> list) {
 		elements = list;
 	}
-	
+	/**
+	 * Adds element to view.
+	 * @param element element to add
+	 */
 	public void addElement(MetaViewElement element){
 		elements.add(element);
 	}
 
 	/**
-	 * @return
+	 * @return dialogs list
 	 */
 	public List<MetaDialog> getDialogs() {
 		return dialogs;
 	}
 
 	/**
-	 * @param list
+	 * Sets dialogs.
+	 * @param list dialogs to set
 	 */
 	public void setDialogs(List<MetaDialog> list) {
 		dialogs = list;
 	}
 
 	/**
-	 * @return
+	 * @return default sortable element
 	 */
 	public MetaViewElement getDefaultSortable() {
 		return defaultSortable;
 	}
 
 	/**
-	 * @param element
+	 * Sets default sortable element.
+	 * @param element element to set
 	 */
 	public void setDefaultSortable(MetaViewElement element) {
 		defaultSortable = element;
@@ -134,15 +146,26 @@ public class MetaModuleSection extends MetaSection{
 		}
 		return false;
 	}
-	
+
+	/**
+	 * Adds filter in the view part of this section.
+	 * @param aFilter filter to add
+	 */
 	public void addMetaFilter(MetaFilter aFilter){
 		filters.add(aFilter);
 	}
 
+	/**
+	 * @return filters in the view part of this section.
+	 */
 	public List<MetaFilter> getFilters() {
 		return filters;
 	}
 
+	/**
+	 * Sets filters in the view part of this section.
+	 * @param filters filter to set
+	 */
 	public void setFilters(List<MetaFilter> filters) {
 		this.filters = filters;
 	}

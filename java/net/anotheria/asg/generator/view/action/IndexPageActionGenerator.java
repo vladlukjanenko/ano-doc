@@ -146,10 +146,12 @@ public class IndexPageActionGenerator extends AbstractGenerator {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		appendGenerationPoint("generateCMSDocumentChangeFB");
-		clazz.setPackageName(getDocumentChangeFBPackageName());		clazz.addImport("net.anotheria.maf.bean.FormBean");
+		clazz.setPackageName(getDocumentChangeFBPackageName());
+		clazz.addImport("net.anotheria.maf.bean.FormBean");
 		clazz.addImport("net.anotheria.util.Date");
 		
-		clazz.addInterface("FormBean");
+
+		clazz.addInterface("FormBean");
 		clazz.setName(getDocumentChangeFBName());
 
 		startClassBody();

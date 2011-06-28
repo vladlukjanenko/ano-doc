@@ -6,7 +6,6 @@ import java.util.List;
 /**
  * The MetaInformation object which holds all data for a web-feedback-form.
  * @author lrosenberg
- * @created on Mar 14, 2005
  */
 public class MetaForm {
 	/**
@@ -27,17 +26,29 @@ public class MetaForm {
     private String action;
     
     private String path;
-    
+
+	/**
+	 * Default constructor.
+	 * @param anId
+	 */
     public MetaForm(String anId){
         this.id = anId;
         targets = new ArrayList<String>();
         elements = new ArrayList<MetaFormField>();
     }
-    
+
+	/**
+	 * Adds recipients of the submitted form.
+	 * @param target target to add
+	 */
     public void addTarget(String target){
         targets.add(target);
     }
-    
+
+	/**
+	 * Adds element of the form.
+	 * @param element element to add
+	 */
     public void addElement(MetaFormField element){
         elements.add(element);
     }
@@ -71,10 +82,6 @@ public class MetaForm {
     public String getId() {
         return id;
     }
-    
-    public String toString(){
-        return id+", targets: "+targets+", elements: "+elements;
-    }
     /**
      * @return Returns the path.
      */
@@ -99,4 +106,10 @@ public class MetaForm {
     public void setAction(String action) {
         this.action = action;
     }
+
+	@Override
+	public String toString(){
+		return id+", targets: "+targets+", elements: "+elements;
+	}
+
 }

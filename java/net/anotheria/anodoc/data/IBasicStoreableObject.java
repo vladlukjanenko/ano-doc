@@ -14,7 +14,7 @@ public interface IBasicStoreableObject {
 	 * Returns the id which is used to store this object.
 	 * This id should be an unique identifier 
 	 * in the objects environment (container).
+	 * @return id which is used to store this object
 	 */
-	public String getStorageId();
+	String getStorageId();
 }
- 

@@ -30,12 +30,12 @@ import net.anotheria.util.sorter.SortType;
 /**
  * Controls different sub generators for generation of the service layer. Generates factories and interfaces.
  * @author lrosenberg
- * @created on Feb 24, 2005
  */
 public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	
 	/**
 	 * Generates the service layer for a MetaModule.
+	 * @return service layer
 	 */
 	public List<FileEntry> generate(IGenerateable gmodule){
 		
@@ -383,7 +383,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	/**
 	 * Returns the name of the base exception class for the service for the given module.
 	 * @param m
-	 * @return
+	 * @return name of exception
 	 */
 	public static String getExceptionName(MetaModule m){
 	    return getServiceName(m)+"Exception";
@@ -396,7 +396,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	/**
 	 * Returns the interface name for the service for the module. 
 	 * @param module
-	 * @return
+	 * @return name of interface
 	 */
 	public static String getInterfaceName(MetaModule module){
 	    return "I"+getServiceName(module);
@@ -405,16 +405,16 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	/**
 	 * Returns the import (package and class name) for the service interface for the given module. 
 	 * @param m
-	 * @return
+	 * @return import for service
 	 */
 	public static String getInterfaceImport(MetaModule m){
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getInterfaceName(m);
 	}
 	
 	/**
-	 * Returns the base exception name for the service for this module
+	 * Returns the base exception name for the service for this module.
 	 * @param m the module.
-	 * @return
+	 * @return exception name
 	 */
 	public static String getExceptionImport(MetaModule m){
 		return getPackageName(GeneratorDataRegistry.getInstance().getContext(),m)+"."+getExceptionName(m);
@@ -427,7 +427,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	/**
 	 * Returns the service name for this module.
 	 * @param m
-	 * @return
+	 * @return service name
 	 */
 	public static String getServiceName(MetaModule m){
 	    return m.getName()+"Service";
@@ -436,7 +436,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	/**
 	 * Returns the factory name for the service for a metamodule.
 	 * @param m
-	 * @return
+	 * @return factory name
 	 */
 	public static String getFactoryName(MetaModule m){
 	    return getServiceName(m)+"Factory";
@@ -444,7 +444,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	/**
 	 * Returns the import for the factory for the service for a metamodule.
 	 * @param m
-	 * @return
+	 * @return inport for factory
 	 */
 	public static String getFactoryImport(MetaModule m){
 	    return getPackageName(GeneratorDataRegistry.getInstance().getContext(), m)+"."+getFactoryName(m);

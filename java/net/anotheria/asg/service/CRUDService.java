@@ -12,7 +12,7 @@ public interface CRUDService<T> {
 	/**
 	 * Returns an instance of T with the given id.
 	 * @param id the id of the object.
-	 * @return
+	 * @return T
 	 * @throws ASGRuntimeException
 	 */
 	T get(String id) throws ASGRuntimeException;
@@ -26,7 +26,7 @@ public interface CRUDService<T> {
 	/**
 	 * Updates an object.
 	 * @param t the object to update.
-	 * @return
+	 * @return T
 	 * @throws ASGRuntimeException
 	 */
 	T update(T t) throws ASGRuntimeException;
@@ -34,7 +34,7 @@ public interface CRUDService<T> {
 	/**
 	 * Creates a new T.
 	 * @param t
-	 * @return
+	 * @return T
 	 * @throws ASGRuntimeException
 	 */
 	T create(T t) throws ASGRuntimeException;

@@ -54,28 +54,30 @@ public class MetaViewElement {
 	}
 	
 	/**
-	 * @return
+	 * @return True if the element is readonly
 	 */
 	public boolean isReadonly() {
 		return readonly;
 	}
 
 	/**
-	 * @param b
+	 * Sets if the element is readonly or not.
+	 * @param b flag to set
 	 */
 	public void setReadonly(boolean b) {
 		readonly = b;
 	}
 
 	/**
-	 * @return
+	 * @return name of the element
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @param string
+	 * Sets name of the element.
+	 * @param string name ot set
 	 */
 	public void setName(String string) {
 		name = string;
@@ -83,14 +85,15 @@ public class MetaViewElement {
 
 	
 	/**
-	 * Returns true if the element is comparable.
+	 * @return true if the element is comparable, otherwise - false
 	 */
 	public boolean isComparable() {
 		return comparable;
 	}
 
 	/**
-	 * @param b
+	 * Sets if document ios comparable.
+	 * @param b flag to set
 	 */
 	public void setComparable(boolean b) {
 		comparable = b;
@@ -98,14 +101,15 @@ public class MetaViewElement {
 
 
 	/**
-	 * @return
+	 * @return decorator for the element
 	 */
 	public MetaDecorator getDecorator() {
 		return decorator;
 	}
 
 	/**
-	 * @param decorator
+	 * Sets decorator for the element.
+	 * @param decorator decorator to set
 	 */
 	public void setDecorator(MetaDecorator decorator) {
 		this.decorator = decorator;

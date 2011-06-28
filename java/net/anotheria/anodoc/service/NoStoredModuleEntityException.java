@@ -10,10 +10,14 @@ import net.anotheria.anodoc.util.CommonModuleStorageException;
  */
 public class NoStoredModuleEntityException extends CommonModuleStorageException{
 	/**
-	 * 
+	 * Basic serial version UID.
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Default constructor.
+	 * @param message message of exception
+	 */
 	public NoStoredModuleEntityException(String message){
 		super(message);
 	}

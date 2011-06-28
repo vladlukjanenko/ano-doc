@@ -66,7 +66,7 @@ public class XMLHelper {
 
 
 
-	private static XMLNode createXMLNodeWithContent(String name, String languages[], String type, Object... value){
+	private static XMLNode createXMLNodeWithContent(String name, String[] languages, String type, Object... value){
 		XMLNode ret = new XMLNode(name);
 		
 		if (languages==null){
@@ -96,7 +96,7 @@ public class XMLHelper {
 		return ret;
 	}
 
-	private static XMLNode createXMLNodeWithAttribute(String name, String languages[], String type, Object... value){
+	private static XMLNode createXMLNodeWithAttribute(String name, String[] languages, String type, Object... value){
 		XMLNode ret = new XMLNode(name);
 		
 		if (languages==null){

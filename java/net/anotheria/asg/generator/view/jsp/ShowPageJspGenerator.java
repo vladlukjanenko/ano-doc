@@ -24,6 +24,9 @@ import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
 import net.anotheria.util.StringUtils;
 
+/**
+ * Generator for show page.
+ */
 public class ShowPageJspGenerator extends AbstractJSPGenerator {
 	
 	private MetaSection currentSection;

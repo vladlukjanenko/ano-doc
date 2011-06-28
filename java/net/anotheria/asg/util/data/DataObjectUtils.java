@@ -15,7 +15,10 @@ import net.anotheria.util.ArrayUtils;
  *
  */
 public class DataObjectUtils {
-	
+
+	private DataObjectUtils() {
+	}
+
 	/**
 	 * Creates for the List of dataObjects same ordered List of dataObjects' IDs except the case when null id was happened.
 	 * 

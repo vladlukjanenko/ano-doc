@@ -20,11 +20,11 @@ public enum TypeOfClass {
 	public static TypeOfClass getDefault(){
 		return CLASS;
 	}
+
 	/**
-	 * Returns java declaration.
-	 * @return
+	 * @return java declaration
 	 */
-	public String toJava(){
+	public String toJava() {
 		return toString().toLowerCase();
 	}
 }

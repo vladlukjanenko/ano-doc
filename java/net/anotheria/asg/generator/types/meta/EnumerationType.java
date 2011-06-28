@@ -26,14 +26,15 @@ public class EnumerationType extends DataType{
 		return "Enumeration "+getName()+" :"+values;
 	}
 	/**
-	 * @return
+	 * @return possible values
 	 */
 	public List<String> getValues() {
 		return values;
 	}
 
 	/**
-	 * @param list
+	 * Sets possible values.
+	 * @param list values
 	 */
 	public void setValues(List<String> list) {
 		values = list;

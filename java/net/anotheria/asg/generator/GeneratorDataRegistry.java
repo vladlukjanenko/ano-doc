@@ -24,7 +24,10 @@ import net.anotheria.asg.generator.view.meta.MetaView;
  * @author lrosenberg
  */
 public final class GeneratorDataRegistry {
-	
+
+	/**
+	 * Instance of GeneratorDataRegistry.
+	 */
 	private static GeneratorDataRegistry instance  = new GeneratorDataRegistry();
 	
 	/**
@@ -79,7 +82,7 @@ public final class GeneratorDataRegistry {
 	
 	/**
 	 * Returns the singleton instance of the GeneratorDataRegistry.
-	 * @return 
+	 * @return instance of the GeneratorDataRegistry
 	 */
 	public static GeneratorDataRegistry getInstance(){
 		return instance;
@@ -95,10 +98,10 @@ public final class GeneratorDataRegistry {
 	
 	/**
 	 * Adds some modules to the storage.
-	 * @param modules a list of modules to add.
+	 * @param aModules a list of modules to add.
 	 */
-	public void addModules(List<MetaModule> modules){
-		for (MetaModule m: modules)
+	public void addModules(List<MetaModule> aModules){
+		for (MetaModule m: aModules)
 			addModule(m);
 	}
 	/**
@@ -111,17 +114,17 @@ public final class GeneratorDataRegistry {
 	
 	/**
 	 * Adds some view to the storage.
-	 * @param views the views to add.
+	 * @param aViews the views to add.
 	 */
-	public void addViews(List<MetaView> views){
-		for (MetaView v: views)
+	public void addViews(List<MetaView> aViews){
+		for (MetaView v: aViews)
 			addView(v);
 	}
 	
 	/**
 	 * 
-	 * @param link
-	 * @return
+	 * @param link link for resolving document
+	 * @return resolved document
 	 */
 	public MetaDocument resolveLink(String link){
 		int dotIndex = link.indexOf('.');
@@ -157,46 +160,70 @@ public final class GeneratorDataRegistry {
 	/**
 	 * Returns the module from the storage.
 	 * @param name the name of the module.
-	 * @return
+	 * @return module
 	 */
 	public MetaModule getModule(String name){
 		return modules.get(name);
 	}
-	
+
+	/**
+	 * Returns module from storage.
+	 * @return modules
+	 */
 	public Collection<MetaModule> getModules(){
 		return modules.values();
 	}
-	
+
+	/**
+	 * Return view from storage.
+	 * @param name name of view
+	 * @return view
+	 */
 	public MetaView getView(String name){
 		return views.get(name);
 	}
+
 	/**
-	 * @return
+	 * @return the context
 	 */
 	public Context getContext() {
 		return context;
 	}
 
 	/**
-	 * @param context
+	 * Sets the context.
+	 * @param context context to set
 	 */
 	public void setContext(Context context) {
 		this.context = context;
 		if (context.getOptions()!=null)
 			options = context.getOptions();
 	}
-	
+
+	/**
+	 * Adds parsed data type.
+	 * @param type type to add
+	 */
 	public void addType(DataType type){
 		types.put(type.getName(), type);
 		
 	}
-	
-	public void addTypes(List<DataType> types){
-		for (Iterator<DataType> it = types.iterator(); it.hasNext();){
+
+	/**
+	 * Adds parsed data types.
+	 * @param aTypes types to add
+	 */
+	public void addTypes(List<DataType> aTypes){
+		for (Iterator<DataType> it = aTypes.iterator(); it.hasNext();){
 			addType(it.next());
 		}
 	}
 
+	/**
+	 * Returns parsed data type by name.
+	 * @param name name of type
+	 * @return type
+	 */
 	public DataType getType(String name){
 		
 		DataType ret = types.get(name);
@@ -219,14 +246,19 @@ public final class GeneratorDataRegistry {
 	
 	/**
 	 * Adds some decorators to the storage.
-	 * @param decorators a list with decorators to add.
+	 * @param someDecorators a list with decorators to add.
 	 */
 	public void addDecorators(List<MetaDecorator> someDecorators){
 		for (int i=0; i<someDecorators.size();i++){
 			addDecorator(someDecorators.get(i));
 		}
 	}
-	
+
+	/**
+	 * Returns parsed decorator by name.
+	 * @param name name of decorator
+	 * @return decorator
+	 */
 	public MetaDecorator getDecorator(String name){
 		return decorators.get(name);
 	}
@@ -239,17 +271,30 @@ public final class GeneratorDataRegistry {
 		ret.setRule(rule);
 		return ret;
 	}
-	
+
+	/**
+	 * Adds parsed filter.
+	 * @param filter filter to add
+	 */
 	public void addFilter(MetaFilter filter){
 		filters.put(filter.getName(), filter);
 	}
 
-	public void addFilters(List<MetaFilter> filters){
-		for (int i=0; i<filters.size();i++){
-			addFilter(filters.get(i));
+	/**
+	 * Adds parsed filters.
+	 * @param aFilters filters to add
+	 */
+	public void addFilters(List<MetaFilter> aFilters){
+		for (int i=0; i<aFilters.size();i++){
+			addFilter(aFilters.get(i));
 		}
 	}
-	
+
+	/**
+	 * returns parsed filter by name.
+	 * @param name name of filter
+	 * @return filter
+	 */
 	public MetaFilter getFilter(String name){
 		return filters.get(name);
 	}
@@ -262,16 +307,29 @@ public final class GeneratorDataRegistry {
 		ret.setFieldName(fieldName);
 		return ret;
 	}
-	
+
+	/**
+	 * Adds parsed validator.
+	 * @param validator validator to add
+	 */
 	public void addValidator(MetaValidator validator) {
 		validators.put(validator.getName(), validator);
 	}
 	
-	public void addValidators(List<MetaValidator> validators) {
-		for (MetaValidator validator : validators)
+	/**
+	 * Adds parsed validators.
+	 * @param aValidators validators to add
+	 */
+	public void addValidators(List<MetaValidator> aValidators) {
+		for (MetaValidator validator : aValidators)
 			addValidator(validator);
 	}
 	
+	/**
+	 * Returns parsed validator by name.
+	 * @param name validator name
+	 * @return validator
+	 */
 	public MetaValidator getValidator(String name) {
 		MetaValidator result = validators.get(name);
 		if (result == null) {
@@ -285,7 +343,7 @@ public final class GeneratorDataRegistry {
 	 * @param doc the document to check.
 	 * @return true if support for languages is enabled and the document has multilingual attributes.
 	 */
-	public static final boolean hasLanguageCopyMethods(MetaDocument doc){
+	public static boolean hasLanguageCopyMethods(MetaDocument doc){
 		if (!getInstance().getContext().areLanguagesSupported())
 			return false;
 		return doc.isMultilingual();

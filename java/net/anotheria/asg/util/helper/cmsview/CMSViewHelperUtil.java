@@ -5,6 +5,10 @@ import java.util.List;
 import net.anotheria.asg.data.DataObject;
 
 public class CMSViewHelperUtil {
+
+	private CMSViewHelperUtil() {
+	}
+
 	public static String getFieldExplanation(String documentPath, DataObject object, String property){
 		List<CMSViewHelper> helpers = CMSViewHelperRegistry.getCMSViewHelpers(documentPath);
 		boolean moreThanOne = false;

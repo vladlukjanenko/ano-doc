@@ -84,7 +84,7 @@ public class FileEntry {
 	/**
 	 * Resolves a package name to a full path including sources dir.
 	 * @param packageName 
-	 * @return
+	 * @return full path of the package
 	 */
 	public static String package2fullPath(String packageName){
 		return "java/" + package2path(packageName); 
@@ -93,17 +93,23 @@ public class FileEntry {
 	/**
 	 * Resolves a package name to a path.
 	 * @param packageName 
-	 * @return
+	 * @return path of package
 	 */
 	public static String package2path(String packageName){
 		return StringUtils.replace(packageName, '.', '/'); 
 	}
 
+	/**
+	 * @return type of the file
+	 */
 	public String getType() {
 		return type;
 	}
 
-	
+	/**
+	 * Sets type of the file.
+	 * @param string type of file to set
+	 */
 	public void setType(String string) {
 		type = string;
 	}

@@ -19,10 +19,15 @@ import net.anotheria.util.StringUtils;
 public final class XMLContextParser {
 
 	/**
-	 * Returns a parsed generation context.
-	 * @return
+	 * Prevent instantiation.
 	 */
-	public static final Context parseContext(String content){
+	private XMLContextParser(){
+	}
+
+	/**
+	 * @return parsed generation context.
+	 */
+	public static Context parseContext(String content){
 		SAXBuilder reader = new SAXBuilder();
 		reader.setValidation(false);
 		Context ret = new Context();
@@ -76,7 +81,7 @@ public final class XMLContextParser {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static final Context parseLanguages(Context src, Element languages){
+	private static  Context parseLanguages(Context src, Element languages){
 		src.enableMultiLanguageSupport();
 		Element supportedLanguages = languages.getChild("supported");
 		List<Element> supLangs = supportedLanguages.getChildren("language");
@@ -90,10 +95,4 @@ public final class XMLContextParser {
 		return src;
 	}
 
-	/**
-	 * Prevent instantiation.
-	 */
-	private XMLContextParser(){
-		
-	}
 }

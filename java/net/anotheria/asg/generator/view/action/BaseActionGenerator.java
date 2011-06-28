@@ -30,8 +30,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 	/**
 	 * Generates all artefacts for this action.
 	 * @param views
-	 * @param context
-	 * @return
+	 * @return generated artifacts
 	 */
 	public FileEntry generate(List<MetaView> views) {
 		return new FileEntry(generateBaseAction(views));
@@ -39,9 +38,8 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 	
 	/**
 	 * Generates the base action.
-	 * @param context
 	 * @param views
-	 * @return
+	 * @return generated base action
 	 */
 	public GeneratedClass generateBaseAction(List<MetaView> views){
 		GeneratedClass clazz = new GeneratedClass();

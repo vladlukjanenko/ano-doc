@@ -39,10 +39,10 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		
 		
 		//System.out.println(ret);
-		List<FileEntry> _ret = new ArrayList<FileEntry>();
-		_ret.add(new FileEntry(generateDocument(doc)));
-		_ret.add(new FileEntry(generateDocumentFactory(doc)));
-		return _ret;
+		List<FileEntry> ret = new ArrayList<FileEntry>();
+		ret.add(new FileEntry(generateDocument(doc)));
+		ret.add(new FileEntry(generateDocumentFactory(doc)));
+		return ret;
 	}
 	
 	public String getDataObjectImplName(MetaDocument doc){
@@ -178,27 +178,27 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 
 
 	private void generatePropertyFields(MetaDocument doc){
-		_generatePropertyField(id);
-		_generatePropertyFields(doc.getProperties());
-		_generatePropertyFields(doc.getLinks());
-		_generatePropertyField(lastUpdate);
+		generatePropertyField(id);
+		generatePropertyFields(doc.getProperties());
+		generatePropertyFields(doc.getLinks());
+		generatePropertyField(lastUpdate);
 		
 	}
 	
-	private void _generatePropertyFields(List<MetaProperty> propertyList){
+	private void generatePropertyFields(List<MetaProperty> propertyList){
 		for (int i=0; i<propertyList.size(); i++){
 			MetaProperty p = propertyList.get(i);
 			if (p instanceof MetaTableProperty){
 				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
 				for (int t=0; t<columns.size(); t++)
-					_generatePropertyField(columns.get(t));
+					generatePropertyField(columns.get(t));
 			}else{
-				_generatePropertyField(p);
+				generatePropertyField(p);
 			}
 		}
 	}
 	
-	private void _generatePropertyField(MetaProperty p){
+	private void generatePropertyField(MetaProperty p){
 		if (GeneratorDataRegistry.getInstance().getContext().areLanguagesSupported() && p.isMultilingual()){
 			System.err.println("Multilingual support for federated VOs not yet implemented!");
 			/*
@@ -221,12 +221,12 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 		generatePropertyGetterMethod(id);
 		List<MetaProperty> lastUpdList = new ArrayList<MetaProperty>();
 		lastUpdList.add(lastUpdate);
-		_generatePropertyAccessMethods(lastUpdList);
-		_generatePropertyAccessMethods(doc.getProperties());
-		_generatePropertyAccessMethods(doc.getLinks());
+		generatePropertyAccessMethods(lastUpdList);
+		generatePropertyAccessMethods(doc.getProperties());
+		generatePropertyAccessMethods(doc.getLinks());
 	}
 	
-	private void _generatePropertyAccessMethods(List<MetaProperty> properties){
+	private void generatePropertyAccessMethods(List<MetaProperty> properties){
 		
 		for (int i=0; i<properties.size(); i++){
 			MetaProperty p = properties.get(i);
@@ -390,7 +390,7 @@ public class FederationVOGenerator extends AbstractDataObjectGenerator
 	}
 	
 	private void generateAdditionalMethods(MetaDocument doc){
-		List <MetaProperty>properties = doc.getProperties();
+		List<MetaProperty> properties = doc.getProperties();
 		for (MetaProperty p : properties){
 			if (p instanceof MetaContainerProperty)
 				generateContainerMethods((MetaContainerProperty)p);

@@ -6,7 +6,7 @@ package net.anotheria.asg.exception;
  */
 public class ConstantNotFoundException extends ASGRuntimeException{
 	/**
-	 * Serial version ID
+	 * Serial version ID.
 	 */
 	private static final long serialVersionUID = 5536478059904917632L;
 	/**

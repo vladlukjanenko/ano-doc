@@ -61,9 +61,9 @@ public class FixtureServiceGenerator  extends AbstractServiceGenerator implement
 
 	
 	/**
-	 * Generates the implementation
+	 * Generates the implementation.
 	 * @param module the metamodule to generate
-	 * @return
+	 * @return generated implementation
 	 */
 	private GeneratedClass generateImplementation(MetaModule module){
 		GeneratedClass clazz = new GeneratedClass();

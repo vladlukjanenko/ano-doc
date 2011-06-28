@@ -15,7 +15,10 @@ public class LockHolder {
 	private static ReadWriteLock lock = new ReentrantReadWriteLock();
 	
 	private static Logger log = Logger.getLogger(LockHolder.class);
-	
+
+	private LockHolder() {
+	}
+
 	public static void prepareForSave(){
 		lock.readLock().lock();
 	}

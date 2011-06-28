@@ -14,7 +14,7 @@ public interface ICompositeDataObject extends IBasicStoreableObject{
 	 * also used by debug or administration programs to trace a composite object, such as Document.  
 	 * @return the keys (ids) of contained elements.
 	 */	
-	public Enumeration<String> getKeys();
+	Enumeration<String> getKeys();
 	
 	/**
 	 * This method is used by the storage to save not only the container, but the underlying data too. It's
@@ -22,6 +22,6 @@ public interface ICompositeDataObject extends IBasicStoreableObject{
 	 * @param key the key (id) of the contained element/object.
 	 * @return the object associated to the key.
 	 */
-	public Object getObject(String key);
+	Object getObject(String key);
 	
 }

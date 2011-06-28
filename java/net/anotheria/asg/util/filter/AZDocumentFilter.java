@@ -7,7 +7,7 @@ import net.anotheria.anodoc.data.NoSuchPropertyException;
 import net.anotheria.asg.data.DataObject;
 
 /**
- * Expose documents filtering by first letter of document name
+ * Expose documents filtering by first letter of document name.
  * 
  * (TEST COMMIT)
  */

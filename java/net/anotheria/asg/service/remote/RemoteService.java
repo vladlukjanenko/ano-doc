@@ -7,7 +7,8 @@ public interface RemoteService extends Remote{
 	
 	/**
 	 * Converts echo request to echo response and return it. Is useful for for checking remote object availability
+	 * @return converted EchoRequest to EchoResponse
 	 */
-	public EchoResponse getEcho(EchoRequest echoRequest) throws RemoteException;
+	EchoResponse getEcho(EchoRequest echoRequest) throws RemoteException;
 	
 }

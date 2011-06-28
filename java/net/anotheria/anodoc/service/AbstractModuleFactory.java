@@ -16,7 +16,7 @@ import net.anotheria.anodoc.data.Module;
  */
 public abstract class AbstractModuleFactory implements IModuleFactory, Serializable{
 	
-	private final static long serialVersionUID=1580293076199614251L;
+	private static final long serialVersionUID=1580293076199614251L;
 	
 	/**
 	 * Logger.
@@ -32,6 +32,7 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	}
 	/**
 	 * Creates a new Document from a name and a context (like list). If this function is not overwritten, it call createDocument(name).
+	 * @return new Document
 	 */
 	public Document createDocument(String name, DataHolder context) {
 		getLog().debug("This Factory doesn't overwrite create document with context (Doc:"+name+", context:"+context+")"); 
@@ -41,6 +42,7 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	
 	/**
 	 * Creates a new Document from a name and a typeidentifier. If this function is not overwritten, it call createDocument(name).
+	 * @retun new Document
 	 */
 	public Document createDocument(String name, String typeIdentifier){
 		getLog().debug("This Factory doesn't overwrite create document with identifier (Doc:"+name+", identifier:"+typeIdentifier+")"); 
@@ -63,19 +65,19 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	}
 
 	/**
-	 * Creates and returns a DocumentList
+	 * Creates and returns a DocumentList.
 	 * @return newly created DocumentList
 	 */
-	public <D extends Document>DocumentList<D> createDocumentList(String name, DataHolder context) {
+	public <D extends Document> DocumentList<D> createDocumentList(String name, DataHolder context) {
 		getLog().debug("This Factory doesn't overwrite create document list(listname:"+name+")");
 		return new DocumentList<D>(name);
 	}
 
 	/**
-	 * Creates and returns a DocumentList
+	 * Creates and returns a DocumentList.
 	 * @return newly created DocumentList
 	 */
-	public <D extends Document>DocumentList<D> createDocumentList(String name) {
+	public <D extends Document> DocumentList<D> createDocumentList(String name) {
 		getLog().debug("This Factory doesn't overwrite create document list(listname:"+name+")");
 		return new DocumentList<D>(name);
 	}
@@ -92,6 +94,7 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	 * Recreates a Module. This method is called by the AbstractModuleFactory in
 	 * the createModule method. It sets the proper owner and copy ids in the newly 
 	 * created Module instance, so the extending class doesn't need to do it itself.
+	 * @return recreated module
 	 */
 	public abstract Module recreateModule(String ownerId, String copyId);
 	

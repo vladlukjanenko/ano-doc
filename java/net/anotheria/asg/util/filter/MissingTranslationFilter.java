@@ -24,18 +24,20 @@ import net.anotheria.asg.data.DataObject;
  * 
  */
 public class MissingTranslationFilter implements DocumentFilter{
-	
+	/**
+	 * Default logger.
+	 */
 	private static final Logger log = Logger.getLogger(MissingTranslationFilter.class);
 	/**
-	 * List of filter triggers
+	 * List of filter triggers.
 	 */
 	private List<FilterTrigger> triggerer;
 	/**
-	 * Supported languages
+	 * Supported languages.
 	 */
 	private List<String> supportedLanguages;
 	/**
-	 * Default language
+	 * Default language.
 	 */
 	private String defaultLanguage;
 	
@@ -60,7 +62,7 @@ public class MissingTranslationFilter implements DocumentFilter{
 	}
 	
 	/**
-	 * Constructor with parameters. May be used for unit test  
+	 * Constructor with parameters. May be used for unit test.
 	 * @param supportedLanguages
 	 * @param defaultLanguage
 	 */
@@ -105,7 +107,7 @@ public class MissingTranslationFilter implements DocumentFilter{
 		return mayPass;
 	}
 	
-	/*
+	/**
 	 * Set supported languages. Method update triggers.
 	 * NOTE: Default language will not be included into triggers.
 	 */

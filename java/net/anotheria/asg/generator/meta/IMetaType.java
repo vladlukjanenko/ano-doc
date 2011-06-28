@@ -6,13 +6,11 @@ package net.anotheria.asg.generator.meta;
  */
 public interface IMetaType {
 	/**
-	 * Returns the type representation of this MetaType in java language.
-	 * @return
+	 * @return the type representation of this MetaType in java language.
 	 */
 	String toJava();
 	/**
-	 * Returns java object for this type (for example Integer for int).
-	 * @return
+	 * @return java object for this type (for example Integer for int).
 	 */
 	String toJavaObject();
 	

@@ -34,9 +34,6 @@ public class LockingConfig {
 		return LockingConfigInstanceHolder.instance;
 	}
 
-	/**
-	 * Private constructor - with defaults.
-	 */
 	private LockingConfig() {
 		this.autolocking = false;
 		this.timeout = 0;

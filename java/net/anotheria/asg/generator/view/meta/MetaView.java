@@ -14,9 +14,8 @@ public class MetaView implements IGenerateable{
 	 * Name of the view.
 	 */
 	private String name;
-	
 	/**
-	 * Flag for cms 2.0 version
+	 * Flag for cms 2.0 version.
 	 */
 	private boolean cms20;
 	
@@ -69,14 +68,16 @@ public class MetaView implements IGenerateable{
 	}
 
 	/**
-	 * Returns sections which are part of this view.
+	 *
+	 * @return sections which are part of this view
 	 */
 	public List<MetaSection> getSections() {
 		return sections;
 	}
 
 	/**
-	 * Sets the sections.
+	 *
+	 * @param list sections of the view
 	 */
 	public void setSections(List<MetaSection> list) {
 		sections = list;
@@ -86,21 +87,21 @@ public class MetaView implements IGenerateable{
 		return "view "+name+", Roles: "+requiredRoles+", Sections: "+sections+" T: "+title;
 	}
 	/**
-	 * @return
+	 * @return name of the view
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @return
+	 * @return title of the view
 	 */
 	public String getTitle() {
 		return title;
 	}
 
 	/**
-	 * @param string
+	 * @param string title of the view
 	 */
 	public void setTitle(String string) {
 		title = string;
@@ -116,10 +117,16 @@ public class MetaView implements IGenerateable{
 		this.requiredRoles = requiredRoles;
 	}
 
+	/**
+	 * @return flag for cms 2.0 version
+	 */
 	public boolean isCms20() {
 		return cms20;
 	}
 
+	/**
+	 * @param cms20 flag for cms 2.0 version
+	 */
 	public void setCms20(boolean cms20) {
 		this.cms20 = cms20;
 	}

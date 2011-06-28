@@ -31,7 +31,7 @@ public class GeneratedClass extends GeneratedArtefact{
 	private ClassDef parent;
 	
 	/**
-	 * The generic of the class
+	 * The generic of the class.
 	 */
 	private String generic;
 	
@@ -76,6 +76,9 @@ public class GeneratedClass extends GeneratedArtefact{
 		abstractClass = anAbstractClass;
 	}
 
+	/**
+	 * Default constructor.
+	 */
 	public GeneratedClass(){
 		body = new StringBuilder();
 		
@@ -163,8 +166,7 @@ public class GeneratedClass extends GeneratedArtefact{
 	}
 	
 	/**
-	 * Returns the imports.
-	 * @return
+	 * @return list of imports
 	 */
 	public List<String> getImports() {
 		return imports;
@@ -175,8 +177,7 @@ public class GeneratedClass extends GeneratedArtefact{
 	}
 
 	/**
-	 * Returns the interfaces.
-	 * @return
+	 * @return list of interfaces
 	 */
 	public List<String> getInterfaces() {
 		return interfaces;
@@ -187,7 +188,7 @@ public class GeneratedClass extends GeneratedArtefact{
 	}
 
 	/**
-	 * Returns the body of the class.
+	 * @return the body of the class
 	 */
 	public StringBuilder getBody() {
 		return body;
@@ -195,7 +196,7 @@ public class GeneratedClass extends GeneratedArtefact{
 
 	/**
 	 * Sets the body of the class.
-	 * @param body the body to set.
+	 * @param aBody the body to set.
 	 */
 	public void setBody(StringBuilder aBody) {
 		body = aBody;
@@ -218,8 +219,7 @@ public class GeneratedClass extends GeneratedArtefact{
 	}
 
 	/**
-	 * Returns the parent of the class.
-	 * @return
+	 * @return the parent of the class
 	 */
 	public ClassDef getParent() {
 		return parent;

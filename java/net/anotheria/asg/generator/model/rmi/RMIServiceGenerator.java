@@ -74,7 +74,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	/**
 	 * Returns the name of the remote exception.
 	 * @param m
-	 * @return
+	 * @return name of exception
 	 */
 	public String getRemoteExceptionName(MetaModule m){
 	    return "RemoteExceptionWrapper";
@@ -82,28 +82,30 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	/**
 	 * Returns the implementation name of the rmi service for this module.
-     * Currently implementation not used! Hack  for using  Stub
+     * Currently implementation not used! Hack  for using  Stub.
+	 * @param m
+	 * @return name of service
 	 */
 	public String getImplementationName(MetaModule m){
 	    return getStubName(m);//"RMI"+getServiceName(m)+"Impl";
 	}
 	
 	/**
-	 * Returns the name of the factory for the service.
+	 * @return the name of the factory for the service.
 	 */
 	public String getFactoryName(MetaModule m){
 	    return "RMI"+getServiceName(m)+"Factory";
 	}
 
 	/**
-	 * Returns the package name for the given module.
+	 * @return the package name for the given module.
 	 */
-	protected String getPackageName(MetaModule module){
-		return getPackageName(GeneratorDataRegistry.getInstance().getContext(), module);
+	protected String getPackageName(MetaModule aModule){
+		return getPackageName(GeneratorDataRegistry.getInstance().getContext(), aModule);
 	}
 	
-	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule module){
-       clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(module)+"."+ServiceGenerator.getInterfaceName(module));
+	protected void addAdditionalFactoryImports(GeneratedClass clazz, MetaModule aModule){
+       clazz.addImport(GeneratorDataRegistry.getInstance().getContext().getServicePackageName(aModule)+"."+ServiceGenerator.getInterfaceName(aModule));
 	}
 	
 	public static String getPackageName(Context context, MetaModule module){
@@ -112,21 +114,21 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	
 	/**
 	 * Generates the RemoteException class for this modules service.
-	 * @param module
+	 * @param aModule
 	 * @return
 	 */
-	private GeneratedClass generateRemoteException(MetaModule module){
+	private GeneratedClass generateRemoteException(MetaModule aModule){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		appendGenerationPoint("generateRemoteException");
 		
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRemoteExceptionName(module), this));
-		clazz.setPackageName(getPackageName(module));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getRemoteExceptionName(aModule), this));
+		clazz.setPackageName(getPackageName(aModule));
 		clazz.addImport("java.rmi.RemoteException");
-		clazz.addImport(ServiceGenerator.getExceptionImport(module));
+		clazz.addImport(ServiceGenerator.getExceptionImport(aModule));
 		
 		clazz.setName("RemoteExceptionWrapper");
-		clazz.setParent(ServiceGenerator.getExceptionName(module));
+		clazz.setParent(ServiceGenerator.getExceptionName(aModule));
 		 
 		startClassBody();
 		appendString("public RemoteExceptionWrapper(RemoteException e){");
@@ -139,16 +141,16 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	/**
 	 * Generates the interface for the remote invocation for the given module.
-	 * @param module
-	 * @return
+	 * @param aModule
+	 * @return generated interface
 	 */
-	private GeneratedClass generateRemoteInterface(MetaModule module){
+	private GeneratedClass generateRemoteInterface(MetaModule aModule){
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		appendGenerationPoint("generateRemoteInterface");
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(module), this));
-		clazz.setPackageName(getPackageName(module));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getInterfaceName(aModule), this));
+		clazz.setPackageName(getPackageName(aModule));
 		clazz.setType(TypeOfClass.INTERFACE);
 		
 		clazz.addImport("java.util.List");
@@ -161,11 +163,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		clazz.addImport("net.anotheria.anodoc.query2.QueryResult");
 		clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
 		clazz.addImport("java.rmi.RemoteException");
-		clazz.addImport(ServiceGenerator.getExceptionImport(module));
+		clazz.addImport(ServiceGenerator.getExceptionImport(aModule));
 		clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
 		clazz.addImport("net.anotheria.asg.service.remote.RemoteService");
 		
-		clazz.setName(getInterfaceName(module));
+		clazz.setName(getInterfaceName(aModule));
 		clazz.setParent("RemoteService");
 
 		startClassBody();
@@ -174,7 +176,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 //	    String throwsClause = " throws "+getExceptionName(module)+", RemoteException";
 	    
-	    List<MetaDocument> docs = module.getDocuments();
+	    List<MetaDocument> docs = aModule.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
@@ -387,7 +389,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	/**
 	 * Returns the name of the remote interface.
 	 * @param mod
-	 * @return
+	 * @return name of interface
 	 */
 	public static String getInterfaceName(MetaModule mod){
 		return "Remote"+getServiceName(mod);
@@ -396,7 +398,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	/**
 	 * Returns the name of the rmi stub.
 	 * @param mod
-	 * @return
+	 * @return name of stub
 	 */
 	public static String getStubName(MetaModule mod){
 		return "Remote"+getServiceName(mod)+"Stub";
@@ -405,7 +407,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	/**
 	 * Returns the name of the rmi server class.
 	 * @param mod
-	 * @return
+	 * @return name of service class
 	 */
 	public static String getServerName(MetaModule mod){
 		return mod.getName()+"Server";
@@ -414,7 +416,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	/**
 	 * Returns the name of the rmi lookup function class.
 	 * @param mod
-	 * @return
+	 * @return name of rmi lookup function class
 	 */
 	public static String getLookupName(MetaModule mod){
 		return getServiceName(mod)+"RMILookup";
@@ -423,7 +425,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	/**
 	 * Returns the name of the rmi skeleton class.
 	 * @param mod
-	 * @return
+	 * @return name of the skeleton class
 	 */
 	public static String getSkeletonName(MetaModule mod){
 		return "Remote"+getServiceName(mod)+"Skeleton";
@@ -431,15 +433,15 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	
 	/**
 	 * Generates lookup utility class.
-	 * @param module
-	 * @return
+	 * @param aModule
+	 * @return utility class
 	 */
-	private GeneratedClass generateLookup(MetaModule module){
+	private GeneratedClass generateLookup(MetaModule aModule){
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		appendGenerationPoint("generateLookup");
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getLookupName(module), this));
-		clazz.setPackageName(getPackageName(module));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getLookupName(aModule), this));
+		clazz.setPackageName(getPackageName(aModule));
 
 		clazz.addImport("org.apache.log4j.Logger");
 		clazz.addImport("java.rmi.registry.Registry");
@@ -447,11 +449,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		clazz.addImport("net.anotheria.asg.util.rmi.RMIConfig");
 		clazz.addImport("net.anotheria.asg.util.rmi.RMIConfigFactory");
 
-		clazz.setName(getLookupName(module));
+		clazz.setName(getLookupName(aModule));
 		
 		startClassBody();
 		
-	    appendStatement("private static Logger log = Logger.getLogger(", quote(getLookupName(module)), ")");
+	    appendStatement("private static Logger log = Logger.getLogger(", quote(getLookupName(aModule)), ")");
 	    emptyline();
 	    appendStatement("private static Registry rmiRegistry");
 	    appendString("static{");
@@ -467,11 +469,11 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    emptyline();
         
 	    appendString("public static final String getServiceId(){");
-	    appendIncreasedStatement("return ", quote(StringUtils.replace(ServiceGenerator.getInterfaceImport(module), '.', '_')));
+	    appendIncreasedStatement("return ", quote(StringUtils.replace(ServiceGenerator.getInterfaceImport(aModule), '.', '_')));
 	    appendString("}");
 
-	    appendString("static final "+getInterfaceName(module)+" getRemote() throws Exception{");
-	    appendIncreasedStatement("return ("+getInterfaceName(module)+") rmiRegistry.lookup(getServiceId())");
+	    appendString("static final "+getInterfaceName(aModule)+" getRemote() throws Exception{");
+	    appendIncreasedStatement("return ("+getInterfaceName(aModule)+") rmiRegistry.lookup(getServiceId())");
 	    appendString("}");
 	    
 	    return clazz;
@@ -479,17 +481,17 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	/**
 	 * Generates the startable rmi server class.
-	 * @param module
-	 * @return
+	 * @param aModule
+	 * @return startable server class
 	 */
-	private GeneratedClass generateServer(MetaModule module){
+	private GeneratedClass generateServer(MetaModule aModule){
 		
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		appendGenerationPoint("generateServer");
 		
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getServerName(module), this));
-		clazz.setPackageName(getPackageName(module));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getServerName(aModule), this));
+		clazz.setPackageName(getPackageName(aModule));
 		
 	    clazz.addImport("org.apache.log4j.xml.DOMConfigurator");
 	    clazz.addImport("java.rmi.registry.Registry");
@@ -498,12 +500,12 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    
 	    clazz.addImport("net.anotheria.asg.util.rmi.RMIConfig");
 	    clazz.addImport("net.anotheria.asg.util.rmi.RMIConfigFactory");
-	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
-	    clazz.addImport(ServiceGenerator.getFactoryImport(module));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(aModule));
+	    clazz.addImport(ServiceGenerator.getFactoryImport(aModule));
 	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
-	    clazz.addImport(InMemoryServiceGenerator.getInMemoryFactoryImport(module));
+	    clazz.addImport(InMemoryServiceGenerator.getInMemoryFactoryImport(aModule));
 	    
-	    clazz.setName(getServerName(module));
+	    clazz.setName(getServerName(aModule));
 	    clazz.setGenerateLogger(true);
 	    
 	    startClassBody();
@@ -535,19 +537,19 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("@SuppressWarnings(", quote("unchecked"), ")");
 	    appendString("public static void startService(Registry registry) throws Exception{");
 	    increaseIdent();
-	    appendStatement("log.info(", quote("Starting " + getServerName(module)) + ")");
-	    appendStatement(ServiceGenerator.getInterfaceName(module)+" myService = "+ServiceGenerator.getFactoryName(module)+".create"+module.getName()+"Service()");
+	    appendStatement("log.info(", quote("Starting " + getServerName(aModule)) + ")");
+	    appendStatement(ServiceGenerator.getInterfaceName(aModule)+" myService = "+ServiceGenerator.getFactoryName(aModule)+".create"+aModule.getName()+"Service()");
 	    appendStatement("String mode = System.getProperty(", quote("rmi.server.service.mode"),")");
-	    appendString("if(mode != null && mode.equals(", quote("inMemory"),")){");
+	    appendString("if(mode != null && mode.equals(", quote("inMemory"), ")){");
 	    increaseIdent();
 	    appendStatement("log.info(", quote("Switch to InMemory mode"), ")");
 	    openTry();
-	    appendStatement(ServiceGenerator.getInterfaceName(module), " inMemoryService = ", InMemoryServiceGenerator.getInMemoryFactoryName(module)+".create"+module.getName()+"Service()");
-	    appendStatement("log.info(", quote("Reading " + ServiceGenerator.getInterfaceName(module) + " In Memory ..."), ")");
+	    appendStatement(ServiceGenerator.getInterfaceName(aModule), " inMemoryService = ", InMemoryServiceGenerator.getInMemoryFactoryName(aModule) + ".create" + aModule.getName() + "Service()");
+	    appendStatement("log.info(", quote("Reading " + ServiceGenerator.getInterfaceName(aModule) + " In Memory ..."), ")");
 	    appendStatement("long startTime = System.currentTimeMillis()");
-	    appendStatement("((InMemoryService<", ServiceGenerator.getInterfaceName(module), ">)inMemoryService).readFrom(myService)");
+	    appendStatement("((InMemoryService<", ServiceGenerator.getInterfaceName(aModule), ">)inMemoryService).readFrom(myService)");
 	    appendStatement("long duration = System.currentTimeMillis() - startTime");
-	    appendStatement("log.info(", quote("InMemory " + ServiceGenerator.getInterfaceName(module) + " Fillage = "), "+ duration + ", quote(" ms."), ")");
+	    appendStatement("log.info(", quote("InMemory " + ServiceGenerator.getInterfaceName(aModule) + " Fillage = "), "+ duration + ", quote(" ms."), ")");
 	    appendStatement("myService = inMemoryService");
 	    decreaseIdent();
 	    appendString("} catch (Exception e) {");
@@ -558,12 +560,12 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    append(closeBlock());
 	    
 	    
-	    appendStatement(getInterfaceName(module)+" mySkeleton = new "+getSkeletonName(module)+"(myService)");
-	    appendStatement(getInterfaceName(module)+" rmiServant = ("+getInterfaceName(module)+") UnicastRemoteObject.exportObject(mySkeleton, 0);");
+	    appendStatement(getInterfaceName(aModule)+" mySkeleton = new "+getSkeletonName(aModule)+"(myService)");
+	    appendStatement(getInterfaceName(aModule)+" rmiServant = ("+getInterfaceName(aModule)+") UnicastRemoteObject.exportObject(mySkeleton, 0);");
 		appendCommentLine("//register service.");
-		appendStatement("String serviceId = "+getLookupName(module)+".getServiceId()");
+		appendStatement("String serviceId = "+getLookupName(aModule)+".getServiceId()");
 		appendStatement("registry.rebind(serviceId, rmiServant)");
-		appendStatement("log.info(", quote(getServerName(module)+" for service "), " + serviceId + ", quote(" is up and running.")+")");
+		appendStatement("log.info(", quote(getServerName(aModule)+" for service "), " + serviceId + ", quote(" is up and running.")+")");
 
 	    append(closeBlock());
 	    return clazz;
@@ -571,16 +573,16 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	/**
 	 * Generates the rmi stub.
-	 * @param module
+	 * @param aModule
 	 * @return
 	 */
-	private GeneratedClass generateStub(MetaModule module){
+	private GeneratedClass generateStub(MetaModule aModule){
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		appendGenerationPoint("generateStub");
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getStubName(module), this));
-		clazz.setPackageName(getPackageName(module));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getStubName(aModule), this));
+		clazz.setPackageName(getPackageName(aModule));
 
 		clazz.addImport("java.util.List");
 		clazz.addImport("net.anotheria.util.sorter.SortType");
@@ -594,12 +596,12 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport("net.anotheria.asg.util.listener.IServiceListener");
 	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 	    clazz.addImport("java.rmi.RemoteException");
-	    clazz.addImport(ServiceGenerator.getExceptionImport(module));
-	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
+	    clazz.addImport(ServiceGenerator.getExceptionImport(aModule));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(aModule));
 	    
-	    clazz.setName(getStubName(module));
-	    clazz.setParent("BaseRemoteServiceStub<"+getInterfaceName(module)+">");
-	    clazz.addInterface(ServiceGenerator.getInterfaceName(module));
+	    clazz.setName(getStubName(aModule));
+	    clazz.setParent("BaseRemoteServiceStub<"+getInterfaceName(aModule)+">");
+	    clazz.addInterface(ServiceGenerator.getInterfaceName(aModule));
 
 	    
 	    boolean containsAnyMultilingualDocs = false;
@@ -607,10 +609,10 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.setGenerateLogger(true);
 	    startClassBody();
         //Static instance
-        appendStatement("private static "+getStubName(module)+" instance");
+        appendStatement("private static "+getStubName(aModule)+" instance");
 	    emptyline();
 	    
-	    appendStatement("private ", getInterfaceName(module), " delegate");
+	    appendStatement("private ", getInterfaceName(aModule), " delegate");
 	    emptyline();
 	    appendString("protected void notifyDelegateFailed(){");
 	    appendIncreasedStatement("delegate = null");
@@ -618,20 +620,20 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    emptyline();
 
         //Private constructor
-        appendString("private "+getStubName(module)+"(){ }");
+        appendString("private "+getStubName(aModule)+"(){ }");
 	    emptyline();
 
-        appendString("public static final "+getStubName(module)+" getInstance(){");
+        appendString("public static final "+getStubName(aModule)+" getInstance(){");
 	    increaseIdent();
 	    appendString("if (instance==null){");
 	    increaseIdent();
-	    appendStatement("instance = new "+getStubName(module)+"()");
+	    appendStatement("instance = new "+getStubName(aModule)+"()");
 	    append(closeBlock());
 	    appendStatement("return instance");
 	    append(closeBlock());
 	    emptyline();
 	    
-	    appendString("protected "+getInterfaceName(module)+" getDelegate() throws "+ServiceGenerator.getExceptionName(module)+"{");
+	    appendString("protected "+getInterfaceName(aModule)+" getDelegate() throws "+ServiceGenerator.getExceptionName(aModule)+"{");
         increaseIdent();
 	    appendString("if (delegate==null){");
         increaseIdent();
@@ -641,10 +643,10 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         increaseIdent();
         appendString("try{");
         increaseIdent();
-        appendStatement("delegate = "+getLookupName(module)+".getRemote()");
+        appendStatement("delegate = "+getLookupName(aModule)+".getRemote()");
         decreaseIdent();
         appendString("}catch(Exception e){");
-        appendIncreasedStatement("throw new "+ServiceGenerator.getExceptionName(module)+"(e)");
+        appendIncreasedStatement("throw new "+ServiceGenerator.getExceptionName(aModule)+"(e)");
 	    appendString("}");
         
         append(closeBlock());
@@ -654,7 +656,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
         append(closeBlock());
 	    emptyline();
 
-	    List<MetaDocument> docs = module.getDocuments();
+	    List<MetaDocument> docs = aModule.getDocuments();
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = (MetaDocument)docs.get(i);
 	        clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
@@ -934,16 +936,16 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	/**
 	 * Generates the rmi skeleton.
-	 * @param module
+	 * @param aModule
 	 * @return
 	 */
-	private GeneratedClass generateSkeleton(MetaModule module){
+	private GeneratedClass generateSkeleton(MetaModule aModule){
 	    
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
 		appendGenerationPoint("generateSkeleton");
-		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getSkeletonName(module), this));
-		clazz.setPackageName(getPackageName(module));
+		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getSkeletonName(aModule), this));
+		clazz.setPackageName(getPackageName(aModule));
 		
 	    clazz.addImport("java.util.List");
 	    clazz.addImport("net.anotheria.util.sorter.SortType");
@@ -956,27 +958,27 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport("net.anotheria.anodoc.util.context.CallContext");
 	    clazz.addImport("net.anotheria.anodoc.util.context.ContextManager");
 	    clazz.addImport("net.anotheria.asg.service.remote.BaseRemoteServiceSkeleton");
-	    clazz.addImport(ServiceGenerator.getExceptionImport(module));
-	    clazz.addImport(ServiceGenerator.getInterfaceImport(module));
+	    clazz.addImport(ServiceGenerator.getExceptionImport(aModule));
+	    clazz.addImport(ServiceGenerator.getInterfaceImport(aModule));
 
-	    clazz.setName(getSkeletonName(module));
+	    clazz.setName(getSkeletonName(aModule));
 	    clazz.setParent("BaseRemoteServiceSkeleton");
-	    clazz.addInterface(getInterfaceName(module));
+	    clazz.addInterface(getInterfaceName(aModule));
 	    	    
 	    boolean containsAnyMultilingualDocs = false;
 	    
 	    clazz.setGenerateLogger(true);
 	    startClassBody();
 	    
-	    appendStatement("private ", ServiceGenerator.getInterfaceName(module), " service");
+	    appendStatement("private ", ServiceGenerator.getInterfaceName(aModule), " service");
 	    emptyline();
 	    
-	    appendString(getSkeletonName(module)+"("+ServiceGenerator.getInterfaceName(module)+" aService){");
+	    appendString(getSkeletonName(aModule)+"("+ServiceGenerator.getInterfaceName(aModule)+" aService){");
 	    appendIncreasedStatement("service = aService");
 	    appendString("}");
 	    emptyline();
 	    
-	    List<MetaDocument> docs = module.getDocuments();
+	    List<MetaDocument> docs = aModule.getDocuments();
 
 
 	    for (int i=0; i<docs.size(); i++){

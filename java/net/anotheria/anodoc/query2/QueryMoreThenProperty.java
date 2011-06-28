@@ -8,7 +8,7 @@ package net.anotheria.anodoc.query2;
  * @author denis
  *
  */
-public class QueryMoreThenProperty <P extends Comparable<P>> extends QueryProperty{
+public class QueryMoreThenProperty<P extends Comparable<P>> extends QueryProperty{
 	
 	/**
 	 * 

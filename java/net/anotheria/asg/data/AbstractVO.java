@@ -15,12 +15,12 @@ public abstract class AbstractVO implements DataObject{
 	
 	/**
 	 * Returns the timestamp in millis of the creation time of this object by the DAO.
-	 * @return
+	 * @return milliseconds
 	 */
 	public abstract long  getDaoCreated();
 	/**
 	 * Returns the timestamp in millis of the last time of this object was been updated by the DAO.
-	 * @return
+	 * @return milliseconds
 	 */
 	public abstract long  getDaoUpdated();
 	

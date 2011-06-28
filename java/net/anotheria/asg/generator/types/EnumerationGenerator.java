@@ -15,11 +15,14 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.types.meta.EnumerationType;
 
 /**
- * TODO please remind another to comment this class
+ * TODO please remind another to comment this class.
  * @author another
  */
 public class EnumerationGenerator extends AbstractGenerator implements IGenerator{
-    private final static EnumTypeGenerator enumTypeGenerator = new EnumTypeGenerator();
+	/**
+	 * Instance of EnumTypeGenerator.
+	 */
+	private static final EnumTypeGenerator enumTypeGenerator = new EnumTypeGenerator();
 
 	/* (non-Javadoc)
 	 * @see net.anotheria.anodoc.generator.IGenerator#generate(net.anotheria.anodoc.generator.IGenerateable, net.anotheria.anodoc.generator.Context)

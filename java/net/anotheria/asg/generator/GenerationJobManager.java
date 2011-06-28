@@ -1,6 +1,10 @@
 package net.anotheria.asg.generator;
 
 public class GenerationJobManager {
+
+	private GenerationJobManager() {
+	}
+
 	/**
 	 * Currently executed job.
 	 */

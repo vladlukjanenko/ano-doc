@@ -27,8 +27,8 @@ public class IDHolder extends Document{
 		setTypeIdentifier(TYPE_IDENTIFIER);
 	}
 	/**
-	 * Returns next id as string. The id is unique.
-	 * @return
+	 *
+	 * @return next id as string. The id is unique
 	 */
 	public String getNextIdString(){
 		String id = ""+getNextIdInt();

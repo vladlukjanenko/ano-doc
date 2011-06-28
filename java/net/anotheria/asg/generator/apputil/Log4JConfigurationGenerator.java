@@ -13,10 +13,13 @@ import net.anotheria.util.StringUtils;
 
 public class Log4JConfigurationGenerator extends AbstractGenerator implements IGenerator {
 
-	private static final String categories[] = new String[]{
-		"debug","info","warn","error", "fatal"
-	};
-	
+	/**
+	 * Logging levels.
+	 */
+	private static final String[] categories = new String[]{"debug","info","warn","error", "fatal"};
+	/**
+	 * Name of generated package.
+	 */
 	public static final String GENERATED_PACKAGE = "net.anotheria.anosite.gen";
 	
 	public List<FileEntry> generate(IGenerateable g) {

@@ -520,7 +520,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	
 	
 	/**
-	 * Appends to generation output tag without body
+	 * Appends to generation output tag without body.
 	 * @param tag tag name
 	 * @param id html id attribute
 	 * @param clazz html class attribute
@@ -532,7 +532,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 
 	/**
-	 * Appends to generation output tag without body
+	 * Appends to generation output tag without body.
 	 * @param tag tag name
 	 * @param clazz html class attribute
 	 * @param attrs array of tag attributes
@@ -543,7 +543,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	/**
-	 * Appends to generation output tag without body
+	 * Appends to generation output tag without body.
 	 * @param tag tag name
 	 * @param attrs array of tag attributes
 	 */
@@ -555,7 +555,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	/**
-	 * Appends to generation output opening for tag
+	 * Appends to generation output opening for tag.
 	 * @param tag tag name
 	 * @param id html id attribute
 	 * @param clazz html class attribute
@@ -567,7 +567,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 
 	/**
-	 * Appends to generation output opening for tag
+	 * Appends to generation output opening for tag.
 	 * @param tag tag name
 	 * @param clazz html class attribute
 	 * @param attrs array of tag attributes
@@ -578,7 +578,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	/**
-	 * Appends to generation output opening for tag
+	 * Appends to generation output opening for tag.
 	 * @param tag tag name
 	 * @param attrs array of tag attributes
 	 */
@@ -592,7 +592,7 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	
 	
 	/**
-	 * Appends to generation output closing for tag
+	 * Appends to generation output closing for tag.
 	 * @param tag tag name
 	 */
 	protected void tagClose(String tag){
@@ -601,31 +601,31 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	}
 	
 	/**
-	 * Appends to generation output script tag with type javascript
+	 * Appends to generation output script tag with type javascript.
 	 */
 	protected void openJavaScript(){
 		tagOpen("script", new TagAttribute("type", "text/javascript"));
 	}
 	
 	/**
-	 * Appends to generation output script tag closing
+	 * Appends to generation output script tag closing.
 	 */
 	protected void closeJavaScript(){
 		tagClose("script");
 	}
 	
 	/**
-	 * HTML/JSP tag attribute object representation
+	 * HTML/JSP tag attribute object representation.
 	 * @author denis
 	 *
 	 */
 	protected static class TagAttribute{
 		/**
-		 * attr name
+		 * attr name.
 		 */
 		private String name;
 		/**
-		 * attr value
+		 * attr value.
 		 */
 		private String value;
 		

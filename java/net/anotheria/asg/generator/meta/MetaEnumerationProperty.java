@@ -21,14 +21,14 @@ public class MetaEnumerationProperty extends MetaProperty{
 	}
 
 	/**
-	 * @return
+	 * @return name of the enumeration
 	 */
 	public String getEnumeration() {
 		return enumeration;
 	}
 
 	/**
-	 * @param string
+	 * @param string name of enumeration
 	 */
 	public void setEnumeration(String string) {
 		enumeration = string;

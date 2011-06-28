@@ -1,17 +1,16 @@
-/**
- * 
- */
 package net.anotheria.asg.util;
 
 import net.anotheria.asg.util.CmsChangesTracker.Action;
-
+/**
+ *
+ */
 public class DocumentChange{
-	String userName;
-	String parentName;
-	String documentName;
-	String id;
-	Action action;
-	long timestamp;
+	private String userName;
+	private String parentName;
+	private String documentName;
+	private String id;
+	private Action action;
+	private long timestamp;
 	
 	public String getUserName() {
 		return userName;

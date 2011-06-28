@@ -31,7 +31,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @ConfigureMe (name="anodoc.storage")
 public class CommonHashtableModuleStorage implements IModuleStorage{
 
-
+	/**
+	 * Key for storage directory. 
+	 */
 	public static final String DEF_KEY_CFG_STORAGE_DIRECTORY = "storage.dir";
 	/**
 	 * Internal storage.
@@ -48,9 +50,14 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	/**
 	 * Configuration key for the storage dir.
 	 */
-	public String cfgKeyStorageDir;
-
+	private String cfgKeyStorageDir;
+	/**
+	 * Default name for storage directory.
+	 */
 	public static final String DEF_STORAGE_DIR = ".";
+	/**
+	 * Storage directory path.
+	 */
 	@Configure private String storageDir = DEF_STORAGE_DIR;
 
 	/**
@@ -62,7 +69,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	 */
 	private FileWatcher fileWatchingTimer;
 	/**
-	 * Logger.
+	 * Default logger.
 	 */
 	private static Logger log = Logger.getLogger(CommonHashtableModuleStorage.class);
 	/**
@@ -177,17 +184,17 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		return key.substring(key.indexOf('#')+1);
 	}
 	
-	protected String getFile(String filename){
-		return storageDir + File.separator + filename;
+	protected String getFile(String aFilename){
+		return storageDir + File.separator + aFilename;
 	}
 
 	/**
 	 * Return path for lock file by file name.
-	 * @param filename file name for dat file.
+	 * @param aFilename file name for dat file.
 	 * @return file name for lock file.
 	 */
-	protected String getFileLock(String filename){
-		String fileLock = getFile("locks"+File.separator+filename);
+	protected String getFileLock(String aFilename){
+		String fileLock = getFile("locks"+File.separator+aFilename);
 		return fileLock.substring(0, fileLock.lastIndexOf(".")) + ".lock";
 	}
 

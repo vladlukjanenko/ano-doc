@@ -8,6 +8,10 @@ package net.anotheria.anodoc.service;
  */
 
 public class ModuleStorageFactory{
+
+	private ModuleStorageFactory() {
+	}
+
 	public static final IModuleStorage getModuleStorage(){
 //		return new ModuleStorageC();
 		return null;

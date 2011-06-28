@@ -32,15 +32,15 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 	
 	private static final Logger log = Logger.getLogger(MissingAnyTranslationFilter.class);
 	/**
-	 * List of filter triggers
+	 * List of filter triggers.
 	 */
 	private List<FilterTrigger> triggerer;
 	/**
-	 * Supported languages
+	 * Supported languages.
 	 */
 	private List<String> supportedLanguages;
 	/**
-	 * Default language
+	 * Default language.
 	 */
 	private String defaultLanguage;
 	
@@ -67,7 +67,7 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 	}
 	
 	/**
-	 * Constructor with parameters. May be used for unit test  
+	 * Constructor with parameters. May be used for unit test.
 	 * @param supportedLanguages
 	 * @param defaultLanguage
 	 */
@@ -142,7 +142,7 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 	}
 	
 	
-	/*
+	/**
 	 * Set supported languages. Method update triggers.
 	 * NOTE: Default language will not be included into triggers.
 	 */

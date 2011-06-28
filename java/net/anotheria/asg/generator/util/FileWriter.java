@@ -14,8 +14,11 @@ import net.anotheria.util.StringUtils;
  *
  */
 public class FileWriter {
-	
-	private static String BASE_DIR ;
+
+	private FileWriter() {
+	}
+
+	private static String BASE_DIR;
 	
 	public static final String DEF_BASE_DIR = ".";
 	
@@ -44,7 +47,7 @@ public class FileWriter {
 			FileInputStream fIn = null;
 			try{
 				fIn = new FileInputStream(f);
-				byte d[] = new byte[fIn.available()];
+				byte[] d = new byte[fIn.available()];
 				fIn.read(d);
 				if (content.equals(new String(d))){
 					//System.out.println("Skipping "+f);
@@ -70,7 +73,7 @@ public class FileWriter {
 	}
 	
 	public static final void writeJavaFile(String packageName, String className, String content){
-		String tokens[] = StringUtils.tokenize(packageName, '.');
+		String[] tokens = StringUtils.tokenize(packageName, '.');
 		String path = "";
 		for (int i=0; i<tokens.length; i++){
 			path += tokens[i];

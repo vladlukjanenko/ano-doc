@@ -39,7 +39,7 @@ public abstract class Property
 	}
 
 	/**
-	 * Returns the value of this property.
+	 * @return the value of this property.
 	 */	
 	public Object getValue(){
 		return value;
@@ -48,16 +48,12 @@ public abstract class Property
 	
 	/**
 	 * Sets the value of this Property.
+	 * @param o object to set
 	 */
 	public void setValue(Object o){
 		this.value = o;
 	}
 	
-	/**
-	 * A simple string representation of the Property,
-	 * name=value.
-	 * 
-	 */
 	@Override public String toString(){
 		return getPropertyType().getIndicator()+getName()+"="+value;
 	}
@@ -80,8 +76,7 @@ public abstract class Property
 	}
 	
 	/**
-	 * Returns the name of the property. 
-	 * @return
+	 * @return the name of the property
 	 */
 	protected String getName(){
 		return getId();
@@ -95,7 +90,7 @@ public abstract class Property
 	/**
 	 * Creates a copy of this property with a new name.
 	 * @param newName
-	 * @return
+	 * @return created property with new name
 	 * @throws CloneNotSupportedException
 	 */
 	public Property cloneAs(String newName) throws CloneNotSupportedException{
@@ -109,6 +104,7 @@ public abstract class Property
 	
 	/**
 	 * Creates an xml node for export.
+	 * @return new XMLNode object
 	 */
 	public XMLNode toXMLNode(){
 		XMLNode ret = new XMLNode("property");

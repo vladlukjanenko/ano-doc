@@ -12,7 +12,7 @@ import net.anotheria.util.StringUtils;
 
 
 /**
- * TODO please remined another to comment this class
+ * TODO please remined another to comment this class.
  * @author another
  */
 public class AbstractGenerator{
@@ -157,7 +157,7 @@ public class AbstractGenerator{
 
 	
 	/**
-	 * Writes a statement (';' at the end of the line)
+	 * Writes a statement (';' at the end of the line).
 	 * @param s statement to write.
 	 * @return
 	 * @deprecated use appendStatement instead
@@ -327,7 +327,7 @@ public class AbstractGenerator{
 	 * @return
 	 */
 	protected String writeCommentLine(String commentline){
-		String tokens[] = StringUtils.tokenize(commentline, '\n');
+		String[] tokens = StringUtils.tokenize(commentline, '\n');
 		if (tokens.length!=1)
 			return writeComment(commentline);
 		String ret = writeString("// "+commentline);
@@ -335,7 +335,7 @@ public class AbstractGenerator{
 	}
 	
 	protected String writeComment(String commentline){
-	    String tokens[] = StringUtils.tokenize(commentline, '\n');
+	    String[] tokens = StringUtils.tokenize(commentline, '\n');
 	    String ret = "";
 	    
 	    ret += writeString("/**");
@@ -356,7 +356,7 @@ public class AbstractGenerator{
 	}
 	
 	protected void appendCommentLine(StringBuilder target, String commentline){
-		String tokens[] = StringUtils.tokenize(commentline, '\n');
+		String[] tokens = StringUtils.tokenize(commentline, '\n');
 		if (tokens.length!=1)
 			appendComment(target, commentline);
 		else
@@ -368,7 +368,7 @@ public class AbstractGenerator{
 	}
 	
 	protected void appendComment(StringBuilder target, String commentline){
-	    String tokens[] = StringUtils.tokenize(commentline, '\n');
+	    String[] tokens = StringUtils.tokenize(commentline, '\n');
 	    
 	    
 	    appendString(target, "/**");
@@ -422,16 +422,14 @@ public class AbstractGenerator{
 	}
 
 	/**
-	 * Returns the content of the currently active job.
-	 * @return
+	 * @return the content of the currently active job
 	 */
 	public static final StringBuilder getCurrentJobContent(){
 		return GenerationJobManager.getCurrentJob().getStringBuilder();
 	}
 	
 	/**
-	 * Returns the artefact currently being generated.
-	 * @return
+	 * @return the artefact currently being generated
 	 */
 	public static final GeneratedArtefact getCurrentJob(){
 		return GenerationJobManager.getCurrentJob().getArtefact();

@@ -6,6 +6,10 @@ package net.anotheria.asg.generator.meta;
  * @author another
  */
 public class TypeFactory {
+
+	private TypeFactory() {
+	}
+
 	/**
 	 * Creates a type out of a string description.
 	 * 

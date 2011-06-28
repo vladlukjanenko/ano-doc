@@ -7,6 +7,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CmsChangesTracker {
 
+	private CmsChangesTracker() {
+	}
+
 	public static int TRACING_SIZE = 20;
 	
 	public static enum Action{

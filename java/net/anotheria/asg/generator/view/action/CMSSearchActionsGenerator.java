@@ -13,6 +13,9 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 
+/**
+ * Generator for SMC search action.
+ */
 public class CMSSearchActionsGenerator extends AbstractGenerator {
 
 	public List<FileEntry> generate(List<MetaView> views) {

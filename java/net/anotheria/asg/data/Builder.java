@@ -6,10 +6,10 @@ package net.anotheria.asg.data;
  *
  * @param <T> the type to build.
  */
-public interface Builder <T extends DataObject>{
+public interface Builder<T extends DataObject> {
 	/**
 	 * Builds a new instance of T.
-	 * @return
+	 * @return T
 	 */
 	T build();
 }
