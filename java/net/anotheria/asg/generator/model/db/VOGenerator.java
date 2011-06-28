@@ -219,10 +219,9 @@ public class VOGenerator extends AbstractDataObjectGenerator implements IGenerat
 				List<MetaProperty> columns = ((MetaTableProperty)p).getColumns();
 				for (int t=0; t<columns.size(); t++)
 					_generatePropertyField(columns.get(t));
-			}
-			else if (p instanceof MetaListProperty)
+			}else if (p instanceof MetaListProperty){
 				_generatePropertyField(getMetaGenericProperty((MetaListProperty)p));
-			else{
+			}else{
 				_generatePropertyField(p);
 			}
 		}
