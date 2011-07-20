@@ -1,37 +1,10 @@
 package net.anotheria.asg.generator.view.action;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.exception.ConstantNotFoundException;
-import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedArtefact;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.forms.meta.MetaFormField;
-import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaGenericListProperty;
-import net.anotheria.asg.generator.meta.MetaGenericProperty;
-import net.anotheria.asg.generator.meta.MetaLink;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
-import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.*;
+import net.anotheria.asg.generator.forms.meta.*;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.model.AbstractDataObjectGenerator;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.asg.generator.model.ServiceGenerator;
@@ -40,16 +13,14 @@ import net.anotheria.asg.generator.types.meta.EnumerationType;
 import net.anotheria.asg.generator.util.DirectLink;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
 import net.anotheria.asg.generator.view.ViewConstants;
-import net.anotheria.asg.generator.view.meta.MetaDecorator;
-import net.anotheria.asg.generator.view.meta.MetaDialog;
-import net.anotheria.asg.generator.view.meta.MetaFieldElement;
-import net.anotheria.asg.generator.view.meta.MetaFilter;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
-import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This generator generate module-based actions like delete, create, edit, new, update, show and so on.
@@ -1594,7 +1565,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					if (! (p instanceof MetaContainerProperty)){
 						String propertyCopy = "";
 						propertyCopy += doc.getVariableName()+"."+p.toSetter(lang)+"(";
-						propertyCopy += "form."+p.toBeanGetter(lang)+"())";
+						//for cms "date" type
+						if (p.getType().equals(MetaProperty.Type.DATE)){
+							propertyCopy += "net.anotheria.asg.generator.util.DateUtils.getLong(form."+p.toGetter(lang)+"()))";
+						} else {
+							propertyCopy += "form."+p.toBeanGetter(lang)+"())";
+						}
 						appendStatement(propertyCopy);
 					}else{
 						appendString( "// skipped container "+p.getName());
@@ -1895,7 +1871,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					String lang = getElementLanguage(elem);
 					String propertyCopy = "";
 					propertyCopy += "form."+p.toBeanSetter(lang)+"(";
-					propertyCopy += doc.getVariableName()+"."+p.toGetter(lang)+"())";
+
+					//for cms "date" type
+					if (p.getType().equals(MetaProperty.Type.DATE)){
+						propertyCopy += "net.anotheria.asg.generator.util.DateUtils.getString("+doc.getVariableName()+"."+p.toGetter(lang)+"()))";
+					} else {
+						propertyCopy += doc.getVariableName()+"."+p.toGetter(lang)+"())";
+					}
 					appendStatement(propertyCopy);
 				}
 			}

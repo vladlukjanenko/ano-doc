@@ -1,35 +1,15 @@
 package net.anotheria.asg.generator.view.action;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
+import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
-import net.anotheria.asg.generator.meta.ObjectType;
-import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.meta.MetaProperty.Type;
-import net.anotheria.asg.generator.view.meta.MetaDialog;
-import net.anotheria.asg.generator.view.meta.MetaFieldElement;
-import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaValidator;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
-import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO Please remain lrosenberg to comment BeanGenerator.java
@@ -307,7 +287,12 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 						}
 					}
 				}
-				appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
+				//for cms date type //todo this is hack)
+				if (p.getType().equals(MetaProperty.Type.DATE)){
+					appendStatement("private "+ TypeFactory.createType(Type.STRING).toJava()+" "+tmp.getName(lang));
+				} else {
+					appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
+				}
 				if (p.isLinked()){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),MetaProperty.Type.LIST);
 					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
@@ -730,14 +715,21 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 			generateMethodsMultilinguage((MultilingualFieldElement)element, p);
 			return;
 		}
-		
-		appendString("public void "+p.toBeanSetter()+"("+p.toJavaType()+" "+p.getName()+" ){");
+
+		if (p.getType().equals(MetaProperty.Type.DATE)){
+			appendString("public void "+p.toBeanSetter()+"("+TypeFactory.createType(Type.STRING).toJava()+" "+p.getName()+" ){");
+		} else {
+			appendString("public void "+p.toBeanSetter()+"("+p.toJavaType()+" "+p.getName()+" ){");
+		}
 		increaseIdent();
 		appendStatement("this."+p.getName()+" = "+p.getName());
 		append(closeBlock());			
 		emptyline();
-			
-		appendString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
+		if (p.getType().equals(MetaProperty.Type.DATE)){
+			appendString("public "+TypeFactory.createType(Type.STRING).toJava()+" "+p.toBeanGetter()+"(){");
+		} else {
+			appendString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
+		}
 		increaseIdent();
 		appendStatement("return "+p.getName());
 		append(closeBlock());

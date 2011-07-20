@@ -19,6 +19,7 @@ public class MetaProperty implements Cloneable{
 		DOUBLE("double"),
 		FLOAT("float"),
 		LIST("list"),
+		DATE("date"),
 		IMAGE("image");
 		
 

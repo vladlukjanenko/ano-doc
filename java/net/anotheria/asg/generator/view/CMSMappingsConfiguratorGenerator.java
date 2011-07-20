@@ -1,23 +1,12 @@
 package net.anotheria.asg.generator.view;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
-import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.view.action.IndexPageActionGenerator;
 import net.anotheria.asg.generator.view.action.ModuleActionsGenerator;
 import net.anotheria.asg.generator.view.jsp.IndexPageJspGenerator;
@@ -33,6 +22,11 @@ import net.anotheria.webutils.filehandling.actions.FileAjaxUpload;
 import net.anotheria.webutils.filehandling.actions.GetFile;
 import net.anotheria.webutils.filehandling.actions.ShowFile;
 import net.anotheria.webutils.filehandling.actions.ShowTmpFile;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Generator class for the CMSFilter.
@@ -446,7 +440,10 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	 * Unlocks current document.
 	 */
     public static final String ACTION_UNLOCK = "unLock";
-    public static final String ACTION_CLOSE = "close";
+	/**
+	 * Closes current document.
+	 */
+	public static final String ACTION_CLOSE = "close";
 	
 	public static final String getPath(MetaDocument doc, String action){
 		return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(action);

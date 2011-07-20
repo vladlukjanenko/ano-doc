@@ -1,9 +1,9 @@
 package net.anotheria.asg.data;
 
-import java.util.List;
-
 import net.anotheria.util.xml.XMLAttribute;
 import net.anotheria.util.xml.XMLNode;
+
+import java.util.List;
 
 /**
  * A helper class for creation of xml trees.
@@ -33,6 +33,10 @@ public class XMLHelper {
 	
 	public static XMLNode createXMLNodeForImageValue(String name, String[] language, String... value){
 		return createXMLNodeForStringValue(name, language, value);
+	}
+
+	public static XMLNode createXMLNodeForDateValue(String name, String[] language, long... value){
+		return createXMLNodeForLongValue(name, language, value);
 	}
 
 	public static XMLNode createXMLNodeForTextValue(String name, String[] language, String... value){

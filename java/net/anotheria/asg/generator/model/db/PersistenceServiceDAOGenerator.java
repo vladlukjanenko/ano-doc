@@ -1,24 +1,13 @@
 package net.anotheria.asg.generator.model.db;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.CommentGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.ModuleParameter;
+import net.anotheria.asg.generator.*;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This generator generates the DAO for a Document, the daoexceptions, and the rowmapper.
@@ -1080,6 +1069,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			return "float4";
 		case BOOLEAN:
 			return "boolean";
+		case DATE:
+			return "int8";
 		default:
 			return "UNKNOWN!";
 		}
