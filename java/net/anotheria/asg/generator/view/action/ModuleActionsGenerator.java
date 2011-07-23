@@ -1132,7 +1132,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 							MetaDecorator d = element.getDecorator();
 							value = getDecoratorVariableName(element)+".decorate("+doc.getVariableName()+", "+quote(p.getName()+(lang==null?"":"_"+lang))+", "+quote(d.getRule())+")";
 						}
-						appendStatement("bean."+p.toBeanSetter(lang)+"("+value+")");
+
+						//for cms "date" type
+						if (p.getType().equals(MetaProperty.Type.DATE)){
+							appendStatement("bean."+p.toBeanSetter()+"(net.anotheria.asg.generator.util.DateUtils.getString("+value+"))");
+						} else {
+							appendStatement("bean."+p.toBeanSetter(lang)+"("+value+")");
+						}
 					}
 //				}
 			}

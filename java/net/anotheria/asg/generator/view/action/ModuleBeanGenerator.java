@@ -602,7 +602,10 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 							appendStatement("private "+tmp.toJavaType()+" "+tmp.getName()+"ForSorting");
 						}else{
 //							appendStatement("private "+p.toJavaType()+" "+p.getName());
-							appendStatement("private "+tmp.toJavaType()+" "+tmp.getName());
+							if (tmp.getType().equals(MetaProperty.Type.DATE))
+								appendStatement("private "+ TypeFactory.createType(Type.STRING).toJava() +" "+tmp.getName());
+							else
+								appendStatement("private "+tmp.toJavaType()+" "+tmp.getName());
 						}
 					}
 				}
@@ -668,11 +671,14 @@ private GeneratedClass generateListItemBean(MetaModuleSection section){
 			appendString("case "+caseDecl+":");
 			
 			String type2compare = p instanceof MetaEnumerationProperty? "String": StringUtils.capitalize(p.toJavaErasedType());
-	
 			String retDecl = "return BasicComparable.compare"+type2compare;
-			retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
-				"("+p.getName(lang)+", anotherBean."+p.getName(lang)+")";
-	
+			if (p.getType().equals(Type.DATE)){
+				retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
+					"(net.anotheria.asg.generator.util.DateUtils.getLong("+p.getName(lang)+"), net.anotheria.asg.generator.util.DateUtils.getLong(anotherBean."+p.getName(lang)+"))";
+			} else{
+				retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
+					"("+p.getName(lang)+", anotherBean."+p.getName(lang)+")";
+			}
 			appendIncreasedStatement(retDecl);
 		}
 		appendString("default:");

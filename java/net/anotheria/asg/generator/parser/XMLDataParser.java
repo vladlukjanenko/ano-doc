@@ -1,28 +1,17 @@
 package net.anotheria.asg.generator.parser;
 
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.meta.FederatedDocumentMapping;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
-import net.anotheria.asg.generator.meta.MetaFederationModule;
-import net.anotheria.asg.generator.meta.MetaLink;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
-import net.anotheria.asg.generator.meta.ModuleParameter;
-import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.util.StringUtils;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * XMLParser for the data definition files.
@@ -176,12 +165,16 @@ public final class XMLDataParser {
 
 		MetaProperty.Type type = MetaProperty.Type.findTypeByName(typeStr);
 		if(type == null)
-			throw new IllegalArgumentException("Uknown type <" + typeStr + "> for property def " + p);
+			throw new IllegalArgumentException("Unknown type <" + typeStr + "> for property def " + p);
 		
 		MetaProperty ret = new MetaProperty(name, type); 
 		String multilingual = p.getAttributeValue("multilingual");
-		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
+		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true")){
+			if (type.equals(MetaProperty.Type.DATE))
+				throw new IllegalArgumentException("Type \"date\" could not be multilingual, property:" + p);
+
 			ret.setMultilingual(true);
+		}
 //		String validatorName = p.getAttributeValue("validator"); 
 //		if (validatorName != null ) {
 //			MetaValidator validator = GeneratorDataRegistry.getInstance().getValidator(validatorName);
