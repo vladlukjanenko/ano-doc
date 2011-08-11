@@ -46,6 +46,11 @@ public class MetaViewElement {
 	private List<MetaValidator> validators;
 	
 	/**
+	 * The sorting type of the element.
+	 */
+	private SortingType sortingType = SortingType.ALPHABETHICAL;
+	
+	/**
 	 * Creates a new meta view element.
 	 * @param aName
 	 */
@@ -113,6 +118,10 @@ public class MetaViewElement {
 	 */
 	public void setDecorator(MetaDecorator decorator) {
 		this.decorator = decorator;
+		//this is a hack to prevent need for altering all files, fow now.
+		if (decorator!=null && name!=null && name.equals("id"))
+			sortingType = SortingType.NUMERICAL;
+
 	}
 
 	@Override public boolean equals(Object o){
@@ -183,5 +192,13 @@ public class MetaViewElement {
 				", decorator=" + decorator +
 				", validators=" + validators +
 				'}';
+	}
+
+	public SortingType getSortingType() {
+		return sortingType;
+	}
+
+	public void setSortingType(SortingType sortingType) {
+		this.sortingType = sortingType;
 	}
 }
