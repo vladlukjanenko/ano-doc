@@ -622,8 +622,6 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			return getBooleanEditor(element, p);
 		case IMAGE:
 			return getImageEditor(element, p);
-		case DATE:
-			return getStringEditor(element, p);
 		default:
 			return p.getType().getName();
 		}

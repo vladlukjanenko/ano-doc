@@ -37,8 +37,6 @@ public class TypeFactory {
 			return new FloatType();
 		case IMAGE:
 			return new ImageType();
-		case DATE:
-			return new LongType();
 		default:
 			throw new RuntimeException("Unsupported type: " + type);
 		}

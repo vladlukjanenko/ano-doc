@@ -165,16 +165,12 @@ public final class XMLDataParser {
 
 		MetaProperty.Type type = MetaProperty.Type.findTypeByName(typeStr);
 		if(type == null)
-			throw new IllegalArgumentException("Unknown type <" + typeStr + "> for property def " + p);
+			throw new IllegalArgumentException("Uknown type <" + typeStr + "> for property def " + p);
 		
 		MetaProperty ret = new MetaProperty(name, type); 
 		String multilingual = p.getAttributeValue("multilingual");
-		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true")){
-			if (type.equals(MetaProperty.Type.DATE))
-				throw new IllegalArgumentException("Type \"date\" could not be multilingual, property:" + p);
-
+		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
 			ret.setMultilingual(true);
-		}
 //		String validatorName = p.getAttributeValue("validator"); 
 //		if (validatorName != null ) {
 //			MetaValidator validator = GeneratorDataRegistry.getInstance().getValidator(validatorName);

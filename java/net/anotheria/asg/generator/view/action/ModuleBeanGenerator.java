@@ -287,12 +287,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 						}
 					}
 				}
-				//for cms date type //todo this is hack)
-				if (p.getType().equals(MetaProperty.Type.DATE)){
-					appendStatement("private "+ TypeFactory.createType(Type.STRING).toJava()+" "+tmp.getName(lang));
-				} else {
-					appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
-				}
+				appendStatement("private "+tmp.toJavaType()+" "+tmp.getName(lang));
 				if (p.isLinked()){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),MetaProperty.Type.LIST);
 					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
@@ -623,10 +618,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 								appendStatement("private "+tmp.toJavaType()+" "+tmp.getName()+"ForSorting");
 						}else{
 //							appendStatement("private "+p.toJavaType()+" "+p.getName());
-							if (tmp.getType().equals(MetaProperty.Type.DATE))
-								appendStatement("private "+ TypeFactory.createType(Type.STRING).toJava() +" "+tmp.getName());
-							else
-								appendStatement("private "+tmp.toJavaType()+" "+tmp.getName());
+							appendStatement("private "+tmp.toJavaType()+" "+tmp.getName());
 						}
 					}
 				}
@@ -701,13 +693,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			if (element.getName().equals("id")){
 				retDecl = "return BasicComparable."+element.getSortingType().getCompareCall();
 			}
-			if (p.getType().equals(Type.DATE)){
-				retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
-					"(net.anotheria.asg.generator.util.DateUtils.getLong("+p.getName(lang)+"), net.anotheria.asg.generator.util.DateUtils.getLong(anotherBean."+p.getName(lang)+"))";
-			} else{
-				retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")":
-					"("+p.getName(lang)+", anotherBean."+p.getName(lang)+")";
-			}
+			retDecl += field.getDecorator()!=null? "("+p.getName("ForSorting", lang)+", anotherBean."+p.getName("ForSorting", lang)+")" : "("+p.getName(lang)+", anotherBean."+p.getName(lang)+")";
 			appendIncreasedStatement(retDecl);
 		}
 		appendString("default:");
@@ -749,20 +735,12 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 			return;
 		}
 
-		if (p.getType().equals(MetaProperty.Type.DATE)){
-			appendString("public void "+p.toBeanSetter()+"("+TypeFactory.createType(Type.STRING).toJava()+" "+p.getName()+" ){");
-		} else {
-			appendString("public void "+p.toBeanSetter()+"("+p.toJavaType()+" "+p.getName()+" ){");
-		}
+		appendString("public void "+p.toBeanSetter()+"("+p.toJavaType()+" "+p.getName()+" ){");
 		increaseIdent();
 		appendStatement("this."+p.getName()+" = "+p.getName());
 		closeBlockNEW();		
 		emptyline();
-		if (p.getType().equals(MetaProperty.Type.DATE)){
-			appendString("public "+TypeFactory.createType(Type.STRING).toJava()+" "+p.toBeanGetter()+"(){");
-		} else {
-			appendString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
-		}
+		appendString("public "+p.toJavaType()+" "+p.toBeanGetter()+"(){");
 		increaseIdent();
 		appendStatement("return "+p.getName());
 		closeBlockNEW();

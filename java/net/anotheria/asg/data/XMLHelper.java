@@ -35,10 +35,6 @@ public class XMLHelper {
 		return createXMLNodeForStringValue(name, language, value);
 	}
 
-	public static XMLNode createXMLNodeForDateValue(String name, String[] language, long... value){
-		return createXMLNodeForLongValue(name, language, value);
-	}
-
 	public static XMLNode createXMLNodeForTextValue(String name, String[] language, String... value){
 		return createXMLNodeForStringValue(name, language, value);
 	}

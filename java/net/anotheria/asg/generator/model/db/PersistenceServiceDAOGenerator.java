@@ -1069,8 +1069,6 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			return "float4";
 		case BOOLEAN:
 			return "boolean";
-		case DATE:
-			return "int8";
 		default:
 			return "UNKNOWN!";
 		}

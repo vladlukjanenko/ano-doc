@@ -1132,13 +1132,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 							MetaDecorator d = element.getDecorator();
 							value = getDecoratorVariableName(element)+".decorate("+doc.getVariableName()+", "+quote(p.getName()+(lang==null?"":"_"+lang))+", "+quote(d.getRule())+")";
 						}
-
-						//for cms "date" type
-						if (p.getType().equals(MetaProperty.Type.DATE)){
-							appendStatement("bean."+p.toBeanSetter()+"(net.anotheria.asg.generator.util.DateUtils.getString("+value+"))");
-						} else {
-							appendStatement("bean."+p.toBeanSetter(lang)+"("+value+")");
-						}
+						appendStatement("bean."+p.toBeanSetter(lang)+"("+value+")");
 					}
 //				}
 			}
@@ -1571,12 +1565,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					if (! (p instanceof MetaContainerProperty)){
 						String propertyCopy = "";
 						propertyCopy += doc.getVariableName()+"."+p.toSetter(lang)+"(";
-						//for cms "date" type
-						if (p.getType().equals(MetaProperty.Type.DATE)){
-							propertyCopy += "net.anotheria.asg.generator.util.DateUtils.getLong(form."+p.toGetter(lang)+"()))";
-						} else {
-							propertyCopy += "form."+p.toBeanGetter(lang)+"())";
-						}
+						propertyCopy += "form."+p.toBeanGetter(lang)+"())";
 						appendStatement(propertyCopy);
 					}else{
 						appendString( "// skipped container "+p.getName());
@@ -1877,13 +1866,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					String lang = getElementLanguage(elem);
 					String propertyCopy = "";
 					propertyCopy += "form."+p.toBeanSetter(lang)+"(";
-
-					//for cms "date" type
-					if (p.getType().equals(MetaProperty.Type.DATE)){
-						propertyCopy += "net.anotheria.asg.generator.util.DateUtils.getString("+doc.getVariableName()+"."+p.toGetter(lang)+"()))";
-					} else {
-						propertyCopy += doc.getVariableName()+"."+p.toGetter(lang)+"())";
-					}
+					propertyCopy += doc.getVariableName()+"."+p.toGetter(lang)+"())";
 					appendStatement(propertyCopy);
 				}
 			}

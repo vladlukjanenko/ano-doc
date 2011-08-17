@@ -440,10 +440,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	 * Unlocks current document.
 	 */
     public static final String ACTION_UNLOCK = "unLock";
-	/**
-	 * Closes current document.
-	 */
-	public static final String ACTION_CLOSE = "close";
+    public static final String ACTION_CLOSE = "close";
 	
 	public static final String getPath(MetaDocument doc, String action){
 		return doc.getParentModule().getName().toLowerCase()+StringUtils.capitalize(doc.getName())+StringUtils.capitalize(action);

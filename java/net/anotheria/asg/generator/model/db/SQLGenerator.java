@@ -136,8 +136,6 @@ public class SQLGenerator extends AbstractGenerator implements IGenerator{
 			return "float4";
 		case BOOLEAN:
 			return "boolean";
-		case DATE:
-			return "int8";
 		case LIST:
 			return getSQLPropertyType(((MetaListProperty)p).getContainedProperty()) + "[]";
 		default:
