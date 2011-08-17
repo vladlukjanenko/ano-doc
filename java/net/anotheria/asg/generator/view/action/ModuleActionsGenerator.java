@@ -2090,6 +2090,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		for (MetaProperty property : section.getDocument().getProperties()){
 			if ( property.getType() == MetaProperty.Type.IMAGE)
 				appendStatement("FileStorage.removeFilePermanently( "+doc.getVariableName()+"Curr."+property.toGetter()+"() )");
+			if (property instanceof MetaListProperty){
+				MetaListProperty mlp = (MetaListProperty)property;
+				MetaProperty containerProperty = mlp.getContainedProperty();
+				if (containerProperty.getType() == MetaProperty.Type.IMAGE){
+					appendString("for ( String image : " + doc.getVariableName() + "Curr." + property.toGetter() + "() )");
+					appendStatement("FileStorage.removeFilePermanently(image)");
+				}
+			}
 		}
 
 		closeBlockNEW();
@@ -2111,7 +2119,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		addStandardActionImports(clazz);
 		clazz.addImport(DataFacadeGenerator.getDocumentFactoryImport(GeneratorDataRegistry.getInstance().getContext(), doc));
 		clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
-		
 		clazz.setName(getDuplicateActionName(section));
 		clazz.setParent(getBaseActionName(section));
 
@@ -2129,15 +2136,29 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("String id = getStringParameter(req, PARAM_ID)");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+"Src = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+"Dest = "+DataFacadeGenerator.getDocumentFactoryName(doc)+".create"+doc.getName()+"("+doc.getVariableName()+"Src)");
+		emptyline();
 
 		//clone images from file system
 		for (MetaProperty property : section.getDocument().getProperties()){
 			if ( property.getType() == MetaProperty.Type.IMAGE)
 				appendStatement(doc.getVariableName()+"Dest."+property.toSetter()+"(FileStorage.cloneFilePermanently( "+doc.getVariableName()+"Dest."+property.toGetter()+"() ))");
-		}
 
+			if (property instanceof MetaListProperty){
+				emptyline();
+				MetaListProperty mlp = (MetaListProperty)property;
+				MetaProperty containerProperty = mlp.getContainedProperty();
+				if (containerProperty.getType() == MetaProperty.Type.IMAGE){
+					appendStatement("List<String> newImages = new ArrayList<String>()");
+					appendString("for ( String image : " + doc.getVariableName() + "Dest." + property.toGetter() + "() )");
+					appendStatement("newImages.add(FileStorage.cloneFilePermanently(image))");
+					appendStatement(doc.getVariableName() + "Dest." + property.toSetter() + "(newImages)");
+				}
+			}
+		}
+		emptyline();
 		appendStatement(doc.getName()+" "+doc.getVariableName()+"Created = "+getServiceGetterCall(section.getModule())+".create"+doc.getName()+"("+doc.getVariableName()+"Dest"+")");
 	    appendStatement("res.sendRedirect("+getEditActionRedirect(doc)+"+"+quote("&")+"+PARAM_ID+"+quote("=")+"+"+doc.getVariableName()+"Created.getId()"+")");
+		emptyline();
 	    appendStatement("return null");
 	    closeBlockNEW();
 	}
@@ -2579,6 +2600,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    clazz.addImport("net.anotheria.maf.action.ActionForward");
 	    clazz.addImport("net.anotheria.maf.action.ActionMapping");
 	    clazz.addImport("net.anotheria.maf.bean.FormBean");
+
+		clazz.addImport("java.util.List");
+		clazz.addImport("java.util.ArrayList");
+
 	}
 	
 
@@ -2956,12 +2981,11 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 
 	private void generateContainerDeleteEntryActionMethod(MetaModuleSection section, MetaContainerProperty container, String methodName){		
 		MetaDocument doc = section.getDocument();
-
 		appendString(getExecuteDeclaration(methodName));
 		increaseIdent();
 		appendStatement("String id = getStringParameter(req, \"ownerId\")");
-         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-           appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id);");
+	 	if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+           appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
            //appendString("if("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
            //appendIncreasedStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
 		   //This is SomeHow related  to Document Updation! SO next method should be invoked!
@@ -2971,10 +2995,19 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
            //appendString("}");
         }
 		appendStatement("int position = getIntParameter(req, "+quote("pPosition")+")"); 
-		appendStatement(doc.getName()+" "+doc.getVariableName());
-		appendStatement(doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
-		
+		appendStatement(doc.getName()+" "+doc.getVariableName()+" = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+
+
+		//deleting of image
+		if (container instanceof MetaListProperty){
+			MetaListProperty mlp = (MetaListProperty)container;
+			MetaProperty containerProperty = mlp.getContainedProperty();
+			if (containerProperty.getType() == MetaProperty.Type.IMAGE)
+			appendStatement("FileStorage.removeFilePermanently( "+doc.getVariableName()+"."+DataFacadeGenerator.getListElementGetterName(mlp)+"(position) )");
+		}
+
 		appendStatement(doc.getVariableName()+"."+DataFacadeGenerator.getContainerEntryDeleterName(container)+"(position)");
+
 		appendStatement(getServiceGetterCall(section.getModule())+".update"+doc.getName()+"("+doc.getVariableName()+")");
 		if (methodName==null)
 			appendStatement("return "+getSuperCall());
