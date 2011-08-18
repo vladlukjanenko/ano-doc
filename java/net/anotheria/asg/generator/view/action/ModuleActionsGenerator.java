@@ -2147,11 +2147,12 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				emptyline();
 				MetaListProperty mlp = (MetaListProperty)property;
 				MetaProperty containerProperty = mlp.getContainedProperty();
-				if (containerProperty.getType() == MetaProperty.Type.IMAGE){
-					appendStatement("List<String> newImages = new ArrayList<String>()");
+				if (containerProperty.getType() == MetaProperty.Type.IMAGE) {
+					String listName = "newImages" + property.getName();
+					appendStatement("List<String> " + listName + " = new ArrayList<String>()");
 					appendString("for ( String image : " + doc.getVariableName() + "Dest." + property.toGetter() + "() )");
-					appendStatement("newImages.add(FileStorage.cloneFilePermanently(image))");
-					appendStatement(doc.getVariableName() + "Dest." + property.toSetter() + "(newImages)");
+					appendStatement(listName+".add(FileStorage.cloneFilePermanently(image))");
+					appendStatement(doc.getVariableName() + "Dest." + property.toSetter() + "("+listName+")");
 				}
 			}
 		}
