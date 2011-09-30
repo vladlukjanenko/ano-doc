@@ -238,8 +238,15 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    }
 	    emptyline();
 	    
+	    String jdbcConfigName = null;
+	    if (module.getModuleOptions()!= null)
+	    	if (module.getModuleOptions().get("jdbcConfig") != null )
+	    		jdbcConfigName = module.getModuleOptions().get("jdbcConfig").getValue();
+	    
 	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
+	    if (jdbcConfigName != null)
+	    	appendStatement("super(\""+jdbcConfigName+"\")");
 	    closeBlockNEW();
 	    emptyline();
 	    
