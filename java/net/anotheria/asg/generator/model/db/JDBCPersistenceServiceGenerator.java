@@ -8,6 +8,7 @@ import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
+import net.anotheria.asg.generator.GenerationOptions;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
@@ -240,12 +241,12 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    
 	    String jdbcConfigName = null;
 	    if (module.getModuleOptions()!= null)
-	    	if (module.getModuleOptions().get("jdbcConfig") != null )
-	    		jdbcConfigName = module.getModuleOptions().get("jdbcConfig").getValue();
+	    	if (module.getModuleOptions().get(GenerationOptions.JDBCCONFIG) != null )
+	    		jdbcConfigName = module.getModuleOptions().get(GenerationOptions.JDBCCONFIG).getValue();
 	    
 	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
-	    if (jdbcConfigName != null)
+	    if (jdbcConfigName != null && jdbcConfigName.length() > 0)
 	    	appendStatement("super(\""+jdbcConfigName+"\")");
 	    closeBlockNEW();
 	    emptyline();

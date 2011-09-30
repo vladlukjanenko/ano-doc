@@ -22,6 +22,10 @@ public class GenerationOptions {
 	 */
 	public static final String FIXTURE = "fixture";
 	/**
+	 * Name of the JDBCConfig option.
+	 */
+	public static final String JDBCCONFIG = "jdbcConfig";
+	/**
 	 * Internal map with generation options.
 	 */
 	private Map<String, GenerationOption> options;
