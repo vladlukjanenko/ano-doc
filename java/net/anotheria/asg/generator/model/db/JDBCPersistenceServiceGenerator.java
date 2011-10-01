@@ -239,15 +239,16 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    }
 	    emptyline();
 	    
-	    String jdbcConfigName = null;
+	    String jdbcConfigName = "";
 	    if (module.getModuleOptions()!= null)
 	    	if (module.getModuleOptions().get(GenerationOptions.JDBCCONFIG) != null )
 	    		jdbcConfigName = module.getModuleOptions().get(GenerationOptions.JDBCCONFIG).getValue();
-	    
+
+	    if (jdbcConfigName.length() > 0)
+	    	jdbcConfigName = "\"" + jdbcConfigName + "\"";//surround with "" if it is not an empty string
 	    appendString("private "+getImplementationName(module)+"(){");
 	    increaseIdent();
-	    if (jdbcConfigName != null && jdbcConfigName.length() > 0)
-	    	appendStatement("super(\""+jdbcConfigName+"\")");
+    	appendStatement("super("+jdbcConfigName+")");
 	    closeBlockNEW();
 	    emptyline();
 	    
@@ -266,7 +267,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    appendStatement("super.init()");
 	    for (int i=0; i<docs.size(); i++){
 	        MetaDocument doc = docs.get(i);
-	        appendStatement(getDAOVariableName(doc) +" = new "+PersistenceServiceDAOGenerator.getDAOName(doc)+"()");
+	        appendStatement(getDAOVariableName(doc) +" = new "+PersistenceServiceDAOGenerator.getDAOName(doc)+"("+jdbcConfigName+")");
 	    }
 	    appendStatement("String currentDAO = null");
         openTry();

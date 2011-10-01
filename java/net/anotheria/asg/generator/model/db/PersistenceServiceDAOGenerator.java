@@ -441,9 +441,22 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 			appendStatement("private AtomicLong lastId = new AtomicLong()");
 		}
 		//appendStatement("private static final long START_ID = 0");
-		appendStatement("private JDBCConfig dbConfig = JDBCConfigFactory.getJDBCConfig()");
+		
 		emptyline();
-
+		appendStatement("private final JDBCConfig dbConfig");
+		emptyline();
+		//write out default constructor
+		appendString("public " + getDAOName(doc) + "() {");
+		increaseIdent();
+		appendStatement("dbConfig = JDBCConfigFactory.getJDBCConfig()");
+		closeBlockNEW();
+		emptyline();
+		//write out constructor with specified JDBC config
+		appendString("public " + getDAOName(doc) + "(String jdbcConfig) {");
+		increaseIdent();
+		appendStatement("dbConfig = JDBCConfigFactory.getNamedJDBCConfig(jdbcConfig)");
+		closeBlockNEW();
+		emptyline();
 		//get last id method
 		appendString("private AtomicLong getLastId(Connection con) throws DAOException {");
 		increaseIdent();
