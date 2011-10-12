@@ -96,6 +96,10 @@ public class ConfiguratorGenerator extends AbstractGenerator implements IGenerat
 			
 		}
 		append(closeBlock());
+		emptyline();
+		openFun("public static void deInit()");
+		appendString("configured = false;");		
+		closeBlock("");
 		return new FileEntry(clazz);
 			
 	}
