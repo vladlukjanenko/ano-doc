@@ -54,7 +54,7 @@ public class IndexPageActionGenerator extends AbstractGenerator {
 	public GeneratedClass generateBaseAction(List<MetaView> views) {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		appendGenerationPoint("generateBaseMafAction");
+		appendGenerationPoint("generateBaseAction");
 		clazz.setPackageName(getIndexPagePackageName());
 
 		
@@ -68,7 +68,7 @@ public class IndexPageActionGenerator extends AbstractGenerator {
 		clazz.addImport("net.anotheria.asg.util.DocumentChange");
 		clazz.addImport("net.anotheria.asg.util.CmsChangesTracker");
 		clazz.addImport(CMSMappingsConfiguratorGenerator.getClassName());
-		clazz.addImport("net.anotheria.anosite.gen.shared.bean.DocumentChangeFB");
+		clazz.addImport(getDocumentChangeFBPackageName() + ".DocumentChangeFB");
 		clazz.addImport("java.util.Collections");
 		clazz.addImport("java.util.Collection");
 		clazz.addImport("java.util.List");
@@ -145,7 +145,7 @@ public class IndexPageActionGenerator extends AbstractGenerator {
 	public GeneratedClass generateDocumentChangeFBviews(List<MetaView> views) {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
-		appendGenerationPoint("generateCMSDocumentChangeFB");
+		appendGenerationPoint("generateDocumentChangeFBviews");
 		clazz.setPackageName(getDocumentChangeFBPackageName());
 		clazz.addImport("net.anotheria.maf.bean.FormBean");
 		clazz.addImport("net.anotheria.util.Date");
