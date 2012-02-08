@@ -1,5 +1,7 @@
 package net.anotheria.asg.generator.meta;
 
+import java.util.List;
+
 /**
  * Representation of an internal link to another document.
  * @author another
@@ -13,7 +15,12 @@ public class MetaLink extends MetaProperty{
 	/**
 	 * Link target as relative or absolute document name.
 	 */
-	private String linkTarget; 
+	private String linkTarget;
+	
+	/**
+	 * Properties of target document are used to decorate link in additional to ID
+	 */
+	private List<String> linkDecoration;
 	
 	public MetaLink(String name){
 		super(name, MetaProperty.Type.STRING);
@@ -81,6 +88,12 @@ public class MetaLink extends MetaProperty{
 	
 	public boolean isRelative(){
 		return getLinkTarget().indexOf('.') == -1;
+	}
+	public List<String> getLinkDecoration() {
+		return linkDecoration;
+	}
+	public void setLinkDecoration(List<String> linkDecoration) {
+		this.linkDecoration = linkDecoration;
 	}
 
 }

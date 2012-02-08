@@ -16,6 +16,7 @@ import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
 import net.anotheria.asg.generator.view.ViewConstants;
+import net.anotheria.asg.generator.view.meta.MetaCustomSection;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
@@ -304,7 +305,16 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		for (int i=0; i<views.size(); i++){
 			MetaView view = views.get(i);
 			MetaSection first = view.getSections().get(0);
-			String statement = "menu.add(makeMenuItemBean("+quote(view.getTitle())+", "+quote(CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)first).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_SHOW))+"))";
+			
+			String firstPath = null;
+			if(first instanceof MetaModuleSection)
+				firstPath = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection)first).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_SHOW);
+			else if(first instanceof MetaCustomSection)
+				firstPath = ((MetaCustomSection)first).getPath();
+			else
+				throw new RuntimeException("MetaSection extension Class: " + first.getClass());
+			
+			String statement = "menu.add(makeMenuItemBean("+quote(view.getTitle())+", "+quote(firstPath)+"))";
 			if (view.getRequiredRoles()!=null && view.getRequiredRoles().size()>0){
 				String roles = "";
 				for (String r :view.getRequiredRoles()){

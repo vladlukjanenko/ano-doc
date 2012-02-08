@@ -98,6 +98,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		clazz.addInterface("FormBean");
 
 		startClassBody();
+		appendGenerationPoint("generateListQuickAddForm");
+		
 		appendStatement("private String quickAddIds");
 		appendStatement("private String ownerId");
 		
@@ -145,6 +147,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		clazz.setName(getContainerEntryFormName(list));
 		clazz.addInterface("FormBean");
 		startClassBody();
+		appendGenerationPoint("generateListElementForm");
 		
 		for (int i=0; i<elements.size(); i++){
 			MetaProperty p = elements.get(i);
@@ -197,6 +200,8 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		clazz.setParent("BaseActionForm");
 
 		startClassBody();
+		appendGenerationPoint("generateTableRowForm");
+		
 		List<MetaProperty> columns = (List<MetaProperty>)((ArrayList)p.getColumns()).clone();
 		columns.add(0, new MetaProperty(p.getName()+"_ownerId", MetaProperty.Type.STRING));
 		columns.add(0, new MetaProperty(p.getName()+"_position", MetaProperty.Type.INT));
@@ -241,6 +246,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		clazz.addImport("net.anotheria.maf.bean.FormBean");
 		
 		startClassBody();
+		appendGenerationPoint("generateDialogForm");
 		
 		//this is only used if the multilingual support is enabled for the project AND document.
 		MetaFieldElement multilingualInstanceDisabledElement = new MetaFieldElement(FIELD_ML_DISABLED);
@@ -263,6 +269,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		clazz.addInterface("FormBean");
 		
 		startClassBody();
+		appendGenerationPoint("generateDialogForm");
 	
 		for (MetaViewElement element : elements){
 			if (element instanceof MetaFieldElement){
@@ -412,6 +419,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		clazz.setParent("SortType");
 		
 		startClassBody();
+		appendGenerationPoint("generateListItemSortType");
 		
 		MetaViewElement defaultElem = section.getDefaultSortable();
 		String defaultElemName = null;
@@ -583,6 +591,7 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
         //section.getModule().
 		
 		startClassBody();
+		appendGenerationPoint("generateListItemBean");
 		
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);

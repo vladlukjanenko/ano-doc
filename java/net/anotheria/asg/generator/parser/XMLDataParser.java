@@ -1,17 +1,28 @@
 package net.anotheria.asg.generator.parser;
 
 
-import net.anotheria.asg.generator.meta.*;
-import net.anotheria.util.StringUtils;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.anotheria.asg.generator.meta.FederatedDocumentMapping;
+import net.anotheria.asg.generator.meta.MetaDocument;
+import net.anotheria.asg.generator.meta.MetaEnumerationProperty;
+import net.anotheria.asg.generator.meta.MetaFederationModule;
+import net.anotheria.asg.generator.meta.MetaLink;
+import net.anotheria.asg.generator.meta.MetaListProperty;
+import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.asg.generator.meta.MetaProperty;
+import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.meta.ModuleParameter;
+import net.anotheria.asg.generator.meta.StorageType;
+import net.anotheria.util.StringUtils;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 /**
  * XMLParser for the data definition files.
@@ -244,9 +255,19 @@ public final class XMLDataParser {
 		String name = p.getAttributeValue("name");
 		String linkType = p.getAttributeValue("type");
 		String target = p.getAttributeValue("target");
+		String decorationStr = p.getAttributeValue("decoration");
+		List<String> decoration;
+		if(StringUtils.isEmpty(decorationStr)){
+			decoration = new ArrayList<String>();
+			decoration.add("name");
+		}else{
+			decoration = StringUtils.tokenize2list(decorationStr, ',');
+		}
+		
 		MetaLink l = new MetaLink(name);
 		l.setLinkTarget(target);
 		l.setLinkType(linkType);
+		l.setLinkDecoration(decoration);
 		String multilingual = p.getAttributeValue("multilingual");
 		if (multilingual!=null && multilingual.length()>0 && multilingual.equalsIgnoreCase("true"))
 			l.setMultilingual(true);

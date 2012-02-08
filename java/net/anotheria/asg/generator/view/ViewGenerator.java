@@ -37,32 +37,46 @@ public class ViewGenerator extends AbstractAnoDocGenerator {
 		Context context = GeneratorDataRegistry.getInstance().getContext();
 
 		// MAF Filter and Mapping generation
+		System.out.println("ViewGenerator: CMSFilterGenerator");
 		files.addAll(new CMSFilterGenerator().generate());
+		
+		System.out.println("ViewGenerator: CMSMappingsConfiguratorGenerator");
 		files.addAll(new CMSMappingsConfiguratorGenerator().generate(views));
 
 		// hack, works only with one view.
+		System.out.println("ViewGenerator: BaseActionGenerator");
 		files.add(new BaseActionGenerator().generate(views));
+		
+		System.out.println("ViewGenerator: CMSSearchActionsGenerator");
 		files.addAll(new CMSSearchActionsGenerator().generate(views));
+		
+		System.out.println("ViewGenerator: IndexPageActionGenerator");
 		files.addAll(new IndexPageActionGenerator().generate(views));
+		
+		System.out.println("ViewGenerator: IndexPageActionGenerator");
 		files.add(new IndexPageJspGenerator().generate(context));
+		
+		System.out.println("ViewGenerator: MenuJspGenerator");
 		files.add(new MenuJspGenerator().generate(views, context));
 
 		timer.stopExecution("common");
 
 		timer.startExecution("views");
 		for (MetaView view : views) {
-
 			timer.startExecution("view-" + view.getName());
 
 			timer.startExecution("v-" + view.getName() + "-View");
+			System.out.println("ViewGenerator: ViewGenerator -> " + view.getName());
 			files.addAll(generateView(path, view));
 			timer.stopExecution("v-" + view.getName() + "-View");
 
 			timer.startExecution("v-" + view.getName() + "-BaseViewMafAction");
+			System.out.println("ViewGenerator: BaseViewActionGenerator -> " + view.getName());
 			files.add(new BaseViewActionGenerator().generate(view));
 			timer.stopExecution("v-" + view.getName() + "-BaseViewMafAction");
 
 			timer.startExecution("v-" + view.getName() + "-Jsp");
+			System.out.println("ViewGenerator: JspGenerator -> " + view.getName());
 			files.addAll(new JspGenerator().generate(view));
 			timer.stopExecution("v-" + view.getName() + "-Jsp");
 

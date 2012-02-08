@@ -1844,7 +1844,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.setParent(getShowActionName(section));
 
 		startClassBody();
-		generateEditActionMethod(section, "anoDocExecute");
+		generateEditActionMethod(clazz, section, "anoDocExecute");
 
 		return clazz;
 
@@ -1855,7 +1855,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	 * @param section
 	 * @return
 	 */
-	private void generateEditActionMethod(MetaModuleSection section, String methodname){
+	private void generateEditActionMethod(GeneratedClass clazz, MetaModuleSection section, String methodname){
+		appendGenerationPoint("generateEditActionMethod");
 
 		MetaDocument doc = section.getDocument();
 		MetaDialog dialog = section.getDialogs().get(0);
@@ -1925,7 +1926,6 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		emptyline();
 		
 		Set<String> linkTargets = new HashSet<String>();
-		
 		for (int i=0; i<elements.size(); i++){
 			MetaViewElement element = elements.get(i);
 			if (element instanceof MetaFieldElement){
@@ -1949,13 +1949,15 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 					}else{
 					
 						appendString( "//link "+link.getName()+" to "+link.getLinkTarget());
-						appendString( "//to lazy to include List in the imports.");
-						appendStatement("List<"+DataFacadeGenerator.getDocumentImport(targetDocument)+"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");
+						clazz.addImport(DataFacadeGenerator.getDocumentImport(targetDocument));
+						appendStatement("List<"+ targetDocument.getName() +"> "+listName+" = "+getServiceGetterCall(targetModule)+".get"+targetDocument.getMultiple()+"()");						
 						appendStatement("List<LabelValueBean> "+listName+"Values = new ArrayList<LabelValueBean>("+listName+".size()+1)");
 						appendStatement(listName+"Values.add(new LabelValueBean("+quote("")+", \"-----\"))");
 						appendString( "for ("+(DataFacadeGenerator.getDocumentImport(targetDocument))+" "+targetDocument.getVariableName()+"Temp : "+listName+"){");
 						increaseIdent();
-						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+"Temp.getId(), "+targetDocument.getVariableName()+"Temp.getName() )");
+						
+						String linkDecorationStr = generateLinkDecoration(targetDocument, link);
+						appendStatement("LabelValueBean bean = new LabelValueBean("+targetDocument.getVariableName()+"Temp.getId(), " + linkDecorationStr + " )");
 						appendStatement(listName,"Values.add(bean)");
 						closeBlockNEW();
 
@@ -2071,6 +2073,26 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				}
 			}
 		}
+	}
+	
+	private String generateLinkDecoration(MetaDocument doc, MetaLink link){
+		String tDocName = link.getTargetDocumentName();
+		
+		MetaModule targetModule = link.getLinkTarget().indexOf('.')== -1 ? doc.getParentModule(): GeneratorDataRegistry.getInstance().getModule(link.getTargetModuleName());
+		MetaDocument targetDocument = targetModule.getDocumentByName(tDocName);
+		
+		String linkDecorationStr = "";
+		boolean first = true;
+		for(String decoration: link.getLinkDecoration()){
+			if(!first)
+				linkDecorationStr += " + \" - \" + ";
+			first = false;
+			linkDecorationStr += targetDocument.getVariableName()+ "Temp.get"+StringUtils.capitalize(decoration)+"()";
+		}
+		
+		linkDecorationStr += " + \" [\" + " + targetDocument.getVariableName()+ "Temp.getId() + \"]\"";
+		
+		return linkDecorationStr;
 	}
 
 	private GeneratedClass generateDeleteAction(MetaModuleSection section){
