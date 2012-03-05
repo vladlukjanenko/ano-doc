@@ -10,7 +10,9 @@ import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Generates the jsps for the edit view.
@@ -805,10 +807,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		
 		appendString("<!-- JQuery DateTime Widget: START -->");
 		appendString("<script type=\"text/javascript\">");
-		appendString("$(document).ready(function() {");
-		appendString("$('form').DateTimeStamp();");
-		appendString("});");
-		
+		appendString(" $(document).ready(function() {");
+		// HACK for fast solution
+		appendString("  serverTimezoneOffset = <%=java.util.TimeZone.getDefault().getOffset(new java.util.Date().getTime())%>;");
+		appendString("  $('form').DateTimeStamp();");
+		appendString(" });");
 		appendString("</script>");
 		appendString("<!-- JQuery DateTime Widget: END -->");
 	}
