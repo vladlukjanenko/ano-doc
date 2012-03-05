@@ -34,8 +34,11 @@ public class MetaViewElement {
 	/**
 	 * If true the element is rich element.
 	 */
-	private boolean rich;
-	
+	private boolean rich;	
+	/**
+	 * If true the element is datetime in long.
+	 */
+	private boolean datetime;	
 	/**
 	 * The decorator for the element.
 	 */
@@ -140,6 +143,14 @@ public class MetaViewElement {
 	public void setRich(boolean rich) {
 		this.rich = rich;
 	}
+	
+	public boolean isDatetime() {
+		return datetime;
+	}
+
+	public void setDatetime(boolean datetime) {
+		this.datetime = datetime;
+	}
 
 	public void setCaption(String caption) {
 		this.caption = caption;
@@ -189,6 +200,7 @@ public class MetaViewElement {
 				", description='" + description + '\'' +
 				", comparable=" + comparable +
 				", rich=" + rich +
+				", datetime=" + datetime +
 				", decorator=" + decorator +
 				", validators=" + validators +
 				'}';
@@ -201,4 +213,6 @@ public class MetaViewElement {
 	public void setSortingType(SortingType sortingType) {
 		this.sortingType = sortingType;
 	}
+
+	
 }

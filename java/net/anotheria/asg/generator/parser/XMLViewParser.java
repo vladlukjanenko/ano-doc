@@ -225,11 +225,15 @@ public final class XMLViewParser {
 		String name = elem.getAttributeValue("name");
 		String readonly = elem.getAttributeValue("readonly");
 		String rich = elem.getAttributeValue("rich");
+		String datetime = elem.getAttributeValue("datetime");
 		MetaFieldElement field = new MetaFieldElement(name); 
 		if (readonly!=null && readonly.equals("true"))
 			field.setReadonly(true);
 		if (rich!=null && rich.equals("true"))
 			field.setRich(true);
+		if (datetime != null && datetime.equals("true"))
+			field.setDatetime(true);
+		
 		return field;
 	}
 	

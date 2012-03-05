@@ -26,7 +26,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	/**
 	 * Currently generated dialog.
 	 */
-	private MetaDialog currentDialog;
+	private MetaDialog currentDialog;	
+	/**
+	 * Is need render JS for enabling DateTime widgets.
+	 */
+	private boolean isNeedEnableDateTimeWidgets = false;
 	
 	public GeneratedJSPFile generate(MetaSection metaSection, MetaDialog dialog, MetaModuleSection section, MetaView view) {
 		this.currentSection = metaSection;
@@ -59,7 +63,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/container/assets/skins/sam/container.css")) + " />");
 		appendString("<link href=\"" + getCurrentCSSPath("newadmin.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>");
 		appendString("<link href=\"" + getCurrentCSSPath("fileuploader.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>");
-
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentCSSPath("jquery-ui-1.8.18.custom.css")) + " />");
+		
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
@@ -77,12 +82,16 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 		// *** CMS3.0 START ***
 //		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.4.min.js") + "\"></script>");
-		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.5.1.min.js") + "\"></script>");
+//		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.5.1.min.js") + "\"></script>");		
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.6.2.min.js") + "\"></script>");
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-ui-1.8.18.custom.min.js") + "\"></script>");
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("datetimpicker.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("anofunctions.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("fileuploader.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("cms-tooltip.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("tiny_mce/tiny_mce.js") + "\"></script>");
-		// *** CMS3.0 FINISH ***
+		// *** CMS3.0 FINISH ***		
+		
 
 		if(dialog.getJavascript() != null) {
 			appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath(dialog.getJavascript()) + "\"></script>");
@@ -457,6 +466,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 		generateRichTextEditorJS(section.getDocument(), richTextElementsRegistry);
 		generateLinkElementEditorJS(section.getDocument(), linkElementsRegistry);
+		generateDateTimeWidgetJS();
 
 		decreaseIdent();
 		appendString("</html>");
@@ -700,6 +710,12 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		}
 		else {
 			ret += " value=\"<ano:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang)) + "/>\"";
+			
+			// Required for DateTime widget
+			if (element.isDatetime()) {
+				ret += " class=" + quote("datetime");
+				isNeedEnableDateTimeWidgets = true;
+			}
 		}
 		if (element.isReadonly())
 			ret += " readonly="+quote("readonly");
@@ -783,6 +799,20 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		
 	}
 	
+	private void generateDateTimeWidgetJS() {
+		if (!isNeedEnableDateTimeWidgets)
+			return;
+		
+		appendString("<!-- JQuery DateTime Widget: START -->");
+		appendString("<script type=\"text/javascript\">");
+		appendString("$(document).ready(function() {");
+		appendString("$('form').DateTimeStamp();");
+		appendString("});");
+		
+		appendString("</script>");
+		appendString("<!-- JQuery DateTime Widget: END -->");
+	}
+	
 	private String getFunctionEditor(MetaDocument doc, MetaFunctionElement element){
 		if (element.getName().equals("cancel")) {
 			String onClick = "return confirm('All unsaved data will be lost!!!. Document will be unlocked"; 
@@ -823,17 +853,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result+="  <ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
 			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-					".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a> \n";
+					".nextAction.value='stay'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a> \n";
 			result+="  </ano:equal> \n";
 			result+="</ano:equal> \n";
 			result+="<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
 			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-					".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>\n";
+					".nextAction.value='stay'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>\n";
 			result+="</ano:equal> \n";
 			return result;
 		}
 		return "<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-				".nextAction.value='stay'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>";
+				".nextAction.value='stay'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>";
 	}
 	private String getUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
 		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
@@ -843,17 +873,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result+="  <ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) +
 					" property=" + quote(LockableObject.INT_LOCKER_ID_PROPERTY_NAME) + " value=" + quote("<%=(java.lang.String)session.getAttribute(\\"+quote("currentUserId\\")+")%>") + "> \n";
 			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-					".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
+					".nextAction.value='close'; if (validateForm()) { FormatTime('datetime'); document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
 			result+="  </ano:equal> \n";
 			result+="</ano:equal> \n";
 			result+="<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
 			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-					".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
+					".nextAction.value='close'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
 			result+="</ano:equal> \n";
 			return result;
 		}
 		return "<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
-				".nextAction.value='close'; if (validateForm()) document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); return false\"><span><ano:write name=\"save.label.prefix\"/></span></a>";
+				".nextAction.value='close'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a>";
 	}	
 
 	/**
