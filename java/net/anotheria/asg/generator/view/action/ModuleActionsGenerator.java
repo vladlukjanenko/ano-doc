@@ -1095,7 +1095,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    
 	    //add filters
 	    for (MetaFilter f : section.getFilters()){
-	    	appendStatement("addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\"\"))");
+	    	appendStatement("addBeanToRequest(req, ", quote(getFilterVariableName(f)), ", ", getFilterVariableName(f), ".getTriggerer(\""+f.getFieldName()+"\"))");
 	    }
 	    
 	    appendStatement("return mapping.findForward(\"success\")");
