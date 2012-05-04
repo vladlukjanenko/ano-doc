@@ -15,6 +15,7 @@ import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.maf.action.ActionMappings;
 import net.anotheria.util.StringUtils;
 import net.anotheria.webutils.actions.LoginAction;
 import net.anotheria.webutils.actions.LogoutAction;
@@ -294,16 +295,16 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		closeBlock("getActionPath");
 		
 		appendString("@Override");
-		openFun("public void configureActionMappings()");
-		appendStatement("ActionMappings.addMapping(\"index\", " + IndexPageActionGenerator.getIndexPageActionName() + ".class, new ActionForward(\"success\", "+quote(IndexPageJspGenerator.getIndexJspFullName())+"))");
-		appendStatement("ActionMappings.addMapping(\"fileShow\", "+quote(ShowFile.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
-		appendStatement("ActionMappings.addMapping(\"fileUpload\", "+quote(FileAjaxUpload.class.getName())+")");
+		openFun("public void configureActionMappings(ActionMappings mappings)");
+		appendStatement("mappings.addMapping(\"index\", " + IndexPageActionGenerator.getIndexPageActionName() + ".class, new ActionForward(\"success\", "+quote(IndexPageJspGenerator.getIndexJspFullName())+"))");
+		appendStatement("mappings.addMapping(\"fileShow\", "+quote(ShowFile.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/UploadFile.jsp\"))");
+		appendStatement("mappings.addMapping(\"fileUpload\", "+quote(FileAjaxUpload.class.getName())+")");
 		
-		appendStatement("ActionMappings.addMapping(\"showTmpFile\", "+quote(ShowTmpFile.class.getName())+")");
-		appendStatement("ActionMappings.addMapping(\"getFile\", "+quote(GetFile.class.getName())+")");
+		appendStatement("mappings.addMapping(\"showTmpFile\", "+quote(ShowTmpFile.class.getName())+")");
+		appendStatement("mappings.addMapping(\"getFile\", "+quote(GetFile.class.getName())+")");
 		
-		appendStatement("ActionMappings.addMapping(\"login\", "+quote(LoginAction.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
-		appendStatement("ActionMappings.addMapping(\"logout\", "+quote(LogoutAction.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
+		appendStatement("mappings.addMapping(\"login\", "+quote(LoginAction.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
+		appendStatement("mappings.addMapping(\"logout\", "+quote(LogoutAction.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
 		
 		
 		generateSharedMappings(clazz);
@@ -350,9 +351,9 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 //			String actionName = action.getClassName(section);
 //			clazz.addImport(actionsPackage + "." + actionName);
 			String actionName = actionsPackage + "." + action.getClassName(section);
-			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName(section)+".jsp") + "))");
+			appendStatement("mappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName(section)+".jsp") + "))");
 			if (validatedUpdateAction && action.equals(SectionAction.UPDATE)) {
-				appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"validationError\"," + quote(SectionAction.NEW.getViewFullName(section)+".jsp") + "))");
+				appendStatement("mappings.addMapping("+ quote(action.getMappingName(section)) +", "+  actionName +".class, new ActionForward(\"validationError\"," + quote(SectionAction.NEW.getViewFullName(section)+".jsp") + "))");
 			}
 		}
 
@@ -371,7 +372,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 //			String actionName = action.getClassName();
 //			clazz.addImport(actionsPackage + "." + actionName);
 			String actionName = actionsPackage + "." + action.getClassName();
-			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName()) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName()+".jsp") + "))");
+			appendStatement("mappings.addMapping("+ quote(action.getMappingName()) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(action.getViewFullName()+".jsp") + "))");
 		}
 
 	}
@@ -388,7 +389,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 //			String actionName = action.getClassName(doc, container);
 //			clazz.addImport(actionsPackage + "." + actionName);
 			String actionName = actionsPackage + "." + action.getClassName(doc, container);
-			appendStatement("ActionMappings.addMapping("+ quote(action.getMappingName(doc, container)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(jspPath + action.getViewName(doc, container)+".jsp") + "))");
+			appendStatement("mappings.addMapping("+ quote(action.getMappingName(doc, container)) +", "+  actionName +".class, new ActionForward(\"success\"," + quote(jspPath + action.getViewName(doc, container)+".jsp") + "))");
 		}
 
 	}
