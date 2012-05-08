@@ -327,6 +327,14 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	protected String getDeleteImage(){
 		return getDeleteImage("delete");
 	}
+	
+	/**
+	 * Returns the tag for the preview image in the overview. 
+	 * @return
+	 */
+	protected String getPreviewImage(){
+		return getPreviewImage("preview");
+	}
 
 	/**
 	 * Returns the tag for the version info image in the overview. Note: for now it returns a 'V' text.
@@ -358,6 +366,14 @@ public abstract class AbstractJSPGenerator extends AbstractGenerator{
 	 */
 	protected String getDeleteImage(String alt){
 		return getImage("delete",alt);
+	}
+	
+	/**
+	 * Returns the tag for the preview image in the overview with the given alt tag. 
+	 * @return
+	 */
+	protected String getPreviewImage(String alt){
+		return getImage("preview",alt);
 	}
 
     /**

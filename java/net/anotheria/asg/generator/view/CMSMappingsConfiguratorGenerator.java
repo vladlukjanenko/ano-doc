@@ -64,6 +64,7 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		UPDATE("Update", "Show", OperationType.MULTIPLE_DIALOG),
 		DELETE("Delete", "Show", OperationType.MULTIPLE_DIALOG),
 		DUPLICATE("Duplicate", "Show", OperationType.MULTIPLE_DIALOG),
+		PREVIEW("Preview", "Show", OperationType.MULTIPLE_DIALOG),
 		LOCK("Lock", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		UNLOCK("UnLock", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),
 		COPYLANG("CopyLang", "EditBoxDialog", OperationType.MULTIPLE_DIALOG),

@@ -44,7 +44,6 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		append(getBaseJSPHeader());		
 		
 		MetaDocument doc = section.getDocument();
-		
 		appendString("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"");
 		appendString("\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">");
 		appendString("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
@@ -226,6 +225,12 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 			appendString("<tbody>");
 			increaseIdent();
 				String entryName = doc.getName().toLowerCase();
+				appendString("<!--TEST-->");
+				appendString("<!--"+doc.getFullName()+"-->");
+				appendString("<!--"+doc.getListName()+"-->");
+				appendString("<!--"+doc.getName()+"-->");
+				appendString("<!--"+doc.getTemporaryVariableName()+"-->");
+				appendString("<!--"+doc.getVariableName()+"-->");
 				appendString("<ano:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+" indexId=\"ind\">");
 				increaseIdent();
 					appendString("<tr class=\"cmsDocument <%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
@@ -417,7 +422,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <ano:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</ano:equal>";
 		}
 		
-		return "<td " + displayLanguageCheck + "><ano:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
+		return "<!--"+quote(entryName)+"_____"+elementName+"--><td " + displayLanguageCheck + "><ano:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
 		//return "<td><ano:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}
 	
@@ -450,6 +455,9 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		if (element.getName().equals("deleteWithConfirmation")){
 			return getDeleteWithConfirmationFunction(entryName, element);
 		}
+		
+		if (element.getName().equals("preview"))
+			return "<a target=\"_blank\" href=../<ano:write filter=\"false\" name=\"pagex\" property=\"nameForSorting\"/>.html>"+getPreviewImage()+"</a>";
 
 		if (element.getName().equals("edit"))
 			return getEditFunction(entryName, element);
@@ -539,4 +547,5 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		
 		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getEditImage()+"</a>" ;
 	}
+	
 }
