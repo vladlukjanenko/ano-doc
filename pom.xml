@@ -13,7 +13,7 @@
 	<name>anotheria.net document generation framework</name>
 
     <properties>
-    	<moskito.version>1.3.0</moskito.version>
+    	<moskito.version>1.4.0</moskito.version>
     </properties>
 
 	<dependencies>
