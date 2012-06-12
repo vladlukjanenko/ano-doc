@@ -208,7 +208,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 			increaseIdent();
 			boolean opened = false;
 
-			appendString("<td><input type=\"checkbox\" onclick=\"javascript:alert('Fix Me Andrey!')\"></td>");
+			appendString("<td><input type=\"checkbox\" id=\"checkAllCmsDocsCheckbox\"></td>");
 				for (int i=0; i<elements.size(); i++){
 					MetaViewElement element = elements.get(i);
 					
