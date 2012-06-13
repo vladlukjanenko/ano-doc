@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="datadefinitions" type="datadefinitionsType"/>
+  <xs:complexType name="listenerType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="class" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="documentType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element type="propertyType" name="property">
+        <xs:annotation>
+          <xs:documentation>&lt;link name="region" type="single" target="ASGeographicData.Region"/> Used for linking  obsolete will be removed</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element type="linkType" name="link"/>
+    </xs:choice>
+    <xs:attribute type="xs:string" name="name" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="propertyType" mixed="true">
+    <xs:sequence>
+      <xs:element type="contentType" name="content" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="required"/>
+    <xs:attribute type="xs:string" name="type" use="required"/>
+    <xs:attribute type="xs:string" name="multilingual" use="optional"/>
+    <xs:attribute type="xs:string" name="enumeration" use="optional"/>
+    <xs:attribute type="xs:string" name="target" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="optionsType">
+    <xs:sequence>
+      <xs:element type="optionType" name="option"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="moduleType">
+    <xs:choice maxOccurs="unbounded" minOccurs="0">
+      <xs:element type="optionsType" name="options"/>
+      <xs:element type="listenerType" name="listener"/>
+      <xs:element type="federatedmoduleType" name="federatedmodule"/>
+      <xs:element type="mappingType" name="mapping"/>
+      <xs:element type="documentType" name="document">
+        <xs:annotation>
+          <xs:documentation><![CDATA[<document name="Region">
+            <property name="priority" type="enumeration" enumeration="Priority"/>
+            <property name="byDefault" type="boolean" />
+            <property name="name" type="string"/>
+            <property name="value" type="enumeration" enumeration="Region"/>
+            <property name="description" type="string" multilingual="true"/>
+            <link name="country" type="single" target="ASGeographicData.Country"/>
+        </document>
+              Wizard document! - "MultiPageDialog"  Wizard Handler]]></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute type="xs:string" name="name" use="required"/>
+    <xs:attribute type="xs:string" name="storageType" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="federatedmoduleType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:string" name="key" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="linkType" mixed="true">
+    <xs:sequence>
+      <xs:element type="contentType" name="content" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="required"/>
+    <xs:attribute type="xs:string" name="type" use="required"/>
+    <xs:attribute type="xs:string" name="target" use="required"/>
+    <xs:attribute type="xs:string" name="multilingual" use="optional"/>
+    <xs:attribute type="xs:string" name="enumeration" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="contentType">
+    <xs:sequence>
+      <xs:element type="linkType" name="link" minOccurs="0"/>
+      <xs:element type="propertyType" name="property" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="mappingType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="sourceDocument" use="required"/>
+        <xs:attribute type="xs:string" name="targetDocument" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="datadefinitionsType">
+    <xs:sequence>
+      <xs:element type="moduleType" name="module" maxOccurs="unbounded" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation><![CDATA[<document name="ReservedBonusesDef">
+                <property name="name" type="string"/>
+                <link name="bonusId" type="single" target="Users.BonusesDef"/>
+                <property name="transactionId" type="string"/>
+                <property name="userId" type="string"/>
+                <property name="createdDate" type="string"/>
+                <property name="bonusBalance" type="int"/>
+            </document>]]></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="optionType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

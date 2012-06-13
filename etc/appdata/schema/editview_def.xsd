@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="views" type="viewsType"/>
+    <xs:complexType name="dialogType">
+        <xs:sequence>
+            <xs:element type="elementsType" name="elements"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+        <xs:attribute type="xs:string" name="title" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="decoratorType" mixed="true">
+        <xs:sequence>
+            <xs:element type="xs:string" name="rule" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="viewsType">
+        <xs:sequence>
+            <xs:element type="viewType" name="view" maxOccurs="unbounded" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Layout view, here everything is defined  Layout view, here everything is defined  Wizard expert mode view :)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="sectionsType">
+        <xs:sequence>
+            <xs:element type="sectionType" name="section" maxOccurs="unbounded" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation><![CDATA[Section Page  Section Box  Section Attribute  Site  NaviItems  Section PageTemplate  MediaLink  Script  EntryPoint  PageAlias  RedirectUrl  Section PageStyle  Section PageLayout  Section BoxHandler  Section Guard  custom  Section BoxHandler  Section Guard  combined  Section BoxHandler  Section BoxHandler
+               <section title="Region" type="module">
+                   <module>ASGeographicData</module>
+                   <document>Region</document>
+                   <filter name="AZ" field="email"/>
+                   <elements>
+                       <element type="field" name="id" comparable="true">
+                              <decorator name="idToA">
+                                <rule>3</rule>
+                              </decorator>
+                       </element>
+                         <element type="field" name="name" comparable="true">
+                           <decorator name="editLink"/>
+                       </element>
+                       <element type="field" name="country" comparable="default">
+                           <decorator name="countryDecorator"/>
+                       </element>
+                         <element type="field" name="value" comparable="true"/>
+                         <element type="field" name="description" comparable="true"/>
+                       <element type="field" name="priority" comparable="true"/>
+                       <element type="field" name="byDefault" comparable="true"/>
+
+                       <element type="function" name="edit"/>
+                       <element type="function" name="duplicate"/>
+                       <element type="function" name="deleteWithConfirmation"/>
+                     </elements>
+                     <dialog name="Edit" title="Edit Account">
+                       <elements>
+                              <element type="empty"/>
+                              <element type="field" name="id" readonly="true"/>
+                             <element type="field" name="name" />
+                             <element type="field" name="country" />
+                           <element type="field" name="value" />
+                             <element type="field" name="description"/>
+                             <element type="empty"/>
+                             <element type="field" name="priority" />
+                             <element type="field" name="byDefault"/>
+                           <element type="empty"/>
+                           <element type="list">
+                               <element type="function" name="updateAndClose"/>
+                               <element type="function" name="updateAndStay"/>
+                               <element type="function" name="cancel"/>
+                           </element>
+                       </elements>
+                     </dialog>
+               </section>
+                 Wizard Document section   &lt;!&ndash; WizardHandler section&ndash;]]></xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="sectionType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="module"/>
+            <xs:element type="xs:string" name="document"/>
+            <xs:element type="filterType" name="filter" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="elementsType" name="elements"/>
+            <xs:element type="dialogType" name="dialog" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="title" use="required"/>
+        <xs:attribute type="xs:string" name="type" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="viewType">
+        <xs:sequence>
+            <xs:element type="sectionsType" name="sections"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+        <xs:attribute type="xs:string" name="title" use="optional"/>
+        <xs:attribute type="xs:string" name="requiredroles" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="elementsType">
+        <xs:sequence>
+            <xs:element type="elementType" name="element" maxOccurs="unbounded" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>&lt;element type="field" name="region" comparable="true"/> &lt;element type="field" name="region" /></xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="filterType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="name" use="required"/>
+                <xs:attribute type="xs:string" name="field" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="elementType" mixed="true">
+        <xs:sequence>
+            <xs:element type="decoratorType" name="decorator" minOccurs="0"/>
+            <xs:element type="elementType" name="element" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="type" use="required"/>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+        <xs:attribute type="xs:string" name="comparable" use="optional"/>
+        <xs:attribute type="xs:string" name="readonly" use="optional"/>
+        <xs:attribute type="xs:string" name="comarable" use="optional"/>
+        <xs:attribute type="xs:string" name="title" use="optional"/>
+        <xs:attribute type="xs:string" name="validator" use="optional"/>
+        <xs:attribute type="xs:string" name="caption" use="optional"/>
+        <xs:attribute type="xs:string" name="rich" use="optional"/>
+        <xs:attribute type="xs:string" name="datetime" use="optional"/>
+    </xs:complexType>
+</xs:schema>

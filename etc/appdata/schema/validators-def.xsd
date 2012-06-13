@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="validators" type="validatorsType"/>
+  <xs:complexType name="validatorType" mixed="true">
+    <xs:sequence>
+      <xs:element type="xs:string" name="jsValidation" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>jsValidation block should contain validation logic (value should be referenced as 'value'). 
+			 Value is concerned valid if expression returns TRUE</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="required"/>
+    <xs:attribute type="xs:string" name="class" use="required"/>
+    <xs:attribute type="xs:string" name="defaultError" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="validatorsType">
+    <xs:sequence>
+      <xs:element type="validatorType" name="validator" maxOccurs="unbounded" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>intValidator allows empty values, use in combination with 'notEmpty' if neededfloatValidator allows empty values, use in combination with 'notEmpty' if neededemailValidator allows empty values, use in combination with 'notEmpty' if neededdateValidator not allows empty valuesdateValidator allows empty valuesdateValidator not allows empty valuesintegerValidator not allows empty values</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

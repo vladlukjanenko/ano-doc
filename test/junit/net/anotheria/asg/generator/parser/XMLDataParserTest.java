@@ -1,27 +1,22 @@
 package net.anotheria.asg.generator.parser;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaLink;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.util.StringUtils;
-
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import static junit.framework.Assert.*;
 
 public class XMLDataParserTest {
 	@Test public void testDataParser() throws Exception{
 		File f = new File("test/xmldataset/datadef.xml");
-		String content = XMLPreprocessor.loadFile(f);
+		String content = XMLPreprocessor.loadFile(f,null);
 		
 		assertNotNull(content);
 		assertFalse(content.length()==0);
@@ -109,7 +104,7 @@ public class XMLDataParserTest {
 	}
 	
 	private List<MetaModule> loadFile(String name) throws IOException{
-		String content = XMLPreprocessor.loadFile(new File("test/xmldataset/"+name));
+		String content = XMLPreprocessor.loadFile(new File("test/xmldataset/"+name),null);
 		assertNotNull(content);
 		assertFalse(content.length()==0);
 		

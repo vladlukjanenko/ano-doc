@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="datatypes" type="datatypesType"/>
+    <xs:complexType name="enumerationType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="element" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="datatypesType">
+        <xs:sequence>
+            <xs:element type="enumerationType" name="enumeration" maxOccurs="unbounded" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>HTTP DTD types</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
