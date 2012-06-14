@@ -1,6 +1,7 @@
 package net.anotheria.asg.generator.validation;
 
 import net.anotheria.asg.generator.util.IncludedDocuments;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -15,13 +16,14 @@ public final class XMLAgainstXSDValidation {
     private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
     private static final String SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
 
-    public static void validateAgainstXSDSchema(String nameOfFile,String fileNameToValidate,InputStream inputStream,IncludedDocuments includedDocuments){
+    public static void validateAgainstXSDSchema(String nameOfFile,String content,InputStream inputStream,IncludedDocuments includedDocuments){
         File tempXSDFile = null;
+
         try {
             System.out.println("----------VALIDATING "+nameOfFile+" STARTED");
 
             // create file xsd from input stream to validate xml against it
-            tempXSDFile = createTempXSDFile(inputStream);
+            tempXSDFile = createTempFile(inputStream);
 
             DocumentBuilderFactory factory =  DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -34,10 +36,10 @@ public final class XMLAgainstXSDValidation {
             XMLAgainstXSDErrorHandler XMLAgainstXSDErrorHandler = new XMLAgainstXSDErrorHandler(includedDocuments);
             builder.setErrorHandler(XMLAgainstXSDErrorHandler);
 
-            File fileToValidate = new File(fileNameToValidate);
+            final InputStream contentOfFileAsInputStream = new ByteArrayInputStream(content.getBytes());
 
-            if (fileToValidate.exists()) {
-                builder.parse(new FileInputStream(fileToValidate));
+            if (contentOfFileAsInputStream != null) {
+                builder.parse(new InputSource(contentOfFileAsInputStream));
             } else {
                 System.out.println("----------File "+nameOfFile+" doesn't exist");
             }
@@ -49,6 +51,7 @@ public final class XMLAgainstXSDValidation {
             // the program will terminate if xml file has errors
             if (XMLAgainstXSDErrorHandler.isHasErrors()){
                 tempXSDFile.delete();
+//                tempFileToValidate.delete();
                 System.exit(-1);
             }
 
@@ -66,11 +69,10 @@ public final class XMLAgainstXSDValidation {
             if (tempXSDFile != null) {
                 tempXSDFile.delete();
             }
-
         }
     }
 
-    private static File createTempXSDFile(InputStream inputStream){
+    private static File createTempFile(InputStream inputStream){
         try {
             File tempFile = File.createTempFile("temp-valid",".xsd");
             FileOutputStream fileOutputStream = new FileOutputStream(tempFile,true);
