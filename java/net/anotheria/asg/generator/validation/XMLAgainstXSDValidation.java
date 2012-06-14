@@ -20,7 +20,7 @@ public final class XMLAgainstXSDValidation {
         File tempXSDFile = null;
 
         try {
-            System.out.println("----------VALIDATING "+nameOfFile+" STARTED");
+            System.out.println("----------Validating "+nameOfFile+" started.");
 
             // create file xsd from input stream to validate xml against it
             tempXSDFile = createTempFile(inputStream);
@@ -41,7 +41,7 @@ public final class XMLAgainstXSDValidation {
             if (contentOfFileAsInputStream != null) {
                 builder.parse(new InputSource(contentOfFileAsInputStream));
             } else {
-                System.out.println("----------File "+nameOfFile+" doesn't exist");
+                System.out.println("-----File "+nameOfFile+" doesn't exist.");
             }
 
 
@@ -51,19 +51,19 @@ public final class XMLAgainstXSDValidation {
             // the program will terminate if xml file has errors
             if (XMLAgainstXSDErrorHandler.isHasErrors()){
                 tempXSDFile.delete();
-//                tempFileToValidate.delete();
+                System.out.println("-----Validating "+nameOfFile+" finished with errors.");
                 System.exit(-1);
             }
 
-            System.out.println("----------VALIDATING "+nameOfFile+" FINISHED SUCCESSFULLY");
+            System.out.println("-----Validating "+nameOfFile+" finished successfully.");
         } catch (ParserConfigurationException e) {
-            System.out.println("----------Error: ParserConfigurationException "+e.getMessage());
+            System.out.println("-----Error: ParserConfigurationException "+e.getMessage());
             throw new RuntimeException("ParserConfigurationException.",e);
         } catch (SAXException e) {
-            System.out.println("----------Error: SAXException "+e.getMessage());
+            System.out.println("-----Error: SAXException "+e.getMessage());
             throw new RuntimeException("SAXException.",e);
         } catch (IOException e) {
-            System.out.println("----------Error: IOException"+e.getMessage());
+            System.out.println("-----Error: IOException"+e.getMessage());
             throw new RuntimeException("IOException.",e);
         } finally {
             if (tempXSDFile != null) {
@@ -88,7 +88,7 @@ public final class XMLAgainstXSDValidation {
 
             return tempFile;
         } catch (IOException e) {
-            System.out.println("----------Error: IOException" + e.getMessage());
+            System.out.println("-----Error: IOException" + e.getMessage());
             throw new RuntimeException("IOException.",e);
         }
     }
