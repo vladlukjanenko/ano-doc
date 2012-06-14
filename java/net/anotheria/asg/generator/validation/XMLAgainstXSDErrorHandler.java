@@ -15,9 +15,6 @@ public class XMLAgainstXSDErrorHandler extends DefaultHandler{
         this.includedDocuments = includedDocuments;
     }
 
-    public XMLAgainstXSDErrorHandler() {
-    }
-
     public void error (SAXParseException e) {
         setHasErrors(true);
         System.out.println(getErrorMessage("error",e,includedDocuments));
@@ -29,11 +26,12 @@ public class XMLAgainstXSDErrorHandler extends DefaultHandler{
 
     public void fatalError (SAXParseException e) {
         System.out.println(getErrorMessage("fatal",e,includedDocuments));
+        e.printStackTrace();
         System.exit(1);
     }
 
     public String getErrorMessage(String errorType,SAXParseException e, IncludedDocuments includedDocuments){
-        String message = "Validating "+errorType+" : "+e.getMessage() + "in line : "+e.getLineNumber();
+        String message = "Validating "+errorType+" : "+e.getMessage() + " in line : "+e.getLineNumber();
         if (includedDocuments == null){
             return message;
         }
