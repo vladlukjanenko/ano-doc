@@ -1,7 +1,6 @@
 package net.anotheria.asg.generator.validation;
 
 import net.anotheria.asg.generator.util.IncludedDocuments;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,7 +15,7 @@ public final class XMLAgainstXSDValidation {
     private static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
     private static final String SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
 
-    public static void validateAgainstXSDSchema(String nameOfFile,String content,InputStream inputStream,IncludedDocuments includedDocuments){
+    public static void validateAgainstXSDSchema(String nameOfFile,String fileNameToValidate,InputStream inputStream,IncludedDocuments includedDocuments){
         File tempXSDFile = null;
         try {
             System.out.println("----------VALIDATING "+nameOfFile+" STARTED");
@@ -35,9 +34,14 @@ public final class XMLAgainstXSDValidation {
             XMLAgainstXSDErrorHandler XMLAgainstXSDErrorHandler = new XMLAgainstXSDErrorHandler(includedDocuments);
             builder.setErrorHandler(XMLAgainstXSDErrorHandler);
 
-            final InputStream contentOfFileAsInputStream = new ByteArrayInputStream(content.getBytes());
+            File fileToValidate = new File(fileNameToValidate);
 
-            builder.parse(new InputSource(contentOfFileAsInputStream));
+            if (fileToValidate.exists()) {
+                builder.parse(new FileInputStream(fileToValidate));
+            } else {
+                System.out.println("----------File "+nameOfFile+" doesn't exist");
+            }
+
 
             if (includedDocuments != null){
                 includedDocuments.clearListOfIncludedDocuments();
@@ -70,14 +74,16 @@ public final class XMLAgainstXSDValidation {
         try {
             File tempFile = File.createTempFile("temp-valid",".xsd");
             FileOutputStream fileOutputStream = new FileOutputStream(tempFile,true);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
+
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            while ((read = inputStream.read(bytes)) != -1) {
+                fileOutputStream.write(bytes, 0, read);
             }
             inputStream.close();
             fileOutputStream.close();
+
             return tempFile;
         } catch (IOException e) {
             System.out.println("----------Error: IOException" + e.getMessage());

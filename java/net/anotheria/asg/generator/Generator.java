@@ -43,7 +43,7 @@ public class Generator {
 
         String dataContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/datadef.xml"),includedDocuments);
         // validating datadef.xml
-        validateXML("datadef",dataContent,includedDocuments);
+        validateXML("datadef",BASE_DIR+"etc/def/datadef.xml",includedDocuments);
 
 
         String viewContent = null;
@@ -58,7 +58,7 @@ public class Generator {
         }
         if (viewContent != null){
             //validating editview_def.xml
-            validateXML("editview_def",viewContent,includedDocuments);
+            validateXML("editview_def",BASE_DIR+"etc/def/editview_def.xml",includedDocuments);
         }
 
 
@@ -66,7 +66,7 @@ public class Generator {
         String contextContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/context.xml"),null);
 
         //validating context.xml
-        validateXML("context",contextContent,null);
+        validateXML("context",BASE_DIR+"etc/def/context.xml",null);
 
         Context c = XMLContextParser.parseContext(contextContent);
         GeneratorDataRegistry.getInstance().setContext(c);
@@ -76,7 +76,7 @@ public class Generator {
         try{
             String typesContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/datatypes.xml"),null);
             // validating datatypes.xml
-            validateXML("datatypes",typesContent,null);
+            validateXML("datatypes",BASE_DIR+"etc/def/datatypes.xml",null);
             List<DataType> types = XMLTypesParser.parseTypes(typesContent);
             TypesGenerator tg = new TypesGenerator();
             tg.generate("java", types);
@@ -88,7 +88,7 @@ public class Generator {
         try{
             String decoratorsContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/decorators-def.xml"),null);
             // validating decorators-def.xml
-            validateXML("decorators-def",decoratorsContent,null);
+            validateXML("decorators-def",BASE_DIR+"etc/def/decorators-def.xml",null);
             List<MetaDecorator> decorators = XMLDecoratorsParser.parseDecorators(decoratorsContent);
             GeneratorDataRegistry.getInstance().addDecorators(decorators);
             //System.out.println(decorators);
@@ -98,7 +98,7 @@ public class Generator {
         try{
             String filtersContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/filters-def.xml"),null);
             // validating filters-def.xml
-            validateXML("filters-def",filtersContent,null);
+            validateXML("filters-def",BASE_DIR+"etc/def/filters-def.xml",null);
             List<MetaFilter> filters = XMLFiltersParser.parseFilters(filtersContent);
             //System.out.println("parsed filters: "+filters);
             GeneratorDataRegistry.getInstance().addFilters(filters);
@@ -109,7 +109,7 @@ public class Generator {
         try{
             String validatorsContent = XMLPreprocessor.loadFile(new File(BASE_DIR+"etc/def/validators-def.xml"),null);
             // validating validators-def.xml
-            validateXML("validators-def",validatorsContent,null);
+            validateXML("validators-def",BASE_DIR+"etc/def/validators-def.xml",null);
             List<MetaValidator> filters = XMLValidatorsParser.parseValidators(validatorsContent);
             GeneratorDataRegistry.getInstance().addValidators(filters);
         }catch(Exception e){}
