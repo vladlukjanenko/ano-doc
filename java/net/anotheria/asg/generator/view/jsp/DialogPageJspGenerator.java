@@ -329,6 +329,14 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 //					name = "&nbsp;";
 				String caption = (element.getCaption() != null ? element.getCaption() : name) + "(<b>DEF</b>)";
 				appendString(caption);
+				if (element.isRich()) {
+					appendString("<div class=\"clear\"></div>");
+					appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
+							+ "_ID').hide();\" class=\"rich_on_off\" style=\"display:none;\">off</a>");
+					appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
+							+ "_ID').show();\" class=\"rich_on_off\">on</a>");
+					appendString("<span class=\"rich_on_off\">Rich:</span>");
+				}
 				if (element.getDescription() != null)
 					append("<a href=\"#\" class=\"showTooltip\"><img src=\"../cms_static/img/tooltip.gif\" alt=\"\"/>",element.getDescription(),"</a>");
 				decreaseIdent();
@@ -385,9 +393,9 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			if (element.isRich()) {
 				appendString("<div class=\"clear\"></div>");
 				appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
-						+ "_ID').show();\" class=\"rich_on_off\" style=\"display:none;\">on</a>");
+						+ "_ID').hide();\" class=\"rich_on_off\" style=\"display:none;\">off</a>");
 				appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
-						+ "_ID').hide();\" class=\"rich_on_off\">off</a>");
+						+ "_ID').show();\" class=\"rich_on_off\">on</a>");
 				appendString("<span class=\"rich_on_off\">Rich:</span>");
 			}
 			appendString("</td>");
@@ -794,8 +802,15 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("theme_advanced_buttons1 : \"undo, redo, separator, bold, italic, underline, separator, justifyleft, justifycenter, justifyright, justifyfull, formatselect,  fontselect, fontsizeselect, forecolor\",");
 		appendString("theme_advanced_buttons2 : \"bullist, numlist, separator, image, link, unlink, separator, table, code\",");
 		appendString("theme_advanced_buttons3 : \"\",");
-		appendString("theme_advanced_resize_horizontal : true");
+		appendString("theme_advanced_resize_horizontal : true,");
+		appendString("oninit : myCustomOnInit");
 		appendString("});");
+		appendString("function myCustomOnInit() {");
+		appendString(" var editors = tinyMCE.editors;");
+		appendString(" for(i = 0; i<editors.length; i++){");
+		appendString(" tinyMCE.get(editors[i].id).hide();");
+		appendString("}");
+		appendString("}");
 		appendString("</script>");
 		appendString("<!-- /TinyMCE -->");
 		
