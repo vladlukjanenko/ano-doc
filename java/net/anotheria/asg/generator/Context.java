@@ -177,7 +177,7 @@ public class Context {
 	public void setEncoding(String string) {
 		encoding = string;
 	}
-    //def lang
+
 	public String getDefaultLanguage() {
 		return defaultLanguage;
 	}

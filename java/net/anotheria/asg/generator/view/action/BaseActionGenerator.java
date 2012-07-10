@@ -92,8 +92,8 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		for (MetaModule m:modules)
 			appendStatement("private static volatile "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceInstanceName(m));
 
-		appendStatement("private static XMLUserManager userManager");
-		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
+		appendStatement("private static CMSUserManager userManager");
+		clazz.addImport("net.anotheria.anosite.users.CMSUserManager");
 		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
 		appendStatement("private static LockingConfig lockConfig;");
 		appendStatement("private static Logger log = Logger.getLogger("+getBaseActionName()+".class)");
@@ -115,7 +115,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		emptyline();
 		appendComment("//initializing user manager");
 		appendString("try{");
-		appendIncreasedStatement("userManager = XMLUserManager.getInstance()");
+		appendIncreasedStatement("userManager = CMSUserManager.getInstance()");
 		appendString("}catch(Exception e){");
 		appendIncreasedStatement("log.fatal("+quote("Can't init user manager")+", e)");
 		appendString("}");
