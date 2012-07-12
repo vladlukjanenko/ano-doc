@@ -1,7 +1,5 @@
 package net.anotheria.asg.generator.view.jsp;
 
-import java.util.List;
-
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedJSPFile;
@@ -9,6 +7,8 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SharedAction;
 import net.anotheria.asg.generator.view.meta.MetaView;
+
+import java.util.List;
 
 public class MenuJspGenerator extends AbstractJSPGenerator {
 
@@ -132,7 +132,8 @@ public class MenuJspGenerator extends AbstractJSPGenerator {
 								appendString("</ano:iterate>");
 							decreaseIdent();
 							appendString("</ul>");
-							
+
+                            appendString("<a href=\"<ano:tslink>changePass</ano:tslink>\" class=\"change_pass\">Change password</a>");
 							appendString("<a href=\"<ano:tslink>logout</ano:tslink>\" class=\"logout\">Logout</a>");
 							appendString("<div class=\"clear\"><!-- --></div>");
 							appendString("<a href=\"http://www.anotheria.net\" class=\"powered\"><img src=\"../cms_static/img/powered_conf.gif\" alt=\"\"/></a>");

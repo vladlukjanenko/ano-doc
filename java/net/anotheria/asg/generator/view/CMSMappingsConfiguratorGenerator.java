@@ -15,7 +15,6 @@ import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.maf.action.ActionMappings;
 import net.anotheria.util.StringUtils;
 import net.anotheria.webutils.filehandling.actions.FileAjaxUpload;
 import net.anotheria.webutils.filehandling.actions.GetFile;
@@ -304,9 +303,10 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		
 		appendStatement("mappings.addMapping(\"login\", net.anotheria.anosite.users.LoginAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
 		appendStatement("mappings.addMapping(\"logout\", net.anotheria.anosite.users.LogoutAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
-		
-		
-		generateSharedMappings(clazz);
+        appendStatement("mappings.addMapping(\"changePass\", net.anotheria.anosite.users.ChangePassAction.class, new ActionForward(\"success\", \"/cms_static/ChangePass.jsp\"))");
+
+
+        generateSharedMappings(clazz);
 		for(MetaView view: views){
 			for (MetaSection section: view.getSections()){
 				if (!(section instanceof MetaModuleSection))
