@@ -12,6 +12,7 @@ public class MetaProperty implements Cloneable{
 	
 	public static enum Type{
 		STRING("string"),
+        PASSWORD("password"),
 		TEXT("text"),
 		BOOLEAN("boolean"),
 		INT("int"),

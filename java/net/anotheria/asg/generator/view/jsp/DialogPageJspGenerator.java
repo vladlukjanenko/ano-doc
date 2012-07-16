@@ -10,9 +10,7 @@ import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 /**
  * Generates the jsps for the edit view.
@@ -620,6 +618,8 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		switch (p.getType()) {
 		case STRING:
 			return getStringEditor(element, p);
+        case PASSWORD:
+            return getPasswordEditor(element, p);
 		case TEXT:
 			return getTextEditor(element, p);
 		case LONG:
@@ -693,6 +693,10 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	private String getStringEditor(MetaFieldElement element, MetaProperty p){
 		return getInputEditor(element, p, "text");
 	}
+
+    private String getPasswordEditor(MetaFieldElement element, MetaProperty p){
+        return getInputEditor(element, p, "password");
+    }
 	
 	private String getBooleanEditor(MetaFieldElement element, MetaProperty p){
 		return getInputEditor(element, p, "checkbox");

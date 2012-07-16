@@ -1,7 +1,7 @@
 package net.anotheria.asg.generator.meta;
 
 /**
- * Representation of the string tpye.
+ * Representation of the string type.
  * @author another
  */
 public class StringType extends AbstractType{
