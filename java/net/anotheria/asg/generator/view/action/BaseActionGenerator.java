@@ -1,10 +1,6 @@
 package net.anotheria.asg.generator.view.action;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import net.anotheria.anodoc.util.context.ContextManager;
 import net.anotheria.anoprise.metafactory.Extension;
 import net.anotheria.anoprise.metafactory.MetaFactory;
@@ -21,6 +17,10 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Generator class for the base action for a generator.
@@ -93,7 +93,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 			appendStatement("private static volatile "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceInstanceName(m));
 
 		appendStatement("private static CMSUserManager userManager");
-		clazz.addImport("net.anotheria.anosite.users.CMSUserManager");
+		clazz.addImport("net.anotheria.anosite.cms.user.CMSUserManager");
 		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
 		appendStatement("private static LockingConfig lockConfig;");
 		appendStatement("private static Logger log = Logger.getLogger("+getBaseActionName()+".class)");

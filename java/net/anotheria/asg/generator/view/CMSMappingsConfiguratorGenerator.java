@@ -301,9 +301,9 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		appendStatement("mappings.addMapping(\"showTmpFile\", "+quote(ShowTmpFile.class.getName())+")");
 		appendStatement("mappings.addMapping(\"getFile\", "+quote(GetFile.class.getName())+")");
 		
-		appendStatement("mappings.addMapping(\"login\", net.anotheria.anosite.users.LoginAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
-		appendStatement("mappings.addMapping(\"logout\", net.anotheria.anosite.users.LogoutAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
-        appendStatement("mappings.addMapping(\"changePass\", net.anotheria.anosite.users.ChangePassAction.class, new ActionForward(\"success\", \"/cms_static/ChangePass.jsp\"))");
+		appendStatement("mappings.addMapping(\"login\", net.anotheria.anosite.cms.action.LoginAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
+		appendStatement("mappings.addMapping(\"logout\", net.anotheria.anosite.cms.action.LogoutAction.class, new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
+        appendStatement("mappings.addMapping(\"changePass\", net.anotheria.anosite.cms.action.ChangePassAction.class, new ActionForward(\"success\", \"/net/anotheria/anosite/cms/jsp/ChangePass.jsp\"))");
 
 
         generateSharedMappings(clazz);
