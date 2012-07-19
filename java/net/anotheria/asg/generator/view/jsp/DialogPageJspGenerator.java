@@ -804,19 +804,15 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("theme_advanced_buttons3 : \"\",");
 		appendString("theme_advanced_resize_horizontal : true,");
 		appendString("oninit : myCustomOnInit");
-		appendString("onSubmit : myCustomSubmit");
 		appendString("});");
+
 		appendString("function myCustomOnInit() {");
 		appendString(" var editors = tinyMCE.editors;");
 		appendString(" for(i = 0; i<editors.length; i++){");
 		appendString(" tinyMCE.get(editors[i].id).hide();");
 		appendString("}");
-		appendString("function myCustomSubmit() {");
-		appendString(" var editors = tinyMCE.editors;");
-		appendString(" for(i = 0; i<editors.length; i++){");
-		appendString(" tinyMCE.get(editors[i].id).load();");
 		appendString("}");
-		appendString("}");
+		
 		appendString("</script>");
 		appendString("<!-- /TinyMCE -->");
 		
@@ -881,16 +877,19 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result+="  </ano:equal> \n";
 			result+="</ano:equal> \n";
 			result+="<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" class=\"button\" onClick=";
+			//tinyMCE save hack start
+			result+="\"customSubmit(); ";
+			//tinyMCE save hack end 
+			result+="document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='stay'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>\n";
 			result+="</ano:equal> \n";
 			return result;
 		}
-		return "<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
+		//Delete customSubmit in the bottom, if not using tinyMCE
+		return "<a href=\"#\" class=\"button\" onClick=\"customSubmit(); document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='stay'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>";
 	}
-  
-    
 	private String getUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
 		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
 			//creating logic for hiding or showing current operation link in Locking CASE!!!!!
@@ -903,12 +902,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result+="  </ano:equal> \n";
 			result+="</ano:equal> \n";
 			result+="<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" class=\"button\" onClick=";
+			//tinyMCE save hack start
+			result+="\"customSubmit(); ";
+			//tinyMCE save hack end 
+			result+="document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='close'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
 			result+="</ano:equal> \n";
 			return result;
 		}
-		return "<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
+		//Delete customSubmit in the bottom, if not using tinyMCE
+		return "<a href=\"#\" class=\"button\" onClick=\"customSubmit(); document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='close'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a>";
 	}	
 
