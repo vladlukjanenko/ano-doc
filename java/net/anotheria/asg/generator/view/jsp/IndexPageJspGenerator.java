@@ -70,7 +70,7 @@ public class IndexPageJspGenerator extends AbstractJSPGenerator {
 			appendString("<div class=\"c_r\"><!-- --></div>");
 			appendString("<div class=\"c_b_l\"><!-- --></div>");
 			appendString("<div class=\"c_b_r\"><!-- --></div>");
-			appendString("<h1>Welcome, <ano:write name=\"currentUserId\"/>!</h1>");
+			appendString("<h1>Welcome, <ano:write name=\"currentUserLogin\"/>!</h1>");
 			
 			appendString("<table cellpadding=\"0\" cellspacing=\"0\" width=\"48.8%\" class=\"pages_table welcome_table\">");
 			appendString("<thead>");
