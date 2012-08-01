@@ -86,9 +86,11 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendStatement("public static final String SA_FILTER_PREFIX = SA_PREFIX+"+quote(ViewConstants.SA_FILTER_PREFIX));
 		emptyline();
 		appendStatement("public static final String BEAN_VIEW_SELECTOR = "+quote("views"));
-		emptyline();
-		
-		appendStatement("private static Object serviceInstantiationLock = new Object()");
+        emptyline();
+        appendStatement("public static final String BEAN_USER_DEF_ID = "+quote("currentUserDefId"));
+        emptyline();
+
+        appendStatement("private static Object serviceInstantiationLock = new Object()");
 		for (MetaModule m:modules)
 			appendStatement("private static volatile "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceInstanceName(m));
 
@@ -136,7 +138,15 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("public void preProcess(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
 		appendString("super.preProcess(mapping, req, res);");
-		appendString("prepareMenu(req);");
+        emptyline();
+        appendStatement("String userId = (String)getBeanFromSession(req, BEAN_USER_DEF_ID)");
+        appendString("if (userId != null) {");
+            increaseIdent();
+                appendStatement("String login = CMSUserManager.getLoginById(userId)");
+                appendStatement("addBeanToSession(req, BEAN_USER_ID, login)");
+            closeBlock("if");
+        emptyline();
+        appendString("prepareMenu(req);");
 		closeBlock("preProcess");
 		emptyline();
 		
@@ -162,7 +172,8 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 					appendStatement("return null");		
 				closeBlock("if");
 			closeBlock("if");
-			appendStatement("checkAccessPermissions(req)");
+        emptyline();
+        appendStatement("checkAccessPermissions(req)");
 		emptyline();
 		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, getCurrentDocumentDefName())");
 		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, getActiveMainNavi())");
