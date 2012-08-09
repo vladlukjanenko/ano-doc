@@ -1,18 +1,17 @@
 package net.anotheria.asg.generator.view;
 
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Generator class for the CMSFilter.
@@ -45,7 +44,7 @@ public class CMSFilterGenerator extends AbstractGenerator{
 		clazz.addImport("javax.servlet.ServletException");
 		clazz.addImport("net.anotheria.maf.MAFFilter");
 		clazz.addImport("net.anotheria.maf.action.ActionMappingsConfigurator");
-		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
+        clazz.addImport("net.anotheria.anosite.cms.user.CMSUserManager");
 
 		clazz.setParent("MAFFilter");
 		clazz.setName("CMSFilter");
@@ -62,15 +61,11 @@ public class CMSFilterGenerator extends AbstractGenerator{
 		openFun("public void init(FilterConfig config) throws ServletException");
 		appendStatement("log.info(\"----  Initing CMS...  ------\")");
 		appendStatement("super.init(config)");
-		
-		appendComment("Init CMS Users Manager");
-		appendStatement("String path = config.getServletContext().getRealPath(\"WEB-INF\")");
-		appendStatement("File f = new File(path+\"/classes/\"+\"users.xml\")");
-		appendComment("Double check for back compatibility");
-		appendString("if(!f.exists())");
-		appendIncreasedStatement("f = new File(path+\"/appdata/\"+\"users.xml\")");
-		appendStatement("XMLUserManager.init(f)");
-		
+
+        emptyline();
+
+        appendStatement("log.info(\"----  Initing CMS user manager...  ------\")");
+        appendStatement("CMSUserManager.init()");
 		
 		closeBlock("init");
 		

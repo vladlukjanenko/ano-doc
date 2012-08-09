@@ -15,10 +15,7 @@ import net.anotheria.asg.generator.view.meta.MetaDialog;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.maf.action.ActionMappings;
 import net.anotheria.util.StringUtils;
-import net.anotheria.webutils.actions.LoginAction;
-import net.anotheria.webutils.actions.LogoutAction;
 import net.anotheria.webutils.filehandling.actions.FileAjaxUpload;
 import net.anotheria.webutils.filehandling.actions.GetFile;
 import net.anotheria.webutils.filehandling.actions.ShowFile;
@@ -304,11 +301,12 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 		appendStatement("mappings.addMapping(\"showTmpFile\", "+quote(ShowTmpFile.class.getName())+")");
 		appendStatement("mappings.addMapping(\"getFile\", "+quote(GetFile.class.getName())+")");
 		
-		appendStatement("mappings.addMapping(\"login\", "+quote(LoginAction.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
-		appendStatement("mappings.addMapping(\"logout\", "+quote(LogoutAction.class.getName())+", new ActionForward(\"success\", \"/net/anotheria/webutils/jsp/Login.jsp\"))");
-		
-		
-		generateSharedMappings(clazz);
+		appendStatement("mappings.addMapping(\"login\", net.anotheria.anosite.cms.action.LoginAction.class, new ActionForward(\"success\", \"/net/anotheria/anosite/cms/jsp/Login.jsp\"))");
+		appendStatement("mappings.addMapping(\"logout\", net.anotheria.anosite.cms.action.LogoutAction.class, new ActionForward(\"success\", \"/net/anotheria/anosite/cms/jsp/Login.jsp\"))");
+        appendStatement("mappings.addMapping(\"changePass\", net.anotheria.anosite.cms.action.ChangePassAction.class, new ActionForward(\"success\", \"/net/anotheria/anosite/cms/jsp/ChangePass.jsp\"))");
+
+
+        generateSharedMappings(clazz);
 		for(MetaView view: views){
 			for (MetaSection section: view.getSections()){
 				if (!(section instanceof MetaModuleSection))

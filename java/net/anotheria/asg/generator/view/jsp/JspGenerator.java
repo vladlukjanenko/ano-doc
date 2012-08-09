@@ -1,35 +1,15 @@
 package net.anotheria.asg.generator.view.jsp;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedJSPFile;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.forms.meta.MetaForm;
-import net.anotheria.asg.generator.forms.meta.MetaFormField;
-import net.anotheria.asg.generator.forms.meta.MetaFormSingleField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableColumn;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableField;
-import net.anotheria.asg.generator.forms.meta.MetaFormTableHeader;
-import net.anotheria.asg.generator.meta.MetaContainerProperty;
-import net.anotheria.asg.generator.meta.MetaDocument;
-import net.anotheria.asg.generator.meta.MetaListProperty;
-import net.anotheria.asg.generator.meta.MetaModule;
-import net.anotheria.asg.generator.meta.MetaProperty;
-import net.anotheria.asg.generator.meta.MetaTableProperty;
+import net.anotheria.asg.generator.*;
+import net.anotheria.asg.generator.forms.meta.*;
+import net.anotheria.asg.generator.meta.*;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
 import net.anotheria.asg.generator.view.action.ModuleActionsGenerator;
-import net.anotheria.asg.generator.view.meta.MetaDialog;
-import net.anotheria.asg.generator.view.meta.MetaFieldElement;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaSection;
-import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
-import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generates the jsps for the edit view.
@@ -426,7 +406,10 @@ public class JspGenerator extends AbstractJSPGenerator implements IGenerator{
 		
 		if (field.getType().equals("string"))
 			return "<input type=\"text\" size="+quote(field.getSize())+" name="+quote(name)+" class="+quote(className)+"/>";
-			
+
+        if (field.getType().equals("password"))
+            return "<input type=\"password\" size="+quote(field.getSize())+" name="+quote(name)+" class="+quote(className)+"/>";
+
 		if (field.getType().equals("spacer"))
 			return "";
 		

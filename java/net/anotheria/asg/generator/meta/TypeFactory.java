@@ -21,6 +21,8 @@ public class TypeFactory {
 		switch (type) {
 		case STRING:
 			return new StringType();
+        case PASSWORD:
+            return new PasswordType();
 		case INT:
 			return new IntType();
 		case LONG:

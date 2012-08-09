@@ -39,6 +39,10 @@ public class XMLHelper {
 		return createXMLNodeForStringValue(name, language, value);
 	}
 
+    public static XMLNode createXMLNodeForPasswordValue(String name, String[] language, String... value){
+        return createXMLNodeForStringValue(name, language, value);
+    }
+
 	public static XMLNode createXMLNodeForStringValue(String name, String[] language, String... value){
 		return createXMLNodeWithContent(name, language, "string",(Object[])value);
 	}

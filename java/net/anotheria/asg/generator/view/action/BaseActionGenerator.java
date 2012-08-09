@@ -1,10 +1,6 @@
 package net.anotheria.asg.generator.view.action;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import net.anotheria.anodoc.util.context.ContextManager;
 import net.anotheria.anoprise.metafactory.Extension;
 import net.anotheria.anoprise.metafactory.MetaFactory;
@@ -21,6 +17,10 @@ import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Generator class for the base action for a generator.
@@ -86,14 +86,16 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendStatement("public static final String SA_FILTER_PREFIX = SA_PREFIX+"+quote(ViewConstants.SA_FILTER_PREFIX));
 		emptyline();
 		appendStatement("public static final String BEAN_VIEW_SELECTOR = "+quote("views"));
-		emptyline();
-		
-		appendStatement("private static Object serviceInstantiationLock = new Object()");
+        emptyline();
+        appendStatement("public static final String BEAN_USER_DEF_ID = "+quote("currentUserDefId"));
+        emptyline();
+
+        appendStatement("private static Object serviceInstantiationLock = new Object()");
 		for (MetaModule m:modules)
 			appendStatement("private static volatile "+ServiceGenerator.getInterfaceName(m)+" "+ModuleActionsGenerator.getServiceInstanceName(m));
 
-		appendStatement("private static XMLUserManager userManager");
-		clazz.addImport("net.anotheria.webutils.service.XMLUserManager");
+		appendStatement("private static CMSUserManager userManager");
+		clazz.addImport("net.anotheria.anosite.cms.user.CMSUserManager");
 		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
 		appendStatement("private static LockingConfig lockConfig;");
 		appendStatement("private static Logger log = Logger.getLogger("+getBaseActionName()+".class)");
@@ -115,7 +117,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		emptyline();
 		appendComment("//initializing user manager");
 		appendString("try{");
-		appendIncreasedStatement("userManager = XMLUserManager.getInstance()");
+		appendIncreasedStatement("userManager = CMSUserManager.getInstance()");
 		appendString("}catch(Exception e){");
 		appendIncreasedStatement("log.fatal("+quote("Can't init user manager")+", e)");
 		appendString("}");
@@ -136,7 +138,15 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("public void preProcess(ActionMapping mapping, HttpServletRequest req, HttpServletResponse res) throws Exception {");
 		increaseIdent();
 		appendString("super.preProcess(mapping, req, res);");
-		appendString("prepareMenu(req);");
+        emptyline();
+        appendStatement("String userId = (String)getBeanFromSession(req, BEAN_USER_DEF_ID)");
+        appendString("if (userId != null) {");
+            increaseIdent();
+                appendStatement("String login = CMSUserManager.getLoginById(userId)");
+                appendStatement("addBeanToSession(req, BEAN_USER_ID, login)");
+            closeBlock("if");
+        emptyline();
+        appendString("prepareMenu(req);");
 		closeBlock("preProcess");
 		emptyline();
 		
@@ -162,7 +172,8 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 					appendStatement("return null");		
 				closeBlock("if");
 			closeBlock("if");
-			appendStatement("checkAccessPermissions(req)");
+        emptyline();
+        appendStatement("checkAccessPermissions(req)");
 		emptyline();
 		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, getCurrentDocumentDefName())");
 		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, getActiveMainNavi())");
