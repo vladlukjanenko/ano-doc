@@ -1,18 +1,7 @@
 package net.anotheria.asg.generator.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.exception.ASGRuntimeException;
-import net.anotheria.asg.generator.AbstractGenerator;
-import net.anotheria.asg.generator.CommentGenerator;
-import net.anotheria.asg.generator.Context;
-import net.anotheria.asg.generator.FileEntry;
-import net.anotheria.asg.generator.GeneratedClass;
-import net.anotheria.asg.generator.GeneratorDataRegistry;
-import net.anotheria.asg.generator.IGenerateable;
-import net.anotheria.asg.generator.IGenerator;
-import net.anotheria.asg.generator.TypeOfClass;
+import net.anotheria.asg.generator.*;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.meta.StorageType;
@@ -26,6 +15,9 @@ import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
 import net.anotheria.asg.generator.model.rmi.RMIServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.sorter.SortType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Controls different sub generators for generation of the service layer. Generates factories and interfaces.
@@ -266,7 +258,7 @@ public class ServiceGenerator extends AbstractGenerator implements IGenerator{
 	        appendStatement("public void delete"+doc.getMultiple()+"("+listDecl+" list)"+throwsClause);
 	        emptyline();
 	        appendComment("Returns the "+doc.getName()+" object with the specified id.");
-	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause+", "+getItemNotFoundExceptionImport(doc, module));
+	        appendStatement("public "+doc.getName()+" get"+doc.getName()+"(String id)"+throwsClause);
 	        emptyline();
 
 
