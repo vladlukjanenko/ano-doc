@@ -2127,13 +2127,13 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		closeBlockNEW();
 		appendString("for (String id : iDs){");
 		increaseIdent();
-        if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
-           appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
-           appendString("if ("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
-           appendStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
-            //Actually We does not Care - about admin role in Delete action!  So checkExecutionPermission  2-nd parameter  can be anything!
-           appendStatement("DocumentLockingHelper.delete.checkExecutionPermission(lockable, false, getUserId(req))");
-           appendString("}");
+			appendStatement(doc.getName()+" "+doc.getVariableName()+"Curr = "+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(id)");
+         if(StorageType.CMS.equals(section.getDocument().getParentModule().getStorageType())){
+			appendString("if ("+doc.getVariableName()+"Curr instanceof LockableObject){ ");
+			appendStatement("LockableObject lockable = (LockableObject)" + doc.getVariableName() + "Curr");
+			//Actually We does not Care - about admin role in Delete action!  So checkExecutionPermission  2-nd parameter  can be anything!
+			appendStatement("DocumentLockingHelper.delete.checkExecutionPermission(lockable, false, getUserId(req))");
+			appendString("}");
         }
 	    appendStatement(getServiceGetterCall(section.getModule())+".delete"+doc.getName()+"(id)");
 		//delete images from file system
