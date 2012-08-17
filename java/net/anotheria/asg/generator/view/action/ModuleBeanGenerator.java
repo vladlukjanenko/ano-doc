@@ -299,12 +299,16 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection"+(lang==null?"":lang),MetaProperty.Type.LIST);
 					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
 					appendStatement("private String "+p.getName()+"CurrentValue"+(lang==null?"":lang));
+
+					appendStatement("private String "+p.getName()+"IdOfCurrentValue"+(lang==null?"":lang));
 				}
 				
 				if (p instanceof MetaEnumerationProperty){
 					MetaProperty collection = new MetaProperty(p.getName()+"Collection",MetaProperty.Type.LIST);
 					appendStatement("private "+collection.toJavaType()+"<LabelValueBean> "+collection.getName());//hacky
 					appendStatement("private String "+p.getName()+"CurrentValue");
+
+					appendStatement("private String "+p.getName()+"IdOfCurrentValue");
 				}
 			}
 			
@@ -361,14 +365,17 @@ public class ModuleBeanGenerator extends AbstractGenerator implements IGenerator
 		if (p.isLinked() || p instanceof MetaEnumerationProperty){
 			MetaFieldElement pColl = new MetaFieldElement(element.getName()+"Collection");
 			MetaFieldElement pCurr = new MetaFieldElement(element.getName()+"CurrentValue");
+			MetaFieldElement pIdOfCurr = new MetaFieldElement(element.getName()+"IdOfCurrentValue");
 			//;
 			if (p.isMultilingual()){
 				String l = getElementLanguage(element);
 				generateMethods(new MultilingualFieldElement(l, pColl), new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
 				generateMethods(new MultilingualFieldElement(l, pCurr), new MetaProperty(element.getName()+"CurrentValue", MetaProperty.Type.STRING));
+				generateMethods(new MultilingualFieldElement(l, pIdOfCurr), new MetaProperty(element.getName()+"IdOfCurrentValue", MetaProperty.Type.STRING));
 			}else{
 				generateMethods(pColl, new MetaListProperty(element.getName()+"Collection", new MetaProperty("temp", new ObjectType("LabelValueBean"))));
 				generateMethods(pCurr, new MetaProperty(element.getName()+"CurrentValue", MetaProperty.Type.STRING));
+				generateMethods(pIdOfCurr, new MetaProperty(element.getName()+"IdOfCurrentValue", MetaProperty.Type.STRING));
 			}
 			
 		}
