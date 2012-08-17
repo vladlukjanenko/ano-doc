@@ -55,7 +55,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		increaseIdent();
 		appendString("<title>" + dialog.getTitle() + "</title>");
 		generatePragmas(view);
-		// appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\"  dtype=\"text/css\">");
+		// appendString("<link href=\""+getCurrentCSSPath("admin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
 		// *** CMS2.0 START ***
 
 		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/fonts/fonts-min.css")) + " />");
