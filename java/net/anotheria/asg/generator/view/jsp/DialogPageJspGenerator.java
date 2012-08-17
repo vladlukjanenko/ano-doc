@@ -574,40 +574,39 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		 */
 
 		//*** CMS2.0 START ***
-        String editLink = "";
-        if (p.getName().equalsIgnoreCase("handler")) {
-            String anoNotEqualNoneStartTag = "<ano:notEqual value=\"none\" property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
-            String anoNotEqualNoneEndTag = "</ano:notEqual>";
-            String anoNotEmptyStartTag = "<ano:notEmpty property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
-            String anoNotEmptyEndTag = "</ano:notEmpty>";
+		String editLink = "";
+	       if (p.getName().equalsIgnoreCase("handler")) {
+	           String anoNotEqualNoneStartTag = "<ano:notEqual value=\"none\" property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
+	           String anoNotEqualNoneEndTag = "</ano:notEqual>";
+	           String anoNotEmptyStartTag = "<ano:notEmpty property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
+	           String anoNotEmptyEndTag = "</ano:notEmpty>";
 
-            String path = "ascustomdataCustomBoxHandlerDefEdit"+"?pId="+"<ano:write property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>";
+	           String path = "ascustomdataCustomBoxHandlerDefEdit"+"?pId="+"<ano:write property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>";
 
-            editLink = anoNotEmptyStartTag+
-                                anoNotEqualNoneStartTag+
-                                    "<i><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+" Edit old"+"</a></i>" +
-                                anoNotEqualNoneEndTag+
-                          anoNotEmptyEndTag;
-        }
-        if (p.getName().equalsIgnoreCase("type")) {
-            String anoNotEqualNoneStartTag = "<ano:notEqual value=\"none\" property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
-            String anoNotEqualNoneEndTag = "</ano:notEqual>";
-            String anoNotEmptyStartTag = "<ano:notEmpty property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
-            String anoNotEmptyEndTag = "</ano:notEmpty>";
+	           editLink = anoNotEmptyStartTag+
+	                               anoNotEqualNoneStartTag+
+	                                   "<i><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+" Edit handler"+"</a></i>" +
+	                               anoNotEqualNoneEndTag+
+	                         anoNotEmptyEndTag;
+	       }
+	       if (p.getName().equalsIgnoreCase("type")) {
+	           String anoNotEqualNoneStartTag = "<ano:notEqual value=\"none\" property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
+	           String anoNotEqualNoneEndTag = "</ano:notEqual>";
+	           String anoNotEmptyStartTag = "<ano:notEmpty property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
+	           String anoNotEmptyEndTag = "</ano:notEmpty>";
 
-            String path = "ascustomdataCustomBoxTypeEdit"+"?pId="+"<ano:write property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>";
+	           String path = "ascustomdataCustomBoxTypeEdit"+"?pId="+"<ano:write property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>";
 
-            editLink = anoNotEmptyStartTag
-                                +anoNotEqualNoneStartTag+
-                                    "<i><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+" Edit old"+"</a></i>" +
-                                anoNotEqualNoneEndTag+
-                          anoNotEmptyEndTag;
-        }
-		//quoted "name" attr in em, cause w3c validation says it's error
-		ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
-		ret += " (<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>"+
-                 ""+editLink+")";
-
+	           editLink = anoNotEmptyStartTag
+	                               +anoNotEqualNoneStartTag+
+	                                   "<i><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+" Edit type"+"</a></i>" +
+	                               anoNotEqualNoneEndTag+
+	                         anoNotEmptyEndTag;
+	       }
+			//quoted "name" attr in em, cause w3c validation says it's error
+			ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
+			ret += " (<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>"+
+	                ")&nbsp;"+editLink;
 
 		//*** CMS2.0 FINISH ***
 		
