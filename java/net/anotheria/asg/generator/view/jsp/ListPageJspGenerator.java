@@ -186,7 +186,7 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		String addFormAction = ContainerAction.ADD.getMappingName(doc, list);
 		String addFormName = addFormAction + "ElementForm";
 		
-		appendString("<form name=" + quote(addFormName) + " action=" + quote(addFormAction) + " method=\"post\">");
+		appendString("<form id=" + quote(addFormName) + " name=" + quote(addFormName) + " action=" + quote(addFormAction) + " method=\"post\">");
 		appendString("<input type=" + quote("hidden") + " name=" + quote("ownerId") + " value=\"<ano:write name=" + quote("ownerId") + "/>\">");
 		
 		if (p.isLinked() || (p instanceof MetaEnumerationProperty)) {
@@ -198,7 +198,10 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 			appendIncreasedString("<input class=\"add_id fll\" type=\"text\" style=\"width:25%\" name=" + quote(name) + " value=\"\"/>");
 		}
 		
-		appendString("<a href=" + quote("#") + " class=\"button\" onClick=" + quote("document." + addFormName + ".submit()") + "><span>Add</span></a>");
+		appendString("<a href=" + quote("#") + " id=\"add_button\" class=\"button_grey\" " +
+                "onClick=" + quote("submitAddElementForm()") +
+                "><span>Add</span></a>");
+        appendString("<span class=\"add_error_mess\"></span>");
 		appendString("</form>");
 	}
 	
@@ -262,6 +265,10 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 
 	private void generateEditorJS(MetaDocument doc, MetaListProperty list, String elName) {
 		MetaProperty p = list.getContainedProperty();
+
+        String addFormAction = ContainerAction.ADD.getMappingName(doc, list);
+        String addFormName = addFormAction + "ElementForm";
+
 		if (!(p.isLinked() || p instanceof MetaEnumerationProperty))
 			return;
 
@@ -286,7 +293,25 @@ public class ListPageJspGenerator extends AbstractJSPGenerator {
 		String propertyName = list.getContainedProperty().getName();
 		appendString("new YAHOO.anoweb.widget.ComboBox(" + quote(propertyName) + ",\"" + propertyName + "Selector\"," + elName + "Json, {id:'',name:'none'});");
 
-		decreaseIdent();
+        appendString("function submitAddElementForm() {\n" +
+                "        var formObj = $('#" + addFormName + "');\n" +
+                "        var currentValue = $('#" + propertyName + "Input').val();\n" +
+                "        \n" +
+                "        if (currentValue == null || currentValue == '') {\n" +
+                "            $('.add_error_mess').text(\"Select any item!\").delay(1900).fadeOut(100, function(){\n" +
+                "               $('.add_error_mess').text('');\n" +
+                "               $('.add_error_mess').fadeIn();\n" +
+                "            });\n" +
+                "            return false;\n" +
+                "        }\n" +
+                "        formObj.submit();\n" +
+                "    };");
+        appendString("$(function() {\n" +
+                "        $('.yui-ac-bd li').live('click',function(){\n" +
+                "            $('#add_button').removeClass('button_grey').addClass('button');\n" +
+                "        })\n" +
+                "    });");
+        decreaseIdent();
 		appendString("</script>");
 
 	}
