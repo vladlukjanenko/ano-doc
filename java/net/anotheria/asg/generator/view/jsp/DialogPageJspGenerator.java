@@ -10,7 +10,9 @@ import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Generates the jsps for the edit view.
@@ -35,7 +37,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	public GeneratedJSPFile generate(MetaSection metaSection, MetaDialog dialog, MetaModuleSection section, MetaView view) {
 		this.currentSection = metaSection;
 		this.currentDialog = dialog;
-
+		
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		jsp.setName(getDialogName(dialog, section.getDocument()));
@@ -327,6 +329,14 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 //					name = "&nbsp;";
 				String caption = (element.getCaption() != null ? element.getCaption() : name) + "(<b>DEF</b>)";
 				appendString(caption);
+				if (element.isRich()) {
+					appendString("<div class=\"clear\"></div>");
+					appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
+							+ "_ID').hide();\" class=\"rich_on_off\" style=\"display:none;\">off</a>");
+					appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
+							+ "_ID').show();\" class=\"rich_on_off\">on</a>");
+					appendString("<span class=\"rich_on_off\">Rich:</span>");
+				}
 				if (element.getDescription() != null)
 					append("<a href=\"#\" class=\"showTooltip\"><img src=\"../cms_static/img/tooltip.gif\" alt=\"\"/>",element.getDescription(),"</a>");
 				decreaseIdent();
@@ -383,9 +393,9 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			if (element.isRich()) {
 				appendString("<div class=\"clear\"></div>");
 				appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
-						+ "_ID').show();\" class=\"rich_on_off\" style=\"display:none;\">on</a>");
+						+ "_ID').hide();\" class=\"rich_on_off\" style=\"display:none;\">off</a>");
 				appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
-						+ "_ID').hide();\" class=\"rich_on_off\">off</a>");
+						+ "_ID').show();\" class=\"rich_on_off\">on</a>");
 				appendString("<span class=\"rich_on_off\">Rich:</span>");
 			}
 			appendString("</td>");
@@ -572,42 +582,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		ret += "&nbsp;";
 		ret += "(<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 		 */
-
+		
 		//*** CMS2.0 START ***
-		String editLink = "";
-	       if (p.getName().equalsIgnoreCase("handler")) {
-	           String anoNotEqualNoneStartTag = "<ano:notEqual value=\"none\" property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
-	           String anoNotEqualNoneEndTag = "</ano:notEqual>";
-	           String anoNotEmptyStartTag = "<ano:notEmpty property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
-	           String anoNotEmptyEndTag = "</ano:notEmpty>";
-
-	           String path = "ascustomdataCustomBoxHandlerDefEdit"+"?pId="+"<ano:write property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>";
-
-	           editLink = anoNotEmptyStartTag+
-	                               anoNotEqualNoneStartTag+
-	                                   "<i><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+" Edit handler"+"</a></i>" +
-	                               anoNotEqualNoneEndTag+
-	                         anoNotEmptyEndTag;
-	       }
-	       if (p.getName().equalsIgnoreCase("type")) {
-	           String anoNotEqualNoneStartTag = "<ano:notEqual value=\"none\" property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
-	           String anoNotEqualNoneEndTag = "</ano:notEqual>";
-	           String anoNotEmptyStartTag = "<ano:notEmpty property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
-	           String anoNotEmptyEndTag = "</ano:notEmpty>";
-
-	           String path = "ascustomdataCustomBoxTypeEdit"+"?pId="+"<ano:write property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>";
-
-	           editLink = anoNotEmptyStartTag
-	                               +anoNotEqualNoneStartTag+
-	                                   "<i><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+" Edit type"+"</a></i>" +
-	                               anoNotEqualNoneEndTag+
-	                         anoNotEmptyEndTag;
-	       }
-			//quoted "name" attr in em, cause w3c validation says it's error
-			ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
-			ret += " (<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>"+
-	                ")&nbsp;"+editLink;
-
+		//quoted "name" attr in em, cause w3c validation says it's error 
+		ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
+		ret += " (<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 		//*** CMS2.0 FINISH ***
 		
 		return ret;
@@ -649,8 +628,6 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		switch (p.getType()) {
 		case STRING:
 			return getStringEditor(element, p);
-        case PASSWORD:
-            return getPasswordEditor(element, p);
 		case TEXT:
 			return getTextEditor(element, p);
 		case LONG:
@@ -724,10 +701,6 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	private String getStringEditor(MetaFieldElement element, MetaProperty p){
 		return getInputEditor(element, p, "text");
 	}
-
-    private String getPasswordEditor(MetaFieldElement element, MetaProperty p){
-        return getInputEditor(element, p, "password");
-    }
 	
 	private String getBooleanEditor(MetaFieldElement element, MetaProperty p){
 		return getInputEditor(element, p, "checkbox");
@@ -829,8 +802,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("theme_advanced_buttons1 : \"undo, redo, separator, bold, italic, underline, separator, justifyleft, justifycenter, justifyright, justifyfull, formatselect,  fontselect, fontsizeselect, forecolor\",");
 		appendString("theme_advanced_buttons2 : \"bullist, numlist, separator, image, link, unlink, separator, table, code\",");
 		appendString("theme_advanced_buttons3 : \"\",");
-		appendString("theme_advanced_resize_horizontal : true");
+		appendString("theme_advanced_resize_horizontal : true,");
+		appendString("oninit : myCustomOnInit");
 		appendString("});");
+
+		appendString("function myCustomOnInit() {");
+		appendString(" var editors = tinyMCE.editors;");
+		appendString(" for(i = 0; i<editors.length; i++){");
+		appendString(" tinyMCE.get(editors[i].id).hide();");
+		appendString("}");
+		appendString("}");
+		
 		appendString("</script>");
 		appendString("<!-- /TinyMCE -->");
 		
@@ -895,12 +877,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result+="  </ano:equal> \n";
 			result+="</ano:equal> \n";
 			result+="<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" class=\"button\" onClick=";
+			//tinyMCE save hack start
+			result+="\"customSubmit(); ";
+			//tinyMCE save hack end 
+			result+="document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='stay'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>\n";
 			result+="</ano:equal> \n";
 			return result;
 		}
-		return "<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
+		//Delete customSubmit in the bottom, if not using tinyMCE
+		return "<a href=\"#\" class=\"button\" onClick=\"customSubmit(); document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='stay'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>";
 	}
 	private String getUpdateAndCloseFunction(MetaDocument doc, MetaFunctionElement element){
@@ -915,12 +902,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result+="  </ano:equal> \n";
 			result+="</ano:equal> \n";
 			result+="<ano:equal name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("false") + "> \n";
-			result+="\t<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
+			result+="\t<a href=\"#\" class=\"button\" onClick=";
+			//tinyMCE save hack start
+			result+="\"customSubmit(); ";
+			//tinyMCE save hack end 
+			result+="document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='close'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
 			result+="</ano:equal> \n";
 			return result;
 		}
-		return "<a href=\"#\" class=\"button\" onClick=\"document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
+		//Delete customSubmit in the bottom, if not using tinyMCE
+		return "<a href=\"#\" class=\"button\" onClick=\"customSubmit(); document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='close'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a>";
 	}	
 
