@@ -8,6 +8,7 @@
             <xs:element type="xs:string" name="applicationName"/>
             <xs:element type="xs:string" name="applicationURLPath" minOccurs="0"/>
             <xs:element type="xs:string" name="servletMapping"/>
+            <xs:element type="xs:string" name="cmsVersion2" minOccurs="0"/>
             <xs:element type="xs:string" name="encoding"/>
             <xs:element type="languagesType" name="languages"/>
             <xs:element type="xs:string" name="cmsVersion1" minOccurs="0"/>
