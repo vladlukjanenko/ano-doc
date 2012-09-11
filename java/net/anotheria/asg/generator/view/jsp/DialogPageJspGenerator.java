@@ -37,7 +37,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	public GeneratedJSPFile generate(MetaSection metaSection, MetaDialog dialog, MetaModuleSection section, MetaView view) {
 		this.currentSection = metaSection;
 		this.currentDialog = dialog;
-		
+
 		GeneratedJSPFile jsp = new GeneratedJSPFile();
 		startNewJob(jsp);
 		jsp.setName(getDialogName(dialog, section.getDocument()));
@@ -582,11 +582,42 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		ret += "&nbsp;";
 		ret += "(<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
 		 */
-		
+
 		//*** CMS2.0 START ***
-		//quoted "name" attr in em, cause w3c validation says it's error 
-		ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
-		ret += " (<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
+		String editLink = "";
+	       if (p.getName().equalsIgnoreCase("handler")) {
+	           String anoNotEqualNoneStartTag = "<ano:notEqual value=\"none\" property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
+	           String anoNotEqualNoneEndTag = "</ano:notEqual>";
+	           String anoNotEmptyStartTag = "<ano:notEmpty property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
+	           String anoNotEmptyEndTag = "</ano:notEmpty>";
+
+	           String path = "ascustomdataCustomBoxHandlerDefEdit"+"?pId="+"<ano:write property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>";
+
+	           editLink = anoNotEmptyStartTag+
+	                               anoNotEqualNoneStartTag+
+	                                   "<i><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+" Edit handler"+"</a></i>" +
+	                               anoNotEqualNoneEndTag+
+	                         anoNotEmptyEndTag;
+	       }
+	       if (p.getName().equalsIgnoreCase("type")) {
+	           String anoNotEqualNoneStartTag = "<ano:notEqual value=\"none\" property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
+	           String anoNotEqualNoneEndTag = "</ano:notEqual>";
+	           String anoNotEmptyStartTag = "<ano:notEmpty property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+">";
+	           String anoNotEmptyEndTag = "</ano:notEmpty>";
+
+	           String path = "ascustomdataCustomBoxTypeEdit"+"?pId="+"<ano:write property="+quote(p.getName()+"IdOfCurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>";
+
+	           editLink = anoNotEmptyStartTag
+	                               +anoNotEqualNoneStartTag+
+	                                   "<i><a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+" Edit type"+"</a></i>" +
+	                               anoNotEqualNoneEndTag+
+	                         anoNotEmptyEndTag;
+	       }
+			//quoted "name" attr in em, cause w3c validation says it's error
+			ret += "<em id="+quote(StringUtils.capitalize(p.getName())+"CurrentValue")+" name="+quote(p.getName())+" class=\"selectBox\"></em><div id=\""+StringUtils.capitalize(p.getName(lang))+"Selector\"></div>";
+			ret += " (<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue")+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>"+
+	                ")&nbsp;"+editLink;
+
 		//*** CMS2.0 FINISH ***
 		
 		return ret;
@@ -703,7 +734,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	private String getStringEditor(MetaFieldElement element, MetaProperty p){
 		return getInputEditor(element, p, "text");
 	}
-	
+
 	private String getPasswordEditor(MetaFieldElement element, MetaProperty p){
         return getInputEditor(element, p, "password");
     }
@@ -818,7 +849,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString(" tinyMCE.get(editors[i].id).hide();");
 		appendString("}");
 		appendString("}");
-		
+
 		appendString("</script>");
 		appendString("<!-- /TinyMCE -->");
 		
@@ -886,7 +917,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result+="\t<a href=\"#\" class=\"button\" onClick=";
 			//tinyMCE save hack start
 			result+="\"customSubmit(); ";
-			//tinyMCE save hack end 
+			//tinyMCE save hack end
 			result+="document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='stay'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"apply.label.prefix\"/></span></a>\n";
 			result+="</ano:equal> \n";
@@ -911,7 +942,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			result+="\t<a href=\"#\" class=\"button\" onClick=";
 			//tinyMCE save hack start
 			result+="\"customSubmit(); ";
-			//tinyMCE save hack end 
+			//tinyMCE save hack end
 			result+="document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 					".nextAction.value='close'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a> \n";
 			result+="</ano:equal> \n";
