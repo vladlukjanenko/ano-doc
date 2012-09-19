@@ -331,10 +331,10 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				appendString(caption);
 				if (element.isRich()) {
 					appendString("<div class=\"clear\"></div>");
-					appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
-							+ "_ID').hide();\" class=\"rich_on_off\" style=\"display:none;\">off</a>");
-					appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
-							+ "_ID').show();\" class=\"rich_on_off\">on</a>");
+					appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.execCommand('mceRemoveControl', true, '" + section.getDocument().getField(element.getName()).getName(lang)
+							+ "_ID');\" class=\"rich_on_off\" style=\"display:none;\">off</a>");
+					appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.execCommand('mceAddControl', true, '" + section.getDocument().getField(element.getName()).getName(lang)
+							+ "_ID');\" class=\"rich_on_off\">on</a>");
 					appendString("<span class=\"rich_on_off\">Rich:</span>");
 				}
 				if (element.getDescription() != null)
@@ -392,10 +392,10 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			decreaseIdent();
 			if (element.isRich()) {
 				appendString("<div class=\"clear\"></div>");
-				appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
-						+ "_ID').hide();\" class=\"rich_on_off\" style=\"display:none;\">off</a>");
-				appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.get('" + section.getDocument().getField(element.getName()).getName(lang)
-						+ "_ID').show();\" class=\"rich_on_off\">on</a>");
+				appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.execCommand('mceRemoveControl', true, '" + section.getDocument().getField(element.getName()).getName(lang)
+							+ "_ID');\" class=\"rich_on_off\" style=\"display:none;\">off</a>");
+				appendString("<a href=\"javascript:;\" onmousedown=\"tinyMCE.execCommand('mceAddControl', true, '" + section.getDocument().getField(element.getName()).getName(lang)
+							+ "_ID');\" class=\"rich_on_off\">on</a>");
 				appendString("<span class=\"rich_on_off\">Rich:</span>");
 			}
 			appendString("</td>");
@@ -822,15 +822,6 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<script type=\"text/javascript\">");
 		appendString("tinyMCE.init({");
 		appendString("mode : \"exact\",");
-		String allRichTextElements = "elements:\"";
-		for (int i=0; i<richTextElements.size(); i++){
-			String language = getElementLanguage(richTextElements.get(i));
-			if (language == null) language = "";//allow tinyMCE for single language fields 
-			allRichTextElements+=richTextElements.get(i).getName()+language+"_ID";
-			if (i+1!=richTextElements.size())
-				allRichTextElements+=", ";
-		}
-		appendString(allRichTextElements+"\",");
 		appendString("theme : \"advanced\",");
 		appendString("plugins : \"save, table\",");
 		appendString("theme_advanced_layout_manager : \"SimpleLayout\",");
@@ -840,15 +831,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("theme_advanced_buttons2 : \"bullist, numlist, separator, image, link, unlink, separator, table, code\",");
 		appendString("theme_advanced_buttons3 : \"\",");
 		appendString("theme_advanced_resize_horizontal : true,");
-		appendString("oninit : myCustomOnInit");
 		appendString("});");
-
-		appendString("function myCustomOnInit() {");
-		appendString(" var editors = tinyMCE.editors;");
-		appendString(" for(i = 0; i<editors.length; i++){");
-		appendString(" tinyMCE.get(editors[i].id).hide();");
-		appendString("}");
-		appendString("}");
 
 		appendString("</script>");
 		appendString("<!-- /TinyMCE -->");
