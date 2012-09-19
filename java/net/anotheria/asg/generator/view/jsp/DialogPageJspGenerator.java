@@ -766,7 +766,10 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		}
 		if (element.isReadonly())
 			ret += " readonly="+quote("readonly");
-		ret += "/>";
+        if (element.isAutocompleteOff())
+            ret += " autocomplete="+quote("off");
+
+        ret += "/>";
 
 		if (element.isReadonly())
 			ret += "&nbsp;<i>readonly</i>";

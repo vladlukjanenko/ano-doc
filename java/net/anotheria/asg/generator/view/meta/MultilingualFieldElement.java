@@ -48,6 +48,11 @@ public class MultilingualFieldElement extends MetaFieldElement{
 	public boolean isReadonly() {
 		return mappedElement.isReadonly();
 	}
+
+    @Override
+    public boolean isAutocompleteOff() {
+        return mappedElement.isAutocompleteOff();
+    }
 	
 	@Override
 	public boolean isRich() {

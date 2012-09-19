@@ -14,6 +14,10 @@ public class MetaViewElement {
 	 * True if the element is readonly.
 	 */
 	private boolean readonly;
+    /**
+     * True if autocomplete for this element in browser is off.
+     */
+    private boolean autocompleteOff;
 	/**
 	 * The name of the element.
 	 */
@@ -52,8 +56,9 @@ public class MetaViewElement {
 	 * The sorting type of the element.
 	 */
 	private SortingType sortingType = SortingType.ALPHABETHICAL;
-	
-	/**
+
+
+    /**
 	 * Creates a new meta view element.
 	 * @param aName
 	 */
@@ -76,7 +81,22 @@ public class MetaViewElement {
 		readonly = b;
 	}
 
-	/**
+    /**
+     * @return True if autocomplete for this element is off.
+     */
+    public boolean isAutocompleteOff() {
+        return autocompleteOff;
+    }
+
+    /**
+     * Sets if the element allows autocompletion or not.
+     * @param b flag to set
+     */
+    public void setAutocompleteOff(boolean b) {
+        this.autocompleteOff = b;
+    }
+
+    /**
 	 * @return name of the element
 	 */
 	public String getName() {
@@ -195,7 +215,8 @@ public class MetaViewElement {
 	public String toString() {
 		return "MetaViewElement{" +
 				"readonly=" + readonly +
-				", name='" + name + '\'' +
+				", autocompleteOff=" + autocompleteOff +
+                ", name='" + name + '\'' +
 				", caption='" + caption + '\'' +
 				", description='" + description + '\'' +
 				", comparable=" + comparable +

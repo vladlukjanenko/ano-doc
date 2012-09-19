@@ -123,6 +123,7 @@
         <xs:attribute type="xs:string" name="name" use="optional"/>
         <xs:attribute type="xs:string" name="comparable" use="optional"/>
         <xs:attribute type="xs:string" name="readonly" use="optional"/>
+        <xs:attribute type="xs:string" name="autocompleteOff" use="optional"/>
         <xs:attribute type="xs:string" name="comarable" use="optional"/>
         <xs:attribute type="xs:string" name="title" use="optional"/>
         <xs:attribute type="xs:string" name="validator" use="optional"/>
