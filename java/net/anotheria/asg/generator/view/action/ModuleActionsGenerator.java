@@ -534,6 +534,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				if (p.getType() == MetaProperty.Type.IMAGE || (p.getType() == MetaProperty.Type.LIST && ((MetaListProperty)p).getContainedProperty().getType() == MetaProperty.Type.IMAGE)){
 					clazz.addImport("net.anotheria.webutils.filehandling.actions.FileStorage");
 					clazz.addImport("net.anotheria.webutils.filehandling.beans.TemporaryFileHolder");
+                    clazz.addImport("java.lang.reflect.Method");
+                    clazz.addImport("java.lang.reflect.InvocationTargetException");
+                    clazz.addImport("net.anotheria.util.StringUtils");
+                    clazz.addImport("org.apache.commons.lang.WordUtils");
 					break;
 				}
 				if (elem.isValidated()) {
@@ -1573,6 +1577,51 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 				}
 			}
 		}
+
+        // check if document has property with type IMAGE
+        boolean hasImageField = false;
+        for (int i=0; i<elements.size(); i++){
+            MetaViewElement elem = elements.get(i);
+            if (elem instanceof MetaFieldElement){
+                MetaFieldElement field = (MetaFieldElement)elem;
+                MetaProperty p = doc.getField(field.getName());
+                if (p.getType() == MetaProperty.Type.IMAGE){
+                    hasImageField = true;
+                    break;
+                }
+            }
+        }
+        // generating functionality to delete image
+        if (hasImageField) {
+            emptyline();
+            appendString("// delete image method start");
+            appendStatement("String fieldName = req.getParameter(\"fieldName\")");
+            appendStatement("String fileName = req.getParameter(\"fileName\")");
+            emptyline();
+            appendString("if (!StringUtils.isEmpty(fieldName) && !StringUtils.isEmpty(fileName)) {");
+            increaseIdent();
+            appendStatement("String setMethodName = \"set\"+WordUtils.capitalize(fieldName)");
+            appendStatement("Class<?> c = "+doc.getVariableName()+".getClass()");
+            appendString("try{");
+            increaseIdent();
+            appendStatement("Method m = c.getDeclaredMethod(setMethodName, new Class[]{String.class})");
+            appendStatement("m.invoke("+doc.getVariableName()+", new Object[]{\"\"})");
+            appendStatement("FileStorage.removeFilePermanently(fileName)");
+            decreaseIdent();
+            appendString("}catch (NoSuchMethodException e){");
+            increaseIdent();
+            appendStatement("e.printStackTrace()");
+            decreaseIdent();
+            appendString("}catch (InvocationTargetException ignored) {");
+            increaseIdent();
+            appendStatement("ignored.printStackTrace()");
+            decreaseIdent();
+            appendString("}");
+            decreaseIdent();
+            appendString("}");
+            appendString("// delete image method end");
+            emptyline();
+        }
 		
 		emptyline();
 		appendStatement(doc.getName(), " updatedCopy = null");
