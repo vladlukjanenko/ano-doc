@@ -63,8 +63,9 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentYUIPath("core/build/container/assets/skins/sam/container.css")) + " />");
 		appendString("<link href=\"" + getCurrentCSSPath("newadmin.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>");
 		appendString("<link href=\"" + getCurrentCSSPath("fileuploader.css") + "\" rel=\"stylesheet\" type=\"text/css\"/>");
-		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentCSSPath("jquery-ui-1.8.18.custom.css")) + " />");
-		
+//		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentCSSPath("jquery-ui-1.8.18.custom.css")) + " />");
+		appendString("<link rel=" + quote("stylesheet") + " type=" + quote("text/css") + " href=" + quote(getCurrentCSSPath("jquery-ui-1.9.1.custom.min.css")) + " />");
+
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/yahoo-dom-event/yahoo-dom-event.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/container/container-min.js")) + "></script>");
 		appendString("<script type=" + quote("text/javascript") + " src=" + quote(getCurrentYUIPath("core/build/menu/menu-min.js")) + "></script>");
@@ -83,8 +84,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		// *** CMS3.0 START ***
 //		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.4.min.js") + "\"></script>");
 //		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.5.1.min.js") + "\"></script>");		
-		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.6.2.min.js") + "\"></script>");
-		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-ui-1.8.18.custom.min.js") + "\"></script>");
+//		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.6.2.min.js") + "\"></script>");
+        appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.8.2.js") + "\"></script>");
+//		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-ui-1.8.18.custom.min.js") + "\"></script>");
+		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-ui-1.9.1.custom.min.js") + "\"></script>");
+
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("datetimpicker.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("anofunctions.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("fileuploader.js") + "\"></script>");
@@ -224,10 +228,23 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("</div>");
 
         String entryName = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()));
+        if(section.getModule().getName().equalsIgnoreCase("aswebdata") ||
+                section.getModule().getName().equalsIgnoreCase("aslayoutdata") ||
+                    section.getModule().getName().equalsIgnoreCase("asgenericdata") ||
+                        section.getModule().getName().equalsIgnoreCase("ascustomdata") ||
+                            section.getModule().getName().equalsIgnoreCase("assitedata")){
 
-//        appendString("<div class=\"breadcrumbs\">");
-//        appendString("<a href=\"/cms/showUsages?module="+section.getModule().getName()+"&doc="+section.getDocument().getName()+"&pId=<ano:write name=" + entryName + " property=\"id\"/>\">Show usages</a>");
-//        appendString("</div>");
+            if (!section.getDocument().getName().equalsIgnoreCase("RedirectUrl") && !section.getDocument().getName().equalsIgnoreCase("EntryPoint")){
+                String elementName = section.getDocument().getName().equalsIgnoreCase("NaviItem") ? "<ano:write name="+entryName+" property=\"nameEN\"/>" : "<ano:write name="+entryName+" property=\"name\"/>";
+                appendString("<div class=\"breadcrumbs\">");
+                appendString("<a id=\"display_all_usages\" href=\"/cms/showUsages\">Show usages</a>");
+                appendString("<input class=\"showUsagesDocName\" type=\"hidden\" name=\"docName\" value=\""+section.getDocument().getName()+"\"/>");
+                appendString("<input class=\"showUsagesPId\" type=\"hidden\" name=\"pId\" value=\"<ano:write name="+entryName+" property=\"id\"/>\"/>");
+                appendString("</div>");
+                appendString("<div id=\"all_usages_of_element\" style=\"display: none;\" title=\"Usages of this "+section.getDocument().getName()+"["+elementName+"]\"></div>");
+            }
+        }
+
 
 		appendString("<div class=\"main_area\">");
 		appendString("<div class=\"c_l\"><!-- --></div>");
@@ -479,7 +496,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("</div>");
 		appendString("</body>");
 		decreaseIdent();
-
+        addDialogContentToDisplayUsagesOfElement(section);
 		generateRichTextEditorJS(section.getDocument(), richTextElementsRegistry);
 		generateLinkElementEditorJS(section.getDocument(), linkElementsRegistry);
 		generateDateTimeWidgetJS();
@@ -1047,5 +1064,70 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("</form>");
 		appendString("</ano:equal>");
 	}
+
+    private void addDialogContentToDisplayUsagesOfElement(MetaModuleSection section){
+        if(section.getModule().getName().equalsIgnoreCase("aswebdata") ||
+                section.getModule().getName().equalsIgnoreCase("aslayoutdata") ||
+                section.getModule().getName().equalsIgnoreCase("asgenericdata") ||
+                section.getModule().getName().equalsIgnoreCase("ascustomdata") ||
+                section.getModule().getName().equalsIgnoreCase("assitedata")){
+
+            if (!section.getDocument().getName().equalsIgnoreCase("RedirectUrl") && !section.getDocument().getName().equalsIgnoreCase("EntryPoint")){
+                increaseIdent();
+                appendString("<script type=\"text/javascript\">");
+                appendString("$(function(){");
+                appendIncreasedString("$('#display_all_usages').bind('click',function(event){");
+                appendString("event.preventDefault();");
+                appendString("console.log(\"method start\")");
+                appendIncreasedString("var all_usages_of_element = $('#all_usages_of_element');");
+                appendString("$.ajax({");
+                appendIncreasedString("url:\"/cms/showUsages\",");
+                appendString("type:\"POST\",");
+                appendString("data:({");
+                appendIncreasedString("doc: $('.showUsagesDocName').val(),");
+                appendIncreasedString("pId: $('.showUsagesPId').val()");
+                decreaseIdent();
+                appendString("}),");
+                appendString("success:function(data){");
+                appendIncreasedString("var referenceList = data.data.references;");
+                appendIncreasedString("if (referenceList != undefined && !(referenceList.length == 0)) {");
+                appendIncreasedString("all_usages_of_element.append(referenceList);");
+                appendIncreasedString("}else{");
+                appendIncreasedString("all_usages_of_element.append(\"This element have no usages\");");
+                appendString("}");
+                appendString("showDialog();");
+                decreaseIdent();
+                appendString("}");
+                decreaseIdent();
+                appendString("})");
+                decreaseIdent();
+                appendString("})");
+                decreaseIdent();
+                appendString("});");
+
+                appendString("function showDialog(){");
+                appendIncreasedString("var all_usages_of_element = $('#all_usages_of_element');");
+                appendIncreasedString("all_usages_of_element.dialog({");
+                appendString("modal:true,");
+                appendString("draggable: false,");
+                appendString("minHeight: 150,");
+                appendString("maxHeight: 600,");
+                appendString("width: 'auto',");
+                appendString("buttons:{");
+                appendIncreasedString("Close:function(){");
+                appendIncreasedString("all_usages_of_element.text(\"\");");
+                appendIncreasedString("$(this).dialog(\"close\");");
+                decreaseIdent();
+                appendString("}");
+                decreaseIdent();
+                appendString("}");
+                decreaseIdent();
+                appendString("})");
+                decreaseIdent();
+                appendString("};");
+                appendString("</script>");
+            }
+        }
+    }
 
 }
