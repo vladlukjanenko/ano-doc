@@ -1,8 +1,5 @@
 package net.anotheria.asg.generator.view.action;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
@@ -12,6 +9,9 @@ import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SharedA
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generator for SMC search action.
@@ -118,7 +118,7 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		
 		for(MetaView view: views){
 			emptyline();
-			appendString("if(wholeCms || sectionName.equals(\""+view.getName()+"\")){");
+			appendString("if(wholeCms || sectionName.equals(\""+view.getTitle()+"\")){");
 			increaseIdent();
 			for(MetaSection section: view.getSections()){
 				if(!(section instanceof MetaModuleSection))
