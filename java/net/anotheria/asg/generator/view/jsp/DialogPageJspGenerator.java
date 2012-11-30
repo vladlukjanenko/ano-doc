@@ -1078,7 +1078,6 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
                 appendString("$(function(){");
                 appendIncreasedString("$('#display_all_usages').bind('click',function(event){");
                 appendString("event.preventDefault();");
-                appendString("console.log(\"method start\")");
                 appendIncreasedString("var all_usages_of_element = $('#all_usages_of_element');");
                 appendString("$.ajax({");
                 appendIncreasedString("url:\"/cms/showUsages\",");
