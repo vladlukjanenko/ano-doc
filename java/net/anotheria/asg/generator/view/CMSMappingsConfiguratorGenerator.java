@@ -433,6 +433,10 @@ public class CMSMappingsConfiguratorGenerator extends AbstractGenerator{
 	public static final String ACTION_SEARCH = "search";
 	public static final String ACTION_COPY_LANG ="copyLang";
 	public static final String ACTION_SWITCH_MULTILANGUAGE_INSTANCE = "switchMultilang";
+    /**
+     * show usages of an element.
+     */
+    public static final String ACTION_SHOW_USAGES = "showUsages";
 	/**
 	 * Locks current document.
 	 */

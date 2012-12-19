@@ -227,31 +227,28 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		decreaseIdent();
 		appendString("</div>");
 
-        String entryName = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()));
-        if(section.getModule().getName().equalsIgnoreCase("aswebdata") ||
-                section.getModule().getName().equalsIgnoreCase("aslayoutdata") ||
-                    section.getModule().getName().equalsIgnoreCase("asgenericdata") ||
-                        section.getModule().getName().equalsIgnoreCase("ascustomdata") ||
-                            section.getModule().getName().equalsIgnoreCase("assitedata")){
-
-            if (!section.getDocument().getName().equalsIgnoreCase("RedirectUrl") && !section.getDocument().getName().equalsIgnoreCase("EntryPoint")){
-                String elementName = section.getDocument().getName().equalsIgnoreCase("NaviItem") ? "<ano:write name="+entryName+" property=\"nameEN\"/>" : "<ano:write name="+entryName+" property=\"name\"/>";
-                appendString("<div class=\"breadcrumbs\">");
-                appendString("<a id=\"display_all_usages\" href=\"/cms/showUsages\">Show usages</a>");
-                appendString("<input class=\"showUsagesDocName\" type=\"hidden\" name=\"docName\" value=\""+section.getDocument().getName()+"\"/>");
-                appendString("<input class=\"showUsagesPId\" type=\"hidden\" name=\"pId\" value=\"<ano:write name="+entryName+" property=\"id\"/>\"/>");
-                appendString("</div>");
-                appendString("<div id=\"all_usages_of_element\" style=\"display: none;\" title=\"Usages of this "+section.getDocument().getName()+"["+elementName+"]\"></div>");
-            }
-        }
-
-
 		appendString("<div class=\"main_area\">");
 		appendString("<div class=\"c_l\"><!-- --></div>");
 		appendString("<div class=\"c_r\"><!-- --></div>");
 		appendString("<div class=\"c_b_l\"><!-- --></div>");
 		appendString("<div class=\"c_b_r\"><!-- --></div>");
 
+        String entryName = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()));
+        if(section.getModule().getName().equalsIgnoreCase("aswebdata") ||
+                section.getModule().getName().equalsIgnoreCase("aslayoutdata") ||
+                section.getModule().getName().equalsIgnoreCase("asgenericdata") ||
+                section.getModule().getName().equalsIgnoreCase("ascustomdata") ||
+                section.getModule().getName().equalsIgnoreCase("assitedata")){
+
+            if (!section.getDocument().getName().equalsIgnoreCase("RedirectUrl") && !section.getDocument().getName().equalsIgnoreCase("EntryPoint")){
+                String elementName = section.getDocument().getName().equalsIgnoreCase("NaviItem") ? "<ano:write name="+entryName+" property=\"nameEN\"/>" : "<ano:write name="+entryName+" property=\"name\"/>";
+                appendString("<a class=\"button\" id=\"display_all_usages\" href=\"/cms/showUsages\"><span><img src=\"/cms_static/img/usage_white.png\" alt=\"add\">Show usages</span></a>");
+                appendString("<input class=\"showUsagesDocName\" type=\"hidden\" name=\"docName\" value=\""+section.getDocument().getName()+"\"/>");
+                appendString("<input class=\"showUsagesPId\" type=\"hidden\" name=\"pId\" value=\"<ano:write name="+entryName+" property=\"id\"/>\"/>");
+                appendString("<br/><br/>");
+                appendString("<div id=\"all_usages_of_element\" style=\"display: none;\" title=\"Usages of this "+section.getDocument().getName()+"["+elementName+"]\"></div>");
+            }
+        }
 
 
 		if (StorageType.CMS.equals(((MetaModuleSection) metaSection).getDocument().getParentModule().getStorageType())) {

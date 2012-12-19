@@ -1,7 +1,5 @@
 package net.anotheria.asg.generator.view.jsp;
 
-import java.util.List;
-
 import net.anotheria.asg.data.LockableObject;
 import net.anotheria.asg.generator.GeneratedJSPFile;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
@@ -9,20 +7,14 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaProperty;
 import net.anotheria.asg.generator.meta.StorageType;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator;
-import net.anotheria.asg.generator.view.ViewConstants;
 import net.anotheria.asg.generator.view.CMSMappingsConfiguratorGenerator.SectionAction;
+import net.anotheria.asg.generator.view.ViewConstants;
 import net.anotheria.asg.generator.view.action.ModuleActionsGenerator;
 import net.anotheria.asg.generator.view.action.ModuleBeanGenerator;
-import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
-import net.anotheria.asg.generator.view.meta.MetaFieldElement;
-import net.anotheria.asg.generator.view.meta.MetaFilter;
-import net.anotheria.asg.generator.view.meta.MetaFunctionElement;
-import net.anotheria.asg.generator.view.meta.MetaModuleSection;
-import net.anotheria.asg.generator.view.meta.MetaSection;
-import net.anotheria.asg.generator.view.meta.MetaView;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
-import net.anotheria.asg.generator.view.meta.MultilingualFieldElement;
+import net.anotheria.asg.generator.view.meta.*;
 import net.anotheria.util.StringUtils;
+
+import java.util.List;
 
 /**
  * Generator for show page.
@@ -53,8 +45,11 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 			appendString("<title>"+view.getTitle()+"</title>");
 			generatePragmas(view);
 			appendString("<link href=\""+getCurrentCSSPath("newadmin.css")+"\" rel=\"stylesheet\" type=\"text/css\">");
-			appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("jquery-1.4.min.js")+"\"></script>");
+			appendString("<link rel=\"stylesheet\" type=\"text/css\" href=\"/cms_static/css/jquery-ui-1.9.1.custom.min.css\" />");
+			appendString("<script type=\"text/javascript\" src=\"/cms_static/js/jquery-1.8.2.js\"></script>");
+			appendString("<script type=\"text/javascript\" src=\"/cms_static/js/jquery-ui-1.9.1.custom.min.js\"></script>");
 			appendString("<script type=\"text/javascript\" src=\""+getCurrentJSPath("anofunctions.js")+"\"></script>");
+            getShowUsagesScript(section);
 			decreaseIdent();
 		appendString("</head>");
 		appendString("<body>");
@@ -231,6 +226,10 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 				appendString("<!--"+doc.getName()+"-->");
 				appendString("<!--"+doc.getTemporaryVariableName()+"-->");
 				appendString("<!--"+doc.getVariableName()+"-->");
+                if (isShowUsagesElementAllowed(section)){
+                    appendString("<input class=\"showUsagesDocName\" type=\"hidden\" name=\"docName\" value=\"" + doc.getName() + "\"/>");
+                }
+                appendString("<div id=\"all_usages_of_element\" style=\"display:none;\"></div>");
 				appendString("<ano:iterate name="+quote(doc.getMultiple().toLowerCase())+" type="+quote(ModuleBeanGenerator.getListItemBeanImport(getContext(), doc))+" id="+quote(entryName)+" indexId=\"ind\">");
 				increaseIdent();
 					appendString("<tr class=\"cmsDocument <%=ind.intValue()%2==0 ? \"lineLight\" : \"lineDark\"%> highlightable\">");
@@ -245,7 +244,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 								opened = true;
 							}
 
-				            appendString(generateElement(entryName, element,doc));
+				            appendString(generateElement(entryName, element,doc,section));
 				        }
 				        		opened = false;
 				        		appendString("</td>");
@@ -400,11 +399,11 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		return "<td " + displayLanguageCheck + ">"+header+"</td>";
 	}
 	
-	private String generateElement(String entryName, MetaViewElement element,MetaDocument doc){
+	private String generateElement(String entryName, MetaViewElement element,MetaDocument doc, MetaModuleSection section){
 		if (element instanceof MetaFieldElement)
 			return getField(entryName, (MetaFieldElement)element);
 		if (element instanceof MetaFunctionElement)
-			return getFunction(entryName, (MetaFunctionElement)element,doc);
+			return getFunction(entryName, (MetaFunctionElement)element,doc,section);
 		if (element instanceof MetaCustomFunctionElement)
 			return getCustomFunction(entryName, (MetaCustomFunctionElement)element);
 		
@@ -415,12 +414,15 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		if (((MetaModuleSection)currentSection).getDocument().getField(element.getName()).getType() == MetaProperty.Type.IMAGE && element.getDecorator()==null)
 			return generateImage(entryName, element);
 		String elementName = element instanceof MultilingualFieldElement ? element.getVariableName() : element.getName();
-		
+		String cmsDocumentIdClass = elementName.equals("id") ? "showUsagesPId" : "";
 		String displayLanguageCheck = "";
 		if(element instanceof MultilingualFieldElement) {
 			MultilingualFieldElement multilangualElement = (MultilingualFieldElement) element;
-			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <ano:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</ano:equal>";
-		}
+			displayLanguageCheck = "class=\"lang_hide lang_"+multilangualElement.getLanguage()+"\" <ano:equal name=\"display" + multilangualElement.getLanguage() + "\" value=\"false\">style=\"display:none\"</ano:equal> "+cmsDocumentIdClass;
+		}else{
+            if (!StringUtils.isEmpty(cmsDocumentIdClass))
+                displayLanguageCheck = "class=\""+cmsDocumentIdClass+"\"";
+        }
 		
 		return "<!--"+quote(entryName)+"_____"+elementName+"--><td " + displayLanguageCheck + "><ano:write filter=\"false\" name="+quote(entryName)+" property=\""+elementName+"\"/></td>";
 		//return "<td><ano:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
@@ -442,7 +444,7 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 	
 
 
-	private String getFunction(String entryName, MetaFunctionElement element, MetaDocument doc){
+	private String getFunction(String entryName, MetaFunctionElement element, MetaDocument doc, MetaModuleSection section){
 		
 		if (element.getName().equals("version")){
 			return getVersionFunction(entryName, element);
@@ -471,6 +473,14 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
         if (element.getName().equals("unlock") && StorageType.CMS.equals(doc.getParentModule().getStorageType()))
             return getUnLockFunction(entryName, element);
 
+        if (element.getName().equals("showUsages")){
+            if (isShowUsagesElementAllowed(section)){
+                return getShowUsagesFunction();
+            }
+            return "";
+        }
+
+
         return "";
 		//return "<td><ano:write name="+quote(entryName)+" property=\""+element.getName()+"\"/></td>";
 	}
@@ -481,6 +491,10 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		link = StringUtils.replace(link, "$plainId", "<ano:write name="+quote(entryName)+" property=\"plainId\"/>");
 		return "<a href="+quote(generateTimestampedLinkPath(link))+">"+caption+"</a>";
 	}
+
+    private String getShowUsagesFunction(){
+        return "<a class=\"display_all_usages\" href=\"" + CMSMappingsConfiguratorGenerator.ACTION_SHOW_USAGES + "\"><img src=\"/cms_static/img/usage.png\" alt=\"show usage\" title=\"show usage\"></a>" ;
+    }
 
 
 	/**
@@ -547,5 +561,81 @@ public class ShowPageJspGenerator extends AbstractJSPGenerator {
 		
 		return "<a href="+quote("<ano:tslink>"+path+"</ano:tslink>")+">"+getEditImage()+"</a>" ;
 	}
+
+    private String getShowUsagesScript(MetaModuleSection section){
+        if (isShowUsagesElementAllowed(section)){
+            increaseIdent();
+            appendString("<script type=\"text/javascript\">");
+            appendString("$(function(){");
+            appendIncreasedString("$('.display_all_usages').bind('click',function(event){");
+            appendString("event.preventDefault();");
+            appendIncreasedString("var all_usages_of_element = $('#all_usages_of_element');");
+            appendIncreasedString("var idOfSearchedElement = parseInt($(this).parent('td').parent('tr').find('.showUsagesPId').text(),10);");
+            appendString("$.ajax({");
+            appendIncreasedString("url:\"/cms/showUsages\",");
+            appendString("type:\"POST\",");
+            appendString("data:({");
+            appendIncreasedString("doc: $('.showUsagesDocName').val(),");
+            appendIncreasedString("pId: idOfSearchedElement");
+            decreaseIdent();
+            appendString("}),");
+            appendString("success:function(data){");
+            appendIncreasedString("var referenceList = data.data.references;");
+            appendIncreasedString("if (referenceList != undefined && !(referenceList.length == 0)) {");
+            appendIncreasedString("all_usages_of_element.append(referenceList);");
+            appendIncreasedString("}else{");
+            appendIncreasedString("all_usages_of_element.append(\"This element have no usages\");");
+            appendString("}");
+            appendString("showDialog(idOfSearchedElement);");
+            decreaseIdent();
+            appendString("}");
+            decreaseIdent();
+            appendString("})");
+            decreaseIdent();
+            appendString("})");
+            decreaseIdent();
+            appendString("});");
+
+            appendString("function showDialog(elementId){");
+            appendIncreasedString("var all_usages_of_element = $('#all_usages_of_element');");
+            appendIncreasedString("var docName = $('.showUsagesDocName').val();");
+            appendIncreasedString("all_usages_of_element.attr('title','Usages of ' + docName + '[' + elementId + ']');");
+            appendIncreasedString("$('.ui-dialog-title').text('Usages of ' + docName + '[' + elementId + ']');");
+            appendIncreasedString("all_usages_of_element.dialog({");
+            appendString("modal:true,");
+            appendString("draggable: false,");
+            appendString("minHeight: 150,");
+            appendString("maxHeight: 600,");
+            appendString("width: 'auto',");
+            appendString("buttons:{");
+            appendIncreasedString("Close:function(){");
+            appendIncreasedString("all_usages_of_element.text(\"\");");
+            appendIncreasedString("$(this).dialog(\"close\");");
+            decreaseIdent();
+            appendString("}");
+            decreaseIdent();
+            appendString("}");
+            decreaseIdent();
+            appendString("})");
+            decreaseIdent();
+            appendString("};");
+            appendString("</script>");
+        }
+        return null;
+    }
+
+    private boolean isShowUsagesElementAllowed(MetaModuleSection section){
+        if(section.getModule().getName().equalsIgnoreCase("aswebdata") ||
+        section.getModule().getName().equalsIgnoreCase("aslayoutdata") ||
+        section.getModule().getName().equalsIgnoreCase("asgenericdata") ||
+        section.getModule().getName().equalsIgnoreCase("ascustomdata") ||
+        section.getModule().getName().equalsIgnoreCase("assitedata")){
+
+            if (!section.getDocument().getName().equalsIgnoreCase("RedirectUrl") && !section.getDocument().getName().equalsIgnoreCase("EntryPoint")){
+                return true;
+            }
+        }
+        return false;
+    }
 	
 }
