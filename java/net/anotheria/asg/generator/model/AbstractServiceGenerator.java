@@ -7,6 +7,10 @@ import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
+import net.anotheria.moskito.core.dynamic.MoskitoInvokationProxy;
+import net.anotheria.moskito.core.predefined.ServiceStatsCallHandler;
+import net.anotheria.moskito.core.predefined.ServiceStatsFactory;
+
 /**
  * Base class for service generators.
  * @author another
@@ -68,9 +72,9 @@ public class AbstractServiceGenerator extends AbstractGenerator{
 		clazz.setPackageName(getPackageName(module));
 
 		clazz.addImport("java.util.concurrent.atomic.AtomicInteger");
-		clazz.addImport("net.java.dev.moskito.core.dynamic.MoskitoInvokationProxy");
-		clazz.addImport("net.java.dev.moskito.core.predefined.ServiceStatsCallHandler");
-		clazz.addImport("net.java.dev.moskito.core.predefined.ServiceStatsFactory");
+		clazz.addImport(MoskitoInvokationProxy.class);
+		clazz.addImport(ServiceStatsCallHandler.class);
+		clazz.addImport(ServiceStatsFactory.class);
 		clazz.addImport("net.anotheria.asg.service.ASGService");
 	    addAdditionalFactoryImports(clazz, module);
 	    
