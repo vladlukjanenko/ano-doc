@@ -1,9 +1,9 @@
 package net.anotheria.asg.util.locking.config;
 
-import org.apache.log4j.Logger;
+import org.configureme.ConfigurationManager;
 import org.configureme.annotations.Configure;
 import org.configureme.annotations.ConfigureMe;
-import org.configureme.ConfigurationManager;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration for  Locking.
@@ -62,7 +62,7 @@ public class LockingConfig {
 				ConfigurationManager.INSTANCE.configure(instance);
 			}catch(Exception e){
 				try{
-					Logger.getLogger(LockingConfig.class).warn("Couldn't configure LockingConfig, stick to defaults: "+instance);
+					LoggerFactory.getLogger(LockingConfig.class).warn("Couldn't configure LockingConfig, stick to defaults: " + instance);
 				}catch(Exception ignoredlockingexception){
 					//ignored
 				}

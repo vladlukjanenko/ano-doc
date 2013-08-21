@@ -1,11 +1,5 @@
 package net.anotheria.anodoc.query2.string;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.Property;
 import net.anotheria.anodoc.data.StringProperty;
@@ -13,8 +7,15 @@ import net.anotheria.anodoc.query2.DocumentQuery;
 import net.anotheria.anodoc.query2.QueryResultEntry;
 import net.anotheria.asg.data.DataObject;
 import net.anotheria.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 
 /**
  * Implementation of DocumentQuery
@@ -22,15 +23,14 @@ import org.apache.log4j.Logger;
 public class ContainsStringQuery implements DocumentQuery {
 
 	/**
+	 * {@link Logger} instance.
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(ContainsStringQuery.class);
+
+	/**
 	 * Offset.
 	 */
 	public static final int OFFSET = 40;
-
-	/**
-	 * Logger.
-	 */
-	private static final Logger log = Logger
-			.getLogger(ContainsStringQuery.class.getName());
 
 	/**
 	 * Any character constant
@@ -101,14 +101,14 @@ public class ContainsStringQuery implements DocumentQuery {
 			criteriaMatchRegExPattern = Pattern.compile(criteriaMatchRegEx,
 					Pattern.CASE_INSENSITIVE);
 		} catch (PatternSyntaxException e) {
-			log.warn("PatternSyntaxException: " + e.getMessage());
+			LOGGER.warn("PatternSyntaxException: " + e.getMessage());
 			// Try to set regExPattern simply equals to aCriteria
 			try {
 				criteriaRegExPattern = Pattern.compile(aCriteria,
 						Pattern.CASE_INSENSITIVE);
 				criteriaMatchRegExPattern = criteriaRegExPattern;
 			} catch (PatternSyntaxException e1) {
-				log.warn("PatternSyntaxException: " + e.getMessage());
+				LOGGER.warn("PatternSyntaxException: " + e.getMessage());
 				// Should not happened
 				criteriaRegExPattern = null;
 				criteriaMatchRegExPattern = null;
@@ -120,7 +120,7 @@ public class ContainsStringQuery implements DocumentQuery {
 	 * Match method with simple expressions processing support.
 	 */
 	public List<QueryResultEntry> match(DataObject obj) {
-		log.debug("Match DataObject  " + obj.getDefinedName() + " with ID " + obj.getId() + "." + this);
+		LOGGER.debug("Match DataObject  " + obj.getDefinedName() + " with ID " + obj.getId() + "." + this);
 		
 		List<QueryResultEntry> ret = new ArrayList<QueryResultEntry>();
 

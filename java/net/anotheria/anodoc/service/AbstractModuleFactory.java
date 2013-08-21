@@ -1,14 +1,14 @@
 package net.anotheria.anodoc.service;
 
-import java.io.Serializable;
-
-import org.apache.log4j.Logger;
-
 import net.anotheria.anodoc.data.DataHolder;
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.DocumentList;
 import net.anotheria.anodoc.data.IDHolder;
 import net.anotheria.anodoc.data.Module;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 /** 
  * Base imlementation of IModuleFactory interface which only 
@@ -19,12 +19,12 @@ public abstract class AbstractModuleFactory implements IModuleFactory, Serializa
 	private static final long serialVersionUID=1580293076199614251L;
 	
 	/**
-	 * Logger.
+	 * {@link Logger} instance.
 	 */
 	private Logger log;
 	
 	protected AbstractModuleFactory(){
-		log = Logger.getLogger(this.getClass()); 
+		log = LoggerFactory.getLogger(this.getClass());
 	}
 	
 	protected Logger getLog(){

@@ -1,19 +1,20 @@
 package net.anotheria.asg.service;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.apache.log4j.Logger;
-
 import net.anotheria.asg.data.DataObject;
 import net.anotheria.asg.util.listener.IServiceListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AbstractASGService implements ASGService{
 	
 	/**
-	 * Log.
+	 * {@link Logger} instance.
 	 */
-	private static Logger log = Logger.getLogger(AbstractASGService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractASGService.class);
+
 	/**
 	 * List with listeners. This list is a CopyOnWriteArrayList, hence its safe to add a new listener anytime. However, typically you will add a listener on init of some stuff.
 	 */
@@ -28,7 +29,7 @@ public abstract class AbstractASGService implements ASGService{
 			try{
 				listener.documentCreated(created);
 			}catch(Exception e){
-				log.warn("Caught uncaught exception by the listener "+listener+", fireObjectCreatedEvent("+created+")", e);
+				LOGGER.warn("Caught uncaught exception by the listener " + listener + ", fireObjectCreatedEvent(" + created + ")", e);
 			}
 		}
 	}
@@ -43,7 +44,7 @@ public abstract class AbstractASGService implements ASGService{
 			try{
 				listener.documentUpdated(oldVersion, newVersion);
 			}catch(Exception e){
-				log.warn("Caught uncaught exception by the listener "+listener+", fireObjectUpdatedEvent("+oldVersion+", "+newVersion+")", e);
+				LOGGER.warn("Caught uncaught exception by the listener " + listener + ", fireObjectUpdatedEvent(" + oldVersion + ", " + newVersion + ")", e);
 			}
 		}
 	}
@@ -57,7 +58,7 @@ public abstract class AbstractASGService implements ASGService{
 			try{
 				listener.documentDeleted(deleted);
 			}catch(Exception e){
-				log.warn("Caught uncaught exception by the listener "+listener+", fireObjectDeletedEvent("+deleted+")", e);
+				LOGGER.warn("Caught uncaught exception by the listener " + listener + ", fireObjectDeletedEvent(" + deleted + ")", e);
 			}
 		}
 	}
@@ -71,7 +72,7 @@ public abstract class AbstractASGService implements ASGService{
 			try{
 				listener.documentImported(imported);
 			}catch(Exception e){
-				log.warn("Caught uncaught exception by the listener "+listener+", fireObjectImportedEvent("+imported+")", e);
+				LOGGER.warn("Caught uncaught exception by the listener " + listener + ", fireObjectImportedEvent(" + imported + ")", e);
 			}
 		}
 	}
@@ -84,7 +85,7 @@ public abstract class AbstractASGService implements ASGService{
 			try{
 				listener.persistenceChanged();
 			}catch(Exception e){
-				log.warn("Caught uncaught exception by the listener "+listener+", firePersistenceChangedEvent()", e);
+				LOGGER.warn("Caught uncaught exception by the listener " + listener + ", firePersistenceChangedEvent()", e);
 			}
 		}
 	}

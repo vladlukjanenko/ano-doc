@@ -1,8 +1,5 @@
 package net.anotheria.asg.generator.apputil;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.exception.ASGRuntimeException;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.ConfiguratorGenerator;
@@ -13,6 +10,9 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLImporterGenerator extends AbstractGenerator{
 	
@@ -69,7 +69,6 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		clazz.addImport("net.anotheria.util.xml.XMLWriter");
 		clazz.addImport("net.anotheria.util.Date");
 		clazz.addImport(ASGRuntimeException.class.getName());
-		clazz.addImport("org.apache.log4j.BasicConfigurator");
 		emptyline();
 		for (MetaModule m : modules){
 			clazz.addImport(ServiceGenerator.getFactoryImport(m));
@@ -184,7 +183,6 @@ public class XMLImporterGenerator extends AbstractGenerator{
 		
 		appendString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
 		increaseIdent();
-		appendStatement("BasicConfigurator.configure()");
 		appendStatement("new "+getImporterClassName(context)+"().writeCompleteXMLExportToFile(new File("+quote(context.getApplicationName()+"_export.xml")+"))");
 		append(closeBlock());
 

@@ -1,8 +1,5 @@
 package net.anotheria.asg.generator.apputil;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedXMLFile;
@@ -11,6 +8,14 @@ import net.anotheria.asg.generator.IGenerateable;
 import net.anotheria.asg.generator.IGenerator;
 import net.anotheria.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Log4j configuration generator.
+ *
+ * Comment: In version 2.5.1 migration to slf4j was done and this file doesn't seem to be needed and can be removed in future.
+ */
 public class Log4JConfigurationGenerator extends AbstractGenerator implements IGenerator {
 
 	/**

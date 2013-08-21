@@ -1,9 +1,11 @@
 package net.anotheria.anodoc.service;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.apache.log4j.Logger;
 
 /**
  * This class contains a reentrant read-write lock and offers operations on it. It is used to synchronize the shutdown of the VM and to allow the threads to finish the writes prior to the shutdown,
@@ -12,9 +14,13 @@ import org.apache.log4j.Logger;
  *
  */
 public class LockHolder {
+
+	/**
+	 * {@link Logger} instance.
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(LockHolder.class);
+
 	private static ReadWriteLock lock = new ReentrantReadWriteLock();
-	
-	private static Logger log = Logger.getLogger(LockHolder.class);
 
 	private LockHolder() {
 	}
@@ -34,9 +40,9 @@ public class LockHolder {
 	public static final void addShutdownHook(){
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			public void run(){
-				log.info("Shutdown detecting, blocking writing threads");
+				LOGGER.info("Shutdown detecting, blocking writing threads");
 				blockAll();
-				log.info("Proceeding with shutdown");
+				LOGGER.info("Proceeding with shutdown");
 			}
 		});
 	}

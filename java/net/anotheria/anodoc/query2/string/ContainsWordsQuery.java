@@ -1,5 +1,16 @@
 package net.anotheria.anodoc.query2.string;
 
+import net.anotheria.anodoc.data.Document;
+import net.anotheria.anodoc.data.Property;
+import net.anotheria.anodoc.data.StringProperty;
+import net.anotheria.anodoc.query2.DocumentQuery;
+import net.anotheria.anodoc.query2.QueryResultEntry;
+import net.anotheria.asg.data.DataObject;
+import net.anotheria.util.IOUtils;
+import net.anotheria.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,19 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.anotheria.anodoc.data.Document;
-import net.anotheria.anodoc.data.Property;
-import net.anotheria.anodoc.data.StringProperty;
-import net.anotheria.anodoc.query2.DocumentQuery;
-import net.anotheria.anodoc.query2.QueryResultEntry;
-import net.anotheria.asg.data.DataObject;
-import net.anotheria.util.IOUtils;
-import net.anotheria.util.StringUtils;
-
-import org.apache.log4j.Logger;
 
 public class ContainsWordsQuery implements DocumentQuery{
-	
+
+	/**
+	 * {@link Logger} instance.
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(ContainsWordsQuery.class);
+
 	public static class Index{
 		Map<String, Occurrenece> index = new HashMap<String, ContainsWordsQuery.Occurrenece>();
 		int size = 0;
@@ -95,7 +101,6 @@ public class ContainsWordsQuery implements DocumentQuery{
 		WORDS_SEPARATORS.put("_", " ");
 	}
 	
-	private static final Logger log = Logger.getLogger(ContainsWordsQuery.class);
 
 	private String[] criteria;
 	private Set<String> propertiesToSearch = Collections.emptySet();
@@ -115,7 +120,7 @@ public class ContainsWordsQuery implements DocumentQuery{
 	
   
 	public List<QueryResultEntry> match(DataObject obj) {
-		log.debug("Match DataObject  " + obj.getDefinedName() + " with ID " + obj.getId() + "." + this);
+		LOGGER.debug("Match DataObject  " + obj.getDefinedName() + " with ID " + obj.getId() + "." + this);
 		if (!(obj instanceof Document))
 			throw new AssertionError("Supports only search in a Document instance!");
 		return match((Document)obj);

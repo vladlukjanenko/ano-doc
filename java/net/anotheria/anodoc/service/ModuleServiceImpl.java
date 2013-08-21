@@ -1,15 +1,15 @@
 package net.anotheria.anodoc.service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.anotheria.anodoc.data.Module;
-
 import net.anotheria.asg.util.listener.IModuleListener;
-import org.apache.log4j.Logger;
 import org.configureme.ConfigurationManager;
 import org.configureme.annotations.AfterConfiguration;
 import org.configureme.annotations.ConfigureMe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -18,7 +18,12 @@ import org.configureme.annotations.ConfigureMe;
  */
 @ConfigureMe (name="anodoc.storage")
 public class ModuleServiceImpl implements IModuleService, IModuleListener{
-	
+
+	/**
+	 * {@link Logger} instance.
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModuleServiceImpl.class);
+
 	/**
 	 * A delimiter which is used between different parts of the unique module key.
 	 */
@@ -30,11 +35,6 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 	public static final String DEFAULT_COPY_ID = "singlecopy";
 
 	/**
-	 * Logger.
-	 */
-	private static Logger log = Logger.getLogger(ModuleServiceImpl.class);
-	 
-	/** 
 	 * The factories.
 	 */
 	private Map<String, IModuleFactory> factories;
@@ -76,8 +76,8 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 		cache = new ConcurrentHashMap<String, Module>();
 		moduleListeners = new ConcurrentHashMap<String, IModuleListener>();
 
-		if (log.isDebugEnabled()) {
-			log.debug("Created new ModuleServiceImplementation");
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Created new ModuleServiceImplementation");
 		}
 
 		ConfigurationManager.INSTANCE.configure(this);
@@ -88,8 +88,8 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 	 */
 	public void attachModuleFactory(String moduleId, IModuleFactory factory) {
 		factories.put(moduleId, factory);
-		if (log.isDebugEnabled()) {
-			log.debug("Attached module factory "+factory+" for moduleId:"+moduleId);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Attached module factory "+factory+" for moduleId:"+moduleId);
 		}
 	}
 	
@@ -101,8 +101,8 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 		storages.put(moduleId, storage);
 		storage.addModuleListener(this);
 
-		if (log.isDebugEnabled()) {
-			log.debug("Attached module storage "+storage+" for moduleId:"+moduleId);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Attached module storage "+storage+" for moduleId:"+moduleId);
 		}
 	}
 
@@ -141,7 +141,7 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 		putInCache(module);
 		IModuleStorage storage = storages.get(module.getId());
 		if (storage==null){
-			log.warn("No storage for "+module.getId()+", "+module+" is not persistent!");
+			LOGGER.warn("No storage for " + module.getId() + ", " + module + " is not persistent!");
 			throw new NoStorageForModuleException(module.getId());
 		}
 		storage.saveModule(module);
@@ -203,23 +203,23 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 		Module module = cache.get(key);
 		
 		if (module!=null){
-			log.debug("Module "+key+" was in cache");
+			LOGGER.debug("Module " + key + " was in cache");
 			return module;
 		}
 		
 		
 		try{
-			log.debug("Trying to load module from storage:"+key);
+			LOGGER.debug("Trying to load module from storage:" + key);
 			module = loadModule(moduleId, ownerId, copyId);
 			//System.out.println("Loading from disk.");
-			log.debug("Loaded module from storage.");
+			LOGGER.debug("Loaded module from storage.");
 			putInCache(module);
 			//long en = System.currentTimeMillis();
 			return module;
 		}catch(NoStoredModuleEntityException e){
 			//log.debug("Loading failed:",e);
 			if (create){
-				log.debug("Creating new instance of "+moduleId+", "+ownerId+", "+copyId);
+				LOGGER.debug("Creating new instance of " + moduleId + ", " + ownerId + ", " + copyId);
 				//eigentlich sollte das die factory schon tun,
 				//aber sicher ist sicher, oder?	 :-)
 				//interessant, wer wird diesen kommentar lesen? schreibt mal
@@ -231,7 +231,7 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 				return module;
 			}
 			
-			log.debug("Loading failed:",e);
+			LOGGER.debug("Loading failed:", e);
 			throw e;
 			
 		}
@@ -305,7 +305,7 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 	 */
 	@Override
 	public void moduleLoaded(Module module){
-		log.info("Persistence changed for " + module);
+		LOGGER.info("Persistence changed for " + module);
 		removeFromCache(module.getId(),module.getOwnerId(),module.getCopyId());
 
 		IModuleListener listener = moduleListeners.get(getKey(module.getId(), DEFAULT_COPY_ID, module.getOwnerId()));
@@ -313,7 +313,7 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 			try{
 				listener.moduleLoaded(module);
 			}catch(Exception e){
-				log.warn("Caught uncaught exception by the listener "+listener+", contentChanged()", e);
+				LOGGER.warn("Caught uncaught exception by the listener " + listener + ", contentChanged()", e);
 			}
 	}
 
@@ -335,7 +335,7 @@ public class ModuleServiceImpl implements IModuleService, IModuleListener{
 	}
 
 	@AfterConfiguration public void notifyConfigurationFinished() {
-		log.info("Cleaning cache.");
+		LOGGER.info("Cleaning cache.");
 		cache.clear();
 	}
 

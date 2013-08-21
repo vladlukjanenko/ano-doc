@@ -1,12 +1,12 @@
 package net.anotheria.asg.generator.apputil;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.generator.AbstractAnoDocGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.meta.MetaModule;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AppUtilGenerator extends AbstractAnoDocGenerator{
 	
@@ -22,7 +22,7 @@ public class AppUtilGenerator extends AbstractAnoDocGenerator{
 		files.addAll(new XMLExporterGenerator().generate(modules));
 		files.addAll(new XMLImporterGenerator().generate(modules, context));
 		files.addAll(new LanguageUtilsGenerator().generate(modules, context));
-		files.addAll(new Log4JConfigurationGenerator().generate(null));
+		//files.addAll(new Log4JConfigurationGenerator().generate(null));
 		
 		
 		writeFiles(files);

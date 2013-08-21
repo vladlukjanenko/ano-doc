@@ -98,9 +98,10 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		clazz.addImport("net.anotheria.anosite.cms.user.CMSUserManager");
 		clazz.addImport("net.anotheria.asg.util.locking.config.LockingConfig");
 		appendStatement("private static LockingConfig lockConfig;");
-		appendStatement("private static Logger log = Logger.getLogger("+getBaseActionName()+".class)");
-		clazz.addImport("org.apache.log4j.Logger");
-
+		appendStatement("private static Logger log = LoggerFactory.getLogger("+getBaseActionName()+".class)");
+		clazz.addImport("org.slf4j.Logger");
+		clazz.addImport("org.slf4j.LoggerFactory");
+		clazz.addImport("org.slf4j.MarkerFactory");
 		appendString("static{");
 		increaseIdent();
 		
@@ -119,7 +120,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("try{");
 		appendIncreasedStatement("userManager = CMSUserManager.getInstance()");
 		appendString("}catch(Exception e){");
-		appendIncreasedStatement("log.fatal("+quote("Can't init user manager")+", e)");
+		appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), "+quote("Can't init user manager")+", e)");
 		appendString("}");
 		//end init user manager
 		//initing Lock Config
@@ -128,7 +129,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 		appendString("try{");
 		appendIncreasedStatement("lockConfig = LockingConfig.getInstance()");
 		appendString("}catch(Exception e){");
-		appendIncreasedStatement("log.fatal("+quote("Can't init lockConfig")+", e)");
+		appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), "+quote("Can't init lockConfig")+", e)");
 		appendString("}");
         // end initing Lock Config
 	
@@ -194,7 +195,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 			appendString("try{");
 			appendIncreasedStatement(ModuleActionsGenerator.getServiceInstanceName(m)+" = MetaFactory.get("+ServiceGenerator.getInterfaceName(m)+".class, Extension.EDITORINTERFACE)");
 			appendString("}catch(MetaFactoryException e){");
-			appendIncreasedStatement("log.fatal("+quote("Can't load editor instance of module service "+m.getName())+", e)");
+			appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), "+quote("Can't load editor instance of module service "+m.getName())+", e)");
 			appendString("}");
 			closeBlock("... if null");
 			closeBlock("... synch");

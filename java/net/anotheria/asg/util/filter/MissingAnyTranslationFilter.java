@@ -1,15 +1,15 @@
 package net.anotheria.asg.util.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import net.anotheria.anodoc.data.Document;
 import net.anotheria.anodoc.data.NoSuchPropertyException;
 import net.anotheria.anodoc.data.Property;
 import net.anotheria.anodoc.util.context.ContextManager;
 import net.anotheria.asg.data.DataObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Missing Any Translation Filter. Pass documents if any of properties:
@@ -29,8 +29,12 @@ import net.anotheria.asg.data.DataObject;
  * 
  */
 public class MissingAnyTranslationFilter implements DocumentFilter{
-	
-	private static final Logger log = Logger.getLogger(MissingAnyTranslationFilter.class);
+
+	/**
+	 * {@link Logger} instance.
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(MissingAnyTranslationFilter.class);
+
 	/**
 	 * List of filter triggers.
 	 */
@@ -55,7 +59,7 @@ public class MissingAnyTranslationFilter implements DocumentFilter{
 			this.defaultLanguage = ContextManager.getCallContext().getDefaultLanguage();
 			this.setSupportedLanguages( ContextManager.getCallContext().getSupportedLanguages() );			
 		} catch(Exception e) {
-			log.warn("CallContext can not be getted by ContextManager. Setting default language and supported languages to EN",e);
+			LOGGER.warn("CallContext can not be getted by ContextManager. Setting default language and supported languages to EN", e);
 			
 			this.setDefaultLanguage("EN");
 			List<String> defaultSupportedLanguages = new ArrayList<String>();

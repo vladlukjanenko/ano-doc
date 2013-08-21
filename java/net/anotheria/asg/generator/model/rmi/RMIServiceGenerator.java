@@ -1,9 +1,6 @@
 package net.anotheria.asg.generator.model.rmi;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
@@ -21,6 +18,9 @@ import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.asg.generator.model.inmemory.InMemoryServiceGenerator;
 import net.anotheria.util.ExecutionTimer;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Generates a RMI-Backed distribution of a module interface and the according factory.
@@ -443,7 +443,10 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getLookupName(aModule), this));
 		clazz.setPackageName(getPackageName(aModule));
 
-		clazz.addImport("org.apache.log4j.Logger");
+		clazz.addImport("org.slf4j.Logger");
+		clazz.addImport("org.slf4j.LoggerFactory");
+		clazz.addImport("org.slf4j.MarkerFactory");
+
 		clazz.addImport("java.rmi.registry.Registry");
 		clazz.addImport("java.rmi.registry.LocateRegistry");
 		clazz.addImport("net.anotheria.asg.util.rmi.RMIConfig");
@@ -453,7 +456,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		
 		startClassBody();
 		
-	    appendStatement("private static Logger log = Logger.getLogger(", quote(getLookupName(aModule)), ")");
+	    appendStatement("private static Logger log = LoggerFactory.getLogger(", quote(getLookupName(aModule)), ")");
 	    emptyline();
 	    appendStatement("private static Registry rmiRegistry");
 	    appendString("static{");
@@ -463,7 +466,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("try{");
 	    appendIncreasedStatement("rmiRegistry = LocateRegistry.getRegistry(config.getRegistryHost(), config.getRegistryPort())");
 	    appendString("}catch(Exception e){");
-	    appendIncreasedStatement("log.fatal(\"Coulnd't obtain rmi registry\", e)");
+	    appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), \"Coulnd't obtain rmi registry\", e)");
 	    appendString("}");
         closeBlockNEW();
 	    emptyline();
@@ -493,7 +496,6 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 		clazz.setTypeComment(CommentGenerator.generateJavaTypeComment(getServerName(aModule), this));
 		clazz.setPackageName(getPackageName(aModule));
 		
-	    clazz.addImport("org.apache.log4j.xml.DOMConfigurator");
 	    clazz.addImport("java.rmi.registry.Registry");
 	    clazz.addImport("java.rmi.registry.LocateRegistry");
 	    clazz.addImport("java.rmi.server.UnicastRemoteObject");
@@ -504,7 +506,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    clazz.addImport(ServiceGenerator.getFactoryImport(aModule));
 	    clazz.addImport("net.anotheria.asg.service.InMemoryService");
 	    clazz.addImport(InMemoryServiceGenerator.getInMemoryFactoryImport(aModule));
-	    
+	   	clazz.addImport("org.slf4j.MarkerFactory");
 	    clazz.setName(getServerName(aModule));
 	    clazz.setGenerateLogger(true);
 	    
@@ -512,14 +514,13 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 
 	    appendString("public static void main(String a[]){");
 	    increaseIdent();
-	    appendStatement("DOMConfigurator.configureAndWatch(",quote("/log4j.xml"), ")");
 	    appendStatement("Registry rmiRegistry = null");
 	    appendCommentLine("lookup rmi registry");
 	    appendStatement("RMIConfig config = RMIConfigFactory.getRMIConfig()");
 	    appendString("try{");
 	    appendIncreasedStatement("rmiRegistry = LocateRegistry.getRegistry(config.getRegistryHost(), config.getRegistryPort())");
 	    appendString("}catch(Exception e){");
-	    appendIncreasedStatement("log.fatal(\"Coulnd't obtain rmi registry\", e)");
+	    appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), \"Coulnd't obtain rmi registry\", e)");
 	    appendIncreasedStatement("System.err.println(\"Coulnd't obtain rmi registry\")");
 	    appendIncreasedStatement("System.exit(-1)");
 	    appendString("}");
@@ -528,7 +529,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    appendString("try{");
 	    appendIncreasedStatement("startService(rmiRegistry)");
 	    appendString("}catch(Exception e){");
-	    appendIncreasedStatement("log.fatal(", quote("Couldn't start service"), ", e)");
+	    appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), ", quote("Couldn't start service"), ", e)");
 	    appendIncreasedStatement("System.err.println(", quote("Couldn't start service"), ")");
 	    appendIncreasedStatement("System.exit(-2)");
 	    appendString("}");
@@ -554,7 +555,7 @@ public class RMIServiceGenerator extends AbstractServiceGenerator implements IGe
 	    decreaseIdent();
 	    appendString("} catch (Exception e) {");
 	    increaseIdent();	
-	    appendStatement("log.fatal(", quote("Could not read UserService In Memory: "), "+ e)");
+	    appendStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), ", quote("Could not read UserService In Memory: "), "+ e)");
 	    appendStatement("throw e");
 	    closeBlockNEW();
 	    closeBlockNEW();

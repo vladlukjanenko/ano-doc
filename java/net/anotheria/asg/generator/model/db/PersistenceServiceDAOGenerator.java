@@ -321,7 +321,8 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		clazz.addImport("java.sql.ResultSet");
 		clazz.addImport("java.sql.SQLException");
 		clazz.addImport("java.sql.Statement");
-		clazz.addImport("org.apache.log4j.Logger");
+		clazz.addImport("org.slf4j.Logger");
+		clazz.addImport("org.slf4j.LoggerFactory");
 		clazz.addImport("net.anotheria.db.config.JDBCConfigFactory");
 		clazz.addImport("net.anotheria.db.config.JDBCConfig");
 
@@ -334,7 +335,7 @@ public class PersistenceServiceDAOGenerator extends AbstractGenerator implements
 		clazz.addInterface("DAO");
 
 		startClassBody();
-		appendStatement("private static Logger log = Logger.getLogger(" + getDAOName(doc) + ".class)");
+		appendStatement("private static Logger log = LoggerFactory.getLogger(" + getDAOName(doc) + ".class)");
 
 		//first define constants.
 		String constDecl = "public static final String ";

@@ -9,14 +9,19 @@ import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;
 import net.anotheria.asg.util.listener.IModuleListener;
 import net.anotheria.util.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.configureme.ConfigurationManager;
 import org.configureme.annotations.AfterConfiguration;
 import org.configureme.annotations.Configure;
 import org.configureme.annotations.ConfigureMe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -30,6 +35,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @ConfigureMe (name="anodoc.storage")
 public class CommonHashtableModuleStorage implements IModuleStorage{
+
+	/**
+	 * {@link Logger} instance.
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(CommonHashtableModuleStorage.class);
 
 	/**
 	 * Key for storage directory. 
@@ -68,10 +78,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	 * Task for file's changes watching.
 	 */
 	private FileWatcher fileWatchingTimer;
-	/**
-	 * Default logger.
-	 */
-	private static Logger log = Logger.getLogger(CommonHashtableModuleStorage.class);
+
 	/**
 	 * List with listeners. This list is a CopyOnWriteArrayList, hence its safe to add a new listener anytime. However, typically you will add a listener on init of some stuff.
 	 */
@@ -168,7 +175,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 	
 	
 	private String makeKey(Module m){
-		log.debug("key " + m.getOwnerId() + "#"+ m.getCopyId());
+		LOGGER.debug("key " + m.getOwnerId() + "#" + m.getCopyId());
 		return makeKey(m.getOwnerId(), m.getCopyId());	
 	}
 	
@@ -200,7 +207,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 
 	@SuppressWarnings("unchecked")
 	private void save(){
-		log.info("Saving modules...");
+		LOGGER.info("Saving modules...");
 
 		//erstmal konvertieren
 		Enumeration<String> allKeys = storage.keys();
@@ -222,9 +229,8 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 			oOut = new ObjectOutputStream(new FileOutputStream(getFile(filename)));
 			oOut.writeObject(toSave);
 		}catch(Exception e){
-			if (log.isEnabledFor(Priority.ERROR)) {
-				log.error("save",e);
-			}
+			if (LOGGER.isErrorEnabled())
+				LOGGER.error("save",e);
 		}finally{
 			IOUtils.closeIgnoringException(oOut);
 		}
@@ -262,9 +268,8 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 			}
 
 		}catch(FileNotFoundException ignorable){
-			if (log.isEnabledFor(Priority.INFO)) {
-				log.info("FileNotFound "+filename+", assuming new installation");
-			}
+			if (LOGGER.isInfoEnabled())
+				LOGGER.info("FileNotFound "+filename+", assuming new installation");
 
 			for (String key : storage.keySet()){
 				Module module = storage.get(key);
@@ -276,9 +281,8 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 			save();
 
 		}catch(Exception e){
-			if (log.isEnabledFor(Priority.ERROR)) {
-				log.error("load", e);
-			}
+			if (LOGGER.isErrorEnabled())
+				LOGGER.error("load", e);
 		}finally{
 			IOUtils.closeIgnoringException(oIn);
 		}
@@ -336,7 +340,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 				try{
 					listener.moduleLoaded(changed);
 				}catch(Exception e){
-					log.error("Caught uncaught exception by the listener "+listener+", moduleLoaded("+changed+")", e);
+					LOGGER.error("Caught uncaught exception by the listener " + listener + ", moduleLoaded(" + changed + ")", e);
 				}
 	}
 
@@ -350,7 +354,7 @@ public class CommonHashtableModuleStorage implements IModuleStorage{
 		fileWatchingTimer = new FileWatcher(getFileLock(filename), FILE_CHECK_PERIOD) {
 			@Override
 			protected void onChange() {
-				log.info("content of modules in " + getFile(filename) + " has been changed");
+				LOGGER.info("content of modules in " + getFile(filename) + " has been changed");
 				firePersistenceChangedEvent();
 			}
 		};

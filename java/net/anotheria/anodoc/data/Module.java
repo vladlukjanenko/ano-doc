@@ -1,17 +1,17 @@
 package net.anotheria.anodoc.data;
 
+import net.anotheria.anodoc.service.IModuleFactory;
+import net.anotheria.anodoc.util.KeyUtility;
+import net.anotheria.util.xml.XMLAttribute;
+import net.anotheria.util.xml.XMLNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import org.apache.log4j.Logger;
-
-import net.anotheria.anodoc.service.IModuleFactory;
-import net.anotheria.anodoc.util.KeyUtility;
-import net.anotheria.util.xml.XMLAttribute;
-import net.anotheria.util.xml.XMLNode;
 
 /**
  * This class describes a Module, which is a unity that can be stored
@@ -80,7 +80,7 @@ public class Module implements ICompositeDataObject, Serializable{
 		this.id = anId;
 		holders = new Hashtable<String,DataHolder>();
 		getLog();//ensuring that logger is initialized.
-		log = Logger.getLogger(this.getClass());
+		log = LoggerFactory.getLogger(this.getClass());
 	}
 	
 	/**
@@ -188,7 +188,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	
 
 	/**
-	 * @see net.anotheria.anodoc.data.IStoreable#getKeys()
+	 *
 	 */
 	@Override public Enumeration<String> getKeys() {
 		Enumeration<DataHolder> allObjects = holders.elements();
@@ -201,7 +201,7 @@ public class Module implements ICompositeDataObject, Serializable{
 	}
 
 	/**
-	 * @see net.anotheria.anodoc.data.IStoreable#getObject(Object)
+	 * @see net.anotheria.anodoc.data
 	 */
 	@Override public Object getObject(String key) {
 		String myKey = key.substring(key.indexOf(IHelperConstants.DELIMITER)+1);
@@ -342,7 +342,7 @@ public class Module implements ICompositeDataObject, Serializable{
 
 	/**
 	 * Sets the moduleFactory.
-	 * @param moduleFactory The moduleFactory to set
+	 * @param myFactory The moduleFactory to set
 	 */
 	public void setModuleFactory(IModuleFactory myFactory) {
 		this.moduleFactory = myFactory;

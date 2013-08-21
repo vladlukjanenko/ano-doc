@@ -1,10 +1,10 @@
 package net.anotheria.asg.generator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.service.AbstractASGService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -31,9 +31,10 @@ public class BasicServiceGenerator extends AbstractGenerator{
 		
 		clazz.setPackageName(GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED)+".service");
 		
-		clazz.addImport("org.apache.log4j.Logger");
-		clazz.addImport(AbstractASGService.class);
+		clazz.addImport("org.slf4j.Logger");
+		clazz.addImport("org.slf4j.LoggerFactory");
 
+		clazz.addImport(AbstractASGService.class);
 
 		clazz.setAbstractClass(true);
 		clazz.setName("BasicService");
@@ -48,7 +49,7 @@ public class BasicServiceGenerator extends AbstractGenerator{
         //generate constructor
         appendString("protected BasicService(){");
         increaseIdent();
-        appendStatement("log = Logger.getLogger(this.getClass())");
+        appendStatement("log = LoggerFactory.getLogger(this.getClass())");
         closeBlockNEW();
         emptyline();
 		return clazz;

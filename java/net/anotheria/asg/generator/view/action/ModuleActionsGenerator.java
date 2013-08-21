@@ -163,9 +163,9 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		clazz.addImport("net.anotheria.util.slicer.Slice");
 		clazz.addImport("net.anotheria.util.slicer.Segment");
 		clazz.addImport("net.anotheria.asg.util.bean.PagingLink");
-		clazz.addImport("org.apache.log4j.Logger");
-		
-
+		clazz.addImport("org.slf4j.Logger");
+		clazz.addImport("org.slf4j.LoggerFactory");
+		clazz.addImport("org.slf4j.MarkerFactory");
 
 
 		for (MetaViewElement element : elements) {
@@ -188,7 +188,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement("public static final String SA_SORT_TYPE = SA_SORT_TYPE_PREFIX+", quote(doc.getName()));
 		appendStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+", quote(doc.getName()));
 		appendStatement("private static final List<String> ITEMS_ON_PAGE_SELECTOR = java.util.Arrays.asList(new String[]{\"5\",\"10\",\"20\",\"25\",\"50\",\"100\",\"500\",\"1000\"})");
-		appendStatement("private static final Logger log = Logger.getLogger("+getExportActionName(section)+".class)");
+		appendStatement("private static final Logger log = LoggerFactory.getLogger("+getExportActionName(section)+".class)");
 		
 		if (containsComparable) {
 			clazz.addImport("net.anotheria.util.sorter.Sorter");
@@ -221,7 +221,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 			decreaseIdent();
 			appendString("} catch(Exception e){");
-			appendIncreasedStatement("log.fatal(\"Couldn't instantiate filter:\", e)");
+			appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), \"Couldn't instantiate filter:\", e)");
 			appendString("}");
 		}
 		closeBlockNEW();
@@ -833,9 +833,10 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
         if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
            clazz.addImport("net.anotheria.asg.data.LockableObject");
         }
-        
-        clazz.addImport("org.apache.log4j.Logger");
-		
+
+		clazz.addImport("org.slf4j.Logger");
+		clazz.addImport("org.slf4j.LoggerFactory");
+		clazz.addImport("org.slf4j.MarkerFactory");
 		//check if we have to property definition files.
 		//check if we have decorators
 		List<MetaDecorator> neededDecorators = new ArrayList<MetaDecorator>();
@@ -868,7 +869,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    appendStatement("public static final String SA_FILTER = SA_FILTER_PREFIX+", quote(doc.getName()));
 	    appendStatement("private static final List<String> ITEMS_ON_PAGE_SELECTOR = java.util.Arrays.asList(new String[]{\"5\",\"10\",\"20\",\"25\",\"50\",\"100\",\"500\",\"1000\"})");
 	    
-	    appendStatement("private static Logger log = Logger.getLogger("+getShowActionName(section)+".class)");
+	    appendStatement("private static Logger log = LoggerFactory.getLogger("+getShowActionName(section)+".class)");
 	    
 	    boolean containsDecorators = neededDecorators.size() >0;
 	    
@@ -915,7 +916,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 			decreaseIdent();
 			appendString( "} catch(Exception e){");
-			appendIncreasedStatement("log.fatal(\"Couldn't instantiate decorator:\", e)");
+			appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), \"Couldn't instantiate decorator:\", e)");
 			appendString( "}");
 		}
 	    //add filters
@@ -927,7 +928,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			}
 			decreaseIdent();
 			appendString( "} catch(Exception e){");
-			appendIncreasedStatement("log.fatal(\"Couldn't instantiate filter:\", e)");
+			appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), \"Couldn't instantiate filter:\", e)");
 			appendString( "}");
 		}
 	    closeBlockNEW();
@@ -2506,8 +2507,8 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 			clazz.addImport("net.anotheria.asg.data.LockableObject");
 			clazz.addImport("net.anotheria.asg.util.locking.exeption.LockingException");
 			clazz.addImport("net.anotheria.asg.util.locking.helper.DocumentLockingHelper");
-			clazz.addImport("org.apache.log4j.Logger");
-			
+			clazz.addImport("org.slf4j.Logger");
+			clazz.addImport("org.slf4j.LoggerFactory");
 		}
 		clazz.addImport("net.anotheria.maf.bean.FormBean");
 		clazz.setGeneric("T extends FormBean");
@@ -2517,7 +2518,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 	    startClassBody();
 
 		if(isCMS)
-		appendStatement("private final Logger logger = Logger.getLogger(\"cms-lock-log\")");
+		appendStatement("private final Logger logger = LoggerFactory.getLogger(\"cms-lock-log\")");
 	    //generate getTitle
 	    appendString( "protected String getTitle(){");
 	    increaseIdent();

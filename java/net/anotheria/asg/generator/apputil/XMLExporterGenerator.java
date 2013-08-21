@@ -1,8 +1,5 @@
 package net.anotheria.asg.generator.apputil;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.exception.ASGRuntimeException;
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.ConfiguratorGenerator;
@@ -13,6 +10,9 @@ import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class XMLExporterGenerator extends AbstractGenerator {
 	
@@ -56,7 +56,6 @@ public class XMLExporterGenerator extends AbstractGenerator {
 		clazz.addImport("net.anotheria.util.IOUtils");
 		clazz.addImport(StringUtils.class);
 		clazz.addImport(ASGRuntimeException.class);
-		clazz.addImport("org.apache.log4j.BasicConfigurator");
 		for (MetaModule m : modules){
 			clazz.addImport(ServiceGenerator.getFactoryImport(m));
 		}
@@ -174,7 +173,6 @@ public class XMLExporterGenerator extends AbstractGenerator {
 		
 		appendString("public static void main(String[] a) throws IOException,ASGRuntimeException{");
 		increaseIdent();
-		appendStatement("BasicConfigurator.configure()");
 		appendString("if (a.length==0)");
 		appendIncreasedStatement("interactiveMode(a)");
 		appendString("else");

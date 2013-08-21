@@ -1,8 +1,5 @@
 package net.anotheria.asg.generator.model.db;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.CommentGenerator;
 import net.anotheria.asg.generator.Context;
@@ -16,6 +13,9 @@ import net.anotheria.asg.generator.TypeOfClass;
 import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.DataFacadeGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class JDBCPersistenceServiceGenerator extends AbstractGenerator implements IGenerator{
@@ -214,6 +214,7 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	    clazz.addImport("net.anotheria.util.Date");
 	    clazz.addImport("net.anotheria.util.slicer.Segment");
 	    clazz.addImport("net.anotheria.anodoc.query2.QueryProperty");
+		clazz.addImport("org.slf4j.MarkerFactory");
 	    List<MetaDocument> docs = module.getDocuments();
 	    for (MetaDocument doc : docs){
 	    	clazz.addImport(DataFacadeGenerator.getDocumentImport(doc));
@@ -281,14 +282,14 @@ public class JDBCPersistenceServiceGenerator extends AbstractGenerator implement
 	
 	    decreaseIdent();
 	    appendString("}catch(DAOException e){");
-		appendIncreasedStatement("log.fatal(\"init failed (dao:\"+currentDAO+\") \",e )");
+		appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), \"init failed (dao:\"+currentDAO+\") \",e )");
 		//appendIncreasedStatement("throw new RuntimeException(\"init failed (dao:\"+currentDAO+\") cause: \"+e.getMessage())"));
 	    appendString("}catch(SQLException e){");
-		appendIncreasedStatement("log.fatal(\"init failed (sql) \",e )");
+		appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), \"init failed (sql) \",e )");
 		//appendIncreasedStatement("throw new RuntimeException(\"init failed (sql) cause: \"+e.getMessage())"));
 	    appendString("}catch(Exception e){");
 	    appendIncreasedStatement("System.out.println(e.getMessage()+\" \"+e.getClass())");
-		appendIncreasedStatement("log.fatal(\"init failed (e) \",e )");
+		appendIncreasedStatement("log.error(MarkerFactory.getMarker(\"FATAL\"), \"init failed (e) \",e )");
 		//appendIncreasedStatement("throw new RuntimeException(\"init failed (sql) cause: \"+e.getMessage())"));
 		appendString("}");
 	    closeBlockNEW();

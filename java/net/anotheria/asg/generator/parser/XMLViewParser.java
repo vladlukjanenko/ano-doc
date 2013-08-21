@@ -1,11 +1,5 @@
 package net.anotheria.asg.generator.parser;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.view.meta.MetaCustomFunctionElement;
@@ -19,23 +13,32 @@ import net.anotheria.asg.generator.view.meta.MetaListElement;
 import net.anotheria.asg.generator.view.meta.MetaModuleSection;
 import net.anotheria.asg.generator.view.meta.MetaSection;
 import net.anotheria.asg.generator.view.meta.MetaValidator;
-import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.asg.generator.view.meta.MetaView;
+import net.anotheria.asg.generator.view.meta.MetaViewElement;
 import net.anotheria.util.StringUtils;
-
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * XML Parser for MetaViews.
  * @author another
  */
 public final class XMLViewParser {
-	
-	private static Logger log = Logger.getLogger(XMLViewParser.class);
+
+	/**
+	 * {@link Logger} instance.
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(XMLViewParser.class);
 	
 	public static final List<MetaView> parseViews(String content){
 		
@@ -52,10 +55,10 @@ public final class XMLViewParser {
 				ret.add(view);
 			}
 		}catch(JDOMException e){
-			log.error("parseViews", e);
+			LOGGER.error("parseViews", e);
 			throw new RuntimeException("Can't parse view because: "+e.getMessage());
 		}catch(IOException e){
-			log.error("parseViews", e);
+			LOGGER.error("parseViews", e);
 			throw new RuntimeException("Can't parse view because: "+e.getMessage());
 		}
 		return ret;
@@ -207,7 +210,7 @@ public final class XMLViewParser {
 				//System.out.println("found decorator!");
 			}
 		}catch(Exception e){
-			log.error("*********** Could not parse decorator cause: " + e.getMessage() + " ***********");
+			LOGGER.error("*********** Could not parse decorator cause: " + e.getMessage() + " ***********");
 		}
 		
 		return element;

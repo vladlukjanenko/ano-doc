@@ -6,7 +6,8 @@ import net.anotheria.asg.generator.FileEntry;
 import net.anotheria.asg.generator.GeneratedClass;
 import net.anotheria.asg.generator.GeneratorDataRegistry;
 import net.anotheria.asg.generator.meta.MetaModule;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class CMSFilterGenerator extends AbstractGenerator{
 		clazz.addImport(Arrays.class);
 		clazz.addImport(List.class);
 		clazz.addImport(Logger.class);
+		clazz.addImport(LoggerFactory.class);
 		clazz.addImport(File.class);
 		clazz.addImport("javax.servlet.FilterConfig");
 		clazz.addImport("javax.servlet.ServletException");
@@ -53,7 +55,7 @@ public class CMSFilterGenerator extends AbstractGenerator{
 		startClassBody();
 		
 		appendComment("Logger initialization.");
-		appendStatement("private static final Logger log = Logger.getLogger(CMSFilter.class);");
+		appendStatement("private static final Logger log = LoggerFactory.getLogger(CMSFilter.class);");
 		
 		emptyline();
 		

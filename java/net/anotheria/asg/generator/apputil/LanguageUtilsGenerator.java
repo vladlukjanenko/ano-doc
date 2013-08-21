@@ -1,10 +1,5 @@
 package net.anotheria.asg.generator.apputil;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import net.anotheria.asg.generator.AbstractGenerator;
 import net.anotheria.asg.generator.Context;
 import net.anotheria.asg.generator.FileEntry;
@@ -14,6 +9,11 @@ import net.anotheria.asg.generator.meta.MetaDocument;
 import net.anotheria.asg.generator.meta.MetaModule;
 import net.anotheria.asg.generator.model.ServiceGenerator;
 import net.anotheria.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class LanguageUtilsGenerator extends AbstractGenerator{
 	
@@ -50,7 +50,6 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.Arrays");
-		clazz.addImport("org.apache.log4j.BasicConfigurator");
 		emptyline();
 		for (MetaModule m : modulesSet){
 			clazz.addImport(ServiceGenerator.getFactoryImport(m));
@@ -83,7 +82,6 @@ public class LanguageUtilsGenerator extends AbstractGenerator{
 		
 		appendString("public static void main(String[] a) throws Exception{");
 		increaseIdent();
-		appendStatement("BasicConfigurator.configure()");
 		appendStatement("String sourceLang, targetLang");
 		appendString("if (a.length!=2)");
 		appendIncreasedStatement("throw new RuntimeException("+quote("Wrong number of arguments, please use "+getCopierClassName(context)+" sourcelanguage targetlanguage")+")");

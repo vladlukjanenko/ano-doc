@@ -6,7 +6,8 @@ import net.anotheria.anodoc.service.IModuleStorage;
 import net.anotheria.anodoc.service.NoStoredModuleEntityException;
 import net.anotheria.anodoc.service.StorageFailureException;
 import net.anotheria.asg.util.listener.IModuleListener;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class behaves like {@link net.anotheria.anodoc.service.IModuleStorage} but
@@ -14,16 +15,15 @@ import org.apache.log4j.Logger;
  */
 public class CommonModuleStorageWrapper implements IModuleStorage {
 
+	/**
+	 * {@link Logger} instance.
+	 */
+	private static final Logger LOGGER = LoggerFactory.getLogger(CommonModuleStorageWrapper.class);
+
 	private String moduleId;
 	private IModuleFactory factory;
 	private ICommonModuleStorage delegate;
-	
-	private static Logger log;
-	
-	static{
-		log = Logger.getLogger(CommonModuleStorageWrapper.class);
-	}
-	
+
 	public CommonModuleStorageWrapper(String aModuleId, IModuleFactory aFactory, ICommonModuleStorage aDelegate){
 		moduleId = aModuleId;
 		factory = aFactory;
@@ -38,7 +38,7 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 			//das ist nicht bloed, man wirft sie einfach <- lro.
 			//runtimes sind immer bloed. zumal an dieser stelle klar ist das es verschieden arten von
 			//fehlern geben kann. Die sollten dann auch dem entsprechend behandelt werden koennen. <- cho
-			log.warn("saveModule", e);
+			LOGGER.warn("saveModule", e);
 			throw new StorageFailureException(e.getMessage()); 
 		}
 	}
@@ -53,7 +53,7 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 		} catch (NoStoredModuleEntityException e) {
 			throw e;
 		} catch (CommonModuleStorageException e) {
-			log.warn("loadModule", e);
+			LOGGER.warn("loadModule", e);
 			throw new StorageFailureException(e.getMessage());
 		}
 	}
@@ -62,7 +62,7 @@ public class CommonModuleStorageWrapper implements IModuleStorage {
 		try{
 			delegate.deleteModule(moduleId,ownerId,copyId);
 		}catch(Exception ex){
-			log.error("deleteModule", ex);
+			LOGGER.error("deleteModule", ex);
 			throw new StorageFailureException(ex.getMessage());
 		}
 	}
