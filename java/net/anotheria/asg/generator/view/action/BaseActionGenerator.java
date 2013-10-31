@@ -511,7 +511,7 @@ public class BaseActionGenerator extends AbstractActionGenerator {
 
 		appendString("public String toString() {");
 		increaseIdent();
-		appendStatement("final StringBuffer sb = new StringBuffer()");
+		appendStatement("final StringBuilder sb = new StringBuilder()");
 		appendStatement("sb.append(\"LockedDocumentAttribute\")");
 		appendStatement("sb.append(\"{docId='\").append(docId).append('\\'')");
 		appendStatement("sb.append(\", documentClazz=\").append(documentClazz)");
