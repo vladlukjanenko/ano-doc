@@ -2896,7 +2896,7 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		appendStatement(ModuleBeanGenerator.getContainerEntryFormName(list)+" form = new "+ModuleBeanGenerator.getContainerEntryFormName(list)+"()");
 		appendStatement("populateFormBean(req, form)");
 		appendStatement("String id = form.getOwnerId()");
-		appendStatement("System.out.println(\"FormBean: \" + form.toString());");
+
 		
 		appendStatement(doc.getName()+" "+doc.getVariableName());
 		appendStatement(doc.getVariableName()," = ",getServiceGetterCall(section.getModule()),".get",doc.getName(),"(id)");
