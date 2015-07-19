@@ -79,7 +79,7 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		
 		appendString("public ActionForward anoDocExecute(ActionMapping mapping, SearchFB formBean, HttpServletRequest req, HttpServletResponse res) throws Exception{");
 		increaseIdent();
-		appendString("DocumentQuery query = new ContainsStringQuery(formBean.getCriteria());");
+		appendString("DocumentQuery query = new ContainsStringQuery(\"*=*\" + formBean.getCriteria() + \"*\");");
 		appendString("QueryResult result = executeQuery(formBean.getModule(), formBean.getDocument(), query, formBean.getSearchArea());");
 		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, formBean.getDocument())");
 		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, formBean.getModule())");
