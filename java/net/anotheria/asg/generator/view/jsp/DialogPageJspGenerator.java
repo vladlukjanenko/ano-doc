@@ -14,11 +14,11 @@ import java.util.List;
 
 /**
  * Generates the jsps for the edit view.
- * 
+ *
  * @author another
  */
 public class DialogPageJspGenerator extends AbstractJSPGenerator {
-	
+
 	/**
 	 * Currently generated section.
 	 */
@@ -26,12 +26,12 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	/**
 	 * Currently generated dialog.
 	 */
-	private MetaDialog currentDialog;	
+	private MetaDialog currentDialog;
 	/**
 	 * Is need render JS for enabling DateTime widgets.
 	 */
 	private boolean isNeedEnableDateTimeWidgets = false;
-	
+
 	public GeneratedJSPFile generate(MetaSection metaSection, MetaDialog dialog, MetaModuleSection section, MetaView view) {
 		this.currentSection = metaSection;
 		this.currentDialog = dialog;
@@ -83,7 +83,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 		// *** CMS3.0 START ***
 //		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.4.min.js") + "\"></script>");
-//		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.5.1.min.js") + "\"></script>");		
+//		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.5.1.min.js") + "\"></script>");
 //		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.6.2.min.js") + "\"></script>");
         appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-1.8.2.js") + "\"></script>");
 //		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("jquery-ui-1.8.18.custom.min.js") + "\"></script>");
@@ -94,13 +94,13 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("fileuploader.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("cms-tooltip.js") + "\"></script>");
 		appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath("tiny_mce/tiny_mce.js") + "\"></script>");
-		// *** CMS3.0 FINISH ***		
-		
+		// *** CMS3.0 FINISH ***
+
 
 		if(dialog.getJavascript() != null) {
 			appendString("<script type=\"text/javascript\" src=\"" + getCurrentJSPath(dialog.getJavascript()) + "\"></script>");
 		}
-		
+
 		decreaseIdent();
 		appendString("</head>");
 		appendString("<body>");
@@ -234,11 +234,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<div class=\"c_b_r\"><!-- --></div>");
 
         String entryName = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection) metaSection).getDocument()));
-        if(section.getModule().getName().equalsIgnoreCase("aswebdata") ||
-                section.getModule().getName().equalsIgnoreCase("aslayoutdata") ||
-                section.getModule().getName().equalsIgnoreCase("asgenericdata") ||
-                section.getModule().getName().equalsIgnoreCase("ascustomdata") ||
-                section.getModule().getName().equalsIgnoreCase("assitedata")){
+        if(isAppropriateModule(section)){
 
             if (!section.getDocument().getName().equalsIgnoreCase("RedirectUrl") && !section.getDocument().getName().equalsIgnoreCase("EntryPoint")){
                 String elementName = section.getDocument().getName().equalsIgnoreCase("NaviItem") ? "<ano:write name="+entryName+" property=\"nameEN\"/>" : "<ano:write name="+entryName+" property=\"name\"/>";
@@ -263,7 +259,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 					+ "&nbsp;Lock</a>";
 			result += "</ano:equal>";
 			appendString(result);
-			
+
 			appendString("<ano:equal name=" + entryName + " property=" + quote(LockableObject.INT_LOCK_PROPERTY_NAME) + " value=" + quote("true") + ">");
 
 			path = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) metaSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_UNLOCK);
@@ -294,7 +290,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendIncreasedString("<input type=" + quote("hidden") + " name=" + quote("fieldName") + " value=" + quote("") + ">");
 
 		appendIncreasedString("<script type=\"text/javascript\">validators = new Array();validateForm = function() {var result = true;for (i in validators) {try{result = result & validators[i].validate();}catch(e){}}return result;}</script>");
-		
+
 		appendString("<table cellspacing=\"0\" cellpadding=\"0\" width=\"100%\" border=\"0\">");
 		appendString("<tbody>");
 		increaseIdent();
@@ -504,7 +500,16 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 		return jsp;
 	}
-	
+
+	private boolean isAppropriateModule(MetaModuleSection section) {
+		return section.getModule().getName().equalsIgnoreCase("aswebdata") ||
+                section.getModule().getName().equalsIgnoreCase("aslayoutdata") ||
+                section.getModule().getName().equalsIgnoreCase("asgenericdata") ||
+                section.getModule().getName().equalsIgnoreCase("ascustomdata") ||
+                section.getModule().getName().equalsIgnoreCase("assitedata") ||
+				section.getModule().getName().equalsIgnoreCase("asresourcedata");
+	}
+
 	private void generateValidationParts(MetaViewElement element, String name, MetaProperty p) {
 		if (element.isJSValidated()){
 			boolean isTextField = element.isRich() || p.getType() == MetaProperty.Type.TEXT;
@@ -515,16 +520,16 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 				valueSelector = getTextValueSelector(name);
 			} else if (p.isLinked()) {
 				valueSelector = getLinkValueSelector(name);
-			} else { 
+			} else {
 				valueSelector = getValueSelector(name);
 			}
 			appendString("var value = ", valueSelector);
 			for (MetaValidator validator : element.getValidators()){
 				String jsValidation = validator.getJsValidation();
-				if (StringUtils.isEmpty(jsValidation)) 
+				if (StringUtils.isEmpty(jsValidation))
 					continue;
 				jsValidation = jsValidation.trim();
-				if (jsValidation.endsWith(";")) 
+				if (jsValidation.endsWith(";"))
 					jsValidation =jsValidation.substring(0, jsValidation.length() - 1);
 				appendString("if (!("+jsValidation+")) {");
 				increaseIdent();
@@ -548,19 +553,19 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("<img alt=\"\" src=\"../cms_static/img/error_arrow.gif\"/>");
 		appendString("</div></div>");
 	}
-	
+
 	private String getValueSelector(String fieldName) {
 		return "$('input[name="+fieldName+"]').val();";
 	}
-	
+
 	private String getLinkValueSelector(String fieldName) {
 		return "$('input[id="+StringUtils.capitalize(fieldName)+"CurrentValueInput]').val();";
 	}
-	
+
 	private String getTextValueSelector(String fieldName) {
 		return "(tinyMCE.get('"+fieldName+"_ID') == null || tinyMCE.get('"+fieldName+"_ID').isHidden()) ? $('textarea[name="+fieldName+"]').val() : tinyMCE.get('"+fieldName+"_ID').getContent();";
 	}
-	
+
 	private String getElementEditor(MetaDocument doc, MetaViewElement element){
 		if (element instanceof MetaEmptyElement)
 			return "&nbsp;";
@@ -572,29 +577,29 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			return getFunctionEditor(doc, (MetaFunctionElement)element);
 
 		return "";
-			
+
 	}
-	
+
 	private String getListEditor(MetaDocument doc, MetaListElement element){
 		String ret = "";
-		
+
 		List<MetaViewElement> elements = element.getElements();
 		for (int i=0; i<elements.size(); i++){
 			ret += getElementEditor(doc, elements.get(i));
 			if (i<elements.size()-1)
 				ret += "&nbsp;";
 		}
-			
-		
+
+
 		return ret;
 	}
-	
-	
+
+
 	private String getLinkEditor(MetaFieldElement element, MetaProperty p){
 		//for now we have only one link...
 		String ret = "";
-		String lang = getElementLanguage(element); 
-		
+		String lang = getElementLanguage(element);
+
 		/* CMS1.0
 		ret += "<html:select size=\"1\" property="+quote(p.getName(lang))+">";
 		ret += "<html:optionsCollection property="+quote(p.getName()+"Collection"+(lang==null ? "":lang))+" filter=\"false\"/>";
@@ -639,42 +644,42 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	                ")&nbsp;"+editLink;
 
 		//*** CMS2.0 FINISH ***
-		
+
 		return ret;
 	}
-	
+
 	private String getEnumerationEditor(MetaFieldElement element, MetaProperty p){
 		String ret = "";
-		String lang = getElementLanguage(element); 
-		
+		String lang = getElementLanguage(element);
+
 		ret += "<select name=\""+p.getName(lang)+"\">";
 		ret += "<ano:iterate indexId=\"index\" id=\"element\" property=\""+ p.getName() +"Collection\" name=\""+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\">";
 		ret += "<option value=\"<ano:write name=\"element\" property=\"value\"/>\" <ano:equal name=\""+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument())+ "\" property=\""+p.getName()+"CurrentValue"+(lang==null ? "":lang)+"\" value=\"${element.label}\">selected</ano:equal>><ano:write name=\"element\" property=\"label\"/></option>";
 		ret += "</ano:iterate>";
 		ret += "</select>";
-		
-		
+
+
 		ret += "&nbsp;";
 		ret += "(<i>old:</i>&nbsp;<ano:write property="+quote(p.getName()+"CurrentValue"+(lang==null ? "":lang))+" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" filter="+quote("false")+"/>)";
-		
+
 		return ret;
 	}
-	
+
 	private String getFieldEditor(MetaFieldElement element){
 		MetaDocument doc = ((MetaModuleSection)currentSection).getDocument();
 		MetaProperty p = doc.getField(element.getName());
-		
+
 		if (p.isLinked())
 			return getLinkEditor(element, p);
-			
+
 		if (p instanceof MetaEnumerationProperty){
 			return getEnumerationEditor(element, p);
 		}
-		
+
 		if (p instanceof MetaContainerProperty) {
 			return getContainerLinkEditor(element, (MetaContainerProperty)p);
 		}
-		
+
 
 		switch (p.getType()) {
 		case STRING:
@@ -698,12 +703,12 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		default:
 			return p.getType().getName();
 		}
-		
+
 	}
-	
+
 	private String getContainerLinkEditor(MetaFieldElement element, MetaContainerProperty p){
 		String ret = "";
-		String lang = getElementLanguage(element); 
+		String lang = getElementLanguage(element);
 		String name = quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()));
 		ret += "<ano:equal name="+name+" property="+quote("id")+" value="+quote("")+">";
 		ret += "none";
@@ -720,11 +725,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		actionName += "?ownerId=<ano:write name="+name+" property="+quote("id")+"/>";
 		ret += "<a href="+quote(actionName)+">&nbsp;&raquo&nbsp;Edit&nbsp;</a>";
 		ret += "</ano:notEqual>";
-		
+
 		return ret;
 	}
-	
-	
+
+
 
 	private String getImageEditor(MetaFieldElement element, MetaProperty p){
 		String beanName = CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument());
@@ -735,7 +740,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		ret += "</ano:present>\r";
         ret += getUpdateAndDeleteFileAndStayFunction(((MetaModuleSection)currentSection).getDocument(),p);
 		ret += "&nbsp;<i><ano:write name=\"description." + p.getName() + "\" ignore=\"true\"/></i>\r";
-		
+
 		ret += "<div id=\"file-uploader-" + p.getName() + "\" class=\"image_uploader\"><!-- --></div>\r";
 		ret += "<script>\r";
 		ret += "$(document).ready(function() {\r";
@@ -759,17 +764,17 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	private String getPasswordEditor(MetaFieldElement element, MetaProperty p){
         return getInputEditor(element, p, "password");
     }
-	
+
 	private String getBooleanEditor(MetaFieldElement element, MetaProperty p){
 		return getInputEditor(element, p, "checkbox");
 	}
-	
+
 	private String getInputEditor(MetaFieldElement element, MetaProperty p, String inputType){
 		String ret ="";
-		String lang = getElementLanguage(element); 
-		
+		String lang = getElementLanguage(element);
+
 		ret += "<input type=" + quote(inputType) + " name="+quote(p.getName(lang));
-		
+
 		//ret += "<html:text filter=\"false\" property="+quote(element.getName());
 		if (inputType.equalsIgnoreCase("checkbox"))	{
 			ret += " <ano:equal name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" value=\"true\"";
@@ -778,7 +783,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		}
 		else {
 			ret += " value=\"<ano:write name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang)) + "/>\"";
-			
+
 			// Required for DateTime widget
 			if (element.isDatetime()) {
 				ret += " class=" + quote("datetime");
@@ -794,14 +799,14 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 		if (element.isReadonly())
 			ret += "&nbsp;<i>readonly</i>";
-		
+
 		return ret;
 	}
 
 	private String getTextEditor(MetaFieldElement element, MetaProperty p){
 		String lang = getElementLanguage(element);
 		String ret ="";
-		
+
 		ret += "<textarea cols=\"\" rows=\"16\" id="+quote(p.getName(lang) + "_ID")+" name="+quote(p.getName(lang));
 		ret += ">";
 		ret += "<ano:write filter=\"false\" name="+quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument()))+" property="+quote(p.getName(lang))+" />";
@@ -809,7 +814,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 		return ret;
 	}
-	
+
 	private void generateLinkElementEditorJS(MetaDocument doc, List<String> linkElements){
 		appendString("<script type=\"text/javascript\">");
 		increaseIdent();
@@ -818,7 +823,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 			//FIXME: here is assumed that links can't be multilanguage
 			String elCapitalName = StringUtils.capitalize(elName);
 			String beanName = CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, ((MetaModuleSection)currentSection).getDocument());
-			
+
 			appendString("//Initializing items for " + elName);
 			appendString("var " +elName+ "Json = {items:[");
 			appendString("<ano:iterate id=\"item\" name="+quote(beanName)+" property=\""+elName+"Collection\" type=\"net.anotheria.webutils.bean.LabelValueBean\">");
@@ -838,11 +843,11 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		decreaseIdent();
 		appendString("</script>");
 	}
-	
+
 	private void generateRichTextEditorJS(MetaDocument doc, List<MetaViewElement> richTextElements){
-		
+
 		appendString("<!-- TinyMCE -->");
-		
+
 		appendString("<script type=\"text/javascript\">");
 		appendString("tinyMCE.init({");
 		appendString("mode : \"exact\",");
@@ -859,13 +864,13 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 
 		appendString("</script>");
 		appendString("<!-- /TinyMCE -->");
-		
+
 	}
-	
+
 	private void generateDateTimeWidgetJS() {
 		if (!isNeedEnableDateTimeWidgets)
 			return;
-		
+
 		appendString("<!-- JQuery DateTime Widget: START -->");
 		appendString("<script type=\"text/javascript\">");
 		appendString(" $(document).ready(function() {");
@@ -876,10 +881,10 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		appendString("</script>");
 		appendString("<!-- JQuery DateTime Widget: END -->");
 	}
-	
+
 	private String getFunctionEditor(MetaDocument doc, MetaFunctionElement element){
 		if (element.getName().equals("cancel")) {
-			String onClick = "return confirm('All unsaved data will be lost!!!. Document will be unlocked"; 
+			String onClick = "return confirm('All unsaved data will be lost!!!. Document will be unlocked";
 			String cancel = CMSMappingsConfiguratorGenerator.getPath(((MetaModuleSection) currentSection).getDocument(), CMSMappingsConfiguratorGenerator.ACTION_CLOSE);
 			cancel += "?pId=<ano:write name=" + quote(CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)) + " property=\"id\"/>";
 			return "<a href=\"" + cancel + "\" class=\"button\" onClick=\""+onClick+"\"><span>Close</span></a>";
@@ -948,7 +953,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
                 " if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><img src=\"/cms_static/img/delete.gif\" alt=\"Delete file\" title=\"Delete file\"></a>"+
                 "</ano:notEmpty>";
 	}
-	
+
     private String getUpdateAndStayFunction(MetaDocument doc, MetaFunctionElement element){
 		if(StorageType.CMS.equals(doc.getParentModule().getStorageType())){
 			//creating logic for hiding or showing current operation link in Locking CASE!!!!!
@@ -998,7 +1003,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		//Delete customSubmit in the bottom, if not using tinyMCE
 		return "<a href=\"#\" class=\"button\" onClick=\"customSubmit(); document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+
 				".nextAction.value='close'; if (validateForm()) { FormatTime('datetime');  document."+CMSMappingsConfiguratorGenerator.getDialogFormName(currentDialog, doc)+".submit(); } return false\"><span><ano:write name=\"save.label.prefix\"/></span></a>";
-	}	
+	}
 
 	/**
 	 * Creating entries in JSP for Multilanguage Support!!!
@@ -1035,7 +1040,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 		decreaseIdent();
 		appendString("</div>");
 		appendString("<a href=\"#\" class=\"button\" onclick=\"document.CopyLang.submit(); return false\"><span>Copy</span></a>");
-		
+
 		decreaseIdent();
 		appendString("</form>");
 		appendString("<form name="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+" id="+quote(ModuleBeanGenerator.FIELD_ML_DISABLED)+"  method=\"get\" action=\""+CMSMappingsConfiguratorGenerator.getPath(section.getDocument(), CMSMappingsConfiguratorGenerator.ACTION_SWITCH_MULTILANGUAGE_INSTANCE)+"\">");
@@ -1063,12 +1068,7 @@ public class DialogPageJspGenerator extends AbstractJSPGenerator {
 	}
 
     private void addDialogContentToDisplayUsagesOfElement(MetaModuleSection section){
-        if(section.getModule().getName().equalsIgnoreCase("aswebdata") ||
-                section.getModule().getName().equalsIgnoreCase("aslayoutdata") ||
-                section.getModule().getName().equalsIgnoreCase("asgenericdata") ||
-                section.getModule().getName().equalsIgnoreCase("ascustomdata") ||
-                section.getModule().getName().equalsIgnoreCase("assitedata")){
-
+        if(isAppropriateModule(section)){
             if (!section.getDocument().getName().equalsIgnoreCase("RedirectUrl") && !section.getDocument().getName().equalsIgnoreCase("EntryPoint")){
                 increaseIdent();
                 appendString("<script type=\"text/javascript\">");
