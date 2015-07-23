@@ -28,11 +28,11 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 	public static String getSearchPackageName() {
 		return SharedAction.getPackageName();
 	}
-	
+
 	public static String getCmsSearchActionName() {
 		return SharedAction.SEARCH.getClassName();
 	}
-	
+
 	public static String getSearchPageFullName() {
 		return getSearchPackageName() + "." + getCmsSearchActionName();
 	}
@@ -47,7 +47,7 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		clazz.addImport("java.util.List");
 		clazz.addImport("java.util.Collections");
 
-		
+
 		clazz.addImport("javax.servlet.http.HttpServletRequest");
 		clazz.addImport("javax.servlet.http.HttpServletResponse");
 		clazz.addImport("net.anotheria.anodoc.query2.DocumentQuery");
@@ -64,22 +64,22 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		clazz.addImport("net.anotheria.webutils.bean.NavigationItemBean");
 		clazz.addImport("net.anotheria.util.StringUtils");
 		clazz.addImport("net.anotheria.asg.data.DataObject");
-	
+
 		clazz.setParent(BaseActionGenerator.getBaseActionName(), "SearchFB");
 		clazz.setName(getCmsSearchActionName());
 
 		startClassBody();
-		
+
 		appendString("@Override");
 		appendString("public ActionForward execute(ActionMapping mapping, @Form(SearchFB.class) FormBean formBean, HttpServletRequest req, HttpServletResponse res) throws Exception{");
 		increaseIdent();
 		appendString("return super.execute(mapping, formBean, req, res);");
 		closeBlock("");
 		emptyline();
-		
+
 		appendString("public ActionForward anoDocExecute(ActionMapping mapping, SearchFB formBean, HttpServletRequest req, HttpServletResponse res) throws Exception{");
 		increaseIdent();
-		appendString("DocumentQuery query = new ContainsStringQuery(\"*=*\" + formBean.getCriteria() + \"*\");");
+		appendString("DocumentQuery query = new ContainsStringQuery(\"*\" + formBean.getCriteria() + \"*\");");
 		appendString("QueryResult result = executeQuery(formBean.getModule(), formBean.getDocument(), query, formBean.getSearchArea());");
 		appendStatement("addBeanToRequest(req, BEAN_DOCUMENT_DEF_NAME, formBean.getDocument())");
 		appendStatement("addBeanToRequest(req, BEAN_MODULE_DEF_NAME, formBean.getModule())");
@@ -95,7 +95,7 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		increaseIdent();
 		appendStatement("DataObject doc = (DataObject)entry.getMatchedDocument()");
 		appendString("ResultEntryBean bean = new ResultEntryBean();");
-		
+
 		appendString("bean.setEditLink(doc.getDefinedParentName().toLowerCase() + StringUtils.capitalize(doc.getDefinedName()) + \"Edit?pId=\" + doc.getId() + \"&ts=\" + System.currentTimeMillis());");
 
 		appendString("bean.setDocumentId(entry.getMatchedDocument().getId());");
@@ -115,7 +115,7 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		appendStatement("QueryResult ret = new QueryResult()");
 		appendStatement("boolean wholeCms = \"cms\".equals(searchArea)");
 		appendStatement("boolean wholeSection = wholeCms || \"section\".equals(searchArea)");
-		
+
 		for(MetaView view: views){
 			emptyline();
 			appendString("if(wholeCms || sectionName.equals(\""+view.getTitle()+"\")){");
@@ -131,7 +131,7 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 			}
 			closeBlock("if");
 		}
-		
+
 		emptyline();
 		appendStatement("return ret");
 		closeBlock("executeQuery");
@@ -161,19 +161,19 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		emptyline();
 		return clazz;
 	}
-	
+
 	public static String getSearchFBPackageName() {
 		return GeneratorDataRegistry.getInstance().getContext().getPackageName(MetaModule.SHARED) + ".bean";
 	}
-	
+
 	public static String getSearchFBName() {
 		return "SearchFB";
 	}
-	
+
 	public static String getSearchFBFullName() {
 		return getSearchFBPackageName() + "." + getSearchFBName();
 	}
-	
+
 	private GeneratedClass generateSearchFB() {
 		GeneratedClass clazz = new GeneratedClass();
 		startNewJob(clazz);
@@ -181,12 +181,12 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		clazz.setPackageName(getSearchFBPackageName());
 
 		clazz.addImport("net.anotheria.maf.bean.FormBean");
-	
+
 		clazz.addInterface("FormBean");
 		clazz.setName(getSearchFBName());
 
 		startClassBody();
-		
+
 		appendString("private String criteria;");
 		appendString("private String module;");
 		appendString("private String document;");
@@ -232,11 +232,11 @@ public class CMSSearchActionsGenerator extends AbstractGenerator {
 		appendIncreasedString("this.searchArea = searchArea;");
 		closeBlock("");
 		emptyline();
-	
-		
+
+
 		emptyline();
 		return clazz;
 	}
 
-	
+
 }
