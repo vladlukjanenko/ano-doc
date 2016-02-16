@@ -33,15 +33,6 @@ public class ContainsStringQuery implements DocumentQuery {
 	public static final int OFFSET = 40;
 
 	/**
-	 * Any character constant
-	 */
-	public static final String ANY_CHAR_EXPRESSION = "?";
-	/**
-	 * Any character regular expression for replace()
-	 */
-	public static final String ANY_CHAR_REG_EXPRESSION = "\\?";
-
-	/**
 	 * Any string constant
 	 */
 	public static final String ANY_STRING_EXPRESSION = "*";
@@ -66,7 +57,7 @@ public class ContainsStringQuery implements DocumentQuery {
 
 	/**
 	 * ContainsStringQuery constructor.
-	 * 
+	 *
 	 * @param aCriteria
 	 *            is expression, that supports {@link ANY_CHAR_EXPRESSION} and
 	 *            {@link ANY_STRING_EXPRESSION} characters
@@ -75,13 +66,11 @@ public class ContainsStringQuery implements DocumentQuery {
 		criteria = aCriteria;
 
 		// Set criteriaRegEx
-		String criteriaRegEx = aCriteria.replaceAll(ANY_CHAR_REG_EXPRESSION,
-				".").replaceAll(ANY_STRING_REG_EXPRESSION, ".*");
+		String criteriaRegEx = aCriteria.replaceAll(ANY_STRING_REG_EXPRESSION, ".*");
 
 		// remove start end final ANY_STRING_EXPRESSIONs from criteria
 		// to determine criteriaMatchRegEx
-		String criteriaMatchRegEx = aCriteria.replaceAll(
-				ANY_CHAR_REG_EXPRESSION, ".");
+		String criteriaMatchRegEx = aCriteria;
 		if (criteriaMatchRegEx.startsWith(ANY_STRING_EXPRESSION)) {
 			criteriaMatchRegEx = criteriaMatchRegEx
 					.substring(ANY_STRING_EXPRESSION.length());
@@ -171,7 +160,7 @@ public class ContainsStringQuery implements DocumentQuery {
 		String value = matchedProperty.getValue().toString();
 		
 		// Check is value matches to pattern
-		if (StringUtils.isEmpty(value) || !criteriaRegExPattern.matcher(value).matches())
+		if (StringUtils.isEmpty(value) || !criteriaRegExPattern.matcher(value).find())
 			return null;
 
 		QueryResultEntry retEntry = new QueryResultEntry();
