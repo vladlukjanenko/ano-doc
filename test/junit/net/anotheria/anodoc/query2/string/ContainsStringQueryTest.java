@@ -24,7 +24,7 @@ public class ContainsStringQueryTest {
 		String criteria = "Anotheria";
 		ContainsStringQuery instance = new ContainsStringQuery(criteria);
 		List<QueryResultEntry> result = instance.match((DataObject) dataObject);
-		assertTrue(result.size() == 0);
+		assertTrue(result.size() == 1);
 
 		criteria = ContainsStringQuery.ANY_STRING_EXPRESSION + "Anotheria" + ContainsStringQuery.ANY_STRING_EXPRESSION;
 		instance = new ContainsStringQuery(criteria);
@@ -74,7 +74,7 @@ public class ContainsStringQueryTest {
 		assertEquals(matchingInfo.getPost(), " software");
 
 		criteria = ContainsStringQuery.ANY_STRING_EXPRESSION + "Ano"
-		+ ContainsStringQuery.ANY_CHAR_EXPRESSION + ContainsStringQuery.ANY_STRING_EXPRESSION 
+		+ ContainsStringQuery.ANY_STRING_EXPRESSION
 		+ "eria" + ContainsStringQuery.ANY_STRING_EXPRESSION;
 		instance = new ContainsStringQuery(criteria);
 		result = instance.match((DataObject) dataObject);
