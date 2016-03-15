@@ -1525,7 +1525,14 @@ public class ModuleActionsGenerator extends AbstractGenerator implements IGenera
 		//if update, then first get the target object.
 		appendStatement("boolean create = false");
 		appendStatement(doc.getName()+" "+doc.getVariableName()+" = null");
-		appendString( "if (form.getId()!=null && form.getId().length()>0){");
+
+
+		appendString("if (form.getId()==null) {");
+		appendString("res.sendRedirect(\"asresourcedataLocalizationBundleShow?ts=\"+System.currentTimeMillis());");
+		appendString("return null;");
+		closeBlockNEW();
+
+		appendString( "if (form.getId().length()>0){");
 		appendIncreasedString(doc.getVariableName()+" = ("+doc.getName()+")"+getServiceGetterCall(section.getModule())+".get"+doc.getName()+"(form.getId()).clone();");
 		appendString( "}else{");
 		increaseIdent();
